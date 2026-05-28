@@ -146,6 +146,104 @@
 | 파일 | 내용 |
 |------|------|
 | [`BOM.md`](BOM.md) | 부품 목록(BOM) — 단가·용도·42 IC 분류 |
+| [`docs/README.md`](docs/README.md) | 문서 인덱스 |
+| [`docs/microcode-spec.md`](docs/microcode-spec.md) | 16비트 VLIW 제어 워드·시뮬 ISA |
+| [`rtl/README.md`](rtl/README.md) | Verilog RTL 개요 (ALU·레지스터·코어) |
+| [`rtl/alu/README.md`](rtl/alu/README.md) | ALU — 283 구조 / 153·게이트 단순화 설명 |
+| [`sim/README.md`](sim/README.md) | 테스트벤치·ROM hex |
+| [`tools/README.md`](tools/README.md) | `microasm`, `pack_rom` |
+| [`lib/README.md`](lib/README.md) | 예제 `.micro` |
+| [`sim-runner/README.md`](sim-runner/README.md) | FastAPI 시뮬 API |
+| [`web/README.md`](web/README.md) | React UI |
+
+---
+
+## Verilog 시뮬레이터
+
+브레드보드 조립 전에 **Icarus Verilog**로 RTL을 검증하고, 웹 UI에서 ALU·코어·마이크로코드를 실행할 수 있습니다. ALU는 **74HC283 캐스케이드만 구조 모듈**이고, 153/86/08/32는 행위 수준으로 단순화되어 있습니다 — 상세는 [`rtl/alu/README.md`](rtl/alu/README.md).
+
+### 요구 사항
+
+- [Icarus Verilog](http://iverilog.icarus.com/) (`iverilog`, `vvp`) — Linux: `sudo apt install iverilog`, Windows: MSYS2/Chocolatey 또는 **WSL2 권장**
+- Python 3.10+
+- Node.js 18+ (웹 UI)
+
+### WSL2에서 실행 (Windows에 WSL이 있을 때)
+
+저장소가 `D:\Github\plover`에 있으면 WSL 경로는 `/mnt/d/Github/plover`입니다.
+
+**1) WSL 터미널 열기** — PowerShell에서 `wsl` 또는 “Ubuntu” 앱.
+
+**2) 패키지 한 번 설치 (Ubuntu/Debian)**
+
+```bash
+sudo apt update
+sudo apt install -y iverilog make python3 python3-pip python3-venv
+# 웹 UI까지 쓸 때
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+```
+
+**3) 프로젝트로 이동 후 RTL만 검증**
+
+```bash
+cd /mnt/d/Github/plover
+make test
+```
+
+**4) 시뮬 API + 웹 (터미널 2개, 둘 다 WSL에서)**
+
+```bash
+# 터미널 A
+cd /mnt/d/Github/plover
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r sim-runner/requirements.txt
+make sim-server
+```
+
+```bash
+# 터미널 B
+cd /mnt/d/Github/plover/web
+npm install
+npm run dev
+```
+
+Windows 브라우저에서 [http://127.0.0.1:5173](http://127.0.0.1:5173) 접속. Vite가 `/api`를 `127.0.0.1:8000`으로 프록시하므로 **sim-server도 WSL에서 띄운 경우** 그대로 동작합니다.
+
+**참고**
+
+| 항목 | 설명 |
+|------|------|
+| 경로 | `/mnt/d/...`는 Windows `D:\`와 같은 파일. Windows·WSL 어느 쪽에서 편집해도 됨. |
+| `make`만 | RTL·ROM 검증은 **Node 없이** `make test` / `make rom`만으로 가능. |
+| Git 줄바꿈 | `git config core.autocrlf input` (WSL) 권장 — `.micro`/`Makefile` CRLF 이슈 방지. |
+| 느린 I/O | `/mnt/d`가 느리면 `~/plover`에 `git clone` 후 WSL 내부에서 작업하는 편이 빠름. |
+
+### 빠른 시작
+
+```bash
+# RTL 테스트 (ALU + 코어)
+make test
+
+# 마이크로코드 → sim/rom_*.hex
+make rom
+python3 tools/microasm.py lib/inc_r1.micro -o sim
+
+# 시뮬 API + 웹 UI (터미널 2개)
+make sim-server    # http://127.0.0.1:8000
+make web-dev       # http://127.0.0.1:5173
+```
+
+### 디렉터리
+
+| 경로 | 설명 |
+|------|------|
+| `rtl/` | 74HC 행위 모델 + `plover_core` |
+| `sim/` | 테스트벤치, ROM hex |
+| `tools/microasm.py` | 마이크로어셈블러 |
+| `lib/*.micro` | 예제 마이크로 프로그램 |
+| `sim-runner/` | FastAPI → iverilog |
+| `web/` | React 시뮬 UI |
 
 ---
 
@@ -154,7 +252,8 @@
 - [x] 아키텍처·BOM 설계 (대화로 정리)
 - [x] 부품 주문
 - [ ] 브레드보드 조립·클록/PC 검증
-- [ ] 마이크로코드·어셈블러/툴체인
+- [x] 마이크로코드·어셈블러/툴체인 (시뮬 MVP)
+- [x] Verilog 시뮬레이터 (ALU + 코어 + 웹 UI)
 - [ ] RP2350B 그래픽 서브시스템
 
 ---
