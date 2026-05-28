@@ -1,0 +1,8 @@
+build/
+sim/wave.vcd
+__pycache__/
+*.pyc
+.venv/
+web/node_modules/
+web/dist/
+*.vvp
