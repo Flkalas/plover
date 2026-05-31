@@ -1,0 +1,8 @@
+part: 74HC04
+kind: combinational
+description: Hex inverter; one gate per hwsim instance (A/Y)
+pins:
+  inputs: [A]
+  outputs: [Y]
+behavior: invert
+timing_ref: 74HC04

@@ -1,0 +1,8 @@
+part: 74HC157
+kind: combinational
+description: Quad 2-to-1 multiplexer; OE active-low
+pins:
+  inputs: [1A, 1B, 2A, 2B, 3A, 3B, 4A, 4B, S, OE]
+  outputs: [1Y, 2Y, 3Y, 4Y]
+behavior: quad_mux2
+timing_ref: 74HC157

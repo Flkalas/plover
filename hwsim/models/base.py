@@ -116,7 +116,7 @@ class Hc04(ChipModel):
         self._update()
 
     def on_net_change(self, net: str) -> None:
-        if net == self.net_for("A"):
+        if net in (self.net_for("A"),):
             self._update()
 
     def _update(self) -> None:
@@ -126,6 +126,59 @@ class Hc04(ChipModel):
         y = 1 - a
         t = self.t_pd("74HC04", "t_pd", default=9)
         self._drive("Y", y, t, "inv")
+
+
+class Hc153(ChipModel):
+    """74HC153 dual 4-to-1 multiplexer; 1G/2G active-low enable."""
+
+    part = "74HC153"
+
+    def on_start(self) -> None:
+        self._update()
+
+    def on_net_change(self, net: str) -> None:
+        self._update()
+
+    def _update(self) -> None:
+        t = self.t_pd("74HC153", "t_pd", default=17)
+        for ch in ("1", "2"):
+            g = self.read_bit(f"{ch}G")
+            if g == 1:
+                self._drive(f"{ch}Y", 0, t, "disabled")
+                continue
+            sel = self.read_bit("A") | (self.read_bit("B") << 1)
+            val = self.read_bit(f"{ch}C{sel}")
+            if val > 1:
+                continue
+            self._drive(f"{ch}Y", val, t, "mux")
+
+
+class Hc157(ChipModel):
+    """74HC157 quad 2-to-1 multiplexer; OE active-low."""
+
+    part = "74HC157"
+
+    def on_start(self) -> None:
+        self._update()
+
+    def on_net_change(self, net: str) -> None:
+        self._update()
+
+    def _update(self) -> None:
+        oe = self.read_bit("OE")
+        t = self.t_pd("74HC157", "t_pd", default=11)
+        s = self.read_bit("S")
+        if oe == 1:
+            for i in range(1, 5):
+                self._drive(f"{i}Y", 3, t, "z")
+            return
+        for i in range(1, 5):
+            a = self.read_bit(f"{i}A")
+            b = self.read_bit(f"{i}B")
+            if a > 1 or b > 1:
+                continue
+            y = a if s == 0 else b
+            self._drive(f"{i}Y", y, t, "mux")
 
 
 class Hc283(ChipModel):
@@ -280,7 +333,8 @@ class Hc08(ChipModel):
         self._gate(lambda a, b: a & b)
 
     def on_net_change(self, net: str) -> None:
-        self._gate(lambda a, b: a & b)
+        if net in (self.net_for("A"), self.net_for("B")):
+            self._gate(lambda a, b: a & b)
 
     def _gate(self, fn: Any) -> None:
         a, b = self.read_bit("A"), self.read_bit("B")
@@ -297,7 +351,8 @@ class Hc32(Hc08):
         self._gate(lambda a, b: a | b)
 
     def on_net_change(self, net: str) -> None:
-        self._gate(lambda a, b: a | b)
+        if net in (self.net_for("A"), self.net_for("B")):
+            self._gate(lambda a, b: a | b)
 
     def _gate(self, fn: Any) -> None:
         a, b = self.read_bit("A"), self.read_bit("B")
@@ -314,7 +369,8 @@ class Hc86(Hc08):
         self._gate(lambda a, b: a ^ b)
 
     def on_net_change(self, net: str) -> None:
-        self._gate(lambda a, b: a ^ b)
+        if net in (self.net_for("A"), self.net_for("B")):
+            self._gate(lambda a, b: a ^ b)
 
     def _gate(self, fn: Any) -> None:
         a = self.read_bit("A")
@@ -335,6 +391,8 @@ def create_model(ref: str, part: str, pins: dict[str, str], ctx: SimContext) -> 
         "74HC161": Hc161,
         "74HC245": Hc245,
         "74HC138": Hc138,
+        "74HC153": Hc153,
+        "74HC157": Hc157,
         "74HC08": Hc08,
         "74HC32": Hc32,
         "74HC86": Hc86,
