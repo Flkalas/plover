@@ -1335,11 +1335,19 @@ instances:
       Y: net_cp_en_r0
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_CP_CLK_0
+  - ref: U_CP_PRE_0
     part: 74HC08
     pins:
       A: net_clk2
       B: net_cp_en_r0
+      Y: net_cp_pre_r0
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CP_CLK_0
+    part: 74HC08
+    pins:
+      A: net_cp_pre_r0
+      B: pwr_vcc
       Y: net_cp_r0
       VCC: pwr_vcc
       GND: pwr_gnd
@@ -1358,11 +1366,19 @@ instances:
       Y: net_cp_en_r1
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_CP_CLK_1
+  - ref: U_CP_PRE_1
     part: 74HC08
     pins:
       A: net_clk2
       B: net_cp_en_r1
+      Y: net_cp_pre_r1
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CP_CLK_1
+    part: 74HC08
+    pins:
+      A: net_cp_pre_r1
+      B: pwr_vcc
       Y: net_cp_r1
       VCC: pwr_vcc
       GND: pwr_gnd
@@ -1381,11 +1397,19 @@ instances:
       Y: net_cp_en_r2
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_CP_CLK_2
+  - ref: U_CP_PRE_2
     part: 74HC08
     pins:
       A: net_clk2
       B: net_cp_en_r2
+      Y: net_cp_pre_r2
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CP_CLK_2
+    part: 74HC08
+    pins:
+      A: net_cp_pre_r2
+      B: pwr_vcc
       Y: net_cp_r2
       VCC: pwr_vcc
       GND: pwr_gnd
@@ -1404,11 +1428,19 @@ instances:
       Y: net_cp_en_r3
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_CP_CLK_3
+  - ref: U_CP_PRE_3
     part: 74HC08
     pins:
       A: net_clk2
       B: net_cp_en_r3
+      Y: net_cp_pre_r3
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CP_CLK_3
+    part: 74HC08
+    pins:
+      A: net_cp_pre_r3
+      B: pwr_vcc
       Y: net_cp_r3
       VCC: pwr_vcc
       GND: pwr_gnd

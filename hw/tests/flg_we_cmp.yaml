@@ -1,0 +1,30 @@
+netlist: ../netlist/blocks/flg_latch.yaml
+timing: max
+duration_ns: 600
+stimulus:
+  - at_ns: 0
+    set:
+      net_clk2: 0
+      net_flg_we: 1
+      net_c_hi: 0
+    net_y0: 0
+    net_y1: 0
+    net_y2: 0
+    net_y3: 0
+    net_y4: 0
+    net_y5: 0
+    net_y6: 0
+    net_y7: 0
+  - at_ns: 0
+    set:
+      net_clk2: 0
+  - at_ns: 350
+    set:
+      net_clk2: 1
+  - at_ns: 450
+    set:
+      net_clk2: 0
+expect:
+  - at_ns: 430
+    net_z_flg: 1
+    net_z_prev: 1

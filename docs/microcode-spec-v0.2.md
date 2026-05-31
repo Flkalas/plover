@@ -312,7 +312,7 @@ hwsim: `regfile_rmw_8x151_slack.yaml` (참고 테스트).
 | ROM fetch | ROM16 → CW bus, PC stub | **완료** — [`rom_fetch.yaml`](../hw/netlist/blocks/rom_fetch.yaml), `rom_fetch_*`, `p2_rom_*` |
 | IMM→R2 B | `bus_en=11`, 8×157 B mux | **완료** — `p2_imm_load` |
 | Tool | `pack_rom.py` v0.2 | **완료** — [`tools/pack_rom.py`](../tools/pack_rom.py), [`hw/fixtures/rom/`](../hw/fixtures/rom/) |
-| V3 | PC 161 + LOCAL 분기 조합 | TODO |
+| V3 | PC 161 + LOCAL 분기 조합 | **완료** — [`cpu_datapath_p3.yaml`](../hw/netlist/blocks/cpu_datapath_p3.yaml), `local_ctrl_*`, `pc_*`, `p3_*` — [hw-bringup-p3-ctrl-pc.md](hw-bringup-p3-ctrl-pc.md) |
 | Bring-up | regfile 1면 U-routing, scope setup/slack | TODO |
 
 ---
@@ -325,6 +325,7 @@ hwsim: `regfile_rmw_8x151_slack.yaml` (참고 테스트).
 | [hw-bringup-b3-opcode.md](hw-bringup-b3-opcode.md) | `alu_op` → ALU 핀 |
 | [roadmap-next.md](roadmap-next.md) | V1→V2 마일스톤 |
 | [v0.2-implementation-plan.md](v0.2-implementation-plan.md) | Phase2–5 구현 단계·의존 관계 |
+| [hw-bringup-p3-ctrl-pc.md](hw-bringup-p3-ctrl-pc.md) | Phase3 LOCAL·FLG·161 PC |
 | [alu8.md](../hw/netlist/blocks/alu8.md) | ALU netlist |
 | [BOM.md](../BOM.md) | 부품 |
 

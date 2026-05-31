@@ -1,0 +1,161 @@
+version: 1
+block: pc
+instances:
+  - ref: U_PC_0
+    part: 74HC161
+    pins:
+      P0: net_r0_q0
+      P1: net_r0_q1
+      P2: net_r0_q2
+      P3: net_r0_q3
+      Q0: net_pc0
+      Q1: net_pc1
+      Q2: net_pc2
+      Q3: net_pc3
+      CEP: net_pc_count_en
+      CET: pwr_vcc
+      CP: net_clk2
+      TC: net_pc_tc0
+      MR: pwr_vcc
+      PE: net_pc_load
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_PC_1
+    part: 74HC161
+    pins:
+      P0: net_r0_q4
+      P1: net_r0_q5
+      P2: net_r0_q6
+      P3: net_r0_q7
+      Q0: net_pc4
+      Q1: net_pc5
+      Q2: net_pc6
+      Q3: net_pc7
+      CEP: net_pc_tc0
+      CET: net_pc_count_en
+      CP: net_clk2
+      TC: net_pc_tc1
+      MR: pwr_vcc
+      PE: net_pc_load
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_PC_2
+    part: 74HC161
+    pins:
+      P0: net_r1_q0
+      P1: net_r1_q1
+      P2: net_r1_q2
+      P3: net_r1_q3
+      Q0: net_pc8
+      Q1: net_pc9
+      Q2: net_pc10
+      Q3: net_pc11
+      CEP: net_pc_tc1
+      CET: net_pc_count_en
+      CP: net_clk2
+      TC: net_pc_tc2
+      MR: pwr_vcc
+      PE: net_pc_load
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_PC_3
+    part: 74HC161
+    pins:
+      P0: net_r1_q4
+      P1: net_r1_q5
+      P2: net_r1_q6
+      P3: net_r1_q7
+      Q0: net_pc12
+      Q1: net_pc13
+      Q2: net_pc14
+      Q3: net_pc15
+      CEP: net_pc_tc2
+      CET: net_pc_count_en
+      CP: net_clk2
+      MR: pwr_vcc
+      PE: net_pc_load
+      VCC: pwr_vcc
+      GND: pwr_gnd
+nets:
+  - name: net_clk2
+    width: 1
+    probes: [clk]
+  - name: net_pc_load
+    width: 1
+  - name: net_pc_count_en
+    width: 1
+  - name: net_pc_tc0
+    width: 1
+  - name: net_pc_tc1
+    width: 1
+  - name: net_pc_tc2
+    width: 1
+  - name: net_pc0
+    width: 1
+    probes: [pc]
+  - name: net_pc1
+    width: 1
+  - name: net_pc2
+    width: 1
+  - name: net_pc3
+    width: 1
+  - name: net_pc4
+    width: 1
+  - name: net_pc5
+    width: 1
+  - name: net_pc6
+    width: 1
+  - name: net_pc7
+    width: 1
+  - name: net_pc8
+    width: 1
+  - name: net_pc9
+    width: 1
+  - name: net_pc10
+    width: 1
+  - name: net_pc11
+    width: 1
+  - name: net_pc12
+    width: 1
+  - name: net_pc13
+    width: 1
+  - name: net_pc14
+    width: 1
+  - name: net_pc15
+    width: 1
+  - name: net_r0_q0
+    width: 1
+  - name: net_r0_q1
+    width: 1
+  - name: net_r0_q2
+    width: 1
+  - name: net_r0_q3
+    width: 1
+  - name: net_r0_q4
+    width: 1
+  - name: net_r0_q5
+    width: 1
+  - name: net_r0_q6
+    width: 1
+  - name: net_r0_q7
+    width: 1
+  - name: net_r1_q0
+    width: 1
+  - name: net_r1_q1
+    width: 1
+  - name: net_r1_q2
+    width: 1
+  - name: net_r1_q3
+    width: 1
+  - name: net_r1_q4
+    width: 1
+  - name: net_r1_q5
+    width: 1
+  - name: net_r1_q6
+    width: 1
+  - name: net_r1_q7
+    width: 1
+  - name: pwr_vcc
+    width: 1
+  - name: pwr_gnd
+    width: 1

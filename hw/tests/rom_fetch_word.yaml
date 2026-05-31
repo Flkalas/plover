@@ -2,7 +2,7 @@ netlist: ../netlist/blocks/cpu_datapath_p2.yaml
 timing: max
 duration_ns: 200
 rom_image:
-  - 0x1200
+  - 0x1204
 stimulus:
   - at_ns: 0
     set:
@@ -26,7 +26,7 @@ expect:
     net_bus_en1: 0
     net_ctrl0: 0
     net_ctrl1: 0
-    net_ctrl2: 0
+    net_ctrl2: 1
     net_ctrl3: 0
     net_ctrl4: 0
     net_ctrl5: 0

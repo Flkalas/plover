@@ -16,6 +16,7 @@ Design notes and **hwsim** electrical simulation for the Plover 8-bit VLIW-RISC 
 | [hw-viewer-p1.md](hw-viewer-p1.md) | **Phase1 interactive viewer** — `python -m hwsim serve` |
 | [hw-bringup-p1-datapath.md](hw-bringup-p1-datapath.md) | Phase1 datapath hwsim (V1+V2 stub CW) |
 | [hw-bringup-p2-rom.md](hw-bringup-p2-rom.md) | **Phase2 ROM CW** — Flash→bus hwsim, `pack_rom.py` |
+| [hw-bringup-p3-ctrl-pc.md](hw-bringup-p3-ctrl-pc.md) | **Phase3 LOCAL·FLG·161 PC** — branch, `cpu_datapath_p3` |
 | [archive/README.md](archive/README.md) | Archived Gemini logs and Cursor plans |
 | [archive/gemini/](archive/gemini/) | Original design conversation exports |
 | [archive/plans/](archive/plans/) | Completed Verilog simulator plan |

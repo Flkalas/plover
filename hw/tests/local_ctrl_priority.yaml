@@ -1,0 +1,21 @@
+netlist: ../netlist/blocks/local_ctrl.yaml
+timing: max
+duration_ns: 600
+stimulus:
+  - at_ns: 0
+    set:
+      net_bus_en0: 0
+      net_bus_en1: 0
+      net_ctrl0: 0
+      net_ctrl1: 1
+      net_ctrl2: 1
+      net_ctrl3: 1
+      net_ctrl4: 1
+      net_ctrl5: 1
+      net_z_prev: 1
+expect:
+  - at_ns: 250
+    net_halt: 1
+    net_pc_count_en: 0
+    net_pc_load: 0
+    net_flg_we: 0

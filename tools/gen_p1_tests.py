@@ -177,6 +177,8 @@ def write_cmp() -> None:
 
 def write_clock() -> None:
     add_op = _op("ADD")
+    inc_op = _op("INC")
+    nop_op = _op("NOP")
     exp = 0x02
     cycle = 500
     lines = [
@@ -188,8 +190,7 @@ def write_clock() -> None:
         "    set:",
         "      net_cmp_n: 1",
     ]
-    inc_op = _op("INC")
-    for k, v in sorted(cw(inc_op, 0, 0).items()):
+    for k, v in sorted(cw(nop_op, 0, 0).items()):
         lines.append(f"      {k}: {v}")
     lines.append(f"  - at_ns: {cycle}")
     lines.append("    set:")

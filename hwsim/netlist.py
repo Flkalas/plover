@@ -30,6 +30,7 @@ KNOWN_PARTS = frozenset(
         "IS62C256",
         "ROM16",
         "PC8_AUTO",
+        "FLG_LATCH",
     }
 )
 

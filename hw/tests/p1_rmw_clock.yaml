@@ -5,10 +5,10 @@ stimulus:
   - at_ns: 0
     set:
       net_cmp_n: 1
-      net_alu_op0: 1
+      net_alu_op0: 0
       net_alu_op1: 0
       net_alu_op2: 0
-      net_alu_op3: 1
+      net_alu_op3: 0
       net_bus_en0: 0
       net_bus_en1: 0
       net_dst_reg0: 0

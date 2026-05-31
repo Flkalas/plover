@@ -1,5 +1,5 @@
 version: 1
-block: cpu_datapath_p2_clock
+block: cpu_datapath_p3_clock
 instances:
   - ref: U_CLK_OSC
     part: OSC_4M
@@ -19,20 +19,6 @@ instances:
       VCC: pwr_vcc
       GND: pwr_gnd
 
-  - ref: U_PC8
-    part: PC8_AUTO
-    pins:
-      CP: net_clk2
-      Q0: net_pc0
-      Q1: net_pc1
-      Q2: net_pc2
-      Q3: net_pc3
-      Q4: net_pc4
-      Q5: net_pc5
-      Q6: net_pc6
-      Q7: net_pc7
-      VCC: pwr_vcc
-      GND: pwr_gnd
   - ref: U_ROM
     part: ROM16
     pins:
@@ -60,6 +46,428 @@ instances:
       D2: net_ctrl2
       D1: net_ctrl1
       D0: net_ctrl0
+      VCC: pwr_vcc
+      GND: pwr_gnd
+
+  - ref: U_PC_0
+    part: 74HC161
+    pins:
+      P0: net_r0_q0
+      P1: net_r0_q1
+      P2: net_r0_q2
+      P3: net_r0_q3
+      Q0: net_pc0
+      Q1: net_pc1
+      Q2: net_pc2
+      Q3: net_pc3
+      CEP: net_pc_count_en
+      CET: pwr_vcc
+      CP: net_clk2
+      TC: net_pc_tc0
+      MR: pwr_vcc
+      PE: net_pc_load
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_PC_1
+    part: 74HC161
+    pins:
+      P0: net_r0_q4
+      P1: net_r0_q5
+      P2: net_r0_q6
+      P3: net_r0_q7
+      Q0: net_pc4
+      Q1: net_pc5
+      Q2: net_pc6
+      Q3: net_pc7
+      CEP: net_pc_tc0
+      CET: net_pc_count_en
+      CP: net_clk2
+      TC: net_pc_tc1
+      MR: pwr_vcc
+      PE: net_pc_load
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_PC_2
+    part: 74HC161
+    pins:
+      P0: net_r1_q0
+      P1: net_r1_q1
+      P2: net_r1_q2
+      P3: net_r1_q3
+      Q0: net_pc8
+      Q1: net_pc9
+      Q2: net_pc10
+      Q3: net_pc11
+      CEP: net_pc_tc1
+      CET: net_pc_count_en
+      CP: net_clk2
+      TC: net_pc_tc2
+      MR: pwr_vcc
+      PE: net_pc_load
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_PC_3
+    part: 74HC161
+    pins:
+      P0: net_r1_q4
+      P1: net_r1_q5
+      P2: net_r1_q6
+      P3: net_r1_q7
+      Q0: net_pc12
+      Q1: net_pc13
+      Q2: net_pc14
+      Q3: net_pc15
+      CEP: net_pc_tc2
+      CET: net_pc_count_en
+      CP: net_clk2
+      MR: pwr_vcc
+      PE: net_pc_load
+      VCC: pwr_vcc
+      GND: pwr_gnd
+
+  - ref: U_LC_04_1
+    part: 74HC04
+    pins:
+      A: net_bus_en1
+      Y: net_lc_n_0
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_04_2
+    part: 74HC04
+    pins:
+      A: net_bus_en0
+      Y: net_lc_n_1
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_1
+    part: 74HC08
+    pins:
+      A: net_lc_n_0
+      B: net_lc_n_1
+      Y: net_lc_a_2
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_LOCAL_BUF
+    part: 74HC08
+    pins:
+      A: net_lc_a_2
+      B: net_lc_a_2
+      Y: net_local_en
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_2
+    part: 74HC08
+    pins:
+      A: net_lc_a_2
+      B: net_ctrl1
+      Y: net_lc_a_3
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_HALT_BUF
+    part: 74HC08
+    pins:
+      A: net_lc_a_3
+      B: net_lc_a_3
+      Y: net_halt
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_04_3
+    part: 74HC04
+    pins:
+      A: net_lc_a_3
+      Y: net_lc_n_4
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_04_4
+    part: 74HC04
+    pins:
+      A: net_ctrl4
+      Y: net_lc_n_5
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_3
+    part: 74HC08
+    pins:
+      A: net_lc_a_2
+      B: net_ctrl5
+      Y: net_lc_a_6
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_4
+    part: 74HC08
+    pins:
+      A: net_lc_a_6
+      B: net_lc_n_5
+      Y: net_lc_a_7
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_04_5
+    part: 74HC04
+    pins:
+      A: net_ctrl5
+      Y: net_lc_n_8
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_5
+    part: 74HC08
+    pins:
+      A: net_lc_a_2
+      B: net_lc_n_8
+      Y: net_lc_a_9
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_6
+    part: 74HC08
+    pins:
+      A: net_lc_a_9
+      B: net_ctrl4
+      Y: net_lc_a_10
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_7
+    part: 74HC08
+    pins:
+      A: net_lc_a_2
+      B: net_ctrl5
+      Y: net_lc_a_11
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_8
+    part: 74HC08
+    pins:
+      A: net_lc_a_11
+      B: net_ctrl4
+      Y: net_lc_a_12
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_04_6
+    part: 74HC04
+    pins:
+      A: net_ctrl5
+      Y: net_lc_n_13
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_04_7
+    part: 74HC04
+    pins:
+      A: net_ctrl4
+      Y: net_lc_n_14
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_9
+    part: 74HC08
+    pins:
+      A: net_lc_a_2
+      B: net_lc_n_13
+      Y: net_lc_a_15
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_10
+    part: 74HC08
+    pins:
+      A: net_lc_a_15
+      B: net_lc_n_14
+      Y: net_lc_a_16
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_11
+    part: 74HC08
+    pins:
+      A: net_lc_a_10
+      B: net_z_prev
+      Y: net_lc_a_17
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_04_8
+    part: 74HC04
+    pins:
+      A: net_z_prev
+      Y: net_lc_n_18
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_12
+    part: 74HC08
+    pins:
+      A: net_lc_a_12
+      B: net_lc_n_18
+      Y: net_lc_a_19
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_32_1
+    part: 74HC32
+    pins:
+      A: net_lc_a_7
+      B: net_lc_a_17
+      Y: net_lc_o_20
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_32_2
+    part: 74HC32
+    pins:
+      A: net_lc_o_20
+      B: net_lc_a_19
+      Y: net_lc_o_21
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_13
+    part: 74HC08
+    pins:
+      A: net_lc_o_21
+      B: net_lc_n_4
+      Y: net_lc_a_22
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_LOAD_BUF
+    part: 74HC08
+    pins:
+      A: net_lc_a_22
+      B: net_lc_a_22
+      Y: net_pc_load
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_04_9
+    part: 74HC04
+    pins:
+      A: net_lc_a_22
+      Y: net_lc_n_23
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_14
+    part: 74HC08
+    pins:
+      A: net_lc_a_16
+      B: net_ctrl2
+      Y: net_lc_a_24
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_04_10
+    part: 74HC04
+    pins:
+      A: net_z_prev
+      Y: net_lc_n_25
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_15
+    part: 74HC08
+    pins:
+      A: net_lc_a_10
+      B: net_lc_n_25
+      Y: net_lc_a_26
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_16
+    part: 74HC08
+    pins:
+      A: net_lc_a_12
+      B: net_z_prev
+      Y: net_lc_a_27
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_32_3
+    part: 74HC32
+    pins:
+      A: net_lc_a_24
+      B: net_lc_a_26
+      Y: net_lc_o_28
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_32_4
+    part: 74HC32
+    pins:
+      A: net_lc_o_28
+      B: net_lc_a_27
+      Y: net_lc_o_29
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_17
+    part: 74HC08
+    pins:
+      A: net_lc_n_23
+      B: net_lc_o_29
+      Y: net_lc_a_30
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_18
+    part: 74HC08
+    pins:
+      A: net_lc_n_4
+      B: net_lc_a_30
+      Y: net_lc_a_31
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_COUNT_BUF
+    part: 74HC08
+    pins:
+      A: net_lc_a_31
+      B: net_lc_a_31
+      Y: net_pc_count_en
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_19
+    part: 74HC08
+    pins:
+      A: net_lc_a_2
+      B: net_ctrl3
+      Y: net_lc_a_32
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_20
+    part: 74HC08
+    pins:
+      A: net_lc_a_32
+      B: net_lc_n_4
+      Y: net_lc_a_33
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_FLG_BUF
+    part: 74HC08
+    pins:
+      A: net_lc_a_33
+      B: net_lc_a_33
+      Y: net_flg_we
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_04_11
+    part: 74HC04
+    pins:
+      A: net_ctrl2
+      Y: net_lc_n_34
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_08_21
+    part: 74HC08
+    pins:
+      A: net_lc_a_16
+      B: net_lc_n_34
+      Y: net_lc_a_35
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_LC_HOLD_BUF
+    part: 74HC08
+    pins:
+      A: net_lc_a_35
+      B: net_lc_a_35
+      Y: net_pc_hold
+      VCC: pwr_vcc
+      GND: pwr_gnd
+
+  - ref: U_FLG
+    part: FLG_LATCH
+    pins:
+      CP: net_clk2
+      WE: net_flg_we
+      C_IN: net_c_hi
+      Y0: net_y0
+      Y1: net_y1
+      Y2: net_y2
+      Y3: net_y3
+      Y4: net_y4
+      Y5: net_y5
+      Y6: net_y6
+      Y7: net_y7
+      Z: net_z_flg
+      C: net_c_flg
+      Z_PREV: net_z_prev
       VCC: pwr_vcc
       GND: pwr_gnd
 
@@ -1391,7 +1799,7 @@ instances:
     part: 74HC08
     pins:
       A: net_cp_pre_r0
-      B: pwr_vcc
+      B: net_halt_n
       Y: net_cp_r0
       VCC: pwr_vcc
       GND: pwr_gnd
@@ -1422,7 +1830,7 @@ instances:
     part: 74HC08
     pins:
       A: net_cp_pre_r1
-      B: pwr_vcc
+      B: net_halt_n
       Y: net_cp_r1
       VCC: pwr_vcc
       GND: pwr_gnd
@@ -1453,7 +1861,7 @@ instances:
     part: 74HC08
     pins:
       A: net_cp_pre_r2
-      B: pwr_vcc
+      B: net_halt_n
       Y: net_cp_r2
       VCC: pwr_vcc
       GND: pwr_gnd
@@ -1484,8 +1892,15 @@ instances:
     part: 74HC08
     pins:
       A: net_cp_pre_r3
-      B: pwr_vcc
+      B: net_halt_n
       Y: net_cp_r3
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_HALT_N
+    part: 74HC04
+    pins:
+      A: net_halt
+      Y: net_halt_n
       VCC: pwr_vcc
       GND: pwr_gnd
 
@@ -2048,7 +2463,6 @@ nets:
     probes: [clk]
   - name: net_pc0
     width: 1
-    probes: [pc]
   - name: net_pc1
     width: 1
   - name: net_pc2
@@ -2094,6 +2508,230 @@ nets:
   - name: net_ctrl1
     width: 1
   - name: net_ctrl0
+    width: 1
+  - name: pwr_vcc
+    width: 1
+  - name: pwr_gnd
+    width: 1
+
+  - name: net_clk2
+    width: 1
+    probes: [clk]
+  - name: net_pc_load
+    width: 1
+  - name: net_pc_count_en
+    width: 1
+  - name: net_pc_tc0
+    width: 1
+  - name: net_pc_tc1
+    width: 1
+  - name: net_pc_tc2
+    width: 1
+  - name: net_pc0
+    width: 1
+    probes: [pc]
+  - name: net_pc1
+    width: 1
+  - name: net_pc2
+    width: 1
+  - name: net_pc3
+    width: 1
+  - name: net_pc4
+    width: 1
+  - name: net_pc5
+    width: 1
+  - name: net_pc6
+    width: 1
+  - name: net_pc7
+    width: 1
+  - name: net_pc8
+    width: 1
+  - name: net_pc9
+    width: 1
+  - name: net_pc10
+    width: 1
+  - name: net_pc11
+    width: 1
+  - name: net_pc12
+    width: 1
+  - name: net_pc13
+    width: 1
+  - name: net_pc14
+    width: 1
+  - name: net_pc15
+    width: 1
+  - name: net_r0_q0
+    width: 1
+  - name: net_r0_q1
+    width: 1
+  - name: net_r0_q2
+    width: 1
+  - name: net_r0_q3
+    width: 1
+  - name: net_r0_q4
+    width: 1
+  - name: net_r0_q5
+    width: 1
+  - name: net_r0_q6
+    width: 1
+  - name: net_r0_q7
+    width: 1
+  - name: net_r1_q0
+    width: 1
+  - name: net_r1_q1
+    width: 1
+  - name: net_r1_q2
+    width: 1
+  - name: net_r1_q3
+    width: 1
+  - name: net_r1_q4
+    width: 1
+  - name: net_r1_q5
+    width: 1
+  - name: net_r1_q6
+    width: 1
+  - name: net_r1_q7
+    width: 1
+  - name: pwr_vcc
+    width: 1
+  - name: pwr_gnd
+    width: 1
+
+  - name: net_bus_en0
+    width: 1
+  - name: net_bus_en1
+    width: 1
+  - name: net_ctrl0
+    width: 1
+  - name: net_ctrl1
+    width: 1
+  - name: net_ctrl2
+    width: 1
+  - name: net_ctrl3
+    width: 1
+  - name: net_ctrl4
+    width: 1
+  - name: net_ctrl5
+    width: 1
+  - name: net_z_prev
+    width: 1
+  - name: net_local_en
+    width: 1
+  - name: net_halt
+    width: 1
+  - name: net_flg_we
+    width: 1
+  - name: net_pc_load
+    width: 1
+  - name: net_pc_count_en
+    width: 1
+  - name: net_pc_hold
+    width: 1
+  - name: pwr_vcc
+    width: 1
+  - name: pwr_gnd
+    width: 1
+  - name: net_lc_a_10
+    width: 1
+  - name: net_lc_a_11
+    width: 1
+  - name: net_lc_a_12
+    width: 1
+  - name: net_lc_a_15
+    width: 1
+  - name: net_lc_a_16
+    width: 1
+  - name: net_lc_a_17
+    width: 1
+  - name: net_lc_a_19
+    width: 1
+  - name: net_lc_a_2
+    width: 1
+  - name: net_lc_a_22
+    width: 1
+  - name: net_lc_a_24
+    width: 1
+  - name: net_lc_a_26
+    width: 1
+  - name: net_lc_a_27
+    width: 1
+  - name: net_lc_a_3
+    width: 1
+  - name: net_lc_a_30
+    width: 1
+  - name: net_lc_a_31
+    width: 1
+  - name: net_lc_a_32
+    width: 1
+  - name: net_lc_a_33
+    width: 1
+  - name: net_lc_a_35
+    width: 1
+  - name: net_lc_a_6
+    width: 1
+  - name: net_lc_a_7
+    width: 1
+  - name: net_lc_a_9
+    width: 1
+  - name: net_lc_n_0
+    width: 1
+  - name: net_lc_n_1
+    width: 1
+  - name: net_lc_n_13
+    width: 1
+  - name: net_lc_n_14
+    width: 1
+  - name: net_lc_n_18
+    width: 1
+  - name: net_lc_n_23
+    width: 1
+  - name: net_lc_n_25
+    width: 1
+  - name: net_lc_n_34
+    width: 1
+  - name: net_lc_n_4
+    width: 1
+  - name: net_lc_n_5
+    width: 1
+  - name: net_lc_n_8
+    width: 1
+  - name: net_lc_o_20
+    width: 1
+  - name: net_lc_o_21
+    width: 1
+  - name: net_lc_o_28
+    width: 1
+  - name: net_lc_o_29
+    width: 1
+
+  - name: net_clk2
+    width: 1
+    probes: [clk]
+  - name: net_flg_we
+    width: 1
+  - name: net_c_hi
+    width: 1
+  - name: net_z_flg
+    width: 1
+  - name: net_c_flg
+    width: 1
+  - name: net_z_prev
+    width: 1
+  - name: net_y0
+    width: 1
+  - name: net_y1
+    width: 1
+  - name: net_y2
+    width: 1
+  - name: net_y3
+    width: 1
+  - name: net_y4
+    width: 1
+  - name: net_y5
+    width: 1
+  - name: net_y6
+    width: 1
+  - name: net_y7
     width: 1
   - name: pwr_vcc
     width: 1
@@ -2373,6 +3011,10 @@ nets:
   - name: net_bus_en1
     width: 1
   - name: net_cmp_n
+    width: 1
+  - name: net_halt
+    width: 1
+  - name: net_halt_n
     width: 1
   - name: net_bus_imm
     width: 1

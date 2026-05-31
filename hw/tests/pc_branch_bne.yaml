@@ -1,0 +1,54 @@
+netlist: ../netlist/blocks/pc_local.yaml
+timing: max
+duration_ns: 600
+stimulus:
+  - at_ns: 0
+    set:
+      net_bus_en0: 0
+      net_bus_en1: 0
+      net_ctrl4: 1
+      net_ctrl5: 1
+      net_z_prev: 0
+      net_r0_q0: 0
+      net_r0_q1: 1
+      net_r0_q2: 1
+      net_r0_q3: 0
+      net_r0_q4: 1
+      net_r0_q5: 0
+      net_r0_q6: 1
+      net_r0_q7: 0
+      net_r1_q0: 0
+      net_r1_q1: 0
+      net_r1_q2: 0
+      net_r1_q3: 0
+      net_r1_q4: 0
+      net_r1_q5: 0
+      net_r1_q6: 0
+      net_r1_q7: 0
+  - at_ns: 0
+    set:
+      net_clk2: 0
+  - at_ns: 350
+    set:
+      net_clk2: 1
+  - at_ns: 450
+    set:
+      net_clk2: 0
+expect:
+  - at_ns: 430
+    net_pc0: 0
+    net_pc1: 1
+    net_pc2: 1
+    net_pc3: 0
+    net_pc4: 1
+    net_pc5: 0
+    net_pc6: 1
+    net_pc7: 0
+    net_pc8: 0
+    net_pc9: 0
+    net_pc10: 0
+    net_pc11: 0
+    net_pc12: 0
+    net_pc13: 0
+    net_pc14: 0
+    net_pc15: 0

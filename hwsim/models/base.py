@@ -294,22 +294,73 @@ class Hc161(ChipModel):
     part = "74HC161"
 
     def on_start(self) -> None:
-        self._prev_clk["CP"] = self.read_bit("CP")
-        for i in range(4):
-            self._drive(f"Q{i}", 0, 0, "init")
+        self._q = 0
+        cp = "CP"
+        self._prev_clk[cp] = self.read_bit(cp)
+        self._drive_q(0, "init")
+        self._drive_tc(0, 0)
 
     def on_net_change(self, net: str) -> None:
-        if net != self.net_for("CP"):
+        if "MR" in self.pin_nets and self.read_bit("MR") == 0:
+            self._q = 0
+            self._drive_q(self.t_pd("74HC161", "t_clk_to_q", default=15), "async reset")
+            self._drive_tc(0, 15)
             return
-        if not self._posedge("CP"):
+        cp_net = self.net_for("CP")
+        if net == cp_net and self._posedge("CP"):
+            t = self.t_pd("74HC161", "t_clk_to_q", default=15)
+            pe = self.read_bit("PE") if "PE" in self.pin_nets else 0
+            if pe:
+                self._q = sum(self.read_bit(f"P{i}") << i for i in range(4))
+                self._drive_q(t, "load")
+            elif self.read_bit("CEP") and self.read_bit("CET"):
+                self._q = (self._q + 1) & 0xF
+                self._drive_q(t, "count")
+            self._drive_tc(1 if self._q == 0xF else 0, t)
             return
-        if self.read_bit("CEP") == 0 and self.read_bit("CET") == 0:
-            return
-        q = sum(self.read_bit(f"Q{i}") << i for i in range(4))
-        q = (q + 1) & 0xF
-        t = self.t_pd("74HC161", "t_clk_to_q", default=15)
+        if net in {self.net_for(f"Q{i}") for i in range(4)}:
+            self._drive_tc(1 if self._q == 0xF else 0, 0)
+
+    def _drive_q(self, delay: int, reason: str) -> None:
         for i in range(4):
-            self._drive(f"Q{i}", (q >> i) & 1, t, "count")
+            self._drive(f"Q{i}", (self._q >> i) & 1, delay, reason)
+
+    def _drive_tc(self, value: int, delay: int) -> None:
+        if "TC" in self.pin_nets:
+            self._drive("TC", value, delay, "tc")
+
+
+class FlgLatch(ChipModel):
+    """Z/C flag latch: WE on posedge captures zero(Y) and carry; Z_PREV holds pre-edge Z."""
+
+    part = "FLG_LATCH"
+
+    def on_start(self) -> None:
+        self._z = 0
+        self._c = 0
+        cp = "CP"
+        self._prev_clk[cp] = self.read_bit(cp)
+        self._drive_out(0)
+
+    def on_net_change(self, net: str) -> None:
+        cp_net = self.net_for("CP")
+        watched = {cp_net, self.net_for("WE"), self.net_for("C_IN")}
+        watched |= {self.net_for(f"Y{i}") for i in range(8)}
+        if net not in watched:
+            return
+        if net == cp_net and self._posedge("CP") and self.read_bit("WE"):
+            y = sum(self.read_bit(f"Y{i}") << i for i in range(8))
+            self._z = 1 if y == 0 else 0
+            self._c = self.read_bit("C_IN") & 1
+            t = self.t_pd("FLG_LATCH", "t_clk_to_q", default=15)
+            self._drive_out(t)
+            return
+        self._drive_out(0)
+
+    def _drive_out(self, delay: int) -> None:
+        self._drive("Z_PREV", self._z, delay, "z_prev")
+        self._drive("Z", self._z, delay, "z")
+        self._drive("C", self._c, delay, "c")
 
 
 class Hc245(ChipModel):
@@ -482,6 +533,7 @@ def create_model(ref: str, part: str, pins: dict[str, str], ctx: SimContext) -> 
         "74HC86": Hc86,
         "ROM16": Rom16,
         "PC8_AUTO": Pc8Auto,
+        "FLG_LATCH": FlgLatch,
     }
     cls = table.get(part)
     if cls is None:

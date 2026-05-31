@@ -4,7 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "hw" / "netlist" / "blocks" / "regfile.yaml"
+OUT_DEFAULT = ROOT / "hw" / "netlist" / "blocks" / "regfile.yaml"
 
 
 def reg574(ref: str, idx: int) -> list[str]:
@@ -59,10 +59,11 @@ def imm_b_mux(bit: int) -> list[str]:
     ]
 
 
-def cp_gate(idx: int) -> list[str]:
+def cp_gate(idx: int, *, halt_mask: bool) -> list[str]:
     inv_y = f"net_cp_inv_r{idx}"
     and1 = f"net_cp_en_r{idx}"
-    return [
+    pre = f"net_cp_pre_r{idx}"
+    lines = [
         f"  - ref: U_CP_INV_{idx}",
         "    part: 74HC04",
         "    pins:",
@@ -78,15 +79,38 @@ def cp_gate(idx: int) -> list[str]:
         f"      Y: {and1}",
         "      VCC: pwr_vcc",
         "      GND: pwr_gnd",
-        f"  - ref: U_CP_CLK_{idx}",
-        "    part: 74HC08",
-        "    pins:",
-        "      A: net_clk2",
-        f"      B: {and1}",
-        f"      Y: net_cp_r{idx}",
-        "      VCC: pwr_vcc",
-        "      GND: pwr_gnd",
     ]
+    if halt_mask:
+        lines += [
+            f"  - ref: U_CP_PRE_{idx}",
+            "    part: 74HC08",
+            "    pins:",
+            "      A: net_clk2",
+            f"      B: {and1}",
+            f"      Y: {pre}",
+            "      VCC: pwr_vcc",
+            "      GND: pwr_gnd",
+            f"  - ref: U_CP_CLK_{idx}",
+            "    part: 74HC08",
+            "    pins:",
+            f"      A: {pre}",
+            "      B: net_halt_n",
+            f"      Y: net_cp_r{idx}",
+            "      VCC: pwr_vcc",
+            "      GND: pwr_gnd",
+        ]
+    else:
+        lines += [
+            f"  - ref: U_CP_CLK_{idx}",
+            "    part: 74HC08",
+            "    pins:",
+            "      A: net_clk2",
+            f"      B: {and1}",
+            f"      Y: net_cp_r{idx}",
+            "      VCC: pwr_vcc",
+            "      GND: pwr_gnd",
+        ]
+    return lines
 
 
 def imm_dst_override() -> list[str]:
@@ -123,6 +147,26 @@ def imm_dst_override() -> list[str]:
 
 
 def main() -> None:
+    import argparse
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument(
+        "--halt-mask",
+        action="store_true",
+        help="AND reg CP with ~HALT (Phase3 cpu_datapath_p3)",
+    )
+    ap.add_argument(
+        "-o",
+        "--out",
+        type=Path,
+        default=OUT_DEFAULT,
+        help="Output yaml path (default: hw/netlist/blocks/regfile.yaml)",
+    )
+    args = ap.parse_args()
+    halt_mask = args.halt_mask
+    out_path: Path = args.out
+    block_name = "regfile_halt" if halt_mask and out_path.name != "regfile.yaml" else "regfile"
+
     inst: list[str] = []
     for i in range(4):
         inst.extend(reg574(f"U_REG_R{i}", i))
@@ -154,7 +198,17 @@ def main() -> None:
         "      GND: pwr_gnd",
     ]
     for i in range(4):
-        inst.extend(cp_gate(i))
+        inst.extend(cp_gate(i, halt_mask=halt_mask))
+    if halt_mask:
+        inst += [
+            "  - ref: U_HALT_N",
+            "    part: 74HC04",
+            "    pins:",
+            "      A: net_halt",
+            "      Y: net_halt_n",
+            "      VCC: pwr_vcc",
+            "      GND: pwr_gnd",
+        ]
 
     nets = [
         "  - name: net_clk2",
@@ -174,6 +228,15 @@ def main() -> None:
         "    width: 1",
         "  - name: net_cmp_n",
         "    width: 1",
+    ]
+    if halt_mask:
+        nets += [
+            "  - name: net_halt",
+            "    width: 1",
+            "  - name: net_halt_n",
+            "    width: 1",
+        ]
+    nets += [
         "  - name: net_bus_imm",
         "    width: 1",
         "  - name: net_dst_eff0",
@@ -209,14 +272,14 @@ def main() -> None:
         nets += [f"  - name: net_cp_en_r{i}", "    width: 1"]
 
     text = (
-        "version: 1\nblock: regfile\ninstances:\n"
+        f"version: 1\nblock: {block_name}\ninstances:\n"
         + "\n".join(inst)
         + "\nnets:\n"
         + "\n".join(nets)
         + "\n"
     )
-    OUT.write_text(text, encoding="utf-8")
-    print(f"wrote {OUT}")
+    out_path.write_text(text, encoding="utf-8")
+    print(f"wrote {out_path}")
 
 
 if __name__ == "__main__":
