@@ -30,8 +30,6 @@ Outputs go to `build/hwsim/<test_name>/`:
 
 Open [`hw/viewer/index.html`](../hw/viewer/index.html) in a browser and load these files.
 
-Phase1 interactive viewer: `python -m hwsim serve` — see [hw-viewer-p1.md](hw-viewer-p1.md).
-
 ## Assumptions
 
 - 5 V, 25 °C, datasheet typ/max delays
@@ -43,18 +41,62 @@ Phase1 interactive viewer: `python -m hwsim serve` — see [hw-viewer-p1.md](hw-
 
 | Path | Role |
 |------|------|
-| [`hw/netlist/blocks/`](../hw/netlist/blocks/) | Block netlists |
+| [`hw/netlist/blocks/`](../hw/netlist/blocks/) | Block netlists (ALU, CPU gate) |
 | [`hw/timing/`](../hw/timing/) | Datasheet delay tables |
 | [`hw/models/`](../hw/models/) | Chip behavior metadata |
 | [`hw/tests/`](../hw/tests/) | Stimulus + checks |
 | [`hwsim/`](../hwsim/) | Simulator source |
 
+## Tests (15)
+
+### CPU gate (5)
+
+| Test | Block | Focus |
+|------|-------|-------|
+| `cpld_gpr_decode` | cpld_system_ctrl | ADD Reg_Sel + LOAD_R* |
+| `regfile_574` | regfile_574 | 574×4 dual-read GPR |
+| `mem_decode` | sram256_dual | Mode A/B, mailbox, A15 bank |
+| `monitor_poll` | sram256_dual | MMIO STATUS poll stub |
+| `boot_handoff` | cpld_system_ctrl | Reset $FFFC + Run mode |
+
+### ALU bringup (10)
+
+| Test | Block | Focus |
+|------|-------|-------|
+| `alu283_carry` | alu283 | 8-bit carry cascade |
+| `alu8_full` / `alu8_timing` | alu8 | 12-opcode functional + slack |
+| `alu_decode_full` / `alu_decode_timing` | alu8_decode | CW → control nets |
+| `alu_b3_sub_critical` / `alu_b3_xor_critical` / `alu_b3_inc_dec` / `alu_b3_latch` | alu_b3 | B3 phased paths |
+| `bringup_b3c_clock` | alu_b3_clock | B3c + 2 MHz clock |
+
+Full ALU wiring: [alu8.md](../hw/netlist/blocks/alu8.md).
+
 ## BOM part → model
 
-Supported parts in MVP: `OSC_4M`, `74HC74`, `74HC04`, `74HC283`, `74HC574`, `74HC161`, `74HC157`, `74HC245`, `74HC138`, gates `74HC08/32/86`, mux `74HC153`. Full ALU: [alu8.md](../hw/netlist/blocks/alu8.md).
+Supported parts: `OSC_4M`, `74HC74`, `74HC04`, `74HC283`, `74HC574`, `74HC161`, `74HC157`, `74HC245`, gates `74HC08/32/86`, mux `74HC151/153`, **`CPLD_SYSTEM_CTRL` / `ATF1504AS`**, **`REGFILE_574_GPR`**, **`MAILBOX_MMIO`**.
 
 ## Related
 
 - [BOM.md](../BOM.md) — physical parts
-- [roadmap-next.md](roadmap-next.md) — hardware track B1–B3
-- Verilog [`rtl/`](../rtl/) — separate track (not used by hwsim)
+- [roadmap-next.md](roadmap-next.md) — bring-up track
+- [hw-bringup-b3.md](hw-bringup-b3.md) — bench wiring guide
+
+---
+
+## Plover Logic VM (`plover_vm/`)
+
+Functional **logic simulator** with built-in NOR/RAM/Mailbox — runs whole programs without ns timing. Complements hwsim.
+
+```bash
+python -m pytest tests/ -q
+python -m plover_vm run hw/fixtures/sram/add_imm.sram.hex --engine fast --map boot
+python -m plover_vm scenario hw/scenarios/vm/boot_run.yaml
+```
+
+| Engine | Description |
+|--------|-------------|
+| `micro` | 8b CW micro-phases (default faithful) |
+| `macro` | Same as micro via MacroEngine |
+| `fast` | Direct ISA semantics (bring-up) |
+
+Spec: [system-architecture.md](system-architecture.md) · Package: [`plover_vm/`](../plover_vm/)
