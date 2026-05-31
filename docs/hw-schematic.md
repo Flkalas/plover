@@ -9,8 +9,8 @@ Format: `{BLOCK}_{PART}_{IDX}`
 | Block | Example |
 |-------|---------|
 | Clock | `U_CLK_74`, `U_CLK_OSC` |
-| ALU | `U_ALU_283_LO`, `U_ALU_283_HI` |
-| Register | `U_REG_574_0` |
+| ALU | `U_ALU_283_LO`, `U_ALU_283_HI`, `U_ALU_153_0`…`3`, `U_ALU_157_B_0`, `U_ALU_157_B2_0`, `U_ALU_86_INV_0` |
+| Register | `U_REG_574_0`, `U_REG_574_ACC` (B3 accumulator) |
 | PC | `U_PC_161_0` … `U_PC_161_3` |
 
 ## Net names
@@ -21,7 +21,11 @@ Examples:
 
 - `net_osc` — 4 MHz oscillator output
 - `net_clk2` — 2 MHz divided clock
-- `net_data_bus` — 8-bit data (width in net entry)
+- `net_a0` … `net_a7`, `net_b0` … `net_b7` — ALU operands
+- `net_y0` … `net_y7` — ALU result
+- `net_sub_en`, `net_cin`, `net_153_s0`, `net_153_s1`, `net_b_sel`, `net_b_const_sel`, `net_b_const_bit1`…`7`, `net_c3_sel` — ALU control (VLIW or test)
+- `net_d0` … `net_d7` — 574 D inputs (B3: tied to `net_y*`)
+- `net_q0` … `net_q7` — 574 Q outputs
 
 ## Power pins
 

@@ -49,7 +49,7 @@ Open [`hw/viewer/index.html`](../hw/viewer/index.html) in a browser and load the
 
 ## BOM part → model
 
-See [hw-schematic.md](hw-schematic.md). Supported parts in MVP: `OSC_4M`, `74HC74`, `74HC04`, `74HC283`, `74HC574`, `74HC161`, `74HC157`, `74HC245`, `74HC138`, gates `74HC08/32/86/153`.
+Supported parts in MVP: `OSC_4M`, `74HC74`, `74HC04`, `74HC283`, `74HC574`, `74HC161`, `74HC157`, `74HC245`, `74HC138`, gates `74HC08/32/86`, mux `74HC153`. Full ALU: [alu8.md](../hw/netlist/blocks/alu8.md).
 
 ## Related
 
