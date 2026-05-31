@@ -1,6 +1,8 @@
 # Plover
 
-**Plover**는 74HC 시리즈 디스크리트 로직으로 구현하는 8비트 **VLIW-RISC** 홈브류 CPU 프로젝트입니다.  
+**Plover**는 74HC 디스크리트 로직 8-bit CPU 프로젝트입니다.
+
+**활성 설계:** [v0.1 system architecture](docs/system-architecture.md) — TTL GPR + ATF1504AS system CPLD
 
 ---
 
@@ -8,136 +10,46 @@
 
 | 항목 | 내용 |
 |------|------|
-| 데이터 경로 | 8비트 |
-| 제어 방식 | 16비트 VLIW 수평 마이크로코드 (명령어 디코더 없음) |
-| 실행 모델 | 1사이클 = 1명령 (파이프라인 없음 또는 1단) |
-| 목표 클록 | 4 MHz 마스터 → **2.0 MHz** 시스템 클록 |
-| 목표 성능 | **~2.0 MIPS** (0-wait, CPI ≈ 1 가정) |
-| 핵심 IC | **42개** (프로그래밍용 74HC595 3개 제외 시 연산·제어·메모리) |
-| 구현 형태 | 브레드보드 프로토타입 |
+| **지금** | ALU hwsim + CPU gate + **plover_vm** logic VM |
+| **시뮬** | [hwsim](docs/hw-sim.md) (15 tests) · [plover_vm](docs/reviewer-handoff.md#5-plover_vm--로직-vm) |
+| **CPU** | 574×4 GPR · 8b microcode CW · 2×32K SRAM (64 KB) |
+| **BOM** | ~48 74HC + **ATF1504AS** + **SST39×1** + **IS62×2** |
 
 ---
 
-## 아키텍처 개요
-
-### VLIW 마이크로코드
-
-`SST39SF010A`(128K×8) **2개를 병렬**로 묶어 **16비트 제어 워드**를 매 클록 출력합니다. 전통적인 opcode 디코더 대신, ROM 비트 필드가 ALU·레지스터·버스·분기 제어선에 **직접** 연결되는 수평 마이크로프로그래밍 구조입니다.
-
-제안된 16비트 필드 예시 (설계 초안):
-
-| 필드 | 비트 | 역할 |
-|------|------|------|
-| ALU Select | 4 | 산술/논리 연산 선택 |
-| Register Sel | 4 | 74HC574 뱅크 입출력 |
-| Bus Control | 4 | 74HC157/245 방향·선택 |
-| Branch / Misc | 4 | PC(74HC161), MMIO(74HC138) |
-
-실사용 opcode는 하드웨어 fan-out·배선 물리량을 고려해 **32~64개** 수준으로 잡는 것이 현실적입니다.
-
-### 데이터 패스
+## 아키텍처 (v0.1)
 
 ```
-[PC: 74HC161×4] → [병렬 Flash ROM ×2] → 16비트 제어 워드
-                              ↓
-        ┌─────────────────────┴─────────────────────┐
-        │  ALU: 283×2(8b 가산) + 86/08/32 + 153×4   │
-        │  레지스터: 74HC574×7                     │
-        │  버스: 157 / 245 / LVC8T245(3.3V I/O)    │
-        └─────────────────────┬─────────────────────┘
-                              ↓
-              [SRAM IS62C256 32KB]  [MMIO: 74HC138]
+Flash 8b CW ──→ alu8 + CPLD LOAD_R*
+574×4 R0–R3 ──→ ALU A/B
+ATF1504AS ────→ decode · 64KB · Mailbox $FF00
+SST39SF010A ──→ boot + microcode + utility
 ```
 
-- **74HC283×2**: 하위 4비트 `C_out` → 상위 4비트 `C_in` 캐스케이드로 8비트 가산/감산(2의 보수는 74HC86으로 B 반전).
-- **74HC574×7**: SRAM 대신 전용 레지스터 — 1사이클 read/modify/write와 글리치 차단용 래치.
-- **74HC161×4**: 16비트 프로그램 카운터.
-- **IS62C256**: 공유 데이터 SRAM (45 ns). 코프로세서·페이징 등 확장 여지를 둔 설계.
-
-### 클록
-
-| 구성 | 부품 | 역할 |
-|------|------|------|
-| 마스터 | OSC 4 MHz | 기준 클록 |
-| 분주 | 74HC74 | **2.0 MHz**, 50% 듀티 |
-| 위상/지연 | 74HC04 | 2상 클록·지연선·버퍼 |
-
-### 계획된 주변·그래픽
-
-- **RP2350B**: 그래픽·I/O 코프로세서 (PIO, 로컬 메모리).
-- **Apple II식 인터리브**: CPU와 비디오/주변 로직이 SRAM 접근을 시분할 — CPU가 2 MHz 전 구간을 연산에 쓸 수 있게 하는 설계 목표.
-- **SN74LVC8T245×3**: 5 V CPU 도메인 ↔ 3.3 V 코프로세서 버스
+명세: [docs/system-architecture.md](docs/system-architecture.md)
 
 ---
 
-## 명령·연산 (설계 목표)
+## hwsim
 
-### 기본 ISA (하드웨어 직접)
+```bash
+python -m hwsim run --all
+python -m hwsim run hw/tests/mem_decode.yaml
+```
 
-| 유형 | 예시 | 구현 |
-|------|------|------|
-| 산술 | ADD, SUB | 283 + 86 |
-| 논리 | AND, OR, XOR, NOT | 08, 32, 86 |
-| 데이터 이동 | MOV, LOAD, STORE | 574, 245, 157 |
-| 제어 | JMP, BEQ, BNE | 161, 138 |
-
-곱셈기는 없음. 곱셈·시프트·비교는 **마이크로코드 루틴**으로 처리합니다.
-
-### 의사 연산 예상 사이클 (2 MHz 기준)
-
-| 기능 | 방식 | 예상 사이클 |
-|------|------|-------------|
-| Shift / Rotate | 153 + 배선 | 1 |
-| Compare | SUB + Zero 플래그 | 1 |
-| 16비트 ADD/ADC | 하위 8b → 상위 8b + 캐리 | 2 |
-| 8비트 곱셈 | Shift-and-add 루틴 | 8~16 |
-
-16비트 연산은 8비트 ALU 2단 + 플래그 레지스터(캐리 보존)로 **2사이클** 마이크로시퀀스로 확장.
+결과: `build/hwsim/<test>/` — [hw-sim.md](docs/hw-sim.md)
 
 ---
 
-## 부품 (BOM)
+## plover_vm (로직 VM)
 
-**전체 목록·단가·용도**: [`BOM.md`](BOM.md) (32라인, 핵심 IC 42개, 견적 합계 ~68,295 KRW).
+```bash
+python -m pytest tests/ -q
+python tools/run_fib_demo.py
+python tools/run_fib_20000_demo.py
+```
 
-### 핵심 IC 42개 요약
-
-| 분류 | 부품 | 수량 | 비고 |
-|------|------|------|------|
-| ALU | 74HC283N, 153, 86, 08, 32 | 12 | 8비트 연산·MUX |
-| 레지스터/카운터 | 74HC161, 574 | 11 | PC, 누산/래치 |
-| 버스 | 74HC157, 245, SN74LVC8T245 | 10 | 중재·레벨 시프트 |
-| 디코드 | 74HC138 | 1 | CS / MMIO |
-| 메모리 | SST39SF010A, IS62C256 | 3 | VLIW ROM + SRAM |
-| 클록 | 74HC74, 74HC04, OSC 4M | 3 | 2 MHz 생성 |
-| 프로그래밍 | 74HC595 | 3 | Flash 프로그래머 확장 |
-
-그 외 [`BOM.md`](BOM.md): 브레드보드×4, 전원 모듈·어댑터, 디커플링·종단·풀업, 아두이노 나노.
-
-**기가트론**(TTL 홈브류 ~25–30 IC)보다 칩 수는 많지만, VLIW 직접 제어·레지스터 뱅크·버스 중재·코프로세서 인터페이스를 위해 의도적으로 확장한 규모입니다.
-
----
-
-## 성능·비교 (설계 가정)
-
-| 시스템 | CPU | 클록 | 체감 MIPS급 | 비고 |
-|--------|-----|------|-------------|------|
-| **Plover (목표)** | Custom 8b VLIW-RISC | 2.0 MHz | ~2.0 | CPI≈1, 0-wait 목표 |
-| Apple I/II | MOS 6502 | ~1 MHz | ~0.5 | CISC, 다사이클 명령 |
-| C64 | MOS 6510 | ~1 MHz | ~0.4–0.5 | VIC-II 병목 |
-| Commander X16 | WDC 65C02 | 8 MHz | ~4–5 | 고클록 6502 |
-| Amiga 500 | MC68000 | 7.09 MHz | ~1.5–2 | 16/32b, 블리터 |
-
-- **6502 대비**: 클록 2배 × CPI 1/2~1/7 → 정수 루프에서 이론상 큰 이득. 다만 **코드 밀도**는 RISC/VLIW가 불리할 수 있음.
-
-## 구현·검증 로드맵 (문서 기준)
-
-1. **클록 + PC** — 4 MHz → 2 MHz 분주, ROM 주소 순차 접근 확인  
-2. **버스 + SRAM** — 157/245 중재, 읽기/쓰기 타이밍  
-3. **ALU + 574** — 1사이클 연산 경로, 캐리 전파·셋업 타임  
-4. **마이크로코드** — 아두이노 + 595로 SST39SF010A 프로그래밍  
-5. **코프로세서** — LVC8T245 경로, RP2350B 그래픽 통합  
-6. **인터리브** — Apple II식 φ₀/φ₁ 메모리 슬롯 (선택)
+검토자용 전체 가이드: [docs/reviewer-handoff.md](docs/reviewer-handoff.md)
 
 ---
 
@@ -145,57 +57,25 @@
 
 | 파일 | 내용 |
 |------|------|
-| [`BOM.md`](BOM.md) | 부품 목록(BOM) — 단가·용도·42 IC 분류 |
-| [`docs/README.md`](docs/README.md) | 문서 인덱스 |
-| [`docs/hw-sim.md`](docs/hw-sim.md) | **전기·타이밍 시뮬** — `python -m hwsim` |
-| [`docs/hw-schematic.md`](docs/hw-schematic.md) | KiCad ↔ YAML netlist |
-| [`docs/roadmap-next.md`](docs/roadmap-next.md) | 다음 단계 로드맵 |
-| [`hw/README.md`](hw/README.md) | netlist·tests·viewer |
-| [`archive/README.md`](archive/README.md) | 보관된 Verilog·웹 시뮬 스택 |
+| [docs/README.md](docs/README.md) | v0.1 인덱스 |
+| [BOM.md](BOM.md) | Procurement BOM |
+| [docs/microcode-spec.md](docs/microcode-spec.md) | 8b CW · ISA |
+| [docs/memory-map.md](docs/memory-map.md) | Mode A/B map |
 
----
-
-## 전기·타이밍 시뮬 (hwsim)
-
-브레드보드 조립 전에 **74HC 블록**을 데이터시트 지연으로 검증합니다. Python 3.10+ **stdlib만** 필요합니다 (`make`·Icarus·Node 불필요).
-
-### 빠른 시작
-
-```bash
-python -m hwsim run --all
-python -m hwsim validate hw/netlist/blocks/clock.yaml
-```
-
-결과: `build/hwsim/<test>/` — `waves.json`, `timing_report.json`, `report.html`, `wiring.svg`
-
-파형·리포트: [`hw/viewer/index.html`](hw/viewer/index.html) 에서 파일 로드.
-
-### 디렉터리
-
-| 경로 | 설명 |
-|------|------|
-| [`hwsim/`](hwsim/) | 이벤트 시뮬 엔진·CLI |
-| [`hw/netlist/blocks/`](hw/netlist/blocks/) | 블록 YAML netlist |
-| [`hw/tests/`](hw/tests/) | 타이밍·기능 검증 |
-| [`hw/timing/`](hw/timing/) | 74HC 데이터시트 지연 |
-
-### 보관: Verilog·ISA 시뮬
-
-Icarus RTL, `microasm`, React 웹 UI는 [`archive/verilog-sim/`](archive/verilog-sim/)에 보관되어 있습니다. 실행 방법은 해당 README 참고.
+구세대 명세: [docs/archive/pre-v0.1/](docs/archive/pre-v0.1/README.md)
 
 ---
 
 ## 상태
 
-- [x] 아키텍처·BOM 설계
-- [x] 부품 주문
-- [x] **hwsim** 블록 시뮬 (clock, alu283, reg574) — `python -m hwsim run --all`
-- [ ] 브레드보드 조립·실기 B1~B3
-- [x] Verilog·웹 시뮬 MVP — [`archive/verilog-sim/`](archive/verilog-sim/)
-- [ ] RP2350B 그래픽 서브시스템
+- [x] ALU bringup hwsim (10 tests)
+- [x] **v0.1** normative docs · BOM
+- [x] CPU gate hwsim: GPR 574, mem decode, mailbox, boot handoff
+- [x] **plover_vm** logic VM + Fibonacci 데모 (8b/16b)
+- [ ] B3 실기 · full `cpu` netlist integration
 
 ---
 
 ## 라이선스
 
-미정. 저장소에 라이선스 파일이 추가되면 이 절을 갱신합니다.
+미정.

@@ -1,174 +1,149 @@
-# Plover — Bill of Materials
+﻿# Plover — Bill of Materials
 
-프로토타입 1세트 기준 부품 목록입니다.  
-**활성 CW 명세:** [docs/microcode-spec-v0.2.md](docs/microcode-spec-v0.2.md) (4-GPR, 8×153 regfile MUX).
+| 항목 | 값 |
+|------|-----|
+| **설계** | **v0.1** — [system-architecture.md](docs/system-architecture.md) |
+| **수량** | 프로토타입 **1세트** |
+| **개정** | 2026-06-01 |
+| **명세** | [microcode-spec.md](docs/microcode-spec.md) · [cpld-system-controller.md](docs/cpld-system-controller.md) |
 
----
+**이 문서의 §1 표가 유일한 주문·픽·실장 기준입니다.** 아래 §2 이후는 설계 메모·변형·구매 이력입니다.
 
-## 요약
-
-| 구분 | 품목 수(라인) | IC/모듈 합계 | 합계 금액 (KRW) |
-|------|---------------|--------------|-----------------|
-| 핵심 로직 IC (ALU~클록·595) | 18종 | **58** | ~45,470 |
-| 물리 인프라 | 3 | — | 10,400 |
-| 전원 | 3 | — | 6,400 |
-| 무결성·기타 수동 | 8 | — | 13,145 |
-| **전체** | **32** | — | **~75,415** |
-
-*IC 합계·금액은 V2 regfile **+8×153** 반영. 574·161 등 기존 라인 수량은 유지.*
-
-### 핵심 IC (연산·제어·메모리·클록)
-
-| 분류 | 부품 | 수량 |
-|------|------|------|
-| ALU | 74HC283N, 153, 86, 08, 32, 157, 04 | **20** |
-| 레지스터 파일 (v0.2) | 74HC574 (GPR×4), 74HC153 (A/B MUX×8) | **4 + 8** |
-| 레지스터/카운터 (기타) | 74HC161, 74HC574 (여분) | 4 + **3** |
-| 버스 중재 | 74HC157, 245, SN74LVC8T245DWR | 10 |
-| 주소 디코딩 | 74HC138 | 1 |
-| 메모리 | SST39SF010A, IS62C256AL | 3 |
-| 클록 | 74HC74, 74HC04, OSC 4M | 3 |
-| 프로그래밍 확장 | 74HC595 | 3 |
+실구매 기록: [purchase-devicesmart.md](docs/purchase-devicesmart.md)
 
 ---
 
-## 전체 BOM
+## §1 Procurement BOM (v0.1, 1 set)
 
-| 분류 | 품목명 및 규격 | 수량 | 단가 | 합계 | 용도 및 비고 |
-|------|----------------|------|------|------|--------------|
-| **물리 인프라** | 브레드보드 830핀 MB-102 | 4 | 1,400 | 5,600 | 시스템 전역 실장. 병렬 결속으로 면적 확보 |
-| | 3색 점퍼용 단선 0.6φ 1M | 6 | 400 | 2,400 | 데이터/주소/제어선 밀착 배선 |
-| | SOP28/SSOP28 양면 변환보드 | 4 | 600 | 2,400 | LVC 트랜시버·SMD SRAM용 2.54mm 어댑터 |
-| **ALU** | 74HC283N (DIP) | 2 | 1,000 | 2,000 | 4비트 전가산기 ×2 → 8비트 캐리 연쇄 |
-| | 74HC153 (DIP) | **12** | 500 | **6,000** | **ALU 4** + **regfile A/B MUX 8** ([v0.2](docs/microcode-spec-v0.2.md)) |
-| | 74HC86 (DIP) | **4** | 360 | **1,440** | B 반전(SUB) 8 XOR + A^B(XOR op) 8 XOR |
-| | 74HC08 (DIP) | 2 | 300 | 600 | 8비트 AND |
-| | 74HC32 (DIP) | 2 | 500 | 1,000 | 8비트 OR |
-| | 74HC157 (DIP) | **6** | 400 | **2,400** | ALU B/~B, INC/DEC B2 cascade, 출력 MUX |
-| | 74HC04 (DIP) | **2** | 400 | **800** | 8비트 NOT (~A), 클록 칩과 분리 |
-| **레지스터/카운터** | 74HC161 (DIP) | 4 | 400 | 1,600 | 16비트 PC, 분기 제어 |
-| | 74HC574 (DIP) | 7 | 500 | 3,500 | **v0.2 GPR R0–R3×4** + B3/여분×3 (PC는 161) |
-| **버스 중재** | 74HC157 (DIP) | **5** | 400 | 2,000 | 16비트 주소 MUX, 인터리브 스위칭 (ALU용 2개는 위 ALU 섹션) |
-| | 74HC245 (DIP) | 2 | 400 | 800 | 5V 데이터 버스 삼상태 격리 |
-| | SN74LVC8T245DWR | 3 | 2,260 | 6,780 | 5V ↔ 3.3V, 코프로세서 버스 (24b) |
-| **주소 디코딩** | 74HC138 (DIP) | 1 | 500 | 500 | MMIO·CS 디코딩 |
-| **메모리** | SST39SF010A-70-4C-PHE | 2 | 4,930 | 9,860 | 128K×8 Flash ×2 → 16비트 VLIW 제어 ROM |
-| | IS62C256AL-45ULI-TR | 1 | 3,940 | 3,940 | 32K×8 SRAM, 45ns, 공유 데이터 RAM |
-| **클록** | OSC 4M HALF TYPE | 1 | 1,250 | 1,250 | 4.0 MHz 마스터 오실레이터 |
-| | 74HC74 (DIP) | 1 | 500 | 500 | 2분주 → 2.0 MHz, 50% 듀티 |
-| | 74HC04 (DIP) | **1** | 400 | 400 | 2상 클록·지연선·버퍼 (ALU용 2개는 위 ALU 섹션) |
-| **전원** | 5V/3.3V 전원 공급 모듈 | 1 | 2,400 | 2,400 | MB-102 듀얼 레일 |
-| | Coms 5V 1.2A 어댑터 | 1 | 3,000 | 3,000 | 220V AC → 5V DC |
-| | Micro B 케이블 | 1 | 1,000 | 1,000 | 전원 모듈 인입 |
-| **외부 프로그래머** | 아두이노 나노 CH340 호환 | 1 | 5,000 | 5,000 | Flash JEDEC/SPI 비트뱅 프로그래밍 |
-| | 74HC595 (DIP) | 3 | 300 | 900 | 직렬→24비트 병렬 주소/데이터 확장 |
-| **무결성** | Mono Cap 0.1µF Y5V 50V | 30 | 30 | 900 | IC 전원 1:1 디커플링 |
-| | Dip Tantal 10µF / 35V | 10 | 420 | 4,200 | 전원 레일 벌크 |
-| | BMI-BEAD-3590L | 10 | 50 | 500 | 페라이트 비드 |
-| | E/C 63V 10µF 5×11 | 10 | 30 | 300 | 리플·POR 시정수 |
-| | 8×330J 33Ω 어레이 | 10 | 110 | 1,100 | 데이터 버스 직렬 종단 |
-| | Bourns 4708 10KΩ 어레이 | 10 | 60 | 600 | 버스 풀업 |
-| **기타 수동** | 1/4W 10KΩ 저항 | 10 | 40 | 400 | 단일 풀업, RC |
-| | 1N4148 고속 다이오드 | 10 | 14 | 145 | POR 방전 |
+열 정의: **MPN** = 주문·SMT 픽리스트에 넣을 품번 · **Mount** = TH(브레드보드)/SMD/Module · **Ref** = 설계 블록
+
+| # | Category | MPN | Description | Qty | Package | Mount | Ref | Notes |
+|---|----------|-----|-------------|-----|---------|-------|-----|-------|
+| **인프라** |
+| 1 | Mechanical | SZH-BBAD-002 | Breadboard 830-pin MB-102 | 4 | — | TH | BB | 병렬 결속 |
+| 2 | Wire | *(vendor 0.6mm solid)* | 3-color jumper wire 1 m | 6 | — | — | BB | 점퍼·버스 배선 |
+| 3 | Adapter | *(SOP28/SSOP28 dual)* | SOP28↔DIP adapter board | 4 | module | TH | BB | Flash·SRAM·LVC245 |
+| **ALU (20× DIP 74HC)** |
+| 4 | IC | 74HC283N | 4-bit binary full adder | 2 | DIP-16 | TH | alu8 | 캐리 연쇄 |
+| 5 | IC | 74HC153 | Dual 4-to-1 multiplexer | 4 | DIP-16 | TH | alu8 | ALU data path |
+| 6 | IC | 74HC86 | Quad 2-input XOR | 4 | DIP-14 | TH | alu8 | SUB / XOR |
+| 7 | IC | 74HC08 | Quad 2-input AND | 2 | DIP-14 | TH | alu8 | AND |
+| 8 | IC | 74HC32 | Quad 2-input OR | 2 | DIP-14 | TH | alu8 | OR |
+| 9 | IC | 74HC157 | Quad 2-to-1 MUX | 6 | DIP-16 | TH | alu8 | B/~B, INC/DEC, out MUX |
+| 10 | IC | 74HC04 | Hex inverter | 2 | DIP-14 | TH | alu8 | 8-bit NOT (~A) |
+| **CPU datapath (74HC, GPR = 574×4)** |
+| 11 | IC | 74HC574 | Octal D latch, 3-state | 7 | DIP-20 | TH | cpu | MBR,PCH,FLG + **R0–R3** |
+| 12 | IC | 74HC161 | 4-bit sync counter | 3 | DIP-16 | TH | cpu | PCL×2, phase |
+| 13 | IC | 74HC157 | Quad 2-to-1 MUX | 2 | DIP-16 | TH | addr_mux | A[7:0] address MUX |
+| **System CPLD** |
+| 14 | IC | ATF1504AS-10JU44 | CPLD 64-macrocell | 1 | PLCC-44 | SMD | cpld_sys | decode · arb · LOAD_R* |
+| 15 | Adapter | *(PLCC-44→DIP-44)* | PLCC socket to 2.54 mm DIP | 1 | module | TH | BB | CPLD breadboard mount |
+| 16 | Switch | *(DIP-1)* | MAP_MODE Boot/Run | 1 | — | TH | BB | Operator map select |
+| **Bus · memory** |
+| 17 | IC | 74HC245 | Octal bus transceiver | 1 | DIP-20 | TH | sram256 | SRAM ↔ MBR data |
+| 18 | IC | SST39SF010A-70-4C-PHE | 128K×8 NOR Flash, 70 ns | 1 | TSOP-32 | SMD→#3 | nor_flash | boot + 8b CW + utility |
+| 19 | IC | IS62C256AL-45ULI-TR | 32K×8 SRAM, 45 ns | 2 | SOP-28 | SMD→#3 | sram256 | **64KB** A15 bank |
+| **Clock (4 MHz → 2 MHz)** |
+| 20 | Osc | *(4 MHz half-can)* | Crystal oscillator 4.000 MHz | 1 | HC-49 half | TH | clock | 마스터 클록 |
+| 21 | IC | 74HC74 | Dual D flip-flop | 1 | DIP-14 | TH | clock | ÷2 → 2 MHz, 50% duty |
+| 22 | IC | 74HC04 | Hex inverter | 1 | DIP-14 | TH | clock | clk buffer / complement |
+| 23 | IC | 74HC14 | Hex Schmitt inverter | 2 | DIP-14 | TH | clock | clk tree, edge sharpen · **M7** |
+| **Level shift (optional lab)** |
+| 24 | IC | SN74LVC8T245DWR | 8-bit dual-supply transceiver | 3 | SOIC-24 | SMD→#3 | — | 3.3 V ↔ 5 V (Nano·Flash·CPLD) |
+| **Power · programming** |
+| 25 | Module | PWR080015 | Breadboard 5 V / 3.3 V supply | 1 | module | TH | BB | 듀얼 레일 |
+| 26 | Cable | SZH-CAB28 | Micro-B USB 1 m | 1 | — | — | BB | Nano / module power |
+| 27 | Module | THC-NAO002 | Arduino Nano V3 CH340 (C-type) | 1 | module | TH | BB | Flash CW bit-bang |
+| 28 | IC | 74HC595 | 8-bit shift register | 3 | DIP-16 | TH | — | Flash program addr ext |
+| **Passives · integrity** |
+| 29 | Cap | *(Mono 0.1 µF Y5V 50 V)* | Decoupling 0.1 µF | 34 | radial | TH | BB | 1:1 per IC +4 @ CPLD |
+| 30 | Cap | *(Dip tantal 10 µF 35 V)* | Bulk decoupling 10 µF | 10 | radial | TH | BB | VCC rail |
+| 31 | Cap | *(E/C 63 V 10 µF 105 °C 5×11)* | Electrolytic 10 µF | 10 | radial | TH | BB | ripple / POR |
+| 32 | Bead | BMI-BEAD-3590L | Ferrite bead | 10 | axial | TH | BB | power filtering |
+| 33 | Res array | *(8×330 Ω SIP)* | Bus series termination 33 Ω ×8 | 10 | SIP-9 | TH | BB | data bus |
+| 34 | Res array | Bourns 4708-103-103LF | 8×10 kΩ isolated SIP | 10 | SIP-9 | TH | BB | bus pull-up |
+| 35 | Res | *(1/4 W 103F 10 kΩ 1%)* | Axial resistor 10 kΩ | 10 | axial | TH | BB | pull-up / RC |
+| 36 | Diode | 1N4148 | Switching diode | 10 | DO-35 | TH | BB | POR / clamp |
+
+**§1 합계 (라인):** 37 · **74HC DIP:** 38 pcs · **SMD:** Flash×1, SRAM×2, LVC245×3, CPLD×1
 
 ---
 
-## 패키지·실장 메모
+## §2 v0.1 vs v1.3 — BOM Δ
 
-| 부품 | 패키지 | 실장 |
-|------|--------|------|
-| 74HC* (대부분) | DIP | 브레드보드 직결 |
-| SN74LVC8T245DWR | SOP/WSON 등 SMD | SOP28 어댑터 보드 |
-| IS62C256AL-45ULI-TR | SOP/SOIC SMD | SOP28 어댑터 보드 |
-| SST39SF010A | DIP 또는 SMD (품번 확인) | 데이터시트·실물 확인 |
+| MPN | v0.1 | v1.3 | 비고 |
+|-----|------|------|------|
+| 74HC574 | **7** | 3 | +4 GPR |
+| SST39SF010A | **1** | 2 | single NOR |
+| IS62C256AL | **2** | 1 | 64 KB |
+| 74HC138 | **0** | 1 | decode → CPLD |
+| MAP_MODE DIP | **1** | — | Boot/Run |
+| ATF1504AS role | system_ctrl | regfile | |
 
 ---
 
-## 설계에 있으나 본 BOM에 없는 항목
+## §3 Package · SMT / 실장
 
-| 항목 | 비고 |
+| MPN | Vendor package | Footprint / 실장 |
+|-----|----------------|------------------|
+| 74HC* (DIP rows) | DIP | 2.54 mm breadboard direct |
+| ATF1504AS-10JU44 | PLCC-44 | Row #15 adapter → breadboard |
+| SST39SF010A-70-4C-PHE | TSOP-32 (4C-PHE) | Row #3 adapter; verify pin 1 |
+| IS62C256AL-45ULI-TR | SOP-28 | Row #3 adapter |
+| SN74LVC8T245DWR | SOIC-24 (DWR) | Row #3 adapter |
+| OSC 4 MHz half-can | HC-49S half | Row #20; short leads to #21–23 |
+
+---
+
+## §4 BOM에 포함하지 않음
+
+| Item | Note |
 |------|------|
-| RP2350B | 그래픽·I/O 코프로세서 (별도 보드/주문 예정) |
-| 74HC151 | 8-GPR 확장안용 8:1 MUX — **v0.2 미채택**, 주문 불필요 |
-| 비디오 RAM | 공유 SRAM 또는 전용 VRAM 미정 |
-| 리셋 IC | 1N4148 + RC로 POR 구성 (본 BOM) |
+| JTAG ISP | CPLD synthesis |
+| RP2350B coprocessor | 별도 보드 — [rp2350-coprocessor.md](docs/rp2350-coprocessor.md) |
+| alu8_decode PLA | hwsim only — **8b Flash CW** direct |
 
 ---
 
-## 구매 단계 요약 (무엇을 언제 더 사는가)
+## §5 미주문 · 수량 부족 (v1.3 기준)
 
-| 단계 | 시점 | 추가 구매 | 비고 |
-|------|------|-----------|------|
-| **① 초기 BOM** | 2026-05-29 | (본表 수량) | ALU 4×153, 574×7 등 **설계 전체 1세트** 기준 |
-| **② ALU 확정** | 2026-05-31 | **+2×86, +4×157, +2×04** (풀); 최소 **+2×157** (B3 cascade) | [§ ALU 추가 구매](#alu-추가-구매-2026-05-31-갱신) — **이미 반영·주문 대상** |
-| **③ V2 regfile (v0.2)** | 2026-06-01~ | **+8×74HC153** | [§ V2 regfile 추가 구매](#v2-regfile-추가-구매-v02-2026-06-01) — **이번에 새로 필요** |
-| **④ V1 alu_decode (hwsim)** | 2026-05-31 | **+39×04, +72×08, +10×32** (생성 netlist) | [§ V1 ALU decode](#v1-alu-op-디코드-hwsim-2026-05-31) — ALU 20 IC와 **별도** |
+[디바이스마트 1차 주문](docs/purchase-devicesmart.md) 대비 **추가 발주** 필요:
 
-**이번(V2)에만 새로 주문할 것:** 아래 §V2 — **153 ×8** 한 종류가 핵심.  
-**추가 574·151·161·138·245:** v0.2 기준 **불필요** (초기 BOM·ALU 증분으로 충분).
+| MPN | BOM Qty | Ordered | Δ |
+|-----|---------|---------|---|
+| ATF1504AS-10JU44 | 1 | 0 | **+1** |
+| PLCC-44→DIP-44 adapter | 1 | 0 | **+1** |
+| 74HC14 (DIP) | 2 | 0 | **+2** |
+| 74HC86 (DIP) | 4 | 2 | **+2** |
+| 74HC157 (DIP) | 8 | 5 | **+3** |
+| 74HC04 (DIP) | 3 | 1 | **+2** |
+| Mono 0.1 µF | 34 | 30 | **+4** |
 
----
-
-## ALU 추가 구매 (2026-05-31 갱신)
-
-8비트 ALU 12 opcode + B3 INC/DEC cascade 기준 **추가 주문**:
-
-| 부품 | 추가 수량 | 합계(단가) |
-|------|-----------|------------|
-| 74HC86 (DIP) | +2 | ~720 KRW |
-| 74HC157 (DIP) | +4 | ~1,600 KRW |
-| 74HC04 (DIP) | +2 | ~800 KRW |
-
-B3 cascade only (이번): **+2×74HC157** (~800 KRW) — `U_ALU_157_B2_0/1`
-
-결선·테스트: [`hw/netlist/blocks/alu_b3.yaml`](hw/netlist/blocks/alu_b3.yaml), `python -m hwsim run --all`
+*574×7, 161×4, 245×2 등은 1차 주문 **재고 여유**.*
 
 ---
 
-## V2 regfile 추가 구매 (v0.2, 2026-06-01)
+## §6 설계 집계 (참고 — §1과 불일치 시 §1 우선)
 
-[microcode-spec v0.2](docs/microcode-spec-v0.2.md) — **4×574 GPR + 8×153 (A/B read MUX)**.  
-ALU 블록(20 IC) 및 §ALU 추가 구매 **이후** regfile 실장 단계에서 **추가 주문**:
-
-| 부품 | 추가 수량 | 합계(단가) | 용도 |
-|------|-----------|------------|------|
-| **74HC153 (DIP)** | **+8** | **~4,000 KRW** | Regfile A포트 4 IC + B포트 4 IC (듀얈 4:1, 8비트) |
-
-### 이번(V2)에 **사지 않아도 되는** 것
-
-| 부품 | 이유 |
-|------|------|
-| **74HC151** | 8-GPR 확장안 — v0.2 **미채택** |
-| **74HC574 추가** | 초기 BOM **7개** — GPR **4개** + B3 ACC(R2) + 여분 **3** |
-| **74HC161 / 138 / 245** | PC·CP 디코드·버스 — 초기 BOM에 이미 포함 |
-| **74HC283 / 86 / 157 / 04** (ALU) | ALU·B3 **확정·증분 주문 완료** 가정 |
-
-### 선택 (재고·배선에 따라)
-
-| 부품 | 용도 |
-|------|------|
-| 0.1µF 디커플링 | 153 **+8** — 기존 30개 cap 중 **8** 재배치 또는 **+8** 여유 |
-| 3색 점퍼 1M | regfile **1면 U-routing** (~64 가닥/port) — 기존 6 roll 중 **1 roll** 추가 권장 (~400 KRW) |
-| 74HC08 / 04 | IMM→R2 CP 마스크, `~CMP` AND — **여분 08/04**로 가능 (별도 주문 보통 불필요) |
-
-**타이밍 근거:** `python tools/regfile_slack_study.py` — 4×153/port, E2E **228 ns**, slack **22 ns** @ 2 MHz max.
-
-**hwsim netlist:** [`regfile.yaml`](hw/netlist/blocks/regfile.yaml), 통합 [`cpu_datapath_p1.yaml`](hw/netlist/blocks/cpu_datapath_p1.yaml).
+| Block | 74HC count | Key MPN |
+|-------|------------|---------|
+| ALU | 20 | 283×2, 153×4, 86×4, 08×2, 32×2, 157×6, 04×2 |
+| CPU | 12 | 574×7, 161×3, 157×2 |
+| Bus | 1 | 245×1 |
+| Clock | 4 IC + osc | 74×1, 04×1, 14×2 |
+| CPLD | 1 | ATF1504AS system_ctrl |
+| Memory | 3 | SST39×1, IS62×2 |
 
 ---
 
-## V1 ALU op 디코드 (hwsim, 2026-05-31)
+## §7 구매 단계 (마일스톤)
 
-[`alu_decode.yaml`](hw/netlist/blocks/alu_decode.yaml) — `alu_op[3:0]` → 14 ALU 제어선 + `net_cmp_n` (CMP=opcode 11 → active low).  
-**ALU 20 IC와 별도** (브레드보드에서는 138+패치 또는 아래 조합 논리 실장).
-
-| 부품 | 수량 (생성) | 비고 |
-|------|-------------|------|
-| 74HC04 | 39 | 버퍼·인버터 |
-| 74HC08 | 72 | AND (PLA minterm) |
-| 74HC32 | 10 | OR (출력 합) |
-
-Regenerate: `python tools/gen_alu_decode_netlist.py` · 테스트: `alu_decode_full`, `alu_decode_timing`.
+| 단계 | 내용 | BOM rows |
+|------|------|----------|
+| ① | ALU B3 | 4–10 |
+| ② | v1.3 CPU + CPLD | 11–15, 16–19 |
+| ②b | v1.2 fallback | +574×1, +157×4 (§2) |
+| ③ | Clock M7 + decap | 20–23, +4× #29 |
 
 ---
 
@@ -176,7 +151,7 @@ Regenerate: `python tools/gen_alu_decode_netlist.py` · 테스트: `alu_decode_f
 
 | 날짜 | 내용 |
 |------|------|
-| 2026-06-01 | v0.2 regfile: 153 4→12 (+8 구매), 시스템 IC 50→58, 구매 단계 § 추가 |
-| 2026-05-31 | B3: ALU 157 B2 cascade +2 IC, 시스템 48→50 IC, alu_b3 hwsim |
-| 2026-05-31 | ALU 12→18 IC (86×4, 157×2, 04×2), 시스템 42→48 IC |
-| 2026-05-29 | 초기 BOM |
+| 2026-06-01 | **v0.1** — 574×7, SST39×1, IS62×2, system CPLD |
+| 2026-06-01 | 메모리 풀 품번 복원 |
+| 2026-05-31 | v1.3 CPLD hybrid 권장 |
+| 2026-05-29 | 초기 BOM (git `dbb6e8c`) |
