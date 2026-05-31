@@ -309,8 +309,10 @@ hwsim: `regfile_rmw_8x151_slack.yaml` (참고 테스트).
 | B3 | alu8 + 574 ACC, 2 MHz | hwsim PASS |
 | V1 | `alu_op` → ALU 제어선 + `~CMP` | **완료** — [`alu_decode.yaml`](../hw/netlist/blocks/alu_decode.yaml), `alu_decode_full` |
 | V2 | 4×574 + 8×153 regfile, IMM→R2, CP mask | **완료** — [`regfile.yaml`](../hw/netlist/blocks/regfile.yaml), `regfile_*`, [`cpu_datapath_p1.yaml`](../hw/netlist/blocks/cpu_datapath_p1.yaml) |
+| ROM fetch | ROM16 → CW bus, PC stub | **완료** — [`rom_fetch.yaml`](../hw/netlist/blocks/rom_fetch.yaml), `rom_fetch_*`, `p2_rom_*` |
+| IMM→R2 B | `bus_en=11`, 8×157 B mux | **완료** — `p2_imm_load` |
+| Tool | `pack_rom.py` v0.2 | **완료** — [`tools/pack_rom.py`](../tools/pack_rom.py), [`hw/fixtures/rom/`](../hw/fixtures/rom/) |
 | V3 | PC 161 + LOCAL 분기 조합 | TODO |
-| Tool | `pack_rom.py` / microasm v0.2 | TODO |
 | Bring-up | regfile 1면 U-routing, scope setup/slack | TODO |
 
 ---

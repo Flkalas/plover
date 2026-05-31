@@ -28,6 +28,8 @@ KNOWN_PARTS = frozenset(
         "74HC138",
         "SST39SF010A",
         "IS62C256",
+        "ROM16",
+        "PC8_AUTO",
     }
 )
 

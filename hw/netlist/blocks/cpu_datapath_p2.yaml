@@ -1,6 +1,36 @@
 version: 1
-block: cpu_datapath_p1
+block: cpu_datapath_p2
 instances:
+  - ref: U_ROM
+    part: ROM16
+    pins:
+      A0: net_pc0
+      A1: net_pc1
+      A2: net_pc2
+      A3: net_pc3
+      A4: net_pc4
+      A5: net_pc5
+      A6: net_pc6
+      A7: net_pc7
+      D15: net_alu_op3
+      D14: net_alu_op2
+      D13: net_alu_op1
+      D12: net_alu_op0
+      D11: net_src_reg1
+      D10: net_src_reg0
+      D9: net_dst_reg1
+      D8: net_dst_reg0
+      D7: net_bus_en1
+      D6: net_bus_en0
+      D5: net_ctrl5
+      D4: net_ctrl4
+      D3: net_ctrl3
+      D2: net_ctrl2
+      D1: net_ctrl1
+      D0: net_ctrl0
+      VCC: pwr_vcc
+      GND: pwr_gnd
+
   - ref: U_DEC_04_1
     part: 74HC04
     pins:
@@ -1936,6 +1966,62 @@ instances:
       VCC: pwr_vcc
       GND: pwr_gnd
 nets:
+  - name: net_clk2
+    width: 1
+    probes: [clk]
+  - name: net_pc0
+    width: 1
+  - name: net_pc1
+    width: 1
+  - name: net_pc2
+    width: 1
+  - name: net_pc3
+    width: 1
+  - name: net_pc4
+    width: 1
+  - name: net_pc5
+    width: 1
+  - name: net_pc6
+    width: 1
+  - name: net_pc7
+    width: 1
+  - name: net_alu_op3
+    width: 1
+  - name: net_alu_op2
+    width: 1
+  - name: net_alu_op1
+    width: 1
+  - name: net_alu_op0
+    width: 1
+  - name: net_src_reg1
+    width: 1
+  - name: net_src_reg0
+    width: 1
+  - name: net_dst_reg1
+    width: 1
+  - name: net_dst_reg0
+    width: 1
+  - name: net_bus_en1
+    width: 1
+  - name: net_bus_en0
+    width: 1
+  - name: net_ctrl5
+    width: 1
+  - name: net_ctrl4
+    width: 1
+  - name: net_ctrl3
+    width: 1
+  - name: net_ctrl2
+    width: 1
+  - name: net_ctrl1
+    width: 1
+  - name: net_ctrl0
+    width: 1
+  - name: pwr_vcc
+    width: 1
+  - name: pwr_gnd
+    width: 1
+
   - name: net_alu_op0
     width: 1
     probes: [alu_op0]

@@ -114,11 +114,14 @@ def run_scenario(
     expect: list[dict[str, Any]] | None = None,
     checks: list[dict[str, Any]] | None = None,
     test_name: str = "scenario",
+    rom_image: list[int] | None = None,
 ) -> dict[str, Any]:
     nl = load_netlist(netlist_path)
     mode = timing
     tdata = load_timing(repo_root, mode)
     ctx = SimContext(nl, tdata)
+    if rom_image:
+        ctx.rom_image = list(rom_image)
 
     probe_nets = nl.probe_nets() or {n.name for n in nl.nets if not n.name.startswith("pwr_")}
 

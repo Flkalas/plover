@@ -123,8 +123,8 @@ instances:
       2C2: net_r2_q1
       1C3: net_r3_q0
       2C3: net_r3_q1
-      1Y: net_b0
-      2Y: net_b1
+      1Y: net_b153_0
+      2Y: net_b153_1
       1G: pwr_gnd
       2G: pwr_gnd
       A: net_dst_reg0
@@ -161,8 +161,8 @@ instances:
       2C2: net_r2_q3
       1C3: net_r3_q2
       2C3: net_r3_q3
-      1Y: net_b2
-      2Y: net_b3
+      1Y: net_b153_2
+      2Y: net_b153_3
       1G: pwr_gnd
       2G: pwr_gnd
       A: net_dst_reg0
@@ -199,8 +199,8 @@ instances:
       2C2: net_r2_q5
       1C3: net_r3_q4
       2C3: net_r3_q5
-      1Y: net_b4
-      2Y: net_b5
+      1Y: net_b153_4
+      2Y: net_b153_5
       1G: pwr_gnd
       2G: pwr_gnd
       A: net_dst_reg0
@@ -237,12 +237,92 @@ instances:
       2C2: net_r2_q7
       1C3: net_r3_q6
       2C3: net_r3_q7
-      1Y: net_b6
-      2Y: net_b7
+      1Y: net_b153_6
+      2Y: net_b153_7
       1G: pwr_gnd
       2G: pwr_gnd
       A: net_dst_reg0
       B: net_dst_reg1
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_IMM_B_MUX_0
+    part: 74HC157
+    pins:
+      1A: net_b153_0
+      1B: net_ctrl0
+      1Y: net_b0
+      S: net_bus_imm
+      OE: pwr_gnd
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_IMM_B_MUX_1
+    part: 74HC157
+    pins:
+      1A: net_b153_1
+      1B: net_ctrl1
+      1Y: net_b1
+      S: net_bus_imm
+      OE: pwr_gnd
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_IMM_B_MUX_2
+    part: 74HC157
+    pins:
+      1A: net_b153_2
+      1B: net_ctrl2
+      1Y: net_b2
+      S: net_bus_imm
+      OE: pwr_gnd
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_IMM_B_MUX_3
+    part: 74HC157
+    pins:
+      1A: net_b153_3
+      1B: net_ctrl3
+      1Y: net_b3
+      S: net_bus_imm
+      OE: pwr_gnd
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_IMM_B_MUX_4
+    part: 74HC157
+    pins:
+      1A: net_b153_4
+      1B: net_ctrl4
+      1Y: net_b4
+      S: net_bus_imm
+      OE: pwr_gnd
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_IMM_B_MUX_5
+    part: 74HC157
+    pins:
+      1A: net_b153_5
+      1B: net_ctrl5
+      1Y: net_b5
+      S: net_bus_imm
+      OE: pwr_gnd
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_IMM_B_MUX_6
+    part: 74HC157
+    pins:
+      1A: net_b153_6
+      1B: net_dst_reg0
+      1Y: net_b6
+      S: net_bus_imm
+      OE: pwr_gnd
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_IMM_B_MUX_7
+    part: 74HC157
+    pins:
+      1A: net_b153_7
+      1B: net_dst_reg1
+      1Y: net_b7
+      S: net_bus_imm
+      OE: pwr_gnd
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_IMM_BUS
@@ -408,6 +488,18 @@ nets:
     width: 1
   - name: net_dst_eff1
     width: 1
+  - name: net_ctrl0
+    width: 1
+  - name: net_ctrl1
+    width: 1
+  - name: net_ctrl2
+    width: 1
+  - name: net_ctrl3
+    width: 1
+  - name: net_ctrl4
+    width: 1
+  - name: net_ctrl5
+    width: 1
   - name: net_cp_y0
     width: 1
   - name: net_cp_y1
@@ -502,6 +594,8 @@ nets:
     width: 1
   - name: net_b0
     width: 1
+  - name: net_b153_0
+    width: 1
   - name: net_y0
     width: 1
     probes: [y0]
@@ -509,11 +603,15 @@ nets:
     width: 1
   - name: net_b1
     width: 1
+  - name: net_b153_1
+    width: 1
   - name: net_y1
     width: 1
   - name: net_a2
     width: 1
   - name: net_b2
+    width: 1
+  - name: net_b153_2
     width: 1
   - name: net_y2
     width: 1
@@ -521,11 +619,15 @@ nets:
     width: 1
   - name: net_b3
     width: 1
+  - name: net_b153_3
+    width: 1
   - name: net_y3
     width: 1
   - name: net_a4
     width: 1
   - name: net_b4
+    width: 1
+  - name: net_b153_4
     width: 1
   - name: net_y4
     width: 1
@@ -533,17 +635,23 @@ nets:
     width: 1
   - name: net_b5
     width: 1
+  - name: net_b153_5
+    width: 1
   - name: net_y5
     width: 1
   - name: net_a6
     width: 1
   - name: net_b6
     width: 1
+  - name: net_b153_6
+    width: 1
   - name: net_y6
     width: 1
   - name: net_a7
     width: 1
   - name: net_b7
+    width: 1
+  - name: net_b153_7
     width: 1
   - name: net_y7
     width: 1

@@ -413,6 +413,57 @@ class Hc86(Hc08):
         self._drive("Y", fn(a, b), t, "xor")
 
 
+class Rom16(ChipModel):
+    """Behavioral 16-bit ROM: address comb read into D0..D15 (CW field slice)."""
+
+    part = "ROM16"
+
+    def on_start(self) -> None:
+        self._read_out()
+
+    def on_net_change(self, net: str) -> None:
+        addr_nets = {self.net_for(f"A{i}") for i in range(8)}
+        if net in addr_nets:
+            self._read_out()
+
+    def _read_out(self) -> None:
+        addr = sum(self.read_bit(f"A{i}") << i for i in range(8))
+        words: list[int] = getattr(self.ctx, "rom_image", [])
+        word = words[addr] if addr < len(words) else 0
+        t = self.t_pd("ROM16", "t_pd", default=35)
+        for i in range(16):
+            self._drive(f"D{i}", (word >> i) & 1, t, "rom")
+
+
+class Pc8Auto(ChipModel):
+    """Phase2 PC stub: net_clk2 posedge increments 8-bit PC -> ROM address."""
+
+    part = "PC8_AUTO"
+
+    def on_start(self) -> None:
+        self._pc = 0
+        cp = "CP"
+        self._prev_clk[cp] = self.read_bit(cp)
+        self._drive_pc(0)
+
+    def on_net_change(self, net: str) -> None:
+        if net != self.net_for("CP"):
+            return
+        net_name = self.net_for("CP")
+        cur = self.ctx.get_net(net_name) & 1
+        prev = self._prev_clk.get("CP", 0)
+        self._prev_clk["CP"] = cur
+        if not (prev == 1 and cur == 0):
+            return
+        self._pc = (self._pc + 1) & 0xFF
+        t = self.t_pd("PC8_AUTO", "t_clk_to_q", default=15)
+        self._drive_pc(t)
+
+    def _drive_pc(self, delay: int) -> None:
+        for i in range(8):
+            self._drive(f"Q{i}", (self._pc >> i) & 1, delay, "pc")
+
+
 def create_model(ref: str, part: str, pins: dict[str, str], ctx: SimContext) -> ChipModel:
     table: dict[str, type[ChipModel]] = {
         "OSC_4M": Osc4M,
@@ -429,6 +480,8 @@ def create_model(ref: str, part: str, pins: dict[str, str], ctx: SimContext) -> 
         "74HC08": Hc08,
         "74HC32": Hc32,
         "74HC86": Hc86,
+        "ROM16": Rom16,
+        "PC8_AUTO": Pc8Auto,
     }
     cls = table.get(part)
     if cls is None:

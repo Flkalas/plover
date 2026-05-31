@@ -15,6 +15,7 @@ Design notes and **hwsim** electrical simulation for the Plover 8-bit VLIW-RISC 
 | [v0.2-implementation-plan.md](v0.2-implementation-plan.md) | **v0.2 구현 단계·의존 관계** — Flash CW → full CPU |
 | [hw-viewer-p1.md](hw-viewer-p1.md) | **Phase1 interactive viewer** — `python -m hwsim serve` |
 | [hw-bringup-p1-datapath.md](hw-bringup-p1-datapath.md) | Phase1 datapath hwsim (V1+V2 stub CW) |
+| [hw-bringup-p2-rom.md](hw-bringup-p2-rom.md) | **Phase2 ROM CW** — Flash→bus hwsim, `pack_rom.py` |
 | [archive/README.md](archive/README.md) | Archived Gemini logs and Cursor plans |
 | [archive/gemini/](archive/gemini/) | Original design conversation exports |
 | [archive/plans/](archive/plans/) | Completed Verilog simulator plan |

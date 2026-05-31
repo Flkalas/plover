@@ -24,13 +24,15 @@ def reg574(ref: str, idx: int) -> list[str]:
 def mux153_pair(ref: str, port: str, bit_lo: int) -> list[str]:
     sel0 = "net_src_reg0" if port == "a" else "net_dst_reg0"
     sel1 = "net_src_reg1" if port == "a" else "net_dst_reg1"
+    y0 = f"net_{port}{bit_lo}" if port == "a" else f"net_b153_{bit_lo}"
+    y1 = f"net_{port}{bit_lo + 1}" if port == "a" else f"net_b153_{bit_lo + 1}"
     lines = [f"  - ref: {ref}", "    part: 74HC153", "    pins:"]
     for i in range(4):
         lines.append(f"      1C{i}: net_r{i}_q{bit_lo}")
         lines.append(f"      2C{i}: net_r{i}_q{bit_lo + 1}")
     lines += [
-        f"      1Y: net_{port}{bit_lo}",
-        f"      2Y: net_{port}{bit_lo + 1}",
+        f"      1Y: {y0}",
+        f"      2Y: {y1}",
         "      1G: pwr_gnd",
         "      2G: pwr_gnd",
         f"      A: {sel0}",
@@ -39,6 +41,22 @@ def mux153_pair(ref: str, port: str, bit_lo: int) -> list[str]:
         "      GND: pwr_gnd",
     ]
     return lines
+
+
+def imm_b_mux(bit: int) -> list[str]:
+    imm_net = f"net_ctrl{bit}" if bit < 6 else f"net_dst_reg{bit - 6}"
+    return [
+        f"  - ref: U_IMM_B_MUX_{bit}",
+        "    part: 74HC157",
+        "    pins:",
+        f"      1A: net_b153_{bit}",
+        f"      1B: {imm_net}",
+        f"      1Y: net_b{bit}",
+        "      S: net_bus_imm",
+        "      OE: pwr_gnd",
+        "      VCC: pwr_vcc",
+        "      GND: pwr_gnd",
+    ]
 
 
 def cp_gate(idx: int) -> list[str]:
@@ -111,6 +129,8 @@ def main() -> None:
     for p in range(4):
         inst.extend(mux153_pair(f"U_MUX_A_{p}", "a", p * 2))
         inst.extend(mux153_pair(f"U_MUX_B_{p}", "b", p * 2))
+    for bit in range(8):
+        inst.extend(imm_b_mux(bit))
     inst.extend(imm_dst_override())
     inst += [
         "  - ref: U_CP_DEC",
@@ -161,6 +181,8 @@ def main() -> None:
         "  - name: net_dst_eff1",
         "    width: 1",
     ]
+    for i in range(6):
+        nets += [f"  - name: net_ctrl{i}", "    width: 1"]
     for i in range(8):
         nets += [f"  - name: net_cp_y{i}", "    width: 1"]
     for i in range(4):
@@ -176,6 +198,7 @@ def main() -> None:
             nets.append(line)
     for b in range(8):
         nets += [f"  - name: net_a{b}", "    width: 1", f"  - name: net_b{b}", "    width: 1"]
+        nets += [f"  - name: net_b153_{b}", "    width: 1"]
         if b == 0:
             nets += [f"  - name: net_y{b}", "    width: 1", "    probes: [y0]"]
         else:

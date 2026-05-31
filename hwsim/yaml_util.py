@@ -56,6 +56,8 @@ def _scalar(raw: str) -> Any:
         return s[1:-1]
     if re.fullmatch(r"-?\d+", s):
         return int(s)
+    if re.fullmatch(r"0[xX][0-9a-fA-F]+", s):
+        return int(s, 16)
     if re.fullmatch(r"-?\d+\.\d+", s):
         return float(s)
     return s
@@ -134,6 +136,10 @@ def _collect_list_block(lines: list[str], start: int, indent: int) -> tuple[list
         body = body[2:].strip()
         if body.startswith("{") and body.endswith("}"):
             items.append(_parse_inline_map(body))
+            i += 1
+            continue
+        if ":" not in body:
+            items.append(_scalar(body))
             i += 1
             continue
         item_lines = [" " * (indent + 2) + body]

@@ -50,6 +50,7 @@ class SimContext:
         self._pending: dict[str, PendingDrive] = {}
         self._toggle_tasks: dict[str, int] = {}
         self._pin_map: dict[tuple[str, str], str] = {}
+        self.rom_image: list[int] = []
 
         for nd in nl.nets:
             self.nets[nd.name] = 2
@@ -135,6 +136,29 @@ def load_test(path: Path) -> dict[str, Any]:
     return data
 
 
+def load_rom_image(test: dict[str, Any], test_path: Path, repo_root: Path) -> list[int]:
+    if "rom_image" in test:
+        out: list[int] = []
+        for w in test["rom_image"]:
+            out.append(int(w, 16) if isinstance(w, str) else int(w))
+        return out
+    if "rom_image_file" not in test:
+        return []
+    rel = test["rom_image_file"]
+    path = (test_path.parent / rel).resolve()
+    if not path.is_file():
+        path = (repo_root / rel).resolve()
+    if not path.is_file():
+        raise FileNotFoundError(f"rom_image_file not found: {rel}")
+    words: list[int] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.split(";", 1)[0].strip()
+        if not line:
+            continue
+        words.append(int(line, 16))
+    return words
+
+
 def run_test(test_path: Path, repo_root: Path) -> dict[str, Any]:
     from hwsim.scenario import run_scenario
 
@@ -157,6 +181,7 @@ def run_test(test_path: Path, repo_root: Path) -> dict[str, Any]:
         expect=test.get("expect"),
         checks=test.get("checks"),
         test_name=test_path.stem,
+        rom_image=load_rom_image(test, test_path, repo_root),
     )
 
 
@@ -318,6 +343,8 @@ def _is_path_output(part: str, pin: str) -> bool:
         return True
     if part == "74HC574" and pin.startswith("Q"):
         return True
+    if part == "ROM16" and pin.startswith("D"):
+        return True
     return False
 
 
@@ -348,6 +375,10 @@ def _hop_delay(ctx: SimContext, part: str, pin: str) -> int:
         return delay_ns(ctx.timing, "74HC153", "t_pd", default=28)
     if part == "74HC157":
         return delay_ns(ctx.timing, "74HC157", "t_pd", default=18)
+    if part == "ROM16":
+        return delay_ns(ctx.timing, "ROM16", "t_pd", default=40)
+    if part == "PC8_AUTO":
+        return delay_ns(ctx.timing, "PC8_AUTO", "t_clk_to_q", default=15)
     return 10
 
 
