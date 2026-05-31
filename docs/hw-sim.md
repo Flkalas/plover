@@ -30,6 +30,8 @@ Outputs go to `build/hwsim/<test_name>/`:
 
 Open [`hw/viewer/index.html`](../hw/viewer/index.html) in a browser and load these files.
 
+Phase1 interactive viewer: `python -m hwsim serve` — see [hw-viewer-p1.md](hw-viewer-p1.md).
+
 ## Assumptions
 
 - 5 V, 25 °C, datasheet typ/max delays

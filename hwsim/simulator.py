@@ -136,58 +136,28 @@ def load_test(path: Path) -> dict[str, Any]:
 
 
 def run_test(test_path: Path, repo_root: Path) -> dict[str, Any]:
+    from hwsim.scenario import run_scenario
+
     test = load_test(test_path)
     nl_path = (test_path.parent / test["netlist"]).resolve()
     if not nl_path.is_file():
         nl_path = (repo_root / test["netlist"]).resolve()
-    nl = load_netlist(nl_path)
     mode = str(test.get("timing", "typ"))
-    timing = load_timing(repo_root, mode)
     duration = int(test.get("duration_ns", 1000))
-    ctx = SimContext(nl, timing)
-
-    probe_nets = nl.probe_nets() or {n.name for n in nl.nets if not n.name.startswith("pwr_")}
-
-    for stim in test.get("stimulus", []):
-        at = int(stim.get("at_ns", 0))
-        payload: dict[str, Any] = {}
+    stimulus = test.get("stimulus", [])
+    for stim in stimulus:
         if "set" in stim:
-            payload["set"] = {k: int(v) for k, v in stim["set"].items()}
-        if "toggle" in stim:
-            payload["toggle"] = [stim["toggle"]] if isinstance(stim["toggle"], str) else list(stim["toggle"])
-        ctx.scheduler.schedule(at, "stimulus", **payload)
-
-    ctx.run(duration)
-
-    errors: list[str] = []
-    for exp in test.get("expect", []):
-        at = int(exp.get("at_ns", 0))
-        for net, want in exp.items():
-            if net == "at_ns":
-                continue
-            got = _net_at_time(ctx, net, at)
-            if got != int(want):
-                errors.append(f"at {at}ns {net}: expected {want} got {VALUE_NAMES.get(got, got)}")
-
-    check_results: list[dict[str, Any]] = []
-    for chk in test.get("checks", []):
-        cr = _run_check(chk, ctx, duration, errors)
-        check_results.append(cr)
-
-    waves = {n: ctx.wave.samples.get(n, []) for n in sorted(probe_nets) if n in ctx.wave.samples}
-
-    return {
-        "test": test_path.stem,
-        "block": nl.block,
-        "timing_mode": mode,
-        "duration_ns": duration,
-        "passed": len(errors) == 0,
-        "errors": errors,
-        "violations": ctx.violations,
-        "checks": check_results,
-        "waves": waves,
-        "final_nets": {k: VALUE_NAMES.get(v, "?") for k, v in ctx.nets.items()},
-    }
+            stim["set"] = {k: int(v) for k, v in stim["set"].items()}
+    return run_scenario(
+        nl_path,
+        repo_root,
+        stimulus=stimulus,
+        duration_ns=duration,
+        timing=mode,
+        expect=test.get("expect"),
+        checks=test.get("checks"),
+        test_name=test_path.stem,
+    )
 
 
 def _last_transition_before(rows: list[dict[str, Any]], before_ns: int) -> int | None:
