@@ -10,9 +10,9 @@
 | 영역 | 상태 | 비고 |
 |------|------|------|
 | 설계·BOM | 완료 | [BOM.md](../BOM.md) |
-| **hwsim 전기 시뮬** | ALU 12 op + B3 | clock, **alu8**, **alu_b3**, **bringup_b3c**, alu283, reg574 — [hw-sim.md](hw-sim.md) |
+| **hwsim 전기 시뮬** | ALU + v0.2 Phase1 | clock, **alu8**, **alu_decode**, **regfile**, **p1_***, alu_b3, reg574 — [hw-sim.md](hw-sim.md) |
 | KiCad↔YAML | 샘플 | `clock.net` diff; **sheet_alu** 후속 |
-| 블록 netlist | 6종 | [hw/netlist/blocks/](../hw/netlist/blocks/) incl. [alu_b3_clock.yaml](../hw/netlist/blocks/alu_b3_clock.yaml) |
+| 블록 netlist | 10+종 | [hw/netlist/blocks/](../hw/netlist/blocks/) incl. [cpu_datapath_p1.yaml](../hw/netlist/blocks/cpu_datapath_p1.yaml) |
 | 정적 viewer | MVP | [hw/viewer/](../hw/viewer/) |
 | Verilog·ISA 시뮬 | archived | [archive/verilog-sim/](../archive/verilog-sim/) |
 | 하드웨어 조립 | B3a 문서 준비 | [hw-bringup-b3.md](hw-bringup-b3.md), [hw-bringup-b3-opcode.md](hw-bringup-b3-opcode.md) |
@@ -53,9 +53,11 @@ flowchart LR
 | Wavedrom critical path | `report` + viewer | 중 |
 | 42 IC 통합 netlist `include` | 후속 | 낮음 |
 
-**B3 hwsim 완료:** `python -m hwsim run --all` **10 tests** PASS — setup/hold, SUB/XOR slack, 574 latch, INC/DEC 157 B2, **B3c 2 MHz clock+ACC**.
+**Phase1 hwsim 완료 (2026-05-31):** `python -m hwsim run --all` **21 tests** PASS — decode (`alu_decode_*`), regfile (`regfile_*`), 통합 (`p1_rmw_*`, `p1_cmp_no_latch`, `p1_rmw_clock`). ALU [`alu8.yaml`](../hw/netlist/blocks/alu8.yaml) **무변경**.
 
-**완료 기준 (다음 마일스톤):** PC + bus 블록 테스트 PASS; **B3a 실기** per [hw-bringup-b3.md](hw-bringup-b3.md) § B3a.
+**B3 hwsim 완료:** `python -m hwsim run --all` — setup/hold, SUB/XOR slack, 574 latch, INC/DEC 157 B2, **B3c 2 MHz clock+ACC**.
+
+**완료 기준 (다음 마일스톤):** ROM 16b CW fetch + 축소 E2E — [v0.2-implementation-plan.md](v0.2-implementation-plan.md) Phase2A; 풀 CPU는 Phase5.
 
 ---
 
@@ -118,6 +120,7 @@ hwsim 블록 테스트와 1:1 대응. 각 단계마다 **동일 netlist**를 브
 
 | 날짜 | 내용 |
 |------|------|
+| 2026-05-31 | v0.6 — v0.2 Phase1 hwsim: alu_decode + regfile + cpu_datapath_p1, 21 tests PASS |
 | 2026-05-31 | v0.5 — B3a/b/c phased bring-up, opcode cheat sheet, bringup_b3c_clock |
 | 2026-05-31 | v0.4 — B3 alu_b3 netlist, setup/hold, 157 B2 INC/DEC, bring-up doc |
 | 2026-05-31 | v0.3 — BOM ALU 18 IC, alu8 netlist 12 opcode PASS |

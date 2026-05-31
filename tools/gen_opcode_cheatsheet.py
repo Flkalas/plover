@@ -29,12 +29,13 @@ def main() -> None:
     lines = [
         "# B3 — opcode → control line cheat sheet",
         "",
-        "Breadboard **DIP / tie** settings for 12 `alu_sel` operations. "
+        "Breadboard **DIP / tie** settings for 12 `alu_op[3:0]` operations (v0.2 CW `[15:12]`). "
         "Generated from the same vectors as [`alu8_full.yaml`](../hw/tests/alu8_full.yaml).",
         "",
         "Regenerate: `python tools/gen_opcode_cheatsheet.py`",
         "",
-        "**Netlist has no `alu_sel` bus** — set each control net manually (or hardwire per row).",
+        "**Netlist has no `alu_sel` bus** — in Phase1 hwsim use [`alu_decode.yaml`](../hw/netlist/blocks/alu_decode.yaml) "
+        "or set each control net manually (or hardwire per row).",
         "",
         "INC/DEC: do **not** drive `net_b0..7`; use `b_const_sel` + `b_const_bit1..7` only.",
         "",
@@ -52,13 +53,13 @@ def main() -> None:
         "",
         "## 12 opcodes",
         "",
-        "| sel | Op | A | B | sub | cin | b_sel | b_cst | s1 | s0 | c3 | b_hi | Y | Y LEDs y7..y0 | Fixed ties |",
-        "|-----|-----|---|---|-----|-----|-------|-------|----|----|----|------|---|---------------|------------|",
+        "| sel | `alu_op` | Op | A | B | sub | cin | b_sel | b_cst | s1 | s0 | c3 | b_hi | Y | Y LEDs y7..y0 | Fixed ties |",
+        "|-----|----------|-----|---|---|-----|-----|-------|-------|----|----|----|------|---|---------------|------------|",
     ]
 
     for sel, (name, a, b, exp, c) in enumerate(CASES):
         lines.append(
-            f"| {sel} | **{name}** | `{a:02X}` | `{b:02X}` | "
+            f"| {sel} | `{sel:X}` | **{name}** | `{a:02X}` | `{b:02X}` | "
             f"{c['net_sub_en']} | {c['net_cin']} | {c['net_b_sel']} | {c['net_b_const_sel']} | "
             f"{c['net_153_s1']} | {c['net_153_s0']} | {c['net_c3_sel']} | "
             f"{c['net_b_const_bit1']} | `{exp:02X}` | `{y_bits(exp)[::-1]}` | {fixed_ties(c)} |"
