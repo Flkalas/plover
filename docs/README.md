@@ -1,28 +1,37 @@
 # Plover documentation
 
-Design notes and simulator specifications for the Plover 8-bit VLIW-RISC project.
+Design notes and **hwsim** electrical simulation for the Plover 8-bit VLIW-RISC breadboard CPU.
 
 ## Index
 
 | Document | Description |
 |----------|-------------|
-| [microcode-spec.md](microcode-spec.md) | 16-bit control word layout, ALU/bus/branch encodings, `microasm` syntax |
-| [Gemini-_38.md](Gemini-_38.md) | Design conversation log (architecture, BOM, VLIW) |
-| [Gemini-_28.md](Gemini-_28.md) | Timing / critical-path discussion |
-| [Gemini-_22.md](Gemini-_22.md) | Background research notes |
+| [hw-sim.md](hw-sim.md) | **Electrical timing sim** — `python -m hwsim`, netlist YAML, block tests |
+| [hw-schematic.md](hw-schematic.md) | KiCad ↔ YAML netlist naming |
+| [roadmap-next.md](roadmap-next.md) | Next steps — hwsim expansion, breadboard bring-up |
+| [archive/README.md](archive/README.md) | Archived Gemini logs and Cursor plans |
+| [archive/gemini/](archive/gemini/) | Original design conversation exports |
+| [archive/plans/](archive/plans/) | Completed Verilog simulator plan |
+
+Archived Verilog / ISA docs: [../archive/verilog-sim/docs/microcode-spec.md](../archive/verilog-sim/docs/microcode-spec.md)
 
 ## Project root
 
-- [../README.md](../README.md) — project overview, simulator quick start
+- [../README.md](../README.md) — project overview, hwsim quick start
 - [../BOM.md](../BOM.md) — bill of materials
+- [../archive/README.md](../archive/README.md) — archived Verilog stack
 
-## Simulator code map
+## Code map (active)
 
 | Path | README |
 |------|--------|
-| `rtl/` | [../rtl/README.md](../rtl/README.md) |
-| `sim/` | [../sim/README.md](../sim/README.md) |
-| `tools/` | [../tools/README.md](../tools/README.md) |
-| `lib/` | [../lib/README.md](../lib/README.md) |
-| `sim-runner/` | [../sim-runner/README.md](../sim-runner/README.md) |
-| `web/` | [../web/README.md](../web/README.md) |
+| `hwsim/` | [../hwsim/README.md](../hwsim/README.md) |
+| `hw/` | [../hw/README.md](../hw/README.md) |
+
+## Code map (archived)
+
+| Path | README |
+|------|--------|
+| `archive/verilog-sim/rtl/` | [../archive/verilog-sim/rtl/README.md](../archive/verilog-sim/rtl/README.md) |
+| `archive/verilog-sim/sim/` | [../archive/verilog-sim/sim/README.md](../archive/verilog-sim/sim/README.md) |
+| `archive/verilog-sim/web/` | [../archive/verilog-sim/web/README.md](../archive/verilog-sim/web/README.md) |

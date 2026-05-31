@@ -10,7 +10,7 @@ Assembles `.micro` source into 16-bit control words and writes `rom_low.hex` / `
 python3 tools/microasm.py lib/inc_r1.micro -o sim
 ```
 
-Syntax: see [docs/microcode-spec.md](../docs/microcode-spec.md).
+Syntax: see [docs/microcode-spec.md](docs/microcode-spec.md).
 
 Example line:
 
@@ -34,4 +34,5 @@ python3 tools/pack_rom.py 9310 0005 -o sim
 
 ## See also
 
-- [../lib/README.md](../lib/README.md) — example programs  
+- [../lib/README.md](../lib/README.md) — example programs
+- [../../docs/hw-sim.md](../../docs/hw-sim.md) — current electrical simulator (repo root)
