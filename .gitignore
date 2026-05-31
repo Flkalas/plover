@@ -1,8 +1,11 @@
 build/
 sim/wave.vcd
+archive/verilog-sim/sim/wave.vcd
 __pycache__/
 *.pyc
 .venv/
 web/node_modules/
+archive/verilog-sim/web/node_modules/
 web/dist/
+archive/verilog-sim/web/dist/
 *.vvp
