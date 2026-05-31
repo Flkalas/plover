@@ -49,6 +49,7 @@ class SimContext:
         self.path_delays: list[dict[str, Any]] = []
         self._pending: dict[str, PendingDrive] = {}
         self._toggle_tasks: dict[str, int] = {}
+        self._pin_map: dict[tuple[str, str], str] = {}
 
         for nd in nl.nets:
             self.nets[nd.name] = 2
@@ -62,6 +63,7 @@ class SimContext:
                     elif pin in ("GND", "VSS"):
                         self.nets[net] = 0
                     continue
+                self._pin_map[(inst.ref, pin)] = net
                 self.listeners.setdefault(net, []).append(model)
 
     def get_net(self, net: str) -> int:
@@ -80,12 +82,23 @@ class SimContext:
         self.scheduler.schedule_after(half_period_ns, "toggle", net=net, driver=driver)
 
     def check_setup(self, ref: str, clk_pin: str, data_pin: str, setup_ns: int) -> bool:
-        # Simplified: data must be stable setup_ns before edge (tracked via violation flag only on change at edge)
+        edge_ns = self.scheduler.now_ns
+        data_net = self._pin_map.get((ref, data_pin))
+        if not data_net:
+            return True
+        last_chg = _last_transition_before(self.wave.samples.get(data_net, []), edge_ns)
+        if last_chg is not None and last_chg > edge_ns - setup_ns:
+            msg = (
+                f"setup violation {ref}.{data_pin} ({data_net}) at {edge_ns}ns: "
+                f"last change {last_chg}ns, need {setup_ns}ns stable"
+            )
+            self.violations.append(msg)
+            return False
         return True
 
     def _apply_drive(self, net: str, value: int, driver: str, reason: str) -> None:
         old = self.nets.get(net, 2)
-        if old == value and value != 3:
+        if old == value and value != 3 and reason != "stimulus":
             return
         self.nets[net] = value
         self.wave.record(net, self.scheduler.now_ns, value)
@@ -149,11 +162,10 @@ def run_test(test_path: Path, repo_root: Path) -> dict[str, Any]:
     errors: list[str] = []
     for exp in test.get("expect", []):
         at = int(exp.get("at_ns", 0))
-        ctx.scheduler.now_ns = at
         for net, want in exp.items():
             if net == "at_ns":
                 continue
-            got = ctx.nets.get(net, 2)
+            got = _net_at_time(ctx, net, at)
             if got != int(want):
                 errors.append(f"at {at}ns {net}: expected {want} got {VALUE_NAMES.get(got, got)}")
 
@@ -176,6 +188,80 @@ def run_test(test_path: Path, repo_root: Path) -> dict[str, Any]:
         "waves": waves,
         "final_nets": {k: VALUE_NAMES.get(v, "?") for k, v in ctx.nets.items()},
     }
+
+
+def _last_transition_before(rows: list[dict[str, Any]], before_ns: int) -> int | None:
+    last: int | None = None
+    for i in range(1, len(rows)):
+        if rows[i]["t"] > before_ns:
+            break
+        if rows[i]["v"] != rows[i - 1]["v"]:
+            last = rows[i]["t"]
+    return last
+
+
+def _first_transition_after(rows: list[dict[str, Any]], after_ns: int) -> int | None:
+    for i in range(1, len(rows)):
+        if rows[i]["t"] < after_ns:
+            continue
+        if rows[i]["v"] != rows[i - 1]["v"]:
+            return rows[i]["t"]
+    return None
+
+
+def _stable_time(rows: list[dict[str, Any]], after_ns: int, want: str | None = None) -> int | None:
+    """First time at or after after_ns when net holds stable value (optional want)."""
+    val: str | None = None
+    stable_from: int | None = None
+    for i, row in enumerate(rows):
+        if row["t"] < after_ns:
+            val = row["v"]
+            continue
+        if i > 0 and rows[i - 1]["v"] != row["v"]:
+            stable_from = None
+        if want is not None and row["v"] != want:
+            stable_from = None
+            val = row["v"]
+            continue
+        if stable_from is None:
+            stable_from = row["t"]
+        if row["t"] >= after_ns and stable_from is not None:
+            return stable_from
+    return stable_from
+
+
+def _measure_path_delay(ctx: SimContext, from_net: str, to_net: str, after_ns: int) -> int | None:
+    from_rows = ctx.wave.samples.get(from_net, [])
+    to_rows = ctx.wave.samples.get(to_net, [])
+    t0 = _first_transition_after(from_rows, after_ns)
+    if t0 is None:
+        t0 = after_ns
+
+    t1 = _first_transition_after(to_rows, t0)
+    if t1 is not None:
+        return t1 - t0
+
+    final_v = ctx.nets.get(to_net)
+    if final_v not in (0, 1):
+        return None
+    want = VALUE_NAMES[final_v]
+    stable = _stable_time(to_rows, t0, want)
+    if stable is not None and stable >= t0:
+        return stable - t0
+    return None
+
+
+def _net_at_time(ctx: SimContext, net: str, at_ns: int) -> int:
+    rows = ctx.wave.samples.get(net, [])
+    if not rows:
+        return ctx.nets.get(net, 2)
+    rev = {"0": 0, "1": 1, "X": 2, "Z": 3}
+    result = 2
+    for row in rows:
+        if row["t"] > at_ns:
+            break
+        result = rev.get(row["v"], 2)
+    return result
 
 
 def _run_check(chk: dict[str, Any], ctx: SimContext, duration: int, errors: list[str]) -> dict[str, Any]:
@@ -210,6 +296,27 @@ def _run_check(chk: dict[str, Any], ctx: SimContext, duration: int, errors: list
             errors.append(f"slack path {path}: delay {delay}ns budget {budget}ns slack {slack}ns")
         return {"type": ctype, "passed": ok, "delay_ns": delay, "slack_ns": slack, "path": path}
 
+    if ctype == "path_delay":
+        from_net = str(chk["from_net"])
+        to_net = str(chk["to_net"])
+        after_ns = int(chk.get("after_ns", 0))
+        max_delay = int(chk.get("max_delay_ns", 250))
+        measured = _measure_path_delay(ctx, from_net, to_net, after_ns)
+        if measured is None:
+            errors.append(f"path_delay {from_net}->{to_net}: could not measure")
+            return {"type": ctype, "passed": False}
+        ok = measured <= max_delay
+        if not ok:
+            errors.append(f"path_delay {from_net}->{to_net}: {measured}ns > {max_delay}ns")
+        return {
+            "type": ctype,
+            "passed": ok,
+            "measured_ns": measured,
+            "max_delay_ns": max_delay,
+            "from_net": from_net,
+            "to_net": to_net,
+        }
+
     if ctype == "setup_hold":
         ok = len(ctx.violations) == 0
         if not ok:
@@ -225,21 +332,51 @@ def _estimate_path_delay(path: list[str], ctx: SimContext) -> int:
     for hop in path:
         if "." not in hop:
             continue
-        ref, _pin = hop.split(".", 1)
+        ref, pin = hop.split(".", 1)
         part = ref_to_part.get(ref, "")
-        if part == "OSC_4M":
-            total += 0
-        elif part == "74HC74":
-            total += delay_ns(ctx.timing, "74HC74", "t_pd_q", default=25)
-        elif part == "74HC283":
-            total += delay_ns(ctx.timing, "74HC283", "t_pd", "cout", default=45)
-        elif part == "74HC574":
-            total += delay_ns(ctx.timing, "74HC574", "t_pd_q", default=23)
-        elif part == "74HC04":
-            total += delay_ns(ctx.timing, "74HC04", "t_pd", default=15)
-        else:
-            total += 10
+        if _is_path_output(part, pin):
+            total += _hop_delay(ctx, part, pin)
     return total
+
+
+def _is_path_output(part: str, pin: str) -> bool:
+    if pin in ("Y", "Q"):
+        return True
+    if len(pin) == 2 and pin[0] in "1234" and pin[1] == "Y":
+        return True
+    if part == "74HC283" and pin.startswith("C") and pin not in ("Cin",):
+        return True
+    if part == "74HC574" and pin.startswith("Q"):
+        return True
+    return False
+
+
+def _hop_delay(ctx: SimContext, part: str, pin: str) -> int:
+    if part == "OSC_4M":
+        return 0
+    if part == "74HC74":
+        return delay_ns(ctx.timing, "74HC74", "t_pd_q", default=25)
+    if part == "74HC283":
+        if pin in ("C4", "C0") or pin.startswith("C"):
+            return delay_ns(ctx.timing, "74HC283", "t_pd", "cout", default=45)
+        return delay_ns(ctx.timing, "74HC283", "t_pd", "sum", default=45)
+    if part == "74HC574":
+        if pin == "CP":
+            return delay_ns(ctx.timing, "74HC574", "t_setup", default=8)
+        return delay_ns(ctx.timing, "74HC574", "t_pd_q", default=23)
+    if part == "74HC04":
+        return delay_ns(ctx.timing, "74HC04", "t_pd", default=15)
+    if part == "74HC08":
+        return delay_ns(ctx.timing, "74HC08", "t_pd", default=15)
+    if part == "74HC32":
+        return delay_ns(ctx.timing, "74HC32", "t_pd", default=15)
+    if part == "74HC86":
+        return delay_ns(ctx.timing, "74HC86", "t_pd", default=15)
+    if part == "74HC153":
+        return delay_ns(ctx.timing, "74HC153", "t_pd", default=28)
+    if part == "74HC157":
+        return delay_ns(ctx.timing, "74HC157", "t_pd", default=18)
+    return 10
 
 
 def delay_ns(timing: dict[str, Any], part: str, *keys: str, default: int = 10) -> int:

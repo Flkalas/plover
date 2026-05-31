@@ -31,6 +31,10 @@ def write_report(out_dir: Path, result: dict[str, Any]) -> None:
     for e in result.get("errors", []):
         errors_html += f"<li>{e}</li>\n"
 
+    viol_html = ""
+    for v in result.get("violations", []):
+        viol_html += f"<li>{v}</li>\n"
+
     html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,6 +59,8 @@ def write_report(out_dir: Path, result: dict[str, Any]) -> None:
   </table>
   <h2>Errors</h2>
   <ul>{errors_html or '<li>none</li>'}</ul>
+  <h2>Setup/Hold violations</h2>
+  <ul>{viol_html or '<li>none</li>'}</ul>
   <p>See <a href="waves.json">waves.json</a>, <a href="wiring.svg">wiring.svg</a>, <a href="timing_report.json">timing_report.json</a></p>
 </body>
 </html>
