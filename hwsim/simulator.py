@@ -372,6 +372,8 @@ def _hop_delay(ctx: SimContext, part: str, pin: str) -> int:
         return delay_ns(ctx.timing, "74HC32", "t_pd", default=15)
     if part == "74HC86":
         return delay_ns(ctx.timing, "74HC86", "t_pd", default=15)
+    if part == "74HC151":
+        return delay_ns(ctx.timing, "74HC151", "t_pd", default=28)
     if part == "74HC153":
         return delay_ns(ctx.timing, "74HC153", "t_pd", default=28)
     if part == "74HC157":

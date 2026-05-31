@@ -17,6 +17,7 @@ KNOWN_PARTS = frozenset(
         "74HC08",
         "74HC32",
         "74HC86",
+        "74HC151",
         "74HC153",
         "74HC157",
         "74HC161",

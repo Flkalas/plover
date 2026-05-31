@@ -21,6 +21,10 @@
   t_pd: {typ_ns: 17, max_ns: 28}
   source: "Nexperia 74HC153 — select to output"
 
+74HC151:
+  t_pd: {typ_ns: 17, max_ns: 28}
+  source: "Nexperia 74HC151 — select to Y"
+
 74HC157:
   t_pd: {typ_ns: 11, max_ns: 18}
   source: "Nexperia 74HC157"

@@ -1,0 +1,48 @@
+netlist: ../netlist/blocks/regfile_rmw_8x153157.yaml
+timing: max
+duration_ns: 500
+stimulus:
+  - at_ns: 0
+    set:
+      net_a0: 0
+      net_a1: 1
+      net_a2: 0
+      net_a3: 0
+      net_a4: 1
+      net_a5: 0
+      net_a6: 0
+      net_a7: 0
+      net_b1: 0
+      net_b2: 1
+      net_b3: 0
+      net_b4: 1
+      net_b5: 1
+      net_b6: 0
+      net_b7: 0
+      net_sub_en: 1
+      net_cin: 1
+      net_153_s0: 0
+      net_153_s1: 0
+      net_b_sel: 1
+      net_b_const_sel: 0
+      net_c3_sel: 0
+      net_b_const_bit1: 0
+      net_b_const_bit2: 0
+      net_b_const_bit3: 0
+      net_b_const_bit4: 0
+      net_b_const_bit5: 0
+      net_b_const_bit6: 0
+      net_b_const_bit7: 0
+      net_clk: 0
+      net_mux_s0: 0
+      net_mux_s1: 0
+      net_mux_s2: 0
+checks:
+  - type: slack
+    path: [U_REG_DST.Q0, U_MUX153_LO.1Y, U_MUX157_HI.1Y, U_ALU_86_INV_0.A, U_ALU_86_INV_0.Y, U_ALU_157_B_0.1B, U_ALU_157_B_0.1Y, U_ALU_157_B2_0.1A, U_ALU_157_B2_0.1Y, U_ALU_283_LO.B0, U_ALU_283_LO.C4, U_ALU_283_HI.C4, U_ALU_153_0.1C0, U_ALU_153_0.1Y]
+    budget_ns: 250
+    min_slack_ns: 0
+  - type: slack
+    path: [U_REG_DST.Q0, U_MUX153_LO.1Y, U_MUX157_HI.1Y, U_ALU_86_INV_0.A, U_ALU_86_INV_0.Y, U_ALU_157_B_0.1B, U_ALU_157_B_0.1Y, U_ALU_157_B2_0.1A, U_ALU_157_B2_0.1Y, U_ALU_283_LO.B0, U_ALU_283_LO.C4, U_ALU_283_HI.C4, U_ALU_153_0.1C0, U_ALU_153_0.1Y, U_REG_DST.D0, U_REG_DST.CP]
+    budget_ns: 250
+    min_slack_ns: 0

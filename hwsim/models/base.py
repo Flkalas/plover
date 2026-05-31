@@ -128,6 +128,30 @@ class Hc04(ChipModel):
         self._drive("Y", y, t, "inv")
 
 
+class Hc151(ChipModel):
+    """74HC151 8-to-1 data selector; W active-low enable."""
+
+    part = "74HC151"
+
+    def on_start(self) -> None:
+        self._update()
+
+    def on_net_change(self, net: str) -> None:
+        self._update()
+
+    def _update(self) -> None:
+        t = self.t_pd("74HC151", "t_pd", default=17)
+        w = self.read_bit("W")
+        if w == 1:
+            self._drive("Y", 0, t, "disabled")
+            return
+        sel = self.read_bit("S0") | (self.read_bit("S1") << 1) | (self.read_bit("S2") << 2)
+        val = self.read_bit(f"D{sel}")
+        if val > 1:
+            return
+        self._drive("Y", val, t, "mux")
+
+
 class Hc153(ChipModel):
     """74HC153 dual 4-to-1 multiplexer; 1G/2G active-low enable."""
 
@@ -142,15 +166,18 @@ class Hc153(ChipModel):
     def _update(self) -> None:
         t = self.t_pd("74HC153", "t_pd", default=17)
         for ch in ("1", "2"):
+            y_pin = f"{ch}Y"
+            if y_pin not in self.pin_nets:
+                continue
             g = self.read_bit(f"{ch}G")
             if g == 1:
-                self._drive(f"{ch}Y", 0, t, "disabled")
+                self._drive(y_pin, 0, t, "disabled")
                 continue
             sel = self.read_bit("A") | (self.read_bit("B") << 1)
             val = self.read_bit(f"{ch}C{sel}")
             if val > 1:
                 continue
-            self._drive(f"{ch}Y", val, t, "mux")
+            self._drive(y_pin, val, t, "mux")
 
 
 class Hc157(ChipModel):
@@ -168,17 +195,22 @@ class Hc157(ChipModel):
         oe = self.read_bit("OE")
         t = self.t_pd("74HC157", "t_pd", default=11)
         s = self.read_bit("S")
-        if oe == 1:
-            for i in range(1, 5):
-                self._drive(f"{i}Y", 3, t, "z")
-            return
         for i in range(1, 5):
-            a = self.read_bit(f"{i}A")
-            b = self.read_bit(f"{i}B")
+            y_pin = f"{i}Y"
+            if y_pin not in self.pin_nets:
+                continue
+            if oe == 1:
+                self._drive(y_pin, 3, t, "z")
+                continue
+            a_pin, b_pin = f"{i}A", f"{i}B"
+            if a_pin not in self.pin_nets or b_pin not in self.pin_nets:
+                continue
+            a = self.read_bit(a_pin)
+            b = self.read_bit(b_pin)
             if a > 1 or b > 1:
                 continue
             y = a if s == 0 else b
-            self._drive(f"{i}Y", y, t, "mux")
+            self._drive(y_pin, y, t, "mux")
 
 
 class Hc283(ChipModel):
@@ -391,6 +423,7 @@ def create_model(ref: str, part: str, pins: dict[str, str], ctx: SimContext) -> 
         "74HC161": Hc161,
         "74HC245": Hc245,
         "74HC138": Hc138,
+        "74HC151": Hc151,
         "74HC153": Hc153,
         "74HC157": Hc157,
         "74HC08": Hc08,

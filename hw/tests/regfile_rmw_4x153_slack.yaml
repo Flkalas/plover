@@ -1,0 +1,27 @@
+netlist: ../netlist/blocks/cpu_datapath_p1.yaml
+timing: max
+duration_ns: 500
+stimulus:
+  - at_ns: 0
+    set:
+      net_clk2: 0
+      net_cmp_n: 1
+      net_alu_op0: 0
+      net_alu_op1: 1
+      net_alu_op2: 0
+      net_alu_op3: 0
+      net_bus_en0: 0
+      net_bus_en1: 0
+      net_dst_reg0: 0
+      net_dst_reg1: 1
+      net_src_reg0: 0
+      net_src_reg1: 0
+checks:
+  - type: slack
+    path: [U_REG_R0.Q0, U_MUX_B_0.1C0, U_MUX_B_0.1Y, U_ALU_86_INV_0.A, U_ALU_86_INV_0.Y, U_ALU_157_B_0.1B, U_ALU_157_B_0.1Y, U_ALU_157_B2_0.1A, U_ALU_157_B2_0.1Y, U_ALU_283_LO.B0, U_ALU_283_LO.C4, U_ALU_283_HI.C4, U_ALU_153_0.1C0, U_ALU_153_0.1Y]
+    budget_ns: 250
+    min_slack_ns: 0
+  - type: slack
+    path: [U_REG_R0.Q0, U_MUX_B_0.1C0, U_MUX_B_0.1Y, U_ALU_86_INV_0.A, U_ALU_86_INV_0.Y, U_ALU_157_B_0.1B, U_ALU_157_B_0.1Y, U_ALU_157_B2_0.1A, U_ALU_157_B2_0.1Y, U_ALU_283_LO.B0, U_ALU_283_LO.C4, U_ALU_283_HI.C4, U_ALU_153_0.1C0, U_ALU_153_0.1Y, U_REG_R2.D0, U_REG_R2.CP]
+    budget_ns: 250
+    min_slack_ns: 0

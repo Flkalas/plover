@@ -1,0 +1,44 @@
+netlist: ../netlist/blocks/regfile.yaml
+timing: max
+duration_ns: 1500
+stimulus:
+  - at_ns: 0
+    set:
+      net_y0: 1
+      net_y1: 1
+      net_y2: 1
+      net_y3: 1
+      net_y4: 1
+      net_y5: 1
+      net_y6: 1
+      net_y7: 1
+      net_dst_reg0: 0
+      net_dst_reg1: 1
+      net_cmp_n: 1
+      net_clk2: 0
+  - at_ns: 100
+    set:
+      net_clk2: 1
+  - at_ns: 200
+    set:
+      net_clk2: 0
+      net_y0: 0
+      net_y1: 0
+      net_y2: 0
+      net_y3: 0
+      net_y4: 0
+      net_y5: 0
+      net_y6: 0
+      net_y7: 0
+      net_cmp_n: 0
+  - at_ns: 300
+    set:
+      net_clk2: 1
+  - at_ns: 400
+    set:
+      net_clk2: 0
+expect:
+  - at_ns: 450
+    net_r2_q0: 1
+    net_r2_q1: 1
+    net_r2_q7: 1
