@@ -10,12 +10,12 @@
 | 영역 | 상태 | 비고 |
 |------|------|------|
 | 설계·BOM | 완료 | [BOM.md](../BOM.md) |
-| **hwsim 전기 시뮬** | ALU 12 op + B3 | clock, **alu8**, **alu_b3**, alu283, reg574 — [hw-sim.md](hw-sim.md) |
+| **hwsim 전기 시뮬** | ALU 12 op + B3 | clock, **alu8**, **alu_b3**, **bringup_b3c**, alu283, reg574 — [hw-sim.md](hw-sim.md) |
 | KiCad↔YAML | 샘플 | `clock.net` diff; **sheet_alu** 후속 |
-| 블록 netlist | 5종 | [hw/netlist/blocks/](../hw/netlist/blocks/) incl. [alu8.yaml](../hw/netlist/blocks/alu8.yaml), [alu_b3.yaml](../hw/netlist/blocks/alu_b3.yaml) |
+| 블록 netlist | 6종 | [hw/netlist/blocks/](../hw/netlist/blocks/) incl. [alu_b3_clock.yaml](../hw/netlist/blocks/alu_b3_clock.yaml) |
 | 정적 viewer | MVP | [hw/viewer/](../hw/viewer/) |
 | Verilog·ISA 시뮬 | archived | [archive/verilog-sim/](../archive/verilog-sim/) |
-| 하드웨어 조립 | 미착수 | README 로드맵 B1~B6 |
+| 하드웨어 조립 | B3a 문서 준비 | [hw-bringup-b3.md](hw-bringup-b3.md), [hw-bringup-b3-opcode.md](hw-bringup-b3-opcode.md) |
 
 ---
 
@@ -53,9 +53,9 @@ flowchart LR
 | Wavedrom critical path | `report` + viewer | 중 |
 | 42 IC 통합 netlist `include` | 후속 | 낮음 |
 
-**B3 hwsim 완료:** `python -m hwsim run --all` 9 tests PASS — setup/hold, SUB/XOR slack, 574 latch, INC/DEC 157 B2 cascade.
+**B3 hwsim 완료:** `python -m hwsim run --all` **10 tests** PASS — setup/hold, SUB/XOR slack, 574 latch, INC/DEC 157 B2, **B3c 2 MHz clock+ACC**.
 
-**완료 기준 (다음 마일스톤):** PC + bus 블록 테스트 PASS, KiCad diff 0 mismatch; **B3 실기** per [hw-bringup-b3.md](hw-bringup-b3.md).
+**완료 기준 (다음 마일스톤):** PC + bus 블록 테스트 PASS; **B3a 실기** per [hw-bringup-b3.md](hw-bringup-b3.md) § B3a.
 
 ---
 
@@ -67,9 +67,13 @@ hwsim 블록 테스트와 1:1 대응. 각 단계마다 **동일 netlist**를 브
 |------|------|------------|
 | **B1** | 4 MHz → 2 MHz 분주 | [clock_divider.yaml](../hw/tests/clock_divider.yaml) |
 | **B2** | 157/245, SRAM | netlist 추가 후 `run` |
-| **B3** | ALU + 574 | [alu_b3_*](../hw/tests/) (4), [hw-bringup-b3.md](hw-bringup-b3.md) |
+| **B3a** | ALU, Y LED, opcode 치트시트 | [alu8_full](../hw/tests/alu8_full.yaml) |
+| **B3b** | +574 ACC, 수동 CP | [alu_b3_latch](../hw/tests/alu_b3_latch.yaml) |
+| **B3c** | +2 MHz clk, 타이밍 | [bringup_b3c_clock](../hw/tests/bringup_b3c_clock.yaml) |
 | **B4** | Flash 프로그래밍 (595) | 별도 `flashprog` 검토 |
 | **B5~B6** | 코프로·인터리브 | 후순 |
+
+가이드: [hw-bringup-b3.md](hw-bringup-b3.md) · [hw-bringup-b3-opcode.md](hw-bringup-b3-opcode.md)
 
 ---
 
@@ -114,6 +118,7 @@ hwsim 블록 테스트와 1:1 대응. 각 단계마다 **동일 netlist**를 브
 
 | 날짜 | 내용 |
 |------|------|
+| 2026-05-31 | v0.5 — B3a/b/c phased bring-up, opcode cheat sheet, bringup_b3c_clock |
 | 2026-05-31 | v0.4 — B3 alu_b3 netlist, setup/hold, 157 B2 INC/DEC, bring-up doc |
 | 2026-05-31 | v0.3 — BOM ALU 18 IC, alu8 netlist 12 opcode PASS |
 | 2026-05-31 | v0.2 — hwsim MVP 기준선, Verilog 트랙 archive |

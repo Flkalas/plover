@@ -9,7 +9,8 @@ Design notes and **hwsim** electrical simulation for the Plover 8-bit VLIW-RISC 
 | [hw-sim.md](hw-sim.md) | **Electrical timing sim** — `python -m hwsim`, netlist YAML, block tests |
 | [hw-schematic.md](hw-schematic.md) | KiCad ↔ YAML netlist naming |
 | [roadmap-next.md](roadmap-next.md) | Next steps — hwsim expansion, breadboard bring-up |
-| [hw-bringup-b3.md](hw-bringup-b3.md) | **B3** ALU + 574 breadboard procedure |
+| [hw-bringup-b3.md](hw-bringup-b3.md) | **B3a/b/c** ALU + 574 phased breadboard guide |
+| [hw-bringup-b3-opcode.md](hw-bringup-b3-opcode.md) | Opcode → control DIP cheat sheet (12 rows) |
 | [archive/README.md](archive/README.md) | Archived Gemini logs and Cursor plans |
 | [archive/gemini/](archive/gemini/) | Original design conversation exports |
 | [archive/plans/](archive/plans/) | Completed Verilog simulator plan |
