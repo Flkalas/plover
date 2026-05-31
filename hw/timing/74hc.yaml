@@ -1,0 +1,66 @@
+# 74HC timing @ 5V, 25C — typ/max ns (ideal load per datasheet)
+# Net delay is always 0 in hwsim; only IC internal delays apply.
+
+74HC04:
+  t_pd: {typ_ns: 9, max_ns: 15}
+  source: "Nexperia 74HC04 — tpd @ CL=50pF"
+
+74HC08:
+  t_pd: {typ_ns: 9, max_ns: 15}
+  source: "Nexperia 74HC08"
+
+74HC32:
+  t_pd: {typ_ns: 9, max_ns: 15}
+  source: "Nexperia 74HC32"
+
+74HC86:
+  t_pd: {typ_ns: 9, max_ns: 15}
+  source: "Nexperia 74HC86"
+
+74HC153:
+  t_pd: {typ_ns: 17, max_ns: 28}
+  source: "Nexperia 74HC153 — select to output"
+
+74HC157:
+  t_pd: {typ_ns: 11, max_ns: 18}
+  source: "Nexperia 74HC157"
+
+74HC161:
+  t_pd: {typ_ns: 15, max_ns: 25}
+  t_clk_to_q: {typ_ns: 15, max_ns: 25}
+  t_setup: {typ_ns: 5, max_ns: 8}
+  t_hold: {typ_ns: 0, max_ns: 0}
+  source: "Nexperia 74HC161"
+
+74HC245:
+  t_pd: {typ_ns: 11, max_ns: 18}
+  t_pz: {typ_ns: 12, max_ns: 20}
+  t_pl: {typ_ns: 12, max_ns: 20}
+  source: "Nexperia 74HC245"
+
+74HC283:
+  t_pd:
+    sum: {typ_ns: 30, max_ns: 45}
+    cout: {typ_ns: 30, max_ns: 45}
+  source: "Nexperia 74HC283 — A/B to Sum, ripple Cn to Cout"
+
+74HC574:
+  t_pd_q: {typ_ns: 15, max_ns: 23}
+  t_setup: {typ_ns: 5, max_ns: 8}
+  t_hold: {typ_ns: 0, max_ns: 0}
+  source: "Nexperia 74HC574 — CP to Qn"
+
+74HC74:
+  t_pd_q: {typ_ns: 15, max_ns: 25}
+  t_setup: {typ_ns: 5, max_ns: 8}
+  t_hold: {typ_ns: 0, max_ns: 0}
+  source: "Nexperia 74HC74 — CP to Q"
+
+74HC138:
+  t_pd: {typ_ns: 18, max_ns: 28}
+  source: "Nexperia 74HC138"
+
+OSC_4M:
+  frequency_hz: 4000000
+  duty_pct: 50
+  source: "4 MHz can oscillator — ideal square"

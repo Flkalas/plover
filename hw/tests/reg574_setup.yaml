@@ -1,0 +1,22 @@
+netlist: ../netlist/blocks/reg574.yaml
+timing: max
+duration_ns: 1500
+stimulus:
+  - at_ns: 0
+    set:
+      net_clk: 0
+      net_d0: 1
+      net_d7: 1
+  - at_ns: 100
+    set:
+      net_clk: 1
+expect:
+  - at_ns: 200
+    net_q0: 1
+    net_q7: 1
+checks:
+  - type: setup_hold
+  - type: slack
+    path: [U_REG_574_0.D0, U_REG_574_0.CP, U_REG_574_0.Q0]
+    budget_ns: 250
+    min_slack_ns: 0

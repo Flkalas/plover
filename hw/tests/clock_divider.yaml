@@ -1,0 +1,13 @@
+netlist: ../netlist/blocks/clock.yaml
+timing: max
+duration_ns: 3000
+stimulus: []
+checks:
+  - type: frequency
+    signal: net_clk2
+    target_hz: 2000000
+    tolerance_pct: 5
+  - type: slack
+    path: [U_CLK_OSC.OUT, U_CLK_74.1CP, U_CLK_74.1Q]
+    budget_ns: 250
+    min_slack_ns: 0

@@ -1,0 +1,7 @@
+SST39SF010A:
+  t_acc: {typ_ns: 70, max_ns: 70}
+  source: "SST39SF010A-70 — access time"
+
+IS62C256:
+  t_aa: {typ_ns: 45, max_ns: 45}
+  source: "IS62C256AL-45 — address access"

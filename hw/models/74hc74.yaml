@@ -1,0 +1,8 @@
+part: 74HC74
+kind: sequential
+description: Dual D flip-flop — Plover uses one half as /2 divider
+pins:
+  inputs: [1CP, 1D, 1RD, 1SD, 2CP, 2D, 2RD, 2SD]
+  outputs: [1Q, 1QN, 2Q, 2QN]
+behavior: dff_dual
+timing_ref: 74HC74

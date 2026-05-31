@@ -1,0 +1,8 @@
+part: 74HC283
+kind: combinational
+description: 4-bit binary full adder, cascaded for 8-bit in Plover
+pins:
+  inputs: [A0, A1, A2, A3, B0, B1, B2, B3, C0]
+  outputs: [S0, S1, S2, S3, C4]
+behavior: ripple_add4
+timing_ref: 74HC283

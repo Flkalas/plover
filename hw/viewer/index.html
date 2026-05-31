@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Plover hwsim viewer</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <header>
+    <h1>Plover hwsim viewer</h1>
+    <p>Load artifacts from <code>build/hwsim/&lt;test&gt;/</code> — no server required.</p>
+  </header>
+  <section class="loads">
+    <label>timing_report.json <input type="file" id="file-report" accept=".json"/></label>
+    <label>waves.json <input type="file" id="file-waves" accept=".json"/></label>
+    <label>wiring.svg <input type="file" id="file-svg" accept=".svg"/></label>
+  </section>
+  <section id="summary" class="panel"></section>
+  <section class="panel">
+    <h2>Checks</h2>
+    <table id="checks"><thead><tr><th>Type</th><th>Status</th><th>Detail</th></tr></thead><tbody></tbody></table>
+  </section>
+  <section class="panel">
+    <h2>Wiring</h2>
+    <div id="svg-host"></div>
+  </section>
+  <section class="panel">
+    <h2>Waveforms</h2>
+    <canvas id="waves" width="900" height="320"></canvas>
+    <div id="wave-legend"></div>
+  </section>
+  <script src="app.js"></script>
+</body>
+</html>
