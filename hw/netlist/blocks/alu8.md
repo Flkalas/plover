@@ -60,7 +60,9 @@ PASS uses AND with `0xFF` mask; SUB borrow flag is `~carry_hi` (see microcode C 
 | **SUB** | `86_INV_0.A` → `Y` → `157_B_0.1B` → `1Y` → `157_B2_0.1A` → `1Y` → `283_LO.B0` → `C4` → `283_HI.C4` → `153_0.1C0` → `1Y` |
 | **XOR** | `86_XOR_0.A` → `Y` → `157_OUT_0.4A` → `4Y` → `153_0.1C3` → `1Y` |
 
-Output-pin delay sum @ max: SUB **~169 ns**, XOR **~76 ns** (within 250 ns @ 2 MHz typ).
+Output-pin delay sum @ max: SUB **~169 ns**, XOR **~61 ns** (within 250 ns @ 2 MHz typ).
+
+Full opcode × delay tables: [`docs/alu-opcodes-timing.md`](../../../docs/alu-opcodes-timing.md).
 
 ## Tests
 

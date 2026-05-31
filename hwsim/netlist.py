@@ -29,8 +29,15 @@ KNOWN_PARTS = frozenset(
         "SST39SF010A",
         "IS62C256",
         "ROM16",
+        "ROM_CTRL",
         "PC8_AUTO",
         "FLG_LATCH",
+        "CYCLE_FSM",
+        "CPLD_REGFILE",
+        "ATF1504AS",
+        "CPLD_SYSTEM_CTRL",
+        "REGFILE_574_GPR",
+        "MAILBOX_MMIO",
     }
 )
 
@@ -133,7 +140,7 @@ def validate_netlist(nl: Netlist, repo_root: Path | None = None) -> list[str]:
 
 def load_timing(repo_root: Path, mode: str = "typ") -> dict[str, Any]:
     timing: dict[str, Any] = {}
-    for name in ("74hc.yaml", "memory.yaml"):
+    for name in ("74hc.yaml", "memory.yaml", "cpld.yaml"):
         path = repo_root / "hw" / "timing" / name
         if path.is_file():
             data = yaml_util.load_file(str(path))

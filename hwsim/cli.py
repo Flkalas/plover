@@ -11,7 +11,6 @@ from hwsim.export_svg import export_svg
 from hwsim.kicad_diff import diff_kicad
 from hwsim.netlist import load_netlist, validate_netlist
 from hwsim.report import write_report
-from hwsim.serve import serve
 from hwsim.simulator import run_test
 
 
@@ -163,17 +162,7 @@ def build_parser() -> argparse.ArgumentParser:
     d.add_argument("netlist")
     d.set_defaults(func=cmd_diff_kicad)
 
-    s = sub.add_parser("serve", help="Phase1 p1-viewer local server")
-    s.add_argument("--host", default="127.0.0.1")
-    s.add_argument("--port", type=int, default=8765)
-    s.set_defaults(func=cmd_serve)
-
     return p
-
-
-def cmd_serve(args: argparse.Namespace) -> int:
-    serve(host=args.host, port=args.port)
-    return 0
 
 
 def main(argv: list[str] | None = None) -> int:

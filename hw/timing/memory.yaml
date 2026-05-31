@@ -10,6 +10,14 @@ ROM16:
   t_pd: {typ_ns: 30, max_ns: 40}
   source: "Phase2 behavioral ROM (157-class comb budget)"
 
+ROM_CTRL:
+  t_pd: {typ_ns: 35, max_ns: 70}
+  source: "SST39SF010A-70 control store access"
+
+CYCLE_FSM:
+  t_clk_to_q: {typ_ns: 15, max_ns: 15}
+  source: "v1.0 cycle sequencer behavioral"
+
 PC8_AUTO:
   t_clk_to_q: {typ_ns: 15, max_ns: 15}
   source: "Phase2 behavioral PC stub (161 placeholder)"

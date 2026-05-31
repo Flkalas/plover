@@ -1,0 +1,112 @@
+netlist: ../netlist/blocks/sram256_dual.yaml
+timing: typ
+duration_ns: 900
+stimulus:
+  - at_ns: 0
+    set:
+      net_reset_n: 1
+      net_map_mode: 0
+      net_mb_rd: 0
+      net_mb_we: 0
+      net_a0: 0
+      net_a1: 0
+      net_a2: 0
+      net_a3: 0
+      net_a4: 0
+      net_a5: 0
+      net_a6: 0
+      net_a7: 0
+      net_a8: 0
+      net_a9: 0
+      net_a10: 0
+      net_a11: 0
+      net_a12: 0
+      net_a13: 0
+      net_a14: 0
+      net_a15: 0
+  - at_ns: 40
+    set:
+      net_a8: 1
+  - at_ns: 80
+    set:
+      net_a8: 0
+      net_a11: 1
+      net_a8: 1
+  - at_ns: 120
+    set:
+      net_a11: 0
+      net_a8: 0
+      net_a15: 1
+      net_a8: 1
+  - at_ns: 160
+    set:
+      net_a15: 1
+      net_a14: 1
+      net_a13: 1
+      net_a12: 1
+      net_a11: 1
+      net_a10: 1
+      net_a9: 1
+      net_a8: 1
+      net_a7: 0
+      net_a6: 0
+      net_a5: 0
+      net_a4: 0
+      net_a3: 0
+      net_a2: 0
+      net_a1: 0
+      net_a0: 0
+  - at_ns: 200
+    set:
+      net_a15: 1
+      net_a14: 1
+      net_a13: 1
+      net_a12: 1
+      net_a11: 1
+      net_a10: 1
+      net_a9: 1
+      net_a8: 1
+      net_a7: 1
+      net_a6: 1
+      net_a5: 1
+      net_a4: 1
+      net_a3: 1
+      net_a2: 1
+      net_a1: 0
+      net_a0: 0
+  - at_ns: 240
+    set:
+      net_map_mode: 1
+expect:
+  - at_ns: 20
+    net_rom_cs_n: 0
+    net_ram1_cs_n: 1
+    net_ram2_cs_n: 1
+    net_mailbox_en: 0
+  - at_ns: 60
+    net_rom_cs_n: 0
+    net_ram1_cs_n: 1
+    net_ram2_cs_n: 1
+    net_mailbox_en: 0
+  - at_ns: 100
+    net_rom_cs_n: 1
+    net_ram1_cs_n: 0
+    net_ram2_cs_n: 1
+    net_mailbox_en: 0
+  - at_ns: 140
+    net_rom_cs_n: 1
+    net_ram1_cs_n: 1
+    net_ram2_cs_n: 0
+    net_mailbox_en: 0
+  - at_ns: 180
+    net_mailbox_en: 1
+    net_ram2_cs_n: 1
+    net_rom_cs_n: 1
+  - at_ns: 220
+    net_mailbox_en: 0
+    net_rom_cs_n: 0
+    net_ram2_cs_n: 1
+  - at_ns: 260
+    net_mailbox_en: 0
+    net_rom_cs_n: 1
+    net_ram2_cs_n: 0

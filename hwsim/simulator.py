@@ -50,7 +50,6 @@ class SimContext:
         self._pending: dict[str, PendingDrive] = {}
         self._toggle_tasks: dict[str, int] = {}
         self._pin_map: dict[tuple[str, str], str] = {}
-        self.rom_image: list[int] = []
 
         for nd in nl.nets:
             self.nets[nd.name] = 2
@@ -136,29 +135,6 @@ def load_test(path: Path) -> dict[str, Any]:
     return data
 
 
-def load_rom_image(test: dict[str, Any], test_path: Path, repo_root: Path) -> list[int]:
-    if "rom_image" in test:
-        out: list[int] = []
-        for w in test["rom_image"]:
-            out.append(int(w, 16) if isinstance(w, str) else int(w))
-        return out
-    if "rom_image_file" not in test:
-        return []
-    rel = test["rom_image_file"]
-    path = (test_path.parent / rel).resolve()
-    if not path.is_file():
-        path = (repo_root / rel).resolve()
-    if not path.is_file():
-        raise FileNotFoundError(f"rom_image_file not found: {rel}")
-    words: list[int] = []
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.split(";", 1)[0].strip()
-        if not line:
-            continue
-        words.append(int(line, 16))
-    return words
-
-
 def run_test(test_path: Path, repo_root: Path) -> dict[str, Any]:
     from hwsim.scenario import run_scenario
 
@@ -181,7 +157,6 @@ def run_test(test_path: Path, repo_root: Path) -> dict[str, Any]:
         expect=test.get("expect"),
         checks=test.get("checks"),
         test_name=test_path.stem,
-        rom_image=load_rom_image(test, test_path, repo_root),
     )
 
 

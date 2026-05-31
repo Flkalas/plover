@@ -330,39 +330,6 @@ class Hc161(ChipModel):
             self._drive("TC", value, delay, "tc")
 
 
-class FlgLatch(ChipModel):
-    """Z/C flag latch: WE on posedge captures zero(Y) and carry; Z_PREV holds pre-edge Z."""
-
-    part = "FLG_LATCH"
-
-    def on_start(self) -> None:
-        self._z = 0
-        self._c = 0
-        cp = "CP"
-        self._prev_clk[cp] = self.read_bit(cp)
-        self._drive_out(0)
-
-    def on_net_change(self, net: str) -> None:
-        cp_net = self.net_for("CP")
-        watched = {cp_net, self.net_for("WE"), self.net_for("C_IN")}
-        watched |= {self.net_for(f"Y{i}") for i in range(8)}
-        if net not in watched:
-            return
-        if net == cp_net and self._posedge("CP") and self.read_bit("WE"):
-            y = sum(self.read_bit(f"Y{i}") << i for i in range(8))
-            self._z = 1 if y == 0 else 0
-            self._c = self.read_bit("C_IN") & 1
-            t = self.t_pd("FLG_LATCH", "t_clk_to_q", default=15)
-            self._drive_out(t)
-            return
-        self._drive_out(0)
-
-    def _drive_out(self, delay: int) -> None:
-        self._drive("Z_PREV", self._z, delay, "z_prev")
-        self._drive("Z", self._z, delay, "z")
-        self._drive("C", self._c, delay, "c")
-
-
 class Hc245(ChipModel):
     part = "74HC245"
 
@@ -464,55 +431,177 @@ class Hc86(Hc08):
         self._drive("Y", fn(a, b), t, "xor")
 
 
-class Rom16(ChipModel):
-    """Behavioral 16-bit ROM: address comb read into D0..D15 (CW field slice)."""
+# v0.1 — opcode×phase → Reg_Sel (see microcode-spec.md)
+_REG_SEL_TABLE: dict[tuple[int, int], int] = {
+    (0x1, 0): 0,  # ADD phase 0 → R0
+    (0x1, 1): 1,
+    (0x1, 2): 2,
+}
 
-    part = "ROM16"
+
+class CpldSystemCtrl(ChipModel):
+    """Behavioral ATF1504AS system decode — comb only, no internal state."""
+
+    part = "CPLD_SYSTEM_CTRL"
 
     def on_start(self) -> None:
-        self._read_out()
+        self._update(0)
 
     def on_net_change(self, net: str) -> None:
-        addr_nets = {self.net_for(f"A{i}") for i in range(8)}
-        if net in addr_nets:
-            self._read_out()
+        self._update(0)
 
-    def _read_out(self) -> None:
-        addr = sum(self.read_bit(f"A{i}") << i for i in range(8))
-        words: list[int] = getattr(self.ctx, "rom_image", [])
-        word = words[addr] if addr < len(words) else 0
-        t = self.t_pd("ROM16", "t_pd", default=35)
+    def _addr(self) -> int:
+        v = 0
         for i in range(16):
-            self._drive(f"D{i}", (word >> i) & 1, t, "rom")
+            if f"A{i}" in self.pin_nets:
+                v |= self.read_bit(f"A{i}") << i
+        return v
+
+    def _opcode_phase(self) -> tuple[int, int]:
+        op = sum(self.read_bit(f"OPC{i}") << i for i in range(4) if f"OPC{i}" in self.pin_nets)
+        ph = sum(self.read_bit(f"PH{i}") << i for i in range(2) if f"PH{i}" in self.pin_nets)
+        return op & 0xF, ph & 3
+
+    def _update(self, delay: int) -> None:
+        t = delay or self.t_pd("CPLD_SYSTEM_CTRL", "t_pd", default=8)
+        a = self._addr()
+        rst = self.read_bit("RESET_N") == 0
+        mb = 0xFF00 <= a <= 0xFFFB
+        a15 = (a >> 15) & 1
+        map_mode = self.read_bit("MAP_MODE")
+
+        self._drive("MAILBOX_EN", 1 if mb else 0, t, "mailbox")
+
+        rom_en = False
+        ram1_en = False
+        ram2_en = False
+        if not rst and not mb:
+            if map_mode == 0:
+                if a < 0x0800 or a >= 0xFFFC:
+                    rom_en = True
+                elif a15 == 0:
+                    ram1_en = True
+                else:
+                    ram2_en = True
+            else:
+                if a15 == 0:
+                    ram1_en = True
+                else:
+                    ram2_en = True
+
+        self._drive("RAM1_CS_N", 0 if ram1_en else 1, t, "ram1")
+        self._drive("RAM2_CS_N", 0 if ram2_en else 1, t, "ram2")
+        self._drive("ROM_CS_N", 0 if rom_en else 1, t, "rom")
+
+        fffc_force = 1 if rst else 0
+        self._drive("ADDR_FORCE_FFFC", fffc_force, t, "reset_vec")
+
+        op, ph = self._opcode_phase()
+        reg_sel = _REG_SEL_TABLE.get((op, ph), 0)
+        reg_we = self.read_bit("REG_WE") if "REG_WE" in self.pin_nets else 0
+        for r in range(4):
+            pin = f"LOAD_R{r}"
+            if pin in self.pin_nets:
+                load = 1 if (reg_sel == r and reg_we) else 0
+                self._drive(pin, load, t, f"load_r{r}")
+        if "REG_SEL0" in self.pin_nets:
+            self._drive("REG_SEL0", reg_sel & 1, t, "sel")
+            self._drive("REG_SEL1", (reg_sel >> 1) & 1, t, "sel")
 
 
-class Pc8Auto(ChipModel):
-    """Phase2 PC stub: net_clk2 posedge increments 8-bit PC -> ROM address."""
+class Regfile574Gpr(ChipModel):
+    """4×8-bit GPR via 574 behavior — LOAD_R* + CLK, dual read ports."""
 
-    part = "PC8_AUTO"
+    part = "REGFILE_574_GPR"
 
     def on_start(self) -> None:
-        self._pc = 0
-        cp = "CP"
-        self._prev_clk[cp] = self.read_bit(cp)
-        self._drive_pc(0)
+        self._regs = [0, 0, 0, 0]
+        self._prev_clk["CLK"] = self.read_bit("CLK")
+        self._read_out(0)
 
     def on_net_change(self, net: str) -> None:
-        if net != self.net_for("CP"):
-            return
-        net_name = self.net_for("CP")
-        cur = self.ctx.get_net(net_name) & 1
-        prev = self._prev_clk.get("CP", 0)
-        self._prev_clk["CP"] = cur
-        if not (prev == 1 and cur == 0):
-            return
-        self._pc = (self._pc + 1) & 0xFF
-        t = self.t_pd("PC8_AUTO", "t_clk_to_q", default=15)
-        self._drive_pc(t)
-
-    def _drive_pc(self, delay: int) -> None:
+        watched = {self.net_for("CLK"), self.net_for("REG_WE")}
+        for r in range(4):
+            if f"LOAD_R{r}" in self.pin_nets:
+                watched.add(self.net_for(f"LOAD_R{r}"))
         for i in range(8):
-            self._drive(f"Q{i}", (self._pc >> i) & 1, delay, "pc")
+            watched.add(self.net_for(f"D{i}"))
+        for p in ("RA0", "RA1", "RB0", "RB1"):
+            if p in self.pin_nets:
+                watched.add(self.net_for(p))
+        if net not in watched:
+            return
+        if self._posedge("CLK"):
+            self._maybe_write()
+        self._read_out(0)
+
+    def _maybe_write(self) -> None:
+        if self.read_bit("REG_WE") == 0:
+            return
+        t_su = self.t_pd("74HC574", "t_setup", default=5)
+        for i in range(8):
+            if not self.ctx.check_setup(self.ref, "CLK", f"D{i}", t_su):
+                return
+        val = sum(self.read_bit(f"D{i}") << i for i in range(8))
+        for r in range(4):
+            pin = f"LOAD_R{r}"
+            if pin in self.pin_nets and self.read_bit(pin):
+                self._regs[r] = val & 0xFF
+                return
+
+    def _sel(self, prefix: str) -> int:
+        return self.read_bit(f"{prefix}0") | (self.read_bit(f"{prefix}1") << 1)
+
+    def _read_out(self, delay: int) -> None:
+        t = delay or self.t_pd("74HC574", "t_pd_q", default=15)
+        ra = self._sel("RA") & 3
+        rb = self._sel("RB") & 3
+        qa, qb = self._regs[ra], self._regs[rb]
+        for i in range(8):
+            self._drive(f"QA{i}", (qa >> i) & 1, t, "qa")
+            self._drive(f"QB{i}", (qb >> i) & 1, t, "qb")
+
+
+class MailboxMmio(ChipModel):
+    """Behavioral MMIO mailbox @ $FF00 — STATUS/CMD/PARAM/BUFFER stub."""
+
+    part = "MAILBOX_MMIO"
+
+    def on_start(self) -> None:
+        self._status = 0
+        self._cmd = 0
+        self._param = 0
+        self._buf = [0] * 248
+        self._update(0)
+
+    def on_net_change(self, net: str) -> None:
+        watched = {self.net_for("CS"), self.net_for("RD"), self.net_for("WE")}
+        for i in range(8):
+            watched.add(self.net_for(f"A{i}"))
+        if net not in watched:
+            return
+        if self.read_bit("CS") == 1:
+            self._access(0)
+
+    def _offset(self) -> int:
+        return sum(self.read_bit(f"A{i}") << i for i in range(8) if f"A{i}" in self.pin_nets)
+
+    def _access(self, delay: int) -> None:
+        off = self._offset()
+        if self.read_bit("RD") and off == 0x00:
+            self._update(delay)
+        if self.read_bit("WE") and off == 0x01:
+            self._status = 0x02  # Busy
+            self._status &= ~0x01
+            self._update(delay)
+            self._status = 0x01  # DataReady (RP2350 done)
+            self._update(self.t_pd("MAILBOX_MMIO", "t_pd", default=8))
+
+    def _update(self, delay: int) -> None:
+        t = delay or self.t_pd("MAILBOX_MMIO", "t_pd", default=8)
+        for i in range(8):
+            if f"STATUS{i}" in self.pin_nets:
+                self._drive(f"STATUS{i}", (self._status >> i) & 1, t, "st")
 
 
 def create_model(ref: str, part: str, pins: dict[str, str], ctx: SimContext) -> ChipModel:
@@ -531,9 +620,10 @@ def create_model(ref: str, part: str, pins: dict[str, str], ctx: SimContext) -> 
         "74HC08": Hc08,
         "74HC32": Hc32,
         "74HC86": Hc86,
-        "ROM16": Rom16,
-        "PC8_AUTO": Pc8Auto,
-        "FLG_LATCH": FlgLatch,
+        "CPLD_SYSTEM_CTRL": CpldSystemCtrl,
+        "ATF1504AS": CpldSystemCtrl,
+        "REGFILE_574_GPR": Regfile574Gpr,
+        "MAILBOX_MMIO": MailboxMmio,
     }
     cls = table.get(part)
     if cls is None:
