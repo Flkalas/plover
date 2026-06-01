@@ -5,7 +5,7 @@
 | **설계** | **v0.1** — [system-architecture.md](docs/system-architecture.md) |
 | **용도** | **5 V** 74HC 브레드보드 — 이 표만 보고 부품 구매·조립 |
 | **수량** | 프로토타입 **1대** (74HC CPU + CPLD + Flash/SRAM + 클록) |
-| **개정** | 2026-06-02 |
+| **개정** | 2026-06-02 (ALU Phase B2 Gigatron logic · 16 IC) |
 
 **PCB · 단일 3.3 V 버전:** [BOM-3v3.md](BOM-3v3.md) — **동일 v0.1 시스템** (74LVC SMD · 레벨시프트 없음). 빵판 본 문서와 **중복 주문 금지**.  
 명세·결선·타이밍: [microcode-spec.md](docs/microcode-spec.md) · [cpld-system-controller.md](docs/cpld-system-controller.md) · [hw/netlist/](hw/netlist/).  
@@ -27,17 +27,24 @@
 
 ---
 
-## ALU (74HC, 22 IC)
+## ALU (74HC, 16 IC)
+
+**Phase B2** ([alu8.md](hw/netlist/blocks/alu8.md), [alu8-phase-b.md](docs/alu8-phase-b.md)):
+
+| 개선 | BOM 변화 | 효과 |
+|------|----------|------|
+| **Phase A/B1** | `153_B`×4, `157_YBP`×2, `7485`×2 | SUB Y **151 ns** @ max; CMP 병렬 |
+| **Phase B2** | **−** `08`×2, `32`×2, `86`×2, `157_OUT`×2, `04` NOT×2 | Gigatron **`153_L`** (`net_lgc0..3`); logic **46 ns** @ max |
 
 | # | MPN | Description | Qty | 시스템에서 하는 일 |
 |---|-----|-------------|-----|-------------------|
-| 4 | 74HC283N | 4-bit full adder | 2 | 8비트 **ADD/SUB** 캐리 연쇄 |
-| 5 | 74HC153 | Dual 4-to-1 MUX | 4 | ALU 내부 **데이터 경로** 선택 |
-| 6 | 74HC86 | Quad XOR | 4 | **SUB / XOR** |
-| 7 | 74HC08 | Quad AND | 2 | **AND** |
-| 8 | 74HC32 | Quad OR | 2 | **OR** |
-| 9 | 74HC157 | Quad 2-to-1 MUX | 6 | 피연산자 B/~B, INC/DEC, ALU **출력 MUX** |
-| 10 | 74HC04 | Hex inverter | 2 | 8비트 **NOT (~A)** |
+| 4 | 74HC283N | 4-bit full adder | 2 | 8비트 **ADD/SUB/INC/DEC** 캐리 연쇄 |
+| 5 | 74HC153 | Dual 4-to-1 MUX | **8** | **B-path** ×4 + **logic slice** ×4 (8× `ALU_153_SLICE` in hwsim) |
+| 6 | 74HC157 | Quad 2-to-1 MUX | **2** | **157_YBP** only — sum vs `net_y_logic` → Y |
+| 7 | 74HC04 | Hex inverter | 2 | 8비트 **~B** for `153_B` |
+| 7b | 74HC85N | 4-bit magnitude comparator | **2** | **CMP** Z/C (parallel to SUB Y) |
+
+*Netlist: [alu8.md](hw/netlist/blocks/alu8.md) — **~30** hwsim instances / **16** DIP IC · 타이밍: [alu-opcodes-timing.md](docs/alu-opcodes-timing.md) v1.3.*
 
 ---
 
@@ -80,7 +87,7 @@
 | 22 | 74HC04 | Hex inverter | 1 | 클록 **버퍼 / 보수** (ALU용 04와 별도 1개) |
 | 23 | 74HC14 | Hex Schmitt inverter | 2 | 클록 트리, **엣지 정형** (M7 타이밍) |
 
-*74HC04 합계 **3개** (ALU #10 ×2 + 클록 #22 ×1). 74HC157 합계 **8개** (ALU #9 ×6 + CPU #13 ×2).*
+*74HC04 합계 **3개** (ALU #10 ×2 + 클록 #22 ×1). 74HC157 합계 **6개** (ALU #9 ×4 + CPU #13 ×2). 74HC153 합계 **8개** (ALU만).*
 
 ---
 
@@ -109,7 +116,7 @@
 
 | # | MPN | Description | Qty | 시스템에서 하는 일 |
 |---|-----|-------------|-----|-------------------|
-| 29 | *(Mono 0.1 µF Y5V 50 V)* | Decoupling 0.1 µF | **42** | 74HC DIP **38** + CPLD **4** ([검산](#수량-검산) · #3 어댑터별 +1 권장 **+6**) |
+| 29 | *(Mono 0.1 µF Y5V 50 V)* | Decoupling 0.1 µF | **44** | 74HC DIP **40** + CPLD **4** ([검산](#수량-검산) · #3 어댑터별 +1 권장 **+6**) |
 | 30 | *(Dip tantal 10 µF 35 V)* | Bulk 10 µF | 10 | VCC **벌크 디커플** |
 | 31 | *(E/C 63 V 10 µF 105 °C)* | Electrolytic 10 µF | 10 | 리플·**POR** |
 | 32 | BMI-BEAD-3590L | Ferrite bead | 10 | 전원 **고주파 필터** |
@@ -145,8 +152,8 @@
 | 구분 | 수량 |
 |------|------|
 | 표 라인 (#1–#36, #3a–c) | 38종 |
-| 74HC DIP IC | **42** (ALU 22 + CPU 12 + 버스 1 + 클록 4 + 595×3) |
-| 74HC157 / 74HC04 | 각 **8** / **3** (표 #9+#13, #10+#22) |
+| 74HC DIP IC | **36** (ALU **16** + CPU 12 + 버스 1 + 클록 4 + 595×3) |
+| 74HC153 / 157 / 04 | **8** / **4** / **3** (ALU 153·157 + CPU #13, #7+#22) |
 | SMD (+ #3 어댑터) | Flash×1, SRAM×2, LVC245×3, CPLD×1 |
 
 ---
@@ -159,18 +166,18 @@ v0.1 [system-architecture.md](docs/system-architecture.md) · [alu8.md](hw/netli
 
 | 블록 | 산식 | 합계 |
 |------|------|------|
-| ALU | 283×2 + 153×4 + 86×4 + 08×2 + 32×2 + 157×6 + 04×2 | **22** |
+| ALU | 283×2 + **153×8** + **157×2** + 04×2 + **85×2** | **16** |
 | CPU | 574×7 + 161×3 + 157×2 | **12** |
 | 버스 | 245×1 | **1** |
 | 클록 | 74×1 + 04×1 + 14×2 | **4** |
 | Flash prog | 595×3 | **3** |
-| **합계** | | **42** |
+| **합계** | | **36** |
 
 ### 많이 사는 품목 — 주의
 
 | # | 표 Qty | 검산 | 비고 |
 |---|--------|------|------|
-| **0.1 µF** | **42** | 74HC **38** (42−595×3) + CPLD **4** | 어댑터 **+6** 여유 권장 |
+| **0.1 µF** | **36** | 74HC **32** (36−595×3) + CPLD **4** | 어댑터 **+6** 여유 권장 |
 | **SMD 어댑터** | **6** (#3a+b+c) | SRAM 2 + Flash 1 + LVC 3 | |
 | 10 µF / bead / SIP / axial | 각 **10** | 설계 여유 | |
 | 브레드보드 ×4 · 점퍼 6 m | | ✓ | |
@@ -181,6 +188,8 @@ v0.1 [system-architecture.md](docs/system-architecture.md) · [alu8.md](hw/netli
 
 | 날짜 | 내용 |
 |------|------|
+| 2026-06-02 | ALU **Phase B2** (Gigatron `153_L`, −08/32/86/157_OUT); **16** DIP; 74HC **36**, decap **36** |
+| 2026-06-02 | ALU **SUB Phase A** (153×8, 86×2, 157×4) + **CMP 74HC85×2**; 74HC **44**, decap **44** |
 | 2026-06-02 | [BOM-3v3.md](BOM-3v3.md) = PCB 3.3 V 대응 명세로 정의 |
 | 2026-06-01 | 수량 검산 · 어댑터 6 · 0.1 µF 42 |
 | 2026-06-01 | 완전 구매 목록 + 항목별 시스템 의도 |
