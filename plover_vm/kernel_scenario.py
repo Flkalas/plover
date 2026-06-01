@@ -50,6 +50,14 @@ def run_kernel_scenario(doc: dict) -> KernelScenarioResult:
                 else:
                     k.gpio.clear_bit(0)
                     k.kprint("gpio_smoke_led_off")
+            elif typ == "set_slots":
+                slots = action.get("slots", {})
+                parsed: dict[int, int] = {}
+                for kslot, v in slots.items():
+                    ks = str(kslot).strip().strip('"').strip("'")
+                    vv = str(v).strip().strip('"').strip("'")
+                    parsed[int(ks)] = int(vv) & 0xFF
+                k.state.slot_signatures = parsed
             elif typ == "boot":
                 k.boot()
             elif typ == "alloc":
