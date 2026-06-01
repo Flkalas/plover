@@ -17,6 +17,8 @@ Deliver a **breadboard-prototype 8-bit CPU** with:
 - MMIO Mailbox @ `$FF00` (polling, no IRQ)
 - RP2350 coprocessor board (stretch)
 
+**Parallel track (optional):** FPGA / Verilog on education boards or external ROM/RAM — [fpga-target-guide.md](fpga-target-guide.md) (planning; RTL not in tree yet).
+
 Verification: `python -m hwsim run --all` (15) · `python -m pytest tests/ -q` · `python tools/verify_control_store.py`
 
 ---

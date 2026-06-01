@@ -20,6 +20,15 @@ Design notes and **hwsim** for Plover — **v0.1 CPU** (574×4 GPR + ATF1504AS s
 | [hw-sim.md](hw-sim.md) | `python -m hwsim` · `plover_vm` |
 | [reviewer-handoff.md](reviewer-handoff.md) | **검토자 인수인계** |
 | [roadmap-next.md](roadmap-next.md) | Roadmap |
+| [fpga-target-guide.md](fpga-target-guide.md) | **FPGA / Verilog** 타깃·교육 보드·외부 ROM/RAM (기준 문서) |
+
+## FPGA track (planning)
+
+| Document | Description |
+|----------|-------------|
+| [fpga-target-guide.md](fpga-target-guide.md) | Resource models A/B/C, EP4CE6, speed, future `hw/rtl/v0.1/` |
+
+TTL/PCB 실기와 **병렬** — [implementation-plan-v0.1.md](implementation-plan-v0.1.md) §2 참고.
 
 ## Software (VM)
 
@@ -53,4 +62,4 @@ Pre-v0.1 specs (v0.2 / v1.x): [archive/pre-v0.1/](archive/pre-v0.1/README.md)
 ## Project root
 
 - [../README.md](../README.md)
-- [../BOM.md](../BOM.md)
+- [../BOM.md](../BOM.md) (5 V 빵판) · [../BOM-3v3.md](../BOM-3v3.md) (3.3 V PCB)
