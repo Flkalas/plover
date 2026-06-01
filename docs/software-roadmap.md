@@ -1,0 +1,43 @@
+# Software roadmap (VM OS stack)
+
+**Related:** [software-memory-layout.md](software-memory-layout.md) · [implementation-plan-v0.1.md](implementation-plan-v0.1.md) · [hw-sim.md](hw-sim.md)
+
+Plover v0.1 software milestones **S0–S7** on `plover_vm`, then hardware bring-up (M1–M5).
+
+## Phase overview
+
+| Phase | Milestones | Goal |
+|-------|------------|------|
+| **S0** | docs, regression harness | Index + memory map + `run_sw_regression.py` |
+| **Phase 1** | S1–S3 | Assembler, CALL/RET, Forth core |
+| **Phase 2** | S4–S6 | Forth OS, subset C, C microkernel |
+| **Phase 3** | S7 (PL-DOS) | vFDD, PLFS, `.PLR`, Forth shell |
+
+## Milestone index
+
+| ID | Deliverable | Doc | Test gate |
+|----|-------------|-----|-----------|
+| S0 | Roadmap, layout, regression script | this file | baseline pytest |
+| S1 | `plover_asm` | [plover-asm.md](plover-asm.md) | `test_plover_asm.py` |
+| S2 | CALL/RET ISA + CW | [calling-convention-v0.1.md](calling-convention-v0.1.md) | `test_call_ret.py` |
+| S3 | Forth core | [forth-system.md](forth-system.md) | `test_forth_*.py`, `forth_boot.yaml` |
+| S3c | Normative asm Forth | forth-system §normative | `--engine micro` |
+| S4 | Forth OS services | [forth-os-services.md](forth-os-services.md) | `test_forth_blocks.py` |
+| S5 | `plover_cc` | [subset-c.md](subset-c.md) | `test_plover_cc.py` |
+| S6 | C kernel | [os-kernel.md](os-kernel.md) | `test_kernel_boot.py`, `os_boot.yaml` |
+| S7a | vFDD driver | [virtual-fdd.md](virtual-fdd.md) | `test_vfdd_io.py` |
+| S7b | PLFS | [plover-fat.md](plover-fat.md) | `test_fat_fs.py` |
+| S7c | `.PLR` loader | [program-loader.md](program-loader.md) | `test_plr_exec.py` |
+| S7d | PL-DOS shell | [dos-shell.md](dos-shell.md), [pl-dos-roadmap.md](pl-dos-roadmap.md) | `dos_boot.yaml` |
+
+## Hardware cross-links
+
+| Software | Hardware |
+|----------|----------|
+| S2 CALL/RET | M3 control-store pack |
+| S7 vFDD | [mailbox-protocol.md](mailbox-protocol.md), [rp2350-coprocessor.md](rp2350-coprocessor.md) |
+| Boot / PL-DOS | [bootloader.md](bootloader.md) |
+
+## Verification
+
+Each milestone: add tests → cumulative `pytest tests/` PASS → git commit. See [tests/README.md](../tests/README.md).

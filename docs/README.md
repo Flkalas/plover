@@ -21,6 +21,24 @@ Design notes and **hwsim** for Plover — **v0.1 CPU** (574×4 GPR + ATF1504AS s
 | [reviewer-handoff.md](reviewer-handoff.md) | **검토자 인수인계** |
 | [roadmap-next.md](roadmap-next.md) | Roadmap |
 
+## Software (VM)
+
+| Document | Description |
+|----------|-------------|
+| [software-roadmap.md](software-roadmap.md) | **S0–S7 milestone index** |
+| [software-memory-layout.md](software-memory-layout.md) | RAM regions · Forth · PL-DOS |
+| [plover-asm.md](plover-asm.md) | Normative assembler (S1) |
+| [calling-convention-v0.1.md](calling-convention-v0.1.md) | CALL/RET · stacks (S2) |
+| [forth-system.md](forth-system.md) | Forth kernel (S3) |
+| [forth-os-services.md](forth-os-services.md) | Block I/O · console (S4) |
+| [subset-c.md](subset-c.md) | Subset C compiler (S5) |
+| [os-kernel.md](os-kernel.md) | C microkernel (S6) |
+| [pl-dos-roadmap.md](pl-dos-roadmap.md) | PL-DOS master (S7) |
+| [virtual-fdd.md](virtual-fdd.md) | vFDD driver (S7a) |
+| [plover-fat.md](plover-fat.md) | PLFS on-disk (S7b) |
+| [program-loader.md](program-loader.md) | `.PLR` format (S7c) |
+| [dos-shell.md](dos-shell.md) | PL-DOS shell (S7d) |
+
 ## Archive
 
 Pre-v0.1 specs (v0.2 / v1.x): [archive/pre-v0.1/](archive/pre-v0.1/README.md)
