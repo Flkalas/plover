@@ -141,7 +141,7 @@ def cmd_export_schematic(args: argparse.Namespace) -> int:
         out_html = out_svg.with_suffix(".html")
         if out_html == out_svg:
             out_html = out_svg.parent / (out_svg.stem + ".html")
-        title = f"Plover {nl.block} schematic (16 DIP assembly)"
+        title = f"Plover {nl.block} schematic (14 DIP assembly)"
         if args.logical:
             title = f"Plover {nl.block} schematic (logical)"
         out_html.write_text(export_schematic_html(svg, title=title), encoding="utf-8")

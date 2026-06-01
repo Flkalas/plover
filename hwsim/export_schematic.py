@@ -23,17 +23,25 @@ PART_LAYOUT_ORDER: dict[str, int] = {
     "74HC04": 20,
     "74HC153": 30,
     "74HC157": 50,
-    "74HC85": 70,
+    "ALU_CMP_SUB": 55,
 }
 
-# hwsim-only instances — omitted from assembly schematic (see assembly spec).
-ALU8_ASSEMBLY_SKIP_REFS = frozenset({"U_ALU_Y_MUX_SEL", "U_ALU_CMP_MERGE"})
+# Behavioral-only — omitted from assembly schematic (14 physical DIP).
+ALU8_ASSEMBLY_SKIP_REFS = frozenset({"U_ALU_Y_MUX_SEL", "U_ALU_CMP_SUB"})
 
-CONTROL_NET_PREFIXES = ("net_lgc", "net_153_s", "net_y_mux_sel", "net_b_sel", "net_b_const", "net_cin")
+CONTROL_NET_PREFIXES = (
+    "net_lgc",
+    "net_153_s",
+    "net_y_mux_sel",
+    "net_b_sel",
+    "net_b_const",
+    "net_cin",
+    "net_cmp_z",
+    "net_cmp_c_ge",
+)
 
 _ASSEMBLY_NOTE_ORPHAN = (
-    "net_153_s0|s1 OR → net_y_mux_sel (no DIP); "
-    "net_cmp_z / net_cmp_c_ge from 85 cascade (no DIP)"
+    "glue: s0|s1 OR → net_y_mux_sel; cmp_z/c_ge from SUB (net_y, net_c_hi) — no extra DIP"
 )
 
 POWER_PINS = frozenset({"VCC", "VDD", "GND", "VSS"})
@@ -139,7 +147,7 @@ def _alu153_slice_pin_to_153(mux: int, pin: str) -> str:
 
 
 def _group_alu8_assembly(instances: list[Instance]) -> list[PhysicalPackage]:
-    """16 DIP packages — matches hw-bringup-alu8-assembly-spec / BOM."""
+    """14 DIP packages — matches hw-bringup-alu8-assembly-spec / BOM (no 7485)."""
     merged_l: dict[str, PhysicalPackage] = {}
     rest: list[Instance] = []
 
@@ -547,7 +555,7 @@ def export_schematic_svg(
         f'<text x="{margin:.0f}" y="{margin + 12:.0f}" class="lbl-part">'
         f"block: {_esc(nl.block)}"
         + (
-            f" (assembly 16 DIP) | packages: {len(sorted_pkgs)} | "
+            f" (assembly 14 DIP) | packages: {len(sorted_pkgs)} | "
             f"signals: {signal_nets} | control: orange | {_ASSEMBLY_NOTE_ORPHAN} | "
             f"VCC: {vcc_count} GND: {gnd_count}"
             if assembly

@@ -14,12 +14,6 @@ packages:
   - part: ALU_Y_MUX_SEL
     file: dip/alu_y_mux_sel.dip8.yaml
     bom: [glue — 32 OR or CPLD on breadboard]
-  - part: ALU_CMP_MERGE
-    file: dip/alu_cmp_merge.dip14.yaml
-    bom: [glue — 08/32 or CPLD]
-  - part: 74HC85
-    file: dip/74hc85.dip16.yaml
-    bom: [BOM.md ALU #7b]
   - part: 74HC86
     file: dip/74hc86.dip14.yaml
     bom: [BOM.md ALU #6]
