@@ -410,112 +410,64 @@ stimulus:
       net_b_const_bit5: 0
       net_b_const_bit6: 0
       net_b_const_bit7: 0
-expect:
-  - at_ns: 400
-    net_y0: 0
-    net_y1: 0
-    net_y2: 0
-    net_y3: 0
-    net_y4: 0
-    net_y5: 0
-    net_y6: 0
-    net_y7: 0
-  - at_ns: 1000
-    net_y0: 0
-    net_y1: 1
-    net_y2: 1
-    net_y3: 0
-    net_y4: 0
-    net_y5: 0
-    net_y6: 1
-    net_y7: 0
-  - at_ns: 1600
-    net_y0: 0
-    net_y1: 1
-    net_y2: 1
-    net_y3: 1
-    net_y4: 1
-    net_y5: 0
-    net_y6: 1
-    net_y7: 1
-  - at_ns: 2200
-    net_y0: 0
-    net_y1: 0
-    net_y2: 0
-    net_y3: 0
-    net_y4: 1
-    net_y5: 0
-    net_y6: 0
-    net_y7: 0
-  - at_ns: 2800
-    net_y0: 0
-    net_y1: 1
-    net_y2: 1
-    net_y3: 0
-    net_y4: 1
-    net_y5: 1
-    net_y6: 0
-    net_y7: 0
-  - at_ns: 3400
-    net_y0: 0
-    net_y1: 1
-    net_y2: 1
-    net_y3: 0
-    net_y4: 0
-    net_y5: 1
-    net_y6: 0
-    net_y7: 0
-  - at_ns: 4000
-    net_y0: 1
-    net_y1: 0
-    net_y2: 1
-    net_y3: 1
-    net_y4: 0
-    net_y5: 1
-    net_y6: 1
-    net_y7: 1
-  - at_ns: 4600
-    net_y0: 0
-    net_y1: 1
-    net_y2: 0
-    net_y3: 0
-    net_y4: 1
-    net_y5: 0
-    net_y6: 0
-    net_y7: 0
-  - at_ns: 5200
-    net_y0: 0
-    net_y1: 0
-    net_y2: 1
-    net_y3: 0
-    net_y4: 1
-    net_y5: 1
-    net_y6: 0
-    net_y7: 0
-  - at_ns: 5800
-    net_y0: 1
-    net_y1: 1
-    net_y2: 0
-    net_y3: 0
-    net_y4: 1
-    net_y5: 0
-    net_y6: 0
-    net_y7: 0
-  - at_ns: 6400
-    net_y0: 1
-    net_y1: 0
-    net_y2: 0
-    net_y3: 0
-    net_y4: 1
-    net_y5: 0
-    net_y6: 0
-    net_y7: 0
-  - at_ns: 7000
-    net_y0: 0
-    net_y1: 1
-    net_y2: 1
-    net_y3: 1
-    net_y4: 1
-    net_y5: 0
-    net_y6: 1
-    net_y7: 1
+checks:
+  - type: slack
+    label: NOP
+    path: ['U_ALU_283_LO.A0', 'U_ALU_283_LO.C4', 'U_ALU_283_HI.C4', 'U_ALU_157_YBP_0.1A', 'U_ALU_157_YBP_0.1Y']
+    budget_ns: 250
+    min_slack_ns: 0
+  - type: slack
+    label: ADD
+    path: ['U_ALU_283_LO.A0', 'U_ALU_283_LO.C4', 'U_ALU_283_HI.C4', 'U_ALU_157_YBP_0.1A', 'U_ALU_157_YBP_0.1Y']
+    budget_ns: 250
+    min_slack_ns: 0
+  - type: slack
+    label: SUB
+    path: ['net_b0', 'U_ALU_04_BINV_0.A', 'U_ALU_04_BINV_0.Y', 'U_ALU_153_B_0.1C1', 'U_ALU_153_B_0.1Y', 'U_ALU_283_LO.B0', 'U_ALU_283_LO.C4', 'U_ALU_283_HI.C4', 'U_ALU_157_YBP_0.1A', 'U_ALU_157_YBP_0.1Y']
+    budget_ns: 250
+    min_slack_ns: 0
+  - type: slack
+    label: AND
+    path: ['U_ALU_153_L_0.A', 'U_ALU_153_L_0.Y', 'U_ALU_157_YBP_0.4B', 'U_ALU_157_YBP_0.4Y']
+    budget_ns: 250
+    min_slack_ns: 0
+  - type: slack
+    label: OR
+    path: ['U_ALU_153_L_0.A', 'U_ALU_153_L_0.Y', 'U_ALU_157_YBP_0.4B', 'U_ALU_157_YBP_0.4Y']
+    budget_ns: 250
+    min_slack_ns: 0
+  - type: slack
+    label: XOR
+    path: ['U_ALU_153_L_0.A', 'U_ALU_153_L_0.Y', 'U_ALU_157_YBP_0.4B', 'U_ALU_157_YBP_0.4Y']
+    budget_ns: 250
+    min_slack_ns: 0
+  - type: slack
+    label: NOT
+    path: ['U_ALU_153_L_0.A', 'U_ALU_153_L_0.Y', 'U_ALU_157_YBP_0.4B', 'U_ALU_157_YBP_0.4Y']
+    budget_ns: 250
+    min_slack_ns: 0
+  - type: slack
+    label: PASS_A
+    path: ['U_ALU_153_L_0.A', 'U_ALU_153_L_0.Y', 'U_ALU_157_YBP_0.4B', 'U_ALU_157_YBP_0.4Y']
+    budget_ns: 250
+    min_slack_ns: 0
+  - type: slack
+    label: PASS_B
+    path: ['U_ALU_153_L_0.A', 'U_ALU_153_L_0.Y', 'U_ALU_157_YBP_0.4B', 'U_ALU_157_YBP_0.4Y']
+    budget_ns: 250
+    min_slack_ns: 0
+  - type: slack
+    label: INC
+    path: ['U_ALU_283_LO.A0', 'U_ALU_283_LO.C4', 'U_ALU_283_HI.C4', 'U_ALU_157_YBP_0.1A', 'U_ALU_157_YBP_0.1Y']
+    budget_ns: 250
+    min_slack_ns: 0
+  - type: slack
+    label: DEC
+    path: ['net_b0', 'U_ALU_04_BINV_0.A', 'U_ALU_04_BINV_0.Y', 'U_ALU_153_B_0.1C1', 'U_ALU_153_B_0.1Y', 'U_ALU_283_LO.B0', 'U_ALU_283_LO.C4', 'U_ALU_283_HI.C4', 'U_ALU_157_YBP_0.1A', 'U_ALU_157_YBP_0.1Y']
+    budget_ns: 250
+    min_slack_ns: 0
+  - type: slack
+    label: CMP
+    path: ['net_b0', 'U_ALU_04_BINV_0.A', 'U_ALU_04_BINV_0.Y', 'U_ALU_153_B_0.1C1', 'U_ALU_153_B_0.1Y', 'U_ALU_283_LO.B0', 'U_ALU_283_LO.C4', 'U_ALU_283_HI.C4', 'U_ALU_157_YBP_0.1A', 'U_ALU_157_YBP_0.1Y']
+    budget_ns: 250
+    min_slack_ns: 0

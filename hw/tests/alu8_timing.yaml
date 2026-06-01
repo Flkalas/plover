@@ -20,22 +20,24 @@ stimulus:
       net_b5: 0
       net_b6: 0
       net_b7: 0
-      net_sub_en: 0
       net_cin: 0
       net_153_s0: 0
       net_153_s1: 0
       net_b_sel: 0
-      net_c3_sel: 0
+      net_lgc0: 0
+      net_lgc1: 0
+      net_lgc2: 0
+      net_lgc3: 0
 expect:
   - at_ns: 400
     net_y0: 0
     net_c_hi: 1
 checks:
   - type: slack
-    path: [U_ALU_283_LO.A0, U_ALU_283_LO.C4, U_ALU_283_HI.C4, U_ALU_153_0.1Y]
+    path: [U_ALU_283_LO.A0, U_ALU_283_LO.C4, U_ALU_283_HI.C4, U_ALU_157_YBP_0.4A]
     budget_ns: 250
     min_slack_ns: 0
   - type: slack
-    path: [U_ALU_08_0.A, U_ALU_08_0.Y, U_ALU_153_0.1C1]
+    path: [U_ALU_153_L_0.A, U_ALU_153_L_0.Y, U_ALU_157_YBP_0.4B, U_ALU_157_YBP_0.4Y]
     budget_ns: 250
     min_slack_ns: 0

@@ -1,0 +1,55 @@
+netlist: ../netlist/blocks/alu8.yaml
+timing: max
+duration_ns: 900
+stimulus:
+  - at_ns: 0
+    set:
+      net_a0: 0
+      net_a1: 1
+      net_a2: 0
+      net_a3: 0
+      net_a4: 1
+      net_a5: 0
+      net_a6: 0
+      net_a7: 0
+      net_b0: 0
+      net_b1: 1
+      net_b2: 0
+      net_b3: 0
+      net_b4: 1
+      net_b5: 0
+      net_b6: 0
+      net_b7: 0
+      net_cin: 0
+      net_b_sel: 0
+      net_b_const_sel: 0
+      net_153_s0: 0
+      net_153_s1: 0
+      net_lgc0: 0
+      net_lgc1: 0
+      net_lgc2: 0
+      net_lgc3: 0
+      net_b_const_bit1: 0
+      net_b_const_bit2: 0
+      net_b_const_bit3: 0
+      net_b_const_bit4: 0
+      net_b_const_bit5: 0
+      net_b_const_bit6: 0
+      net_b_const_bit7: 0
+  - at_ns: 400
+    set:
+      net_b0: 0
+      net_b1: 0
+      net_b2: 1
+      net_b3: 0
+      net_b4: 1
+      net_b5: 1
+      net_b6: 0
+      net_b7: 0
+expect:
+  - at_ns: 350
+    net_cmp_z: 1
+    net_cmp_c_ge: 1
+  - at_ns: 750
+    net_cmp_z: 0
+    net_cmp_c_ge: 0
