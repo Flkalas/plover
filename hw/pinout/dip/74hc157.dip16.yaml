@@ -1,0 +1,31 @@
+version: 1
+part: 74HC157
+aliases: [SN74HC157N, CD74HC157E]
+package:
+  name: DIP-16
+  pins: 16
+  view: top_notch_up
+sources:
+  - org: Texas Instruments
+    doc: SN74HC157 — Quad 2-line to 1-line data selector
+    url: https://www.ti.com/lit/ds/symlink/sn74hc157.pdf
+    table: "Pin Functions (PDIP)"
+pins:
+  "1": { sym: S, aliases: [A/B, SELECT], role: input, desc: "Common data select (0=A, 1=B)" }
+  "2": { sym: 1A, role: input, desc: Channel 1 input A }
+  "3": { sym: 1B, role: input, desc: Channel 1 input B }
+  "4": { sym: 1Y, role: output, desc: Channel 1 output }
+  "5": { sym: 2A, role: input, desc: Channel 2 input A }
+  "6": { sym: 2B, role: input, desc: Channel 2 input B }
+  "7": { sym: 2Y, role: output, desc: Channel 2 output }
+  "8": { sym: GND, role: power, desc: Ground }
+  "9": { sym: 3Y, role: output, desc: Channel 3 output }
+  "10": { sym: 3B, role: input, desc: Channel 3 input B }
+  "11": { sym: 3A, role: input, desc: Channel 3 input A }
+  "12": { sym: 4Y, role: output, desc: Channel 4 output }
+  "13": { sym: 4B, role: input, desc: Channel 4 input B }
+  "14": { sym: 4A, role: input, desc: Channel 4 input A }
+  "15": { sym: OE, aliases: [G, nG, STROBE], role: input, desc: "Output enable (active LOW)" }
+  "16": { sym: VCC, role: power, desc: Positive supply }
+plover_netlist:
+  note: alu8.yaml uses S and OE; tie OE=GND for normal operation

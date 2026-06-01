@@ -1,0 +1,36 @@
+version: 1
+part: 74HC04
+aliases: [SN74HC04N, CD74HC04E]
+package:
+  name: DIP-14
+  pins: 14
+  view: top_notch_up
+sources:
+  - org: Texas Instruments
+    doc: SN74HC04 — Hex inverter
+    url: https://www.ti.com/lit/ds/symlink/sn74hc04.pdf
+    table: "Pin Functions (PDIP)"
+gates:
+  "1": { A: 1, Y: 2 }
+  "2": { A: 3, Y: 4 }
+  "3": { A: 5, Y: 6 }
+  "4": { A: 9, Y: 8 }
+  "5": { A: 11, Y: 10 }
+  "6": { A: 13, Y: 12 }
+pins:
+  "1": { sym: 1A, role: input, desc: Inverter 1 input }
+  "2": { sym: 1Y, role: output, desc: Inverter 1 output }
+  "3": { sym: 2A, role: input, desc: Inverter 2 input }
+  "4": { sym: 2Y, role: output, desc: Inverter 2 output }
+  "5": { sym: 3A, role: input, desc: Inverter 3 input }
+  "6": { sym: 3Y, role: output, desc: Inverter 3 output }
+  "7": { sym: GND, role: power, desc: Ground }
+  "8": { sym: 4Y, role: output, desc: Inverter 4 output }
+  "9": { sym: 4A, role: input, desc: Inverter 4 input }
+  "10": { sym: 5Y, role: output, desc: Inverter 5 output }
+  "11": { sym: 5A, role: input, desc: Inverter 5 input }
+  "12": { sym: 6Y, role: output, desc: Inverter 6 output }
+  "13": { sym: 6A, role: input, desc: Inverter 6 input }
+  "14": { sym: VCC, role: power, desc: Positive supply }
+plover_netlist:
+  note: alu8 uses A/Y per gate instance (U_ALU_04_N0..7)

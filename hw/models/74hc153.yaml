@@ -1,4 +1,5 @@
 part: 74HC153
+pinout_dip: ../pinout/dip/74hc153.dip16.yaml
 kind: combinational
 description: Dual 4-to-1 data selector; shared A/B select, active-low enables
 pins:

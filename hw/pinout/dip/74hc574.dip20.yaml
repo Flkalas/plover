@@ -1,0 +1,33 @@
+version: 1
+part: 74HC574
+aliases: [SN74HC574N, CD74HC574E]
+package:
+  name: DIP-20
+  pins: 20
+  view: top_notch_up
+sources:
+  - org: NXP
+    doc: 74HC/HCT574 — Octal D-type flip-flop; positive edge-trigger; 3-state
+    url: https://assets.nexperia.com/documents/data-sheet/74HC_HCT574.pdf
+    table: "Pin description Table 2"
+pins:
+  "1": { sym: OE, aliases: [nOE], role: input, desc: "3-state output enable (active LOW)" }
+  "2": { sym: D0, role: input, desc: Data input 0 }
+  "3": { sym: D1, role: input, desc: Data input 1 }
+  "4": { sym: D2, role: input, desc: Data input 2 }
+  "5": { sym: D3, role: input, desc: Data input 3 }
+  "6": { sym: D4, role: input, desc: Data input 4 }
+  "7": { sym: D5, role: input, desc: Data input 5 }
+  "8": { sym: D6, role: input, desc: Data input 6 }
+  "9": { sym: D7, role: input, desc: Data input 7 }
+  "10": { sym: GND, role: power, desc: Ground }
+  "11": { sym: CP, aliases: [CLK, CLOCK], role: input, desc: "Clock input (LOW-to-HIGH)" }
+  "12": { sym: Q7, role: output, desc: "Flip-flop output 7 (3-state)" }
+  "13": { sym: Q6, role: output, desc: "Flip-flop output 6 (3-state)" }
+  "14": { sym: Q5, role: output, desc: "Flip-flop output 5 (3-state)" }
+  "15": { sym: Q4, role: output, desc: "Flip-flop output 4 (3-state)" }
+  "16": { sym: Q3, role: output, desc: "Flip-flop output 3 (3-state)" }
+  "17": { sym: Q2, role: output, desc: "Flip-flop output 2 (3-state)" }
+  "18": { sym: Q1, role: output, desc: "Flip-flop output 1 (3-state)" }
+  "19": { sym: Q0, role: output, desc: "Flip-flop output 0 (3-state)" }
+  "20": { sym: VCC, role: power, desc: Positive supply }

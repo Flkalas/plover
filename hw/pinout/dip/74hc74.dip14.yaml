@@ -1,0 +1,28 @@
+version: 1
+part: 74HC74
+aliases: [SN74HC74N, CD74HC74E]
+package:
+  name: DIP-14
+  pins: 14
+  view: top_notch_up
+sources:
+  - org: Texas Instruments
+    doc: SN74HC74 — Dual D-type positive edge-triggered flip-flops with preset and clear
+    url: https://www.ti.com/lit/ds/symlink/sn74hc74.pdf
+pins:
+  "1": { sym: 1CLR, aliases: [1MR, n1CLR], role: input, desc: "Flip-flop 1 asynchronous clear (active LOW)" }
+  "2": { sym: 1D, role: input, desc: Flip-flop 1 data input }
+  "3": { sym: 1CLK, aliases: [1CP], role: input, desc: Flip-flop 1 clock input }
+  "4": { sym: 1Q, role: output, desc: Flip-flop 1 true output }
+  "5": { sym: 1Qn, aliases: [1Qbar], role: output, desc: Flip-flop 1 complement output }
+  "6": { sym: 2Qn, aliases: [2Qbar], role: output, desc: Flip-flop 2 complement output }
+  "7": { sym: 2Q, role: output, desc: Flip-flop 2 true output }
+  "8": { sym: 2CLK, aliases: [2CP], role: input, desc: Flip-flop 2 clock input }
+  "9": { sym: 2D, role: input, desc: Flip-flop 2 data input }
+  "10": { sym: 2CLR, aliases: [2MR, n2CLR], role: input, desc: "Flip-flop 2 asynchronous clear (active LOW)" }
+  "11": { sym: GND, role: power, desc: Ground }
+  "12": { sym: 2PRE, aliases: [2SET, n2PRE], role: input, desc: "Flip-flop 2 asynchronous preset (active LOW)" }
+  "13": { sym: 1PRE, aliases: [1SET, n1PRE], role: input, desc: "Flip-flop 1 asynchronous preset (active LOW)" }
+  "14": { sym: VCC, role: power, desc: Positive supply }
+plover_netlist:
+  note: clock.yaml uses ÷2 on one flip-flop; tie unused PRE/CLR per datasheet

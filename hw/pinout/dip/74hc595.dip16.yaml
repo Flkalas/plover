@@ -1,0 +1,29 @@
+version: 1
+part: 74HC595
+aliases: [SN74HC595N, CD74HC595E]
+package:
+  name: DIP-16
+  pins: 16
+  view: top_notch_up
+sources:
+  - org: NXP
+    doc: 74HC/HCT595 — 8-bit serial-in shift register with output latches
+    url: https://assets.nexperia.com/documents/data-sheet/74HC_HCT595.pdf
+    table: "Pin description Table 2"
+pins:
+  "1": { sym: Q1, role: output, desc: Parallel output 1 (3-state when OE high) }
+  "2": { sym: Q2, role: output, desc: Parallel output 2 }
+  "3": { sym: Q3, role: output, desc: Parallel output 3 }
+  "4": { sym: Q4, role: output, desc: Parallel output 4 }
+  "5": { sym: Q5, role: output, desc: Parallel output 5 }
+  "6": { sym: Q6, role: output, desc: Parallel output 6 }
+  "7": { sym: Q7, role: output, desc: Parallel output 7 }
+  "8": { sym: GND, role: power, desc: Ground }
+  "9": { sym: Q7S, aliases: [Q7p, Q7prime], role: output, desc: Serial data output (cascade) }
+  "10": { sym: MR, aliases: [SRCLR, nMR], role: input, desc: "Master reset shift register (active LOW)" }
+  "11": { sym: SHCP, aliases: [SH_CP, SRCLK], role: input, desc: Shift register clock (rising edge) }
+  "12": { sym: STCP, aliases: [ST_CP, RCLK], role: input, desc: Storage register clock (rising edge) }
+  "13": { sym: OE, aliases: [nOE], role: input, desc: "Output enable (active LOW)" }
+  "14": { sym: DS, aliases: [SER, SI], role: input, desc: Serial data input }
+  "15": { sym: Q0, role: output, desc: Parallel output 0 }
+  "16": { sym: VCC, role: power, desc: Positive supply }

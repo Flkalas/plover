@@ -1,4 +1,5 @@
 part: 74HC283
+pinout_dip: ../pinout/dip/74hc283.dip16.yaml
 kind: combinational
 description: 4-bit binary full adder, cascaded for 8-bit in Plover
 pins:

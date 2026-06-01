@@ -1,4 +1,5 @@
 part: 74HC157
+pinout_dip: ../pinout/dip/74hc157.dip16.yaml
 kind: combinational
 description: Quad 2-to-1 multiplexer; OE active-low
 pins:

@@ -1,0 +1,49 @@
+version: 1
+part: 74HC283
+aliases: [SN74HC283N, CD74HC283E, 74HC283N]
+package:
+  name: DIP-16
+  pins: 16
+  view: top_notch_up
+sources:
+  - org: NXP
+    doc: 74HC283 — 4-bit binary full adder
+    url: https://assets.nexperia.com/documents/data-sheet/74HC283.pdf
+    table: "Pin description Table 3"
+  - org: Texas Instruments
+    doc: CD74HC283
+    url: https://www.ti.com/lit/ds/symlink/cd74hc283.pdf
+pins:
+  "1": { sym: S2, aliases: [SUM2], role: output, desc: Sum output bit 2 (datasheet labels S2) }
+  "2": { sym: B2, role: input, desc: B operand bit 2 }
+  "3": { sym: A2, role: input, desc: A operand bit 2 }
+  "4": { sym: S1, aliases: [SUM1], role: output, desc: Sum output bit 1 (LSB sum) }
+  "5": { sym: A1, role: input, desc: A operand bit 1 }
+  "6": { sym: B1, role: input, desc: B operand bit 1 }
+  "7": { sym: CIN, aliases: [C0], role: input, desc: Carry input }
+  "8": { sym: GND, role: power, desc: Ground }
+  "9": { sym: COUT, aliases: [C4], role: output, desc: Carry output }
+  "10": { sym: S4, aliases: [SUM4], role: output, desc: Sum output bit 4 (MSB sum) }
+  "11": { sym: B4, role: input, desc: B operand bit 4 }
+  "12": { sym: A4, role: input, desc: A operand bit 4 }
+  "13": { sym: S3, aliases: [SUM3], role: output, desc: Sum output bit 3 }
+  "14": { sym: B3, role: input, desc: B operand bit 3 }
+  "15": { sym: A3, role: input, desc: A operand bit 3 }
+  "16": { sym: VCC, role: power, desc: Positive supply }
+plover_netlist:
+  note: alu8.yaml uses S0..S3 (0-based bit index) and C0/C4 for carry
+  map:
+    S0: { dip: 4, datasheet: S1 }
+    S1: { dip: 1, datasheet: S2 }
+    S2: { dip: 13, datasheet: S3 }
+    S3: { dip: 10, datasheet: S4 }
+    A0: { dip: 5 }
+    A1: { dip: 7 }
+    A2: { dip: 3 }
+    A3: { dip: 15 }
+    B0: { dip: 6 }
+    B1: { dip: 2 }
+    B2: { dip: 14 }
+    B3: { dip: 11 }
+    C0: { dip: 7, datasheet: CIN }
+    C4: { dip: 9, datasheet: COUT }

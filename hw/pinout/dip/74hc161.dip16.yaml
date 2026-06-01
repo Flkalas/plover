@@ -1,0 +1,29 @@
+version: 1
+part: 74HC161
+aliases: [SN74HC161N, CD74HC161E]
+package:
+  name: DIP-16
+  pins: 16
+  view: top_notch_up
+sources:
+  - org: NXP
+    doc: 74HC161 — Presettable synchronous 4-bit binary counter; asynchronous reset
+    url: https://assets.nexperia.com/documents/data-sheet/74HC161.pdf
+    table: "Pin description Table 2"
+pins:
+  "1": { sym: MR, aliases: [nMR, CLR, RESET], role: input, desc: "Asynchronous master reset (active LOW)" }
+  "2": { sym: CP, aliases: [CLK, CLOCK], role: input, desc: "Clock input (LOW-to-HIGH)" }
+  "3": { sym: D0, aliases: [P0], role: input, desc: Data / parallel load input 0 }
+  "4": { sym: D1, aliases: [P1], role: input, desc: Data / parallel load input 1 }
+  "5": { sym: D2, aliases: [P2], role: input, desc: Data / parallel load input 2 }
+  "6": { sym: D3, aliases: [P3], role: input, desc: Data / parallel load input 3 }
+  "7": { sym: CEP, aliases: [ENP], role: input, desc: Count enable P }
+  "8": { sym: GND, role: power, desc: Ground }
+  "9": { sym: PE, aliases: [nLD, LOAD], role: input, desc: "Parallel enable / load (active LOW)" }
+  "10": { sym: CET, aliases: [ENT], role: input, desc: Count enable carry (T) }
+  "11": { sym: Q3, role: output, desc: Counter output bit 3 (MSB) }
+  "12": { sym: Q2, role: output, desc: Counter output bit 2 }
+  "13": { sym: Q1, role: output, desc: Counter output bit 1 }
+  "14": { sym: Q0, role: output, desc: Counter output bit 0 (LSB) }
+  "15": { sym: TC, aliases: [RCO, COUT], role: output, desc: Terminal count / ripple carry out }
+  "16": { sym: VCC, role: power, desc: Positive supply }

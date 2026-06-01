@@ -1,0 +1,31 @@
+version: 1
+part: 74HC85
+aliases: [SN74HC85N, CD74HC85E]
+package:
+  name: DIP-16
+  pins: 16
+  view: top_notch_up
+sources:
+  - org: Texas Instruments
+    doc: SN74HC85 — 4-bit magnitude comparator
+    url: https://www.ti.com/lit/ds/symlink/sn74hc85.pdf
+    table: "Pin Functions (PDIP)"
+pins:
+  "1": { sym: B0, role: input, desc: Comparator B bit 0 }
+  "2": { sym: A0, role: input, desc: Comparator A bit 0 }
+  "3": { sym: B1, role: input, desc: Comparator B bit 1 }
+  "4": { sym: A1, role: input, desc: Comparator A bit 1 }
+  "5": { sym: A2, role: input, desc: Comparator A bit 2 }
+  "6": { sym: B2, role: input, desc: Comparator B bit 2 }
+  "7": { sym: GND, role: power, desc: Ground }
+  "8": { sym: OAB_EQ, role: output, desc: A = B (active HIGH) }
+  "9": { sym: OAB_GT, role: output, desc: A > B (active HIGH) }
+  "10": { sym: OAB_LT, role: output, desc: A < B (active HIGH) }
+  "11": { sym: A3, role: input, desc: Comparator A bit 3 }
+  "12": { sym: B3, role: input, desc: Comparator B bit 3 }
+  "13": { sym: IAB_LT, role: input, desc: Cascade A < B in }
+  "14": { sym: IAB_EQ, role: input, desc: Cascade A = B in }
+  "15": { sym: IAB_GT, role: input, desc: Cascade A > B in }
+  "16": { sym: VCC, role: power, desc: Positive supply }
+plover_netlist:
+  note: alu8 — U_ALU_85_LO (nibbles 0–3) cascades into U_ALU_85_HI; LO cascade in tied EQ=1, GT/LT=0. Flags merged to net_cmp_z / net_cmp_c_ge (hwsim ALU_CMP_MERGE or FLG glue).

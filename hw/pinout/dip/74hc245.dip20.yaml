@@ -1,0 +1,36 @@
+version: 1
+part: 74HC245
+aliases: [SN74HC245N, CD74HC245E]
+package:
+  name: DIP-20
+  pins: 20
+  view: top_notch_up
+sources:
+  - org: NXP
+    doc: 74HC/HCT245 — Octal bus transceiver; 3-state
+    url: https://assets.nexperia.com/documents/data-sheet/74HC_HCT245.pdf
+    table: "Pin description Table 2"
+  - org: Texas Instruments
+    doc: SN74HC245
+    url: https://www.ti.com/lit/ds/symlink/sn74hc245.pdf
+pins:
+  "1": { sym: DIR, role: input, desc: "Direction (L: B→A, H: A→B per NXP table)" }
+  "2": { sym: A0, role: i/o, desc: Port A bit 0 }
+  "3": { sym: A1, role: i/o, desc: Port A bit 1 }
+  "4": { sym: A2, role: i/o, desc: Port A bit 2 }
+  "5": { sym: A3, role: i/o, desc: Port A bit 3 }
+  "6": { sym: A4, role: i/o, desc: Port A bit 4 }
+  "7": { sym: A5, role: i/o, desc: Port A bit 5 }
+  "8": { sym: A6, role: i/o, desc: Port A bit 6 }
+  "9": { sym: A7, role: i/o, desc: Port A bit 7 }
+  "10": { sym: GND, role: power, desc: Ground }
+  "11": { sym: B7, role: i/o, desc: Port B bit 7 }
+  "12": { sym: B6, role: i/o, desc: Port B bit 6 }
+  "13": { sym: B5, role: i/o, desc: Port B bit 5 }
+  "14": { sym: B4, role: i/o, desc: Port B bit 4 }
+  "15": { sym: B3, role: i/o, desc: Port B bit 3 }
+  "16": { sym: B2, role: i/o, desc: Port B bit 2 }
+  "17": { sym: B1, role: i/o, desc: Port B bit 1 }
+  "18": { sym: B0, role: i/o, desc: Port B bit 0 }
+  "19": { sym: OE, aliases: [nOE, G], role: input, desc: "Output enable (active LOW)" }
+  "20": { sym: VCC, role: power, desc: Positive supply }

@@ -1,0 +1,30 @@
+version: 1
+part: ALU_CMP_MERGE
+package:
+  name: DIP-14
+  pins: 14
+  view: top_notch_up
+sources:
+  - org: Plover
+    doc: CMP flag merge (hwsim behavioral) — breadboard may use 08/32 glue or CPLD
+pins:
+  "1": { sym: LO_GT, role: input, desc: From 85_LO }
+  "2": { sym: LO_LT, role: input, desc: From 85_LO }
+  "3": { sym: LO_EQ, role: input, desc: From 85_LO }
+  "4": { sym: HI_GT, role: input, desc: From 85_HI }
+  "5": { sym: HI_LT, role: input, desc: From 85_HI }
+  "6": { sym: HI_EQ, role: input, desc: From 85_HI }
+  "7": { sym: Z, role: output, desc: net_cmp_z }
+  "8": { sym: GND, role: power, desc: Ground }
+  "9": { sym: C_GE, role: output, desc: net_cmp_c_ge }
+  "14": { sym: VCC, role: power, desc: Positive supply }
+plover_netlist:
+  map:
+    LO_GT: { dip: 1 }
+    LO_LT: { dip: 2 }
+    LO_EQ: { dip: 3 }
+    HI_GT: { dip: 4 }
+    HI_LT: { dip: 5 }
+    HI_EQ: { dip: 6 }
+    Z: { dip: 7 }
+    C_GE: { dip: 9 }
