@@ -88,3 +88,32 @@ def test_monitor_ram_and_vfdd():
     assert "RAM_USED_" in out and "RAM_FREE_" in out
     assert "VFDD_FILES_" in out and "VFDD_USED_SECT_" in out
 
+
+def test_ldrun_and_link_monitors():
+    import subprocess
+    import sys
+
+    root = Path(__file__).resolve().parents[1]
+    obj = root / "hw" / "fixtures" / "sw" / "add_imm.asm"
+    build_dir = root / "build" / "tmp_obj"
+    build_dir.mkdir(parents=True, exist_ok=True)
+    subprocess.run(
+        [sys.executable, "-m", "plover_asm", "obj", str(obj), "-o", str(build_dir)],
+        cwd=root,
+        check=True,
+    )
+    plx_rel = "build/tmp_obj/add_imm.plx"
+    proc = subprocess.run(
+        [sys.executable, "-m", "plover_vm", "dos-shell"],
+        cwd=root,
+        input=f"ldrun {plx_rel}\nmon map\nmon sym\nmon rel\nexit\n",
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    out = proc.stdout
+    assert "R0_8" in out
+    assert "MAP" in out or "_$" in out
+    assert "SYM" in out
+    assert "RELOC_APPLIED_" in out
+

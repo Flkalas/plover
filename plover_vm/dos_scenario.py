@@ -14,6 +14,8 @@ from kern.vfdd import VfddDriver
 from plover_asm.assemble import assemble, assemble_file
 from plover_cc.codegen import program_to_asm
 from plover_cc.parse import parse as cc_parse
+from plover_ld.format import read_plx
+from plover_ld.linker import link_objects
 from plover_vm.machine import PloverMachine
 from plover_vm.memory.bus import MemoryBus
 from plover_vm.memory.vfdd import VfdConfig, VirtualFdd
@@ -34,6 +36,8 @@ class DosRuntime:
     root: Path
     output: list[str] = field(default_factory=list)
     prompt: str = "PL-DOS>"
+    last_link_map: dict[str, int] = field(default_factory=dict)
+    last_link_reloc_count: int = 0
 
     def _emit(self, s: str, acc: list[str]) -> None:
         self.output.append(s)
@@ -70,6 +74,17 @@ class DosRuntime:
         r = spawn(self.machine, self.fs, plr_name, engine="micro")
         self._emit(f"R0_{r.r0}", out)
 
+    def _run_linked_plx(self, plx_paths: list[Path], out: list[str]) -> None:
+        objs = [read_plx(p) for p in plx_paths]
+        lr = link_objects(objs, text_base=0x2800)
+        self.last_link_map = dict(lr.symbols)
+        self.last_link_reloc_count = lr.reloc_applied
+        entry_addr = lr.symbols.get(lr.entry_symbol, 0x2800)
+        plr = pack_plr(
+            PlrImage(load_addr=0x2800, entry_off=(entry_addr - 0x2800) & 0xFFFF, code=lr.final_code())
+        )
+        self._run_plr_bytes("LDRUN.PLR", plr, out)
+
     def run_command(self, line: str) -> list[str]:
         out: list[str] = []
         parts = shlex.split(line.strip())
@@ -84,9 +99,32 @@ class DosRuntime:
             if len(parts) < 2:
                 self._emit("ERR missing filename", out)
             else:
-                self._reset_exec_state()
-                r = spawn(self.machine, self.fs, parts[1], engine="micro")
-                self._emit(f"R0_{r.r0}", out)
+                target = parts[1]
+                if target.lower().endswith(".plx"):
+                    src = (self.root / target).resolve() if not Path(target).is_absolute() else Path(target)
+                    if not src.is_file():
+                        self._emit(f"ERR missing file: {src}", out)
+                    else:
+                        self._run_linked_plx([src], out)
+                else:
+                    self._reset_exec_state()
+                    r = spawn(self.machine, self.fs, target, engine="micro")
+                    self._emit(f"R0_{r.r0}", out)
+        elif cmd == "ldrun":
+            if len(parts) < 2:
+                self._emit("ERR usage: ldrun <obj1.plx> [obj2.plx ...]", out)
+            else:
+                paths: list[Path] = []
+                bad = False
+                for p in parts[1:]:
+                    src = (self.root / p).resolve() if not Path(p).is_absolute() else Path(p)
+                    if not src.is_file():
+                        self._emit(f"ERR missing file: {src}", out)
+                        bad = True
+                        break
+                    paths.append(src)
+                if not bad:
+                    self._run_linked_plx(paths, out)
         elif cmd == "type":
             if len(parts) < 2:
                 self._emit("ERR missing filename", out)
@@ -116,8 +154,21 @@ class DosRuntime:
                 for e in entries:
                     used += (e.size_bytes + 511) // 512
                 self._emit(f"VFDD_FILES_{len(entries)} VFDD_USED_SECT_{used} VFDD_TOTAL_SECT_64", out)
+            elif parts[1].lower() == "map":
+                if not self.last_link_map:
+                    self._emit("MAP empty", out)
+                else:
+                    for k, v in sorted(self.last_link_map.items()):
+                        self._emit(f"{k}_${v:04X}", out)
+            elif parts[1].lower() == "sym":
+                if not self.last_link_map:
+                    self._emit("SYM empty", out)
+                else:
+                    self._emit("SYM " + " ".join(sorted(self.last_link_map.keys())), out)
+            elif parts[1].lower() == "rel":
+                self._emit(f"RELOC_APPLIED_{self.last_link_reloc_count}", out)
             else:
-                self._emit("ERR usage: mon [cpu|ram|vfdd]", out)
+                self._emit("ERR usage: mon [cpu|ram|vfdd|map|sym|rel]", out)
         elif cmd == "asmrun":
             if len(parts) < 2:
                 self._emit("ERR usage: asmrun <path.asm>", out)
@@ -144,7 +195,7 @@ class DosRuntime:
                     plr = pack_plr(PlrImage(load_addr=0x2800, entry_off=0, code=bytes(res.bytes)))
                     self._run_plr_bytes("CCRUN.PLR", plr, out)
         elif cmd == "help":
-            self._emit("dir run type del mon [cpu|ram|vfdd] asmrun ccrun help exit", out)
+            self._emit("dir run ldrun type del mon [cpu|ram|vfdd|map|sym|rel] asmrun ccrun help exit", out)
         elif cmd == "exit":
             self._emit("BYE", out)
             return out
