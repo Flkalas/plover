@@ -1,8 +1,9 @@
 netlist: ../netlist/blocks/alu_b3_clock.yaml
 timing: max
 duration_ns: 2000
+# Stimulus @300ns: SUB Y stable before 574 setup (Phase A ≤179ns @ max)
 stimulus:
-  - at_ns: 0
+  - at_ns: 300
     set:
       net_a0: 0
       net_a1: 1
@@ -20,13 +21,15 @@ stimulus:
       net_b5: 1
       net_b6: 0
       net_b7: 0
-      net_sub_en: 1
       net_cin: 1
       net_153_s0: 0
       net_153_s1: 0
       net_b_sel: 1
       net_b_const_sel: 0
-      net_c3_sel: 0
+      net_lgc0: 0
+      net_lgc1: 0
+      net_lgc2: 0
+      net_lgc3: 0
       net_b_const_bit1: 0
       net_b_const_bit2: 0
       net_b_const_bit3: 0
@@ -35,15 +38,15 @@ stimulus:
       net_b_const_bit6: 0
       net_b_const_bit7: 0
 expect:
-  - at_ns: 400
+  - at_ns: 550
     net_y0: 0
     net_y1: 1
     net_y7: 1
-  - at_ns: 650
+  - at_ns: 900
     net_q0: 0
     net_q1: 1
     net_q7: 1
-  - at_ns: 1150
+  - at_ns: 1400
     net_q0: 0
     net_q1: 1
     net_q7: 1

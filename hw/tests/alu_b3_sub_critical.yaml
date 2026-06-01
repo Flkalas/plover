@@ -20,13 +20,15 @@ stimulus:
       net_b5: 1
       net_b6: 0
       net_b7: 0
-      net_sub_en: 1
       net_cin: 1
       net_153_s0: 0
       net_153_s1: 0
       net_b_sel: 1
       net_b_const_sel: 0
-      net_c3_sel: 0
+      net_lgc0: 0
+      net_lgc1: 0
+      net_lgc2: 0
+      net_lgc3: 0
       net_b_const_bit1: 0
       net_b_const_bit2: 0
       net_b_const_bit3: 0
@@ -47,11 +49,11 @@ expect:
     net_y7: 1
 checks:
   - type: slack
-    path: [U_ALU_86_INV_0.A, U_ALU_86_INV_0.Y, U_ALU_157_B_0.1B, U_ALU_157_B_0.1Y, U_ALU_157_B2_0.1A, U_ALU_157_B2_0.1Y, U_ALU_283_LO.B0, U_ALU_283_LO.C4, U_ALU_283_HI.C4, U_ALU_153_0.1C0, U_ALU_153_0.1Y]
+    path: [net_b0, U_ALU_04_BINV_0.A, U_ALU_04_BINV_0.Y, U_ALU_153_B_0.1C1, U_ALU_153_B_0.1Y, U_ALU_283_LO.B0, U_ALU_283_LO.C4, U_ALU_283_HI.C4, U_ALU_157_YBP_0.1A, U_ALU_157_YBP_0.1Y]
     budget_ns: 250
     min_slack_ns: 0
   - type: path_delay
-    from_net: net_sub_en
+    from_net: net_b_sel
     to_net: net_y0
     after_ns: 0
     max_delay_ns: 250

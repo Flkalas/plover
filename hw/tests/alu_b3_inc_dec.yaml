@@ -20,13 +20,15 @@ stimulus:
       net_b5: 0
       net_b6: 0
       net_b7: 0
-      net_sub_en: 0
       net_cin: 0
       net_153_s0: 0
       net_153_s1: 0
       net_b_sel: 0
       net_b_const_sel: 1
-      net_c3_sel: 0
+      net_lgc0: 0
+      net_lgc1: 0
+      net_lgc2: 0
+      net_lgc3: 0
       net_b_const_bit1: 0
       net_b_const_bit2: 0
       net_b_const_bit3: 0
@@ -45,13 +47,15 @@ stimulus:
       net_a5: 0
       net_a6: 0
       net_a7: 0
-      net_sub_en: 0
       net_cin: 0
       net_153_s0: 0
       net_153_s1: 0
-      net_b_sel: 0
+      net_b_sel: 1
       net_b_const_sel: 1
-      net_c3_sel: 0
+      net_lgc0: 0
+      net_lgc1: 0
+      net_lgc2: 0
+      net_lgc3: 0
       net_b_const_bit1: 1
       net_b_const_bit2: 1
       net_b_const_bit3: 1

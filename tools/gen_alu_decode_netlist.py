@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from alu_opcode_decode import CTRL_NETS, op_bits, truth_table
+from alu_opcode_decode import CTRL_NETS, LGC_NETS, op_bits, truth_table
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "hw" / "netlist" / "blocks" / "alu_decode.yaml"
@@ -102,7 +102,7 @@ class NetlistGen:
     def build(self) -> None:
         table = truth_table()
 
-        for sig in CTRL_NETS:
+        for sig in CTRL_NETS + LGC_NETS:
             ops = [r["op"] for r in table if r.get(sig, 0) == 1]
             if ops:
                 term = self._or_many([self._match_op(op) for op in ops])
@@ -142,7 +142,7 @@ class NetlistGen:
             "  - name: net_alu_op3",
             "    width: 1",
         ]
-        for sig in CTRL_NETS:
+        for sig in CTRL_NETS + LGC_NETS:
             nets += [f"  - name: {sig}", "    width: 1"]
         for i in range(1, 8):
             nets += [f"  - name: net_b_const_bit{i}", "    width: 1"]
