@@ -1,0 +1,138 @@
+"""Minimal Forth interpreter used for S3 bring-up.
+
+This is a host-side implementation that provides a stable behavioral target for
+later VM/normative asm ports (S3c). It is intentionally small: enough to run
+primitives, colon definitions, and a QUIT-like line evaluator.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Callable
+
+
+class ForthError(RuntimeError):
+    pass
+
+
+WordImpl = Callable[["Forth"], None]
+
+
+@dataclass(frozen=True)
+class Word:
+    name: str
+    code: WordImpl
+    immediate: bool = False
+
+
+class Forth:
+    def __init__(self) -> None:
+        self.data: list[int] = []
+        self.rstack: list[int] = []
+        self.dict: dict[str, Word] = {}
+        self.output: list[str] = []
+        self._compile: list[str] | None = None
+        self._compile_name: str | None = None
+        self._install_core()
+
+    def emit(self, s: str) -> None:
+        self.output.append(s)
+
+    def pop(self) -> int:
+        if not self.data:
+            raise ForthError("stack underflow")
+        return self.data.pop()
+
+    def push(self, v: int) -> None:
+        self.data.append(v & 0xFFFF)
+
+    def word(self, name: str, fn: WordImpl, *, immediate: bool = False) -> None:
+        self.dict[name.upper()] = Word(name.upper(), fn, immediate=immediate)
+
+    def _install_core(self) -> None:
+        self.word("DUP", lambda f: f.push(f.data[-1]))
+        self.word("DROP", lambda f: f.pop())
+        self.word("SWAP", lambda f: (lambda a, b: (f.push(a), f.push(b)))(f.pop(), f.pop()))
+
+        def _add(f: Forth) -> None:
+            b = f.pop()
+            a = f.pop()
+            f.push((a + b) & 0xFFFF)
+
+        def _sub(f: Forth) -> None:
+            b = f.pop()
+            a = f.pop()
+            f.push((a - b) & 0xFFFF)
+
+        def _mul(f: Forth) -> None:
+            b = f.pop()
+            a = f.pop()
+            f.push((a * b) & 0xFFFF)
+
+        self.word("+", _add)
+        self.word("-", _sub)
+        self.word("*", _mul)
+
+        self.word(".", lambda f: f.emit(str(f.pop())))
+
+        # Compilation control
+        self.word(":", self._w_colon, immediate=True)
+        self.word(";", self._w_semicolon, immediate=True)
+
+    def _w_colon(self, _f: "Forth") -> None:
+        if self._compile is not None:
+            raise ForthError("nested ':' not allowed")
+        raise ForthError("':' must be handled by parser")
+
+    def _w_semicolon(self, _f: "Forth") -> None:
+        if self._compile is None:
+            raise ForthError("';' outside definition")
+        raise ForthError("';' must be handled by parser")
+
+    def _run_token(self, tok: str) -> None:
+        u = tok.upper()
+        if u in self.dict:
+            self.dict[u].code(self)
+            return
+        try:
+            n = int(tok, 0)
+        except ValueError:
+            raise ForthError(f"unknown word: {tok}")
+        self.push(n)
+
+    def eval_line(self, line: str) -> None:
+        toks = [t for t in line.replace("\t", " ").split(" ") if t]
+        i = 0
+        while i < len(toks):
+            tok = toks[i]
+            u = tok.upper()
+            if u == ":":
+                if i + 1 >= len(toks):
+                    raise ForthError("missing word name after ':'")
+                name = toks[i + 1].upper()
+                self._compile = []
+                self._compile_name = name
+                i += 2
+                continue
+            if u == ";":
+                if self._compile is None or self._compile_name is None:
+                    raise ForthError("';' outside definition")
+                body = list(self._compile)
+                name = self._compile_name
+
+                def _colon_word(f: Forth, _body: list[str] = body) -> None:
+                    for t in _body:
+                        f._run_token(t)
+
+                self.word(name, _colon_word)
+                self._compile = None
+                self._compile_name = None
+                i += 1
+                continue
+
+            if self._compile is not None:
+                self._compile.append(tok)
+            else:
+                self._run_token(tok)
+            i += 1
+

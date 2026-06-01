@@ -60,6 +60,21 @@ def cmd_scenario(args: argparse.Namespace) -> int:
     from hwsim import yaml_util
 
     doc = yaml_util.load_file(str(args.scenario))
+    if doc.get("kind") == "forth":
+        from plover_vm.forth_scenario import run_forth_scenario
+
+        res = run_forth_scenario(doc)
+        if res.ok:
+            print("PASS")
+            return 0
+        print("FAIL")
+        if res.error:
+            print(f"ERROR: {res.error}")
+        if "expect" in doc:
+            print(f"expect: {doc.get('expect')}")
+        print(f"stack: {res.stack}")
+        print(f"output: {res.output}")
+        return 1
     m = PloverMachine(engine=doc.get("engine", "fast"))
     root = Path(__file__).resolve().parents[1]
     for key, rel in doc.get("load", {}).items():

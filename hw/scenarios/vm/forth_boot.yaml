@@ -1,0 +1,9 @@
+kind: forth
+actions:
+  - type: eval
+    line: ": SQUARE DUP * ;"
+  - type: eval
+    line: "5 SQUARE ."
+expect:
+  output: ["25"]
+
