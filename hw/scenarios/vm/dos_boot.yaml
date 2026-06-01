@@ -1,0 +1,11 @@
+kind: dos
+actions:
+  - type: dir
+  - type: run
+    name: HELLO.PLR
+expect:
+  output_contains:
+    - PLDOS
+    - HELLO
+    - R0_7
+
