@@ -21,7 +21,7 @@ CPU remains **master** for program execution; RP2350 serves MMIO Mailbox only (n
 
 | Path | Part |
 |------|------|
-| Data CPU ↔ RP2350 | **SN74LVC8T245** (5 V ↔ 3.3 V) |
+| Data CPU ↔ RP2350 | **SN74LVC8T245** (5 V 빵판 CPU만) · PCB 통합 시 **직접 3.3 V** — [BOM-3v3.md](../BOM-3v3.md) |
 | Address/control | Phase-interleaved per [cpld-system-controller.md](cpld-system-controller.md) |
 | Power | **AMS1117-3.3** for RP2350 rail |
 

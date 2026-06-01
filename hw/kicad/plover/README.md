@@ -1,6 +1,6 @@
 # KiCad — Plover hardware schematics
 
-Human-editable schematics for breadboard wiring. Machine verification uses YAML netlists in [`hw/netlist/blocks/`](../../netlist/blocks/).
+Human-editable schematics for breadboard wiring. Procurement: [BOM.md](../../../BOM.md) · RP2350: [BOM-3v3.md](../../../BOM-3v3.md). Machine verification uses YAML netlists in [`hw/netlist/blocks/`](../../netlist/blocks/).
 
 ## Layout (planned hierarchy)
 

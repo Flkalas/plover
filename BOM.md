@@ -3,13 +3,13 @@
 | 항목 | 값 |
 |------|-----|
 | **설계** | **v0.1** — [system-architecture.md](docs/system-architecture.md) |
-| **용도** | 이 표만 보고 부품을 **전부 구매**한 뒤 브레드보드에 조립·가동 |
+| **용도** | **5 V** 74HC 브레드보드 — 이 표만 보고 부품 구매·조립 |
 | **수량** | 프로토타입 **1대** (74HC CPU + CPLD + Flash/SRAM + 클록) |
-| **개정** | 2026-06-01 |
+| **개정** | 2026-06-02 |
 
-**이 문서 = 조립용 완전 구매 리스트.** 설계 Δ·마일스톤·재고 추적은 넣지 않음.  
+**PCB · 단일 3.3 V 버전:** [BOM-3v3.md](BOM-3v3.md) — **동일 v0.1 시스템** (74LVC SMD · 레벨시프트 없음). 빵판 본 문서와 **중복 주문 금지**.  
 명세·결선·타이밍: [microcode-spec.md](docs/microcode-spec.md) · [cpld-system-controller.md](docs/cpld-system-controller.md) · [hw/netlist/](hw/netlist/).  
-본 프로젝트 발주 이력(참고): [1차](docs/purchase-devicesmart.md) · [2차](docs/purchase-2026-06-01-followup.md).
+발주 이력(참고): [1차](docs/purchase-devicesmart.md) · [2차](docs/purchase-2026-06-01-followup.md).
 
 열: **MPN** = 주문 품번 · **Qty** = 1세트 수량 · **시스템에서 하는 일** = 없으면 막히는 동작
 
@@ -23,7 +23,7 @@
 | 2 | *(0.6 mm solid wire)* | 3-color jumper wire 1 m | 6 | 점퍼·버스·전원 **물리 배선** |
 | 3a | *(SOP28/SSOP28 dual)* | SOP28↔DIP adapter | 2 | **IS62C256** SOP-28 ×2 |
 | 3b | *(TSOP-32→DIP)* | TSOP-32↔DIP adapter | 1 | **SST39SF010** (4C-PHE) — SOP28 **불가** |
-| 3c | *(SOIC-24→DIP)* | SOIC-24↔DIP adapter | 3 | **SN74LVC8T245** DWR ×3 |
+| 3c | *(SOIC-24→DIP)* | SOIC-24↔DIP adapter | 3 | **SN74LVC8T245** DWR ×3 (5 V↔3.3 V) |
 
 ---
 
@@ -84,11 +84,13 @@
 
 ---
 
-## 레벨 시프트 (3.3 V ↔ 5 V)
+## 레벨 시프트 (5 V CPU ↔ 3.3 V SMD)
 
 | # | MPN | Description | Qty | 시스템에서 하는 일 |
 |---|-----|-------------|-----|-------------------|
-| 24 | SN74LVC8T245DWR | 8-bit dual-supply transceiver | 3 | **Nano · Flash · CPLD** 3.3 V 인터페이스 (SOIC→#3 어댑터) |
+| 24 | SN74LVC8T245DWR | 8-bit dual-supply transceiver | 3 | **Nano · Flash · CPLD** — VCCA=5 V, VCCB=3.3 V (SOIC→#3c) |
+
+*5 V 빵판 CPU에 RP2350만 추가: [BOM-3v3.md 부록](BOM-3v3.md#부록-5-v-빵판-cpu--rp2350-만-연결). PCB 통합 시: [BOM-3v3.md](BOM-3v3.md) §RP2350.*
 
 ---
 
@@ -96,7 +98,7 @@
 
 | # | MPN | Description | Qty | 시스템에서 하는 일 |
 |---|-----|-------------|-----|-------------------|
-| 25 | PWR080015 | Breadboard 5 V / 3.3 V supply | 1 | **듀얼 레일** 전원 |
+| 25 | PWR080015 | Breadboard 5 V / 3.3 V supply | 1 | **듀얼 레일** (74HC 5 V + SMD 3.3 V) |
 | 26 | SZH-CAB28 | Micro-B USB cable 1 m | 1 | Nano·모듈 **USB 전원/통신** |
 | 27 | THC-NAO002 | Arduino Nano V3 CH340 (USB-C) | 1 | NOR Flash **CW 비트뱅** 프로그래밍 |
 | 28 | 74HC595 | 8-bit shift register | 3 | Flash 프로그램 시 **주소 확장** |
@@ -107,7 +109,7 @@
 
 | # | MPN | Description | Qty | 시스템에서 하는 일 |
 |---|-----|-------------|-----|-------------------|
-| 29 | *(Mono 0.1 µF Y5V 50 V)* | Decoupling 0.1 µF | **42** | 74HC DIP **38** + CPLD **4** ([검산](#수량-검산) · SMD 어댑터별 +1은 **#3** 보드에 별도 권장) |
+| 29 | *(Mono 0.1 µF Y5V 50 V)* | Decoupling 0.1 µF | **42** | 74HC DIP **38** + CPLD **4** ([검산](#수량-검산) · #3 어댑터별 +1 권장 **+6**) |
 | 30 | *(Dip tantal 10 µF 35 V)* | Bulk 10 µF | 10 | VCC **벌크 디커플** |
 | 31 | *(E/C 63 V 10 µF 105 °C)* | Electrolytic 10 µF | 10 | 리플·**POR** |
 | 32 | BMI-BEAD-3590L | Ferrite bead | 10 | 전원 **고주파 필터** |
@@ -133,7 +135,7 @@
 
 | 항목 | 이유 |
 |------|------|
-| **RP2350B** 코프로 보드 | GPU·HID·vFDD — [rp2350-coprocessor.md](docs/rp2350-coprocessor.md). CPU 1세트와 **별도 구매** |
+| **RP2350B** 코프로 | 빵판: 부록 LVC245×1 · PCB 통합: [BOM-3v3.md](BOM-3v3.md) |
 | **alu8_decode PLA** | 시뮬 전용 — 실기는 **Flash 8b CW** |
 
 ---
@@ -151,7 +153,7 @@
 
 ## 수량 검산
 
-v0.1 [system-architecture.md](docs/system-architecture.md) · [alu8.md](hw/netlist/blocks/alu8.md) · 구매 이력과 대조 (2026-06-01).
+v0.1 [system-architecture.md](docs/system-architecture.md) · [alu8.md](hw/netlist/blocks/alu8.md) · 구매 이력과 대조.
 
 ### 74HC — 표와 일치 ✓
 
@@ -164,27 +166,14 @@ v0.1 [system-architecture.md](docs/system-architecture.md) · [alu8.md](hw/netli
 | Flash prog | 595×3 | **3** |
 | **합계** | | **42** |
 
-`574×7` = MBR·PCH·FLG + R0–R3. `161×3` = PCL×2 + phase. `157×8` = ALU 6 + addr 2.
-
 ### 많이 사는 품목 — 주의
 
 | # | 표 Qty | 검산 | 비고 |
 |---|--------|------|------|
-| **0.1 µF** | **42** | 74HC **38** (42−595×3) + CPLD **4** | 예전 문서 **34** = 최소안(일부 IC 공용 디커플 가정). **처음부터 조립**이면 **42** 권장; #3 어댑터마다 +1이면 **+6** 여유 |
-| **SMD 어댑터** | **6** (#3a+b+c) | SRAM 2 + Flash 1 + LVC 3 | 예전 **4×SOP28**만으로는 Flash(TSOP-32)·LVC(SOIC-24) **부족** |
-| 10 µF tantal / E-C / bead / 33Ω SIP / 10k SIP / axial | 각 **10** | 설계 여유 | 버스·전원 분기 여러 곳 — **10은 맞음** (부족 시 +5) |
-| 1N4148 | **10** | POR·클램프 | ✓ |
-| 브레드보드 | **4** | 병렬 4면 | ✓ |
-| 점퍼 1 m | **6** | 3색×6 | ✓ |
-
-### 혼동하기 쉬운 것
-
-| 항목 | 판정 |
-|------|------|
-| **74HC86 ×4** | [alu8.md](hw/netlist/blocks/alu8.md) 물리 **4패키지** (INV 2 + XOR 2) — ✓ |
-| **OSC 4 MHz ×1** | 클록 마스터 1개만 — 1M/2M osc는 **본 목록 아님** |
-| **IS62C256 ×2** | 64 KB A15 뱅크 — ✓ |
-| **SST39 ×1** | v0.1 단일 NOR — ✓ |
+| **0.1 µF** | **42** | 74HC **38** (42−595×3) + CPLD **4** | 어댑터 **+6** 여유 권장 |
+| **SMD 어댑터** | **6** (#3a+b+c) | SRAM 2 + Flash 1 + LVC 3 | |
+| 10 µF / bead / SIP / axial | 각 **10** | 설계 여유 | |
+| 브레드보드 ×4 · 점퍼 6 m | | ✓ | |
 
 ---
 
@@ -192,6 +181,6 @@ v0.1 [system-architecture.md](docs/system-architecture.md) · [alu8.md](hw/netli
 
 | 날짜 | 내용 |
 |------|------|
-| 2026-06-01 | 수량 검산: 74HC **42**, 어댑터 **6**, 0.1 µF **42** (구 34·어댑터 4 정정) |
-| 2026-06-01 | **완전 구매 목록** + 항목별 시스템 의도 (조립자용) |
-| 2026-06-01 | (오류) 잔여 2건만 적던 버전 → 본문 복원 |
+| 2026-06-02 | [BOM-3v3.md](BOM-3v3.md) = PCB 3.3 V 대응 명세로 정의 |
+| 2026-06-01 | 수량 검산 · 어댑터 6 · 0.1 µF 42 |
+| 2026-06-01 | 완전 구매 목록 + 항목별 시스템 의도 |
