@@ -376,6 +376,112 @@ class Hc138(ChipModel):
             self._drive(f"Y{i}", y, t, "decode")
 
 
+class Hc85(ChipModel):
+    """74HC85 4-bit magnitude comparator with cascade inputs."""
+
+    part = "74HC85"
+
+    def on_start(self) -> None:
+        self._update()
+
+    def on_net_change(self, net: str) -> None:
+        self._update()
+
+    def _nibble(self, prefix: str) -> int | None:
+        bits = [self.read_bit(f"{prefix}{i}") for i in range(4)]
+        if any(b > 1 for b in bits):
+            return None
+        v = 0
+        for i, b in enumerate(bits):
+            v |= b << i
+        return v
+
+    def _update(self) -> None:
+        a = self._nibble("A")
+        b = self._nibble("B")
+        ci_gt = self.read_bit("IAB_GT")
+        ci_lt = self.read_bit("IAB_LT")
+        ci_eq = self.read_bit("IAB_EQ")
+        if a is None or b is None or ci_gt > 1 or ci_lt > 1 or ci_eq > 1:
+            return
+        o_eq = 1 if (ci_eq and a == b) else 0
+        o_gt = 1 if (ci_gt or (ci_eq and a > b)) else 0
+        o_lt = 1 if (ci_lt or (ci_eq and a < b)) else 0
+        t = self.t_pd("74HC85", "t_pd", default=25)
+        self._drive("OAB_GT", o_gt, t, "cmp")
+        self._drive("OAB_LT", o_lt, t, "cmp")
+        self._drive("OAB_EQ", o_eq, t, "cmp")
+
+
+class AluCmpMerge(ChipModel):
+    """Merge cascaded 7485 outputs into 8-bit Z and unsigned A>=B (C)."""
+
+    part = "ALU_CMP_MERGE"
+
+    def on_start(self) -> None:
+        self._update()
+
+    def on_net_change(self, net: str) -> None:
+        self._update()
+
+    def _update(self) -> None:
+        pins = ("LO_GT", "LO_LT", "LO_EQ", "HI_GT", "HI_LT", "HI_EQ")
+        vals = [self.read_bit(p) for p in pins]
+        if any(v > 1 for v in vals):
+            return
+        lo_gt, lo_lt, lo_eq, hi_gt, hi_lt, hi_eq = vals
+        z = 1 if (lo_eq and hi_eq) else 0
+        c_ge = 1 if (hi_gt or (hi_eq and lo_gt) or (hi_eq and lo_eq)) else 0
+        t = self.t_pd("ALU_CMP_MERGE", "t_pd", default=5)
+        self._drive("Z", z, t, "cmp_merge")
+        self._drive("C_GE", c_ge, t, "cmp_merge")
+
+
+class Hc153Slice(ChipModel):
+    """Single 74HC153 4:1 mux (Gigatron ALU bit-slice); A/B are operand select lines."""
+
+    part = "ALU_153_SLICE"
+
+    def on_start(self) -> None:
+        self._update()
+
+    def on_net_change(self, net: str) -> None:
+        self._update()
+
+    def _update(self) -> None:
+        t = self.t_pd("ALU_153_SLICE", "t_pd", default=17)
+        g = self.read_bit("G")
+        if g == 1:
+            self._drive("Y", 0, t, "disabled")
+            return
+        sel = self.read_bit("A") | (self.read_bit("B") << 1)
+        val = self.read_bit(f"C{sel}")
+        if val > 1:
+            return
+        self._drive("Y", val, t, "mux")
+
+
+class AluYMuxSel(ChipModel):
+    """157 Y bypass select: SEL = S0|S1 (logic → B=net_y_logic, arith → A=net_sum)."""
+
+    part = "ALU_Y_MUX_SEL"
+
+    def on_start(self) -> None:
+        self._update()
+
+    def on_net_change(self, net: str) -> None:
+        self._update()
+
+    def _update(self) -> None:
+        s0 = self.read_bit("S0")
+        s1 = self.read_bit("S1")
+        if s0 > 1 or s1 > 1:
+            return
+        sel = 1 if (s0 or s1) else 0
+        t = self.t_pd("ALU_Y_MUX_SEL", "t_pd", default=5)
+        self._drive("SEL", sel, t, "y_mux_sel")
+
+
 class Hc08(ChipModel):
     part = "74HC08"
 
@@ -616,7 +722,11 @@ def create_model(ref: str, part: str, pins: dict[str, str], ctx: SimContext) -> 
         "74HC138": Hc138,
         "74HC151": Hc151,
         "74HC153": Hc153,
+        "ALU_153_SLICE": Hc153Slice,
         "74HC157": Hc157,
+        "74HC85": Hc85,
+        "ALU_CMP_MERGE": AluCmpMerge,
+        "ALU_Y_MUX_SEL": AluYMuxSel,
         "74HC08": Hc08,
         "74HC32": Hc32,
         "74HC86": Hc86,

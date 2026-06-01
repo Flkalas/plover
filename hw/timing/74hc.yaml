@@ -21,6 +21,22 @@
   t_pd: {typ_ns: 17, max_ns: 28}
   source: "Nexperia 74HC153 — select to output"
 
+ALU_153_SLICE:
+  t_pd: {typ_ns: 17, max_ns: 28}
+  source: "Gigatron ALU bit-slice (one 4:1 mux of 74HC153)"
+
+74HC85:
+  t_pd: {typ_ns: 20, max_ns: 30}
+  source: "Nexperia 74HC85 — compare to output"
+
+ALU_CMP_MERGE:
+  t_pd: {typ_ns: 2, max_ns: 5}
+  source: "Combinational flag merge (CPLD or 08/32 glue in hardware)"
+
+ALU_Y_MUX_SEL:
+  t_pd: {typ_ns: 2, max_ns: 5}
+  source: "Combinational OR of 153_s0|153_s1 for 157 Y bypass (glue or 32 in hardware)"
+
 74HC151:
   t_pd: {typ_ns: 17, max_ns: 28}
   source: "Nexperia 74HC151 — select to Y"
