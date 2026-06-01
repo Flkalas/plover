@@ -23,6 +23,18 @@
 
 ---
 
+## 2b. Stage1 bare-metal smoke (teaching gate)
+
+Before kernel takeover, ROM may run a minimal GPIO smoke loop:
+
+- Configure GPIO direction
+- Poll switch input bit
+- Toggle LED output bit
+
+Reference: [baremetal-gpio-smoke.md](baremetal-gpio-smoke.md)
+
+---
+
 ## 3. Operator handoff
 
 1. Flip DIP → **Run** (`MAP_MODE=1`).

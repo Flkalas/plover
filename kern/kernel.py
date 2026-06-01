@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from kern.gpio import GpioController
 from plover_vm.memory.bus import MemoryBus
 from plover_vm.memory.mailbox import MB_BUFFER
 
@@ -22,6 +23,7 @@ class Kernel:
     def __init__(self, bus: MemoryBus) -> None:
         self.bus = bus
         self.state = KernelState()
+        self.gpio = GpioController()
 
     def kprint(self, s: str) -> None:
         # Simulated console: append to log and mirror into mailbox buffer for visibility.
@@ -39,4 +41,3 @@ class Kernel:
     def boot(self) -> None:
         self.kprint("kernel_boot")
         self.kprint("kernel_help")
-

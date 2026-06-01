@@ -38,6 +38,18 @@ def run_kernel_scenario(doc: dict) -> KernelScenarioResult:
                 for i in range(248):
                     bus.write_cpu(0x0800 + i, bus.read_cpu(MB_BUFFER + i))
                 k.kprint("bios_stage0_ok")
+            elif typ == "stage1_gpio_smoke":
+                # Bare-metal style: switch input controls LED output bit0.
+                sw_on = int(action.get("switch", 1)) & 1
+                k.gpio.direction = 0x0F  # low nibble output
+                # bit5 is switch input
+                k.gpio.set_input_bits(mask=(1 << 5), values=(sw_on << 5))
+                if k.gpio.get_bit(5):
+                    k.gpio.set_bit(0)
+                    k.kprint("gpio_smoke_led_on")
+                else:
+                    k.gpio.clear_bit(0)
+                    k.kprint("gpio_smoke_led_off")
             elif typ == "boot":
                 k.boot()
             elif typ == "alloc":
