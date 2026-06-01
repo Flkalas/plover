@@ -6,7 +6,7 @@
 | **대응 명세** | [BOM.md](BOM.md) **와 동일 시스템** — 실장·전기만 다름 |
 | **용도** | **단일 3.3 V** · **PCB SMD** — Fab·픽·조립용 |
 | **수량** | 프로토타입 **1대** |
-| **개정** | 2026-06-02 (ALU Phase B2 · 16 IC) |
+| **개정** | 2026-06-02 (ALU Phase B2 · **14 IC**; no LVC85 CMP) |
 
 **5 V 74HC 브레드보드:** [BOM.md](BOM.md) — **중복 주문 금지** (빵판·DIP·`LVC8T245×3`는 본 PCB BOM에 **없음**).
 
@@ -44,9 +44,9 @@
 
 ---
 
-## ALU (74LVC, 16 IC)
+## ALU (74LVC, 14 IC)
 
-[BOM.md](BOM.md) ALU 표와 동일 논리 — **Phase B2** Gigatron `153_L` + **CMP LVC85×2**.
+[BOM.md](BOM.md) ALU 표와 동일 논리 — **Phase B2** Gigatron `153_L`; **CMP flags from SUB** (no LVC85).
 
 | # | ↔ | MPN (예: TI PWR) | Pkg | Qty | 시스템에서 하는 일 |
 |---|---|------------------|-----|-----|-------------------|
@@ -54,7 +54,6 @@
 | 5 | #5 | SN74LVC153APWR | TSSOP-16 | **8** | B-path ×4 + logic slice ×4 (`net_lgc0..3`) |
 | 6 | #6 | SN74LVC157APWR | TSSOP-16 | **2** | **157_YBP** — sum vs `net_y_logic` → Y |
 | 7 | #7 | SN74LVC04APWR | TSSOP-14 | 2 | 8-bit **~B** for `153_B` |
-| 7b | #7b | SN74LVC85APWR | TSSOP-14 | **2** | **CMP** Z/C (parallel to SUB Y) |
 
 ---
 
@@ -175,7 +174,7 @@
 
 | 구분 | 수량 |
 |------|------|
-| 74LVC 패키지 | **36** (= [BOM.md](BOM.md) 74HC **36**) |
+| 74LVC 패키지 | **34** (= [BOM.md](BOM.md) 74HC **34**) |
 | 메모리 + CPLD | Flash×1, SRAM×2, ATF1504×1 |
 | 153 / 157 / 04 합계 | **8** / **4** / **3** |
 
@@ -187,22 +186,22 @@
 
 | 블록 | 합계 |
 |------|------|
-| ALU | **16** |
+| ALU | **14** |
 | CPU | **12** |
 | 버스 | **1** |
 | 클록 | **4** |
 | Prog | **3** |
-| **합계** | **36** |
+| **합계** | **34** |
 
 ### 0.1 µF
 
 | 항목 | 수 |
 |------|-----|
-| 36 LVC + 245 + 595 | 39 |
+| 34 LVC + 245 + 595 | 37 |
 | Flash + SRAM×2 + CPLD | 4 |
 | CPLD SSO 추가 | +4 |
 | 여유 | +2 |
-| **주문** | **49** |
+| **주문** | **47** |
 
 ---
 
@@ -212,7 +211,7 @@
 |------------------|---------|
 | 74HC283N | SN74LVC283APWR |
 | 74HC153/157/161/574/245/595 | SN74LVC***APWR |
-| 74HC04/14/74/85/153/157/283 | SN74LVC***APWR |
+| 74HC04/14/74/153/157/283 | SN74LVC***APWR |
 | 4 MHz half-can | **3.3 V** SMD XO |
 | PLCC→DIP | **PLCC-44 footprint** |
 
@@ -235,7 +234,8 @@
 
 | 날짜 | 내용 |
 |------|------|
-| 2026-06-02 | [BOM.md](BOM.md) 동기: ALU **Phase B2** (16 IC); LVC **36**, decap **49** |
+| 2026-06-02 | [BOM.md](BOM.md) 동기: ALU **14 IC** (no 7485); LVC **34**, decap **47** |
+| 2026-06-02 | [BOM.md](BOM.md) 동기: ALU Phase B2 (16 IC); LVC **36**, decap **49** |
 | 2026-06-02 | [BOM.md](BOM.md) 동기: ALU SUB Phase A + CMP **LVC85×2**; LVC **44**, decap **57** |
 | 2026-06-02 | [BOM.md](BOM.md) **PCB 3.3 V 대응 명세**로 전면 재작성 (RP2350-only 오해 수정) |
 | 2026-06-01 | 최초 분리 |

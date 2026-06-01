@@ -169,7 +169,7 @@ ALU 쪽 핀은 [alu8.md](../hw/netlist/blocks/alu8.md): 왼쪽 열 핀은 **왼�
 | 신호 | 소스 (통합) |
 |------|-------------|
 | `net_cin`, `net_153_s0/s1`, `net_b_sel`, `net_b_const_sel`, `net_b_const_bit*`, `net_lgc0..3` | **8b CW B7–B4 (`ALU_OP`)** → [`alu8_decode`](../hw/netlist/blocks/alu8_decode.yaml) 또는 Flash 병렬 로드 |
-| `net_cmp_z`, `net_cmp_c_ge` (선택) | CMP 마이크로 시퀀스 · 병렬 [`7485`](../hw/netlist/blocks/alu8.md) — SUB Y와 독립 |
+| `net_cmp_z`, `net_cmp_c_ge` | CMP — SUB 경로 (`net_y`, `net_c_hi`) · [`alu8_cmp_sub`](../hw/tests/alu8_cmp_sub.yaml) |
 
 | CW bit | 신호 |
 |--------|------|
@@ -257,7 +257,7 @@ python -m hwsim run hw/tests/cpld_gpr_decode.yaml
 
 | 문서 | 내용 |
 |------|------|
-| [hw-bringup-alu8-assembly-spec.md](hw-bringup-alu8-assembly-spec.md) | ALU 16 IC 조립 순서 (Phase B2) |
+| [hw-bringup-alu8-assembly-spec.md](hw-bringup-alu8-assembly-spec.md) | ALU 14 IC 조립 순서 (Phase B2) |
 | [hw-bringup-b3.md](hw-bringup-b3.md) | 574 ACC · 2 MHz |
 | [hw-bringup-b3-opcode.md](hw-bringup-b3-opcode.md) | ALU opcode DIP |
 | [cpld-system-controller.md](cpld-system-controller.md) | CPLD 포트 |

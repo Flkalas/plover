@@ -13,7 +13,7 @@ Electrical netlist, timing, and block tests for breadboard bring-up.
 | [viewer/schematic.html](viewer/schematic.html) | DIP schematic SVG viewer (zoom) |
 | [kicad/](kicad/plover/) | KiCad schematics (see [docs/hw-schematic.md](../docs/hw-schematic.md)) |
 
-See [netlist/blocks/alu8.md](netlist/blocks/alu8.md) for **Phase B2** ALU (16 IC: `153_B`, `153_L`, `7485` CMP, `157_YBP`; SUB **151 ns**, logic **46 ns** @ max).  
+See [netlist/blocks/alu8.md](netlist/blocks/alu8.md) for **Phase B2** ALU (14 IC: `153_B`, `153_L`, `157_YBP`; CMP via SUB; SUB **151 ns**, logic **46 ns** @ max).  
 Breadboard phases: [docs/hw-bringup-b3.md](../docs/hw-bringup-b3.md) · [docs/hw-bringup-b3-opcode.md](../docs/hw-bringup-b3-opcode.md).
 
 Regenerate after ALU edits ([docs/hw-sim.md](../docs/hw-sim.md#alu-netlist-regeneration-phase-a)):

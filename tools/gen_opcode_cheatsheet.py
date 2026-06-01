@@ -46,7 +46,7 @@ def main() -> None:
         "| `net_cin` | 283 carry in (1 for SUB/CMP) |",
         "| `net_b_sel` | 153_B LSB: 0=B, 1=~B |",
         "| `net_b_const_sel` | 153_B MSB: 1 → INC/DEC constant mux |",
-        "| `net_cmp_z`, `net_cmp_c_ge` | 7485 parallel CMP (optional flags) |",
+        "| `net_cmp_z`, `net_cmp_c_ge` | SUB-derived CMP flags (`Y==0`, `net_c_hi`) |",
         "| `net_153_s0/s1` | Logic enable → `157_YBP` selects `net_y_logic` |",
         "| `net_lgc0..3` | Gigatron 153 C0..C3 (from decode or DIP) |",
         "",

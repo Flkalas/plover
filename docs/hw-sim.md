@@ -20,7 +20,7 @@ python -m hwsim run --all
 | `python -m hwsim report <build_dir>` | Regenerate HTML from JSON artifacts |
 | `python -m hwsim export-svg <netlist.yaml> [-o out.svg]` | Wiring diagram SVG |
 | `python -m hwsim pinout <74HC283>` / `pinout --list` | DIP pin map ([`hw/pinout/`](../hw/pinout/)) |
-| `python -m hwsim export-schematic <netlist.yaml> [--html]` | DIP schematic; `alu8` → **16 DIP** assembly layout; `--logical` = hwsim instances; `--html` = drag chips, net hubs, wire bends |
+| `python -m hwsim export-schematic <netlist.yaml> [--html]` | DIP schematic; `alu8` → **14 DIP** assembly layout; `--logical` = hwsim instances; `--html` = drag chips, net hubs, wire bends |
 | `python -m hwsim diff-kicad <kicad.net> <netlist.yaml>` | Compare KiCad export vs YAML |
 
 Outputs go to `build/hwsim/<test_name>/`:
@@ -83,7 +83,7 @@ python -m hwsim run --all
 |------|-------|-------|
 | `alu283_carry` | alu283 | 8-bit carry cascade |
 | `alu8_full` / `alu8_timing` / `alu8_opcode_timing` | alu8 | 12-opcode functional + per-opcode slack |
-| `alu8_cmp_85` | alu8 | CMP `7485` parallel Z / C_GE |
+| `alu8_cmp_sub` | alu8 | CMP flags from SUB (`Y==0`, `net_c_hi`) |
 | `alu_decode_full` / `alu_decode_timing` | alu8_decode | CW → control nets |
 | `alu_b3_sub_critical` / `alu_b3_xor_critical` / `alu_b3_inc_dec` / `alu_b3_latch` | alu_b3 | B3 phased paths |
 | `bringup_b3c_clock` | alu_b3_clock | B3c + 2 MHz clock |
@@ -92,7 +92,7 @@ Full ALU wiring: [alu8.md](../hw/netlist/blocks/alu8.md).
 
 ## BOM part → model
 
-Supported parts: `OSC_4M`, `74HC74`, `74HC04`, `74HC283`, `74HC574`, `74HC161`, `74HC157`, `74HC245`, gates `74HC08/32/86`, mux `74HC151/153`, **`ALU_153_SLICE`**, **`ALU_Y_MUX_SEL`**, **`74HC85`**, **`ALU_CMP_MERGE`**, **`CPLD_SYSTEM_CTRL` / `ATF1504AS`**, **`REGFILE_574_GPR`**, **`MAILBOX_MMIO`**.
+Supported parts: `OSC_4M`, `74HC74`, `74HC04`, `74HC283`, `74HC574`, `74HC161`, `74HC157`, `74HC245`, gates `74HC08/32/86`, mux `74HC151/153`, **`ALU_153_SLICE`**, **`ALU_Y_MUX_SEL`**, **`ALU_CMP_SUB`**, **`CPLD_SYSTEM_CTRL` / `ATF1504AS`**, **`REGFILE_574_GPR`**, **`MAILBOX_MMIO`**.
 
 ## Related
 

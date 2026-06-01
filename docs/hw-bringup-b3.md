@@ -5,7 +5,7 @@ Electrical behavior is validated in hwsim before wiring.
 
 **Opcode cheat sheet:** [hw-bringup-b3-opcode.md](hw-bringup-b3-opcode.md) — DIP settings for all 12 opcodes.
 
-**ALU only — step-by-step assembly (16 IC, Phase B2):** [hw-bringup-alu8-assembly-spec.md](hw-bringup-alu8-assembly-spec.md) (Korean build spec).
+**ALU only — step-by-step assembly (14 IC, Phase B2):** [hw-bringup-alu8-assembly-spec.md](hw-bringup-alu8-assembly-spec.md) (Korean build spec).
 
 | Phase | Netlist | hwsim |
 |-------|---------|-------|
@@ -40,7 +40,7 @@ No 574, no OSC/74.
 ### Wiring
 
 1. **Power** — 5 V, GND, decoupling on every DIP.
-2. **ALU core** — ref order in [`alu8.yaml`](../hw/netlist/blocks/alu8.yaml): 283 → 04 BINV → **153_B** → 283 → 85 (CMP) → 08/32/86 XOR/04 → 157 OUT → **153 Y** (logic) → **157 YBP** (arith → Y).
+2. **ALU core** — ref order in [`alu8.yaml`](../hw/netlist/blocks/alu8.yaml): 283 → 04 BINV → **153_B** → 283 → **153_L** (logic) → **157_YBP** (sum vs logic → Y); CMP flags from SUB (`net_y`, `net_c_hi`).
 3. **Operands** — DIP ×16: `net_a0..7`, `net_b0..7` (B ignored for INC/DEC).
 4. **Control** — DIP or tie per cheat sheet: `cin`, `153_s0/s1`, `b_sel`, `b_const_sel`, `b_const_bit1..7`, `net_lgc0..3` (SUB/CMP: `b_sel=1`, `cin=1`).
 5. **Output** — **`net_y0..7` → LED ×8** (330 Ω–1 kΩ); optional `net_c_hi` LED.
@@ -61,7 +61,7 @@ No 574, no OSC/74.
 
 ### Done criteria
 
-- [ ] 16 IC ALU powered and decoupled
+- [ ] 14 IC ALU powered and decoupled
 - [ ] Smoke opcodes match Y LEDs
 - [ ] (Optional) all 12 opcodes from cheat sheet
 

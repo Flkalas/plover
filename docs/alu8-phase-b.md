@@ -9,7 +9,7 @@
 |-------|--------|------|
 | **B1 (frozen)** | `153_B×4`, `04_BINV`, `283×2`, `157_YBP×2` | SUB/ADD/INC/DEC/CMP **Y** |
 | **B2** | `153_L×8` (`ALU_153_SLICE`) | AND/OR/XOR/NOT/PASS via Gigatron mux trick |
-| **CMP** | `7485×2`, `ALU_CMP_MERGE` | Flags parallel to Y |
+| **CMP** | `ALU_CMP_SUB` | Z/C_GE from SUB (`Y==0`, `net_c_hi`) — no 7485 |
 | **Glue** | `ALU_Y_MUX_SEL` | `net_y_mux_sel = s0 \| s1` → 157 picks sum vs logic |
 
 ```mermaid
@@ -70,8 +70,7 @@ Golden vectors: [`tools/alu8_cases.py`](../tools/alu8_cases.py) — all 12 opcod
 | 74HC153 (logic slices, 1 mux/IC) | 4 |
 | 74HC157 (YBP) | 2 |
 | 74HC04 (~B) | 2 |
-| 74HC85 | 2 |
-| **ALU total** | **16** |
+| **ALU total** | **14** |
 
 (Logic uses 4 packages with one 4:1 mux each; B-path uses both muxes per package.)
 

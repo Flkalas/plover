@@ -3,7 +3,7 @@
 | 항목 | 내용 |
 |------|------|
 | **대상** | Plover v0.1 — 8비트 ALU 코어 (`alu8.yaml`) |
-| **규모** | 74HC DIP **16개** (Phase B2: `153_B`×4, `153_L`, `157_YBP`×2, `7485`×2; hwsim **~30** inst) |
+| **규모** | 74HC DIP **14개** (Phase B2: `153_B`×4, `153_L`×4, `157_YBP`×2, `283`×2, `04`×2; CMP via SUB) |
 | **전원** | **5 V** 단일 레일 (본 문서는 5 V 빵판 ALU만) |
 | **목표** | 신호 흐름 순으로 IC를 **한 덩어리씩** 올려, 매 단계에서 **LED로 검증** |
 | **후속** | CPLD 소각 → [GPR↔ALU](hw-bringup-gpr-alu.md) → 574 래치(B3b) · 2 MHz(B3c) → [hw-bringup-b3.md](hw-bringup-b3.md) |
@@ -27,7 +27,7 @@ python -m hwsim run hw/tests/alu8_full.yaml
 python -m hwsim export-schematic hw/netlist/blocks/alu8.yaml -o build/alu8-schematic.svg --html
 ```
 
-인터랙티브 배선도: `build/alu8-schematic.html` — **본 시방서와 동일 16 DIP** (`153_L`×4는 슬라이스 2비트/칩으로 병합). hwsim 전용 glue(`Y_MUX_SEL`, `CMP_MERGE`)는 칩 박스 없음 — 좌측 허브에 `net_153_s0|s1`·`net_cmp_*` 표기. 제어 넷(`net_lgc*`, `net_153_s*`, `net_y_mux_sel`)은 주황색. 논리 뷰(22칸): `export-schematic … --logical`.
+인터랙티브 배선도: `build/alu8-schematic.html` — **14 DIP** (`153_L`×4 병합). glue: `Y_MUX_SEL` only; **CMP** = `net_y` + `net_c_hi` (no 7485). 제어 넷 주황색.
 
 ---
 
@@ -50,9 +50,6 @@ flowchart LR
     BINV[04 ~B]
     MUXB[153_B]
   end
-  subgraph cmp [CMP 병렬]
-    C85[7485 LO/HI]
-  end
   subgraph core [연산]
     ADD[283 x2]
     LOGIC[153_L Gigatron]
@@ -62,8 +59,6 @@ flowchart LR
     Y[net_y LED]
   end
   B --> BINV --> MUXB --> ADD
-  A --> C85
-  B --> C85
   A --> ADD
   A --> LOGIC
   B --> LOGIC
@@ -186,27 +181,11 @@ flowchart LR
 
 **Pass:** ADD/SUB/INC/DEC. B DIP는 INC/DEC에서 **의미 없음**.
 
----
-
-### 단계 3 — CMP 병렬 비교 (IC +2: 74HC85, 선택·권장)
-
-| Ref | Part |
-|-----|------|
-| `U_ALU_85_LO`, `U_ALU_85_HI` | 74HC85 |
-
-**배선**
-
-- `net_a0..3` / `net_b0..3` → 85_LO; LO `OAB_*` → HI `IAB_*` (캐스케이드)  
-- `net_a4..7` / `net_b4..7` → 85_HI  
-- `net_cmp_z`, `net_cmp_c_ge` → FLG 574 또는 LED (시스템 통합 시)
-
-**검증:** A=B → Z=1; A&lt;B → C_GE=0 ([`alu8_cmp_85`](../hw/tests/alu8_cmp_85.yaml)).
-
-**Pass:** CMP 플래그가 SUB Y 지연과 **독립** (Y는 단계 6 이후 opcode로 확인).
+**CMP 플래그 (7485 없음):** `net_cmp_z` ← Y LED all zero; `net_cmp_c_ge` ← `net_c_hi` LED — SUB/CMP opcode 시 ([`alu8_cmp_sub`](../hw/tests/alu8_cmp_sub.yaml)).
 
 ---
 
-### 단계 4 — Gigatron 논리 (`153_L`, IC +4: 74HC153)
+### 단계 3 — Gigatron 논리 (`153_L`, IC +4: 74HC153)
 
 | Ref | Part |
 |-----|------|
@@ -228,7 +207,7 @@ flowchart LR
 
 ---
 
-### 단계 5 — 출력 (`157_YBP`, IC +2)
+### 단계 4 — 출력 (`157_YBP`, IC +2)
 
 | Ref | Part |
 |-----|------|
@@ -291,9 +270,9 @@ ALU 단독 Pass 후 [hw-bringup-b3.md](hw-bringup-b3.md) 진행:
 |------|---------|------|-----------|
 | 0 | — | 0 | 전원 |
 | 1 | 283×2 | 2 | ADD / 캐리 |
-| 2 | 04 BINV + 153_B×4 | 6 | B 경로, INC/DEC |
-| 3 | 85×2 | 8 | CMP flags (선택) |
-| 4 | 153_L×4 + 157 YBP×2 | **16** | Gigatron logic + sum bypass → Y |
+| 2 | 04 BINV + 153_B×4 | 6 | B 경로, INC/DEC, CMP flags via SUB |
+| 3 | 153_L×4 | 10 | Gigatron logic |
+| 4 | 157 YBP×2 | **14** | sum bypass → Y, 12 opcode |
 | 5 | (디코드) | +α | CW 자동 |
 | 6 | 574·클록 | 시스템 | B3b/c |
 
@@ -305,7 +284,7 @@ ALU 단독 Pass 후 [hw-bringup-b3.md](hw-bringup-b3.md) 진행:
 |------|------|
 | **1일차** | 단계 0~1 — 전원, 283, ADD 스모크 |
 | **2일차** | 단계 2 — 153_B, SUB/INC/DEC |
-| **3일차** | 단계 3~4 — 85 CMP, 153_L, 157_YBP, 12 opcode |
+| **3일차** | 단계 3~4 — 153_L, 157_YBP, 12 opcode |
 | **4일차** | hwsim 대조, 배선 정리 |
 | **5일차** | 배선 정리, SUB 경로 shorten, B3b 574 |
 | **6일차** | B3c 클록, 오실로스코프 또는 1.7 MHz 폴백 |
@@ -343,7 +322,7 @@ ALU 단독 Pass 후 [hw-bringup-b3.md](hw-bringup-b3.md) 진행:
 
 ## 8. 완료 체크리스트 (ALU8 단독)
 
-- [ ] 16 IC ALU 전원·0.1 µF 완료 ([BOM.md](../BOM.md))  
+- [ ] 14 IC ALU 전원·0.1 µF 완료 ([BOM.md](../BOM.md))  
 - [ ] `alu8_full` hwsim PASS  
 - [ ] 스모크 SUB / XOR / INC LED 일치  
 - [ ] (권장) opcode 치트시트 12종 전부  

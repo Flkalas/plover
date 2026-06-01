@@ -182,7 +182,7 @@ Maps to [alu8](hw/netlist/blocks/alu8.md) `alu_sel`:
 | 2 | SUB |
 | … | See alu-opcodes-timing.md |
 
-**CMP:** Y follows SUB datapath; **Z / carry≥** may use parallel **7485** (`net_cmp_z`, `net_cmp_c_ge`) — see [alu8.md](../hw/netlist/blocks/alu8.md).
+**CMP:** Y follows SUB datapath; **Z** = (`Y==0`), **C_GE** = `net_c_hi` (`net_cmp_z`, `net_cmp_c_ge`) — see [alu8.md](../hw/netlist/blocks/alu8.md).
 
 **2 MHz Execute comb budget:** worst-case ALU Y **151 ns** (SUB/CMP/DEC); ADD/INC **108 ns** @ max ([alu-opcodes-timing.md](alu-opcodes-timing.md) v1.3). ADD micro-sequence ph0–2 must complete operand→Y within **250 ns** half-period before 574 latch.
 

@@ -80,7 +80,7 @@ flowchart LR
 **hwsim:** `python -m hwsim run hw/tests/alu8_full.yaml`
 
 ### 실장
-- **16 IC** (574·클록 없음; Phase B2 — [`alu8.md`](../hw/netlist/blocks/alu8.md))
+- **14 IC** (574·클록 없음; Phase B2 — [`alu8.md`](../hw/netlist/blocks/alu8.md))
 - DIP: `net_a0..7`, `net_b0..7` (INC/DEC는 B DIP 무시 — `153_B` 상수 경로)
 - 제어: `cin`, `153_s0/s1`, `b_sel`, `b_const_sel`, `b_const_bit1..7`, `net_lgc0..3` ([치트시트](../hw-bringup-b3-opcode.md); SUB/CMP `b_sel=1`, `cin=1`)
 - **Y → LED ×8** (저항 330Ω~1kΩ); carry는 `net_c_hi` LED 1개(선택)
@@ -91,7 +91,7 @@ flowchart LR
 - 1차 스모크: **SUB** (`0x12−0x34→0xDE`), **XOR** (`→0x26`), **INC** (`→0x13`) — 치트시트 + [`alu8_full`](hw/tests/alu8_full.yaml) expect와 대조
 
 ### 완료 기준
-- [ ] 전원·디커플링 16 IC
+- [ ] 전원·디커플링 14 IC
 - [ ] 치트시트 3 opcode Y LED 일치
 - [ ] (선택) 12 opcode 전부 Y 확인
 

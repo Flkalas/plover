@@ -25,7 +25,7 @@
 | 8 | `0x8` | **PASS_B** | Y = B (`AND` + A=0xFF) | Z |
 | 9 | `0x9` | **INC** | Y = A + 1 (B2 상수 `0x01`) | C, Z |
 | 10 | `0xA` | **DEC** | Y = A − 1 (B2 상수 `0xFF`) | C, Z |
-| 11 | `0xB` | **CMP** | SUB와 동일 Y; **선택** 병렬 `7485` → Z/C | C, Z (`net_cmp_*` 또는 SUB carry) |
+| 11 | `0xB` | **CMP** | SUB와 동일 Y | C, Z — `net_cmp_z`=`Y==0`, `net_cmp_c_ge`=`net_c_hi` |
 | 12–15 | — | *(예약)* | NOP 취급 | — |
 
 - **A** · **B**: `net_a0..7`, `net_b0..7` (CPU: ACC.Q → A 직결, B ← CPLD `q_b` 또는 SRAM).
@@ -100,16 +100,17 @@ B3c 브링업 경로 — ALU 출력이 **다음 posedge** 전에 setup 만족해
 
 전체 **operand → ACC.Q** (max): SUB 기준 **151 + 23 (574 t_pd)** ≈ **174 ns** (ACC.Q 직결 A-side, CPLD async read 미포함).
 
-### 3.5 CMP 병렬 플래그 (`7485`, operand → Z/C)
+### 3.5 CMP 플래그 (SUB 유도, no 7485)
 
-Y datapath와 **독립**. hwsim [`alu8_cmp_85`](../hw/tests/alu8_cmp_85.yaml), `A=B` @ max:
+`ALU_CMP_SUB`: CMP/SUB 시 (`b_sel=1`, `cin=1`) **Z** = all `net_y==0`, **C_GE** = `net_c_hi`.  
+hwsim [`alu8_cmp_sub`](../hw/tests/alu8_cmp_sub.yaml) — 플래그는 Y 경로와 **동일 오더**:
 
 | 구간 | typ (ns) | max (ns) | 비고 |
 |------|----------|----------|------|
-| `net_a0` → `net_cmp_z` | — | **65** | `85_LO/HI` + `CMP_MERGE` |
-| `net_a0` → `net_cmp_c_ge` | — | *(동일 오더)* | unsigned A≥B |
+| `net_b0` → `net_cmp_z` | — | **151** | SUB/CMP critical path |
+| `net_b0` → `net_cmp_c_ge` | — | **151** | via `net_c_hi` @ 283 |
 
-실기: `net_cmp_z` / `net_cmp_c_ge` → FLG 574 또는 CPLD ([`alu8.md`](../hw/netlist/blocks/alu8.md)).
+실기: `net_cmp_z` / `net_cmp_c_ge` → FLG 574 또는 CPLD; Execute 말 샘플 ([`alu8.md`](../hw/netlist/blocks/alu8.md)).
 
 ### 3.4 CW 디코드 오버헤드 (v0.1 E2E)
 
@@ -133,7 +134,7 @@ v0.1 CPU는 **8-bit CW** (Flash B7–B4 = `ALU_OP`, B3 = `REG_WE`) + **574×4 GP
 | [`alu8_full`](../hw/tests/alu8_full.yaml) | 12 opcode 기능 | — |
 | [`alu8_opcode_timing`](../hw/tests/alu8_opcode_timing.yaml) | 12 opcode slack | SUB **151** ns, logic **46** ns, ADD **108** ns |
 | [`alu8_timing`](../hw/tests/alu8_timing.yaml) | ADD carry · logic hop | ADD **108** ns, `153_L` **46** ns |
-| [`alu8_cmp_85`](../hw/tests/alu8_cmp_85.yaml) | CMP flags | `A→cmp_z` **65** ns @ max |
+| [`alu8_cmp_sub`](../hw/tests/alu8_cmp_sub.yaml) | CMP flags | `cmp_z` / `cmp_c_ge` **151** ns @ max |
 | [`alu_b3_sub_critical`](../hw/tests/alu_b3_sub_critical.yaml) | SUB | **151** ns @ max; slack **99** ns |
 | [`alu_b3_xor_critical`](../hw/tests/alu_b3_xor_critical.yaml) | XOR | **46** ns (`153_L` → 157_YBP) |
 | [`alu_b3_latch`](../hw/tests/alu_b3_latch.yaml) | ACC setup | **51** ns (153→574 CP) |
