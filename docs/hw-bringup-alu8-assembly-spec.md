@@ -1,0 +1,364 @@
+# ALU8 브레드보드 조립 시방서 (단계별 실장)
+
+| 항목 | 내용 |
+|------|------|
+| **대상** | Plover v0.1 — 8비트 ALU 코어 (`alu8.yaml`) |
+| **규모** | 74HC DIP **16개** (Phase B2: `153_B`×4, `153_L`, `157_YBP`×2, `7485`×2; hwsim **~30** inst) |
+| **전원** | **5 V** 단일 레일 (본 문서는 5 V 빵판 ALU만) |
+| **목표** | 신호 흐름 순으로 IC를 **한 덩어리씩** 올려, 매 단계에서 **LED로 검증** |
+| **후속** | CPLD 소각 → [GPR↔ALU](hw-bringup-gpr-alu.md) → 574 래치(B3b) · 2 MHz(B3c) → [hw-bringup-b3.md](hw-bringup-b3.md) |
+
+**관련 문서**
+
+| 문서 | 용도 |
+|------|------|
+| [hw-bringup-b3.md](hw-bringup-b3.md) | B3a/b/c 전체 브링업 |
+| [hw-bringup-b3-opcode.md](hw-bringup-b3-opcode.md) | 12 opcode DIP/타이 값 |
+| [hw-bringup-cpld-programming.md](hw-bringup-cpld-programming.md) | CPLD 플래싱 |
+| [hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md) | GPR–ALU 연결 |
+| [hw/netlist/blocks/alu8.md](../hw/netlist/blocks/alu8.md) | IC 맵 · 제어 넷 |
+| [BOM.md](../BOM.md) | 구매 수량 |
+| [hw/pinout/](../hw/pinout/) | DIP 핀 번호 |
+
+**도구 (배선 전)**
+
+```bash
+python -m hwsim run hw/tests/alu8_full.yaml
+python -m hwsim export-schematic hw/netlist/blocks/alu8.yaml -o build/alu8-schematic.svg --html
+```
+
+인터랙티브 배선도: `build/alu8-schematic.html` — **본 시방서와 동일 16 DIP** (`153_L`×4는 슬라이스 2비트/칩으로 병합). hwsim 전용 glue(`Y_MUX_SEL`, `CMP_MERGE`)는 칩 박스 없음 — 좌측 허브에 `net_153_s0|s1`·`net_cmp_*` 표기. 제어 넷(`net_lgc*`, `net_153_s*`, `net_y_mux_sel`)은 주황색. 논리 뷰(22칸): `export-schematic … --logical`.
+
+---
+
+## 1. 원칙 — 왜 순서가 중요한가
+
+ALU는 **한 번에 16개를 꽂으면** 어느 구간에서 깨졌는지 찾기 어렵습니다. 아래 순서는:
+
+1. **데이터가 흐르는 방향** (피연산자 → 가산기/논리 → 출력 MUX) 과 같고  
+2. **이전 단계 출력을 다음 단계 입력으로 재사용** 하며  
+3. 각 단계마다 **관측 가능한 노드**(LED·DIP)가 있게 설계되어 있습니다.
+
+```mermaid
+flowchart LR
+  subgraph inputs [입력]
+    A[net_a0..7]
+    B[net_b0..7]
+    CTL[제어 DIP lgc0..3]
+  end
+  subgraph bpath [B 경로 B1]
+    BINV[04 ~B]
+    MUXB[153_B]
+  end
+  subgraph cmp [CMP 병렬]
+    C85[7485 LO/HI]
+  end
+  subgraph core [연산]
+    ADD[283 x2]
+    LOGIC[153_L Gigatron]
+  end
+  subgraph out [출력]
+    YBP[157_YBP]
+    Y[net_y LED]
+  end
+  B --> BINV --> MUXB --> ADD
+  A --> C85
+  B --> C85
+  A --> ADD
+  A --> LOGIC
+  B --> LOGIC
+  CTL --> LOGIC
+  ADD --> YBP
+  LOGIC --> YBP
+  CTL --> YBP
+  YBP --> Y
+```
+
+---
+
+## 2. 공통 준비 (모든 단계 전)
+
+### 2.1 전원·디커플링
+
+| 항목 | 시방 |
+|------|------|
+| 레일 | 5 V / GND — **짧고 굵은** 빨강·검정 버스 |
+| 디커플링 | **0.1 µF / IC 1개** (VCC–GND, IC 가까이) |
+| 벌크 | **10 µF** (보드 1~2곳) |
+| 최초 전원 | **전류 제한** 어댑터 또는 순간 전압 확인 후 풀가동 |
+
+### 2.2 관측·스티뮬러스 (가능한 한 0단계에서 설치)
+
+| 블록 | 연결 | 비고 |
+|------|------|------|
+| 피연산자 A | DIP 8bit → `net_a0..7` | 330 Ω~1 kΩ 직렬 권장 |
+| 피연산자 B | DIP 8bit → `net_b0..7` | INC/DEC 단계 전까지 사용 |
+| 제어 | DIP 또는 **고정 타이** | [opcode 치트시트](hw-bringup-b3-opcode.md) |
+| 결과 Y | LED ×8 ← `net_y0..7` | MSB=y7, LSB=y0 |
+| 캐리(선택) | LED ← `net_c_hi` | SUB/CMP 디버그용 |
+
+### 2.3 제어선 기본값 (미사용 시)
+
+타이 하지 않은 제어 입력은 **GND**. 예외는 치트시트에 **VCC** 로 적힌 핀만 5 V.
+
+**INC/DEC 주의:** `net_b0..7` 을 INC/DEC용으로 바꾸지 말 것. **`153_B` MUX:** INC=`b_const_sel=1,b_sel=0`; DEC=`b_const_sel=1,b_sel=1` ([opcode 치트시트](hw-bringup-b3-opcode.md)).
+
+### 2.4 배선 습관
+
+- **왼쪽 열 핀 → 왼쪽으로**, **오른쪽 열 핀 → 오른쪽으로** 먼저 뻗은 뒤 버스로 연결 (칩 관통 배선 방지).  
+- 한 넷은 **한 색**; VCC 빨강, GND 검정, 신호는 색 8~12가지 로테이션.  
+- 283 **캐리 연쇄**(LO C4→HI)와 SUB 경로는 **짧게** (타이밍 여유 최소 구간).
+
+---
+
+## 3. 단계별 실장 시방
+
+각 단계: **(가) IC 장착 → (나) 전원·디커플링 → (다) 해당 넷만 배선 → (라) 검증 → (마) 다음 단계**.
+
+완료되지 않으면 **다음 IC를 추가하지 않음**.
+
+### 단계 0 — 전원 스모크 (IC 0개)
+
+| 항목 | 내용 |
+|------|------|
+| 작업 | 5 V/GND 버스, 벌크·여분 0.1 µF만 |
+| Pass | 멀티미터로 레일 5 V ±0.2 V, 핫스왑 없음 |
+
+---
+
+### 단계 1 — 8비트 가산기만 (IC +2: 74HC283 ×2)
+
+| Ref | Part |
+|-----|------|
+| `U_ALU_283_LO`, `U_ALU_283_HI` | 74HC283 |
+
+**배선 요점**
+
+- `net_a0..7` → 283 A  
+- **임시:** `net_b_add0..7` ← B DIP (157 없이 **B를 가산기에 직결**하는 **브링업 전용**; 이후 단계 3에서 끊고 157 경유로 전환)  
+- LO **C4** → HI **C4** (캐리 연쇄)  
+- `net_cin` ← GND (ADD), SUB 검증 시 단계 4에서 VCC  
+- `net_sum0..7`, `net_c_hi` 관측
+
+**제어 (ADD 스모크)**
+
+| net | 값 |
+|-----|-----|
+| `net_153_s0`, `net_153_s1` | 0 (나중에 153 장착 전에는 sum을 LED에 **점퍼로 직결**해도 됨) |
+| `net_cin` | GND |
+
+**검증**
+
+| 테스트 | A | B | 기대 sum (Y에 직결 시) |
+|--------|---|---|------------------------|
+| 0+0 | 00 | 00 | 00 |
+| 12+34 | 12 | 34 | 46 |
+| FF+01 | FF | 01 | 00, C_hi=1 |
+
+**hwsim:** `python -m hwsim run hw/tests/alu283_carry.yaml` (서브블록)
+
+**Pass 기준:** 캐리 연쇄 포함 8비트 덧셈 3케이스 일치.
+
+---
+
+### 단계 2 — ~B + 153_B MUX (IC +6: 04 BINV + 153_B×4)
+
+| Ref | Part |
+|-----|------|
+| `U_ALU_04_BINV_*` | 74HC04 (8 inv, ~B) — **×3 패키지 권장** ([BOM.md](../BOM.md)) |
+| `U_ALU_153_B_0..3` | 74HC153 ×4 |
+
+**배선**
+
+- `net_b*` → 04 BINV → `net_b_inv*`  
+- **153_B:** `A`=`net_b_sel`, `B`=`net_b_const_sel`; C0=B, C1=~B, C2=INC, C3=DEC 상수  
+- 153_B 출력 → **`net_b_add*`** 직결 (**283 B** 입력; Phase B1: `157_B2` 없음)  
+- **283 B** 를 `net_b_add*` 만 사용 (**단계 1 B 직결 제거**)
+
+**검증**
+
+| Op | cin | b_sel | b_const_sel | A | B | 기대 Y |
+|----|-----|-------|-------------|---|---|--------|
+| ADD | 0 | 0 | 0 | 12 | 34 | 46 |
+| SUB | 1 | 1 | 0 | 12 | 34 | DE |
+| INC | 0 | 0 | 1 | 12 | × | 13 |
+| DEC | 0 | 1 | 1 | 12 | × | 11 |
+
+**Pass:** ADD/SUB/INC/DEC. B DIP는 INC/DEC에서 **의미 없음**.
+
+---
+
+### 단계 3 — CMP 병렬 비교 (IC +2: 74HC85, 선택·권장)
+
+| Ref | Part |
+|-----|------|
+| `U_ALU_85_LO`, `U_ALU_85_HI` | 74HC85 |
+
+**배선**
+
+- `net_a0..3` / `net_b0..3` → 85_LO; LO `OAB_*` → HI `IAB_*` (캐스케이드)  
+- `net_a4..7` / `net_b4..7` → 85_HI  
+- `net_cmp_z`, `net_cmp_c_ge` → FLG 574 또는 LED (시스템 통합 시)
+
+**검증:** A=B → Z=1; A&lt;B → C_GE=0 ([`alu8_cmp_85`](../hw/tests/alu8_cmp_85.yaml)).
+
+**Pass:** CMP 플래그가 SUB Y 지연과 **독립** (Y는 단계 6 이후 opcode로 확인).
+
+---
+
+### 단계 4 — Gigatron 논리 (`153_L`, IC +4: 74HC153)
+
+| Ref | Part |
+|-----|------|
+| `U_ALU_153_L_0..3` | 74HC153 ×4 (mux1/mux2 → bits 2n, 2n+1) |
+
+**배선**
+
+- Per bit: **A**=`net_a[i]`, **B**=`net_b[i]` (operand select); **C0..C3**=`net_lgc0..3` (decode 또는 DIP)  
+- **Y** → `net_y_logic[i]`  
+- Patterns: AND `0001`, OR `0111`, XOR `0110`, NOT `1000` — [alu8-phase-b.md](alu8-phase-b.md)
+
+**검증**
+
+| Op | A | B | lgc | 기대 |
+|----|---|---|-----|------|
+| AND | 12 | 34 | 0001 | 10 |
+| XOR | 12 | 34 | 0110 | 26 |
+| NOT | 12 | 00 | 1000 | ED |
+
+---
+
+### 단계 5 — 출력 (`157_YBP`, IC +2)
+
+| Ref | Part |
+|-----|------|
+| `U_ALU_157_YBP_0/1` | 74HC157 ×2 — **arith bypass** |
+
+**배선**
+
+- **157_YBP:** `A`=`net_sum*`, `B`=`net_y_logic*`; **`S`=`net_y_mux_sel`** (= s0 OR s1)  
+- `S`=0 → **sum**; `S`=1 → logic → `net_y*`  
+- `net_y0..7` → **Y LED**
+
+**검증 — 12 opcode 전체**
+
+[hw-bringup-b3-opcode.md](hw-bringup-b3-opcode.md) 표를 한 줄씩 따라감.
+
+**우선 스모크 3개 (반드시)**
+
+| Op | A | B | Y |
+|----|---|---|---|
+| SUB | 12 | 34 | DE |
+| XOR | 12 | 34 | 26 |
+| INC | 12 | — | 13 |
+
+**hwsim**
+
+```bash
+python -m hwsim run hw/tests/alu8_full.yaml
+python -m hwsim run hw/tests/alu8_timing.yaml
+```
+
+**Pass (B3a 완료):** 스모크 3 + 원하면 12 opcode 전부 Y LED 일치.
+
+---
+
+### 단계 7 — (선택) CW 디코드 블록
+
+마이크로코드 CW에서 제어선을 자동 생성하려면 [`alu8_decode.yaml`](../hw/netlist/blocks/alu8_decode.yaml) 블록 추가.  
+**권장:** 단계 6까지 **수동 DIP** 로 안정화한 뒤 디코드 IC/타이를 붙임.
+
+```bash
+python -m hwsim run hw/tests/alu_decode_full.yaml
+```
+
+---
+
+### 단계 8 — 시스템 통합 (B3b / B3c)
+
+ALU 단독 Pass 후 [hw-bringup-b3.md](hw-bringup-b3.md) 진행:
+
+| 단계 | 추가 | 목표 |
+|------|------|------|
+| B3b | 74HC574 ×1 | Y → D, 수동 CP로 Q 래치 |
+| B3c | OSC+74HC74 | 2 MHz 연속 래치, setup 마진 |
+
+---
+
+## 4. 단계별 IC 누적표
+
+| 단계 | 추가 IC | 누적 | 핵심 검증 |
+|------|---------|------|-----------|
+| 0 | — | 0 | 전원 |
+| 1 | 283×2 | 2 | ADD / 캐리 |
+| 2 | 04 BINV + 153_B×4 | 6 | B 경로, INC/DEC |
+| 3 | 85×2 | 8 | CMP flags (선택) |
+| 4 | 153_L×4 + 157 YBP×2 | **16** | Gigatron logic + sum bypass → Y |
+| 5 | (디코드) | +α | CW 자동 |
+| 6 | 574·클록 | 시스템 | B3b/c |
+
+---
+
+## 5. 권장 작업 일정 (실무)
+
+| 일차 | 내용 |
+|------|------|
+| **1일차** | 단계 0~1 — 전원, 283, ADD 스모크 |
+| **2일차** | 단계 2 — 153_B, SUB/INC/DEC |
+| **3일차** | 단계 3~4 — 85 CMP, 153_L, 157_YBP, 12 opcode |
+| **4일차** | hwsim 대조, 배선 정리 |
+| **5일차** | 배선 정리, SUB 경로 shorten, B3b 574 |
+| **6일차** | B3c 클록, 오실로스코프 또는 1.7 MHz 폴백 |
+
+복잡도가 높은 날은 **하루 4~6 IC 이하**가 유지보수에 유리합니다.
+
+---
+
+## 6. hwsim ↔ 실기 대응
+
+| hwsim | 브레드보드 |
+|-------|------------|
+| `net_a*`, `net_b*` 자극 | DIP |
+| 제어 넷 | DIP / 치트시트 타이 |
+| `net_y*` 프로브 | Y LED |
+| `alu8_timing` slack | 2 MHz 전 **SUB 배선 짧게**; FAIL 시 ~1.7 MHz |
+| `export-schematic` | 배선 계획·교차 확인 |
+
+---
+
+## 7. 고장 분리 (증상 → 되돌아갈 단계)
+
+| 증상 | 확인 순서 |
+|------|-----------|
+| 전원만 이상 | 단계 0, 핫 IC, 반대 삽입 |
+| ADD만 틀림 | 283 캐리, B가 `net_b_add`에 연결됐는지 |
+| SUB만 틀림 | `cin`, `b_sel`, 04 BINV, 153_B |
+| INC/DEC만 틀림 | `b_const_sel`, `b_sel` (DEC=1), 153_B (**B DIP 건드리지 말 것**) |
+| AND/OR/XOR/NOT만 | `net_lgc0..3`, `153_s0/s1` |
+| Logic | `net_lgc0..3`, `153_s0/s1` |
+| 전부 틀림 | 153 전원, Y LED 순서(y7..y0), GND 플로팅 |
+| hwsim PASS / 실기 FAIL | 타이(클록), 플로팅 제어, 5 V 레일 강하 |
+
+---
+
+## 8. 완료 체크리스트 (ALU8 단독)
+
+- [ ] 16 IC ALU 전원·0.1 µF 완료 ([BOM.md](../BOM.md))  
+- [ ] `alu8_full` hwsim PASS  
+- [ ] 스모크 SUB / XOR / INC LED 일치  
+- [ ] (권장) opcode 치트시트 12종 전부  
+- [ ] SUB·캐리 경로 배선 최단화 기록  
+- [ ] `alu8-schematic.html` 에서 넷별 배선 검토 완료  
+
+이후 → [hw-bringup-b3.md](hw-bringup-b3.md) **B3b** 체크리스트로 진행.
+
+---
+
+## 9. 문서 개정
+
+| 날짜 | 변경 |
+|------|------|
+| 2026-06-02 | Phase B2: Gigatron `153_L`, **16** IC, logic **46 ns** @ max |
+| 2026-06-02 | Phase B1: `157_B2` 제거, `157_YBP` sum bypass, SUB **151 ns** @ max |
+| 2026-06-02 | Phase A: 24 IC, 153_B, 7485 CMP, `net_sub_en` 제거 |
+| 2026-06-02 | 초판 — 8단계 실장 시방, B3 연계 |

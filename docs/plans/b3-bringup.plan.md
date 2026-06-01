@@ -36,7 +36,7 @@ isProject: false
 flowchart LR
   subgraph b3a [B3a]
     DIP[ DIP A B ctrl ]
-    ALU[ alu8 20IC ]
+    ALU[ alu8 16IC ]
     YLED[ Y LED x8 ]
     DIP --> ALU --> YLED
   end
@@ -80,9 +80,9 @@ flowchart LR
 **hwsim:** `python -m hwsim run hw/tests/alu8_full.yaml`
 
 ### 실장
-- **20 IC** (574·클록 없음)
-- DIP: `net_a0..7`, `net_b0..7` (INC/DEC는 B DIP 무시 — cascade만)
-- 제어 DIP 14개: `sub_en`, `cin`, `153_s0/s1`, `b_sel`, `b_const_sel`, `b_const_bit1..7`, `c3_sel`
+- **16 IC** (574·클록 없음; Phase B2 — [`alu8.md`](../hw/netlist/blocks/alu8.md))
+- DIP: `net_a0..7`, `net_b0..7` (INC/DEC는 B DIP 무시 — `153_B` 상수 경로)
+- 제어: `cin`, `153_s0/s1`, `b_sel`, `b_const_sel`, `b_const_bit1..7`, `net_lgc0..3` ([치트시트](../hw-bringup-b3-opcode.md); SUB/CMP `b_sel=1`, `cin=1`)
 - **Y → LED ×8** (저항 330Ω~1kΩ); carry는 `net_c_hi` LED 1개(선택)
 
 ### 치트시트 사용법
@@ -91,7 +91,7 @@ flowchart LR
 - 1차 스모크: **SUB** (`0x12−0x34→0xDE`), **XOR** (`→0x26`), **INC** (`→0x13`) — 치트시트 + [`alu8_full`](hw/tests/alu8_full.yaml) expect와 대조
 
 ### 완료 기준
-- [ ] 전원·디커플링 20 IC
+- [ ] 전원·디커플링 16 IC
 - [ ] 치트시트 3 opcode Y LED 일치
 - [ ] (선택) 12 opcode 전부 Y 확인
 

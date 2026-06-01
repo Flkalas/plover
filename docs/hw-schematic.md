@@ -2,6 +2,9 @@
 
 hwsim uses YAML netlists as the machine-readable source of truth. KiCad schematics in [`hw/kicad/plover/`](../hw/kicad/plover/) should export netlists that match these rules.
 
+**DIP pin numbers** (breadboard): [`hw/pinout/`](../hw/pinout/) — one YAML per BOM part; `python -m hwsim pinout 74HC283`.  
+Logical pins in netlists (`A0`, `1Y`, …) map to physical pins via `plover_netlist` sections where names differ (e.g. 74HC283 `S0` → DIP pin 4).
+
 ## Reference designators
 
 Format: `{BLOCK}_{PART}_{IDX}`
@@ -9,7 +12,7 @@ Format: `{BLOCK}_{PART}_{IDX}`
 | Block | Example |
 |-------|---------|
 | Clock | `U_CLK_74`, `U_CLK_OSC` |
-| ALU | `U_ALU_283_LO`, `U_ALU_283_HI`, `U_ALU_153_0`…`3`, `U_ALU_157_B_0`, `U_ALU_157_B2_0`, `U_ALU_86_INV_0` |
+| ALU | `U_ALU_283_LO/HI`, `U_ALU_153_B_0`…`3`, `U_ALU_153_L_0`…`7`, `U_ALU_04_BINV_*`, `U_ALU_85_LO/HI`, `U_ALU_157_YBP_*` |
 | Register | `U_REG_574_0`, `U_REG_574_ACC` (B3 accumulator) |
 | PC | `U_PC_161_0` … `U_PC_161_3` |
 
@@ -23,7 +26,8 @@ Examples:
 - `net_clk2` — 2 MHz divided clock
 - `net_a0` … `net_a7`, `net_b0` … `net_b7` — ALU operands
 - `net_y0` … `net_y7` — ALU result
-- `net_sub_en`, `net_cin`, `net_153_s0`, `net_153_s1`, `net_b_sel`, `net_b_const_sel`, `net_b_const_bit1`…`7`, `net_c3_sel` — ALU control (VLIW or test)
+- `net_cin`, `net_153_s0`, `net_153_s1`, `net_b_sel`, `net_b_const_sel`, `net_b_const_bit1`…`7`, `net_lgc0`…`3` — ALU control (VLIW or test)
+- `net_cmp_z`, `net_cmp_c_ge` — CMP flags (parallel 7485; optional in block-only bring-up)
 - `net_d0` … `net_d7` — 574 D inputs (B3: tied to `net_y*`)
 - `net_q0` … `net_q7` — 574 Q outputs
 
