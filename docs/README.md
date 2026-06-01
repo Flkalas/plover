@@ -15,6 +15,7 @@ Design notes and **hwsim** for Plover — **v0.1 CPU** (574×4 GPR + ATF1504AS s
 | [rp2350-coprocessor.md](rp2350-coprocessor.md) | Copro board |
 | [bootloader.md](bootloader.md) | Boot · Run handoff |
 | [implementation-plan-v0.1.md](implementation-plan-v0.1.md) | Milestones |
+| [plans/](plans/) | Active bring-up plans (B3) |
 | [alu-opcodes-timing.md](alu-opcodes-timing.md) | ALU comb delay |
 | [hw-sim.md](hw-sim.md) | `python -m hwsim` · `plover_vm` |
 | [reviewer-handoff.md](reviewer-handoff.md) | **검토자 인수인계** |
@@ -29,6 +30,7 @@ Pre-v0.1 specs (v0.2 / v1.x): [archive/pre-v0.1/](archive/pre-v0.1/README.md)
 | `*-v2.0.md` | unversioned name above |
 | `microcode-spec-v1.*.md` | [microcode-spec.md](microcode-spec.md) |
 | `v*.x-implementation-plan.md` | [implementation-plan-v0.1.md](implementation-plan-v0.1.md) |
+| `.cursor/plans/` (historical) | [archive/plans/](archive/plans/README.md) |
 
 ## Project root
 

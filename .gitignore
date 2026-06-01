@@ -9,3 +9,4 @@ archive/verilog-sim/web/node_modules/
 web/dist/
 archive/verilog-sim/web/dist/
 *.vvp
+.cursor/
