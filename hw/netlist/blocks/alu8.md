@@ -79,4 +79,4 @@ Sub-block adder only: [`alu283.yaml`](alu283.yaml).
 
 ## BOM delta
 
-See [BOM.md](../../../BOM.md) — +2×86, +4×157 (B/OUT/B2), +2×04 vs original 12-IC ALU; system **50** core IC.
+ALU IC counts vs legacy 12-IC ALU: +2×86, +4×157, +2×04. Full buy list: [BOM.md](../../../BOM.md).

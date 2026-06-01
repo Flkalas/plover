@@ -6,7 +6,7 @@ Plover 프로젝트 **초기 부품 주문** 기록.
 | 항목 | 내용 |
 |------|------|
 | 판매처 | [디바이스마트](https://www.devicesmart.co.kr/) |
-| 대상 BOM | **Historical** v1.3 order — current procurement: [BOM.md §1](../BOM.md#1-procurement-bom-v01-1-set) (v0.1) |
+| 대상 | v0.1 **1차** 실구매 · 전체 구매 목록: [BOM.md](../BOM.md) |
 | 주문 상태 | 상품준비중 (전 품목) |
 
 ---
@@ -52,7 +52,7 @@ Plover 프로젝트 **초기 부품 주문** 기록.
 
 ## BOM 대조 (§1 vs 본 주문)
 
-상세 Δ: [BOM.md §5](../BOM.md#5-미주문--수량-부족-v13-기준)
+전체 구매 목록: [BOM.md](../BOM.md)
 
 ### 인프라 · 배선
 
@@ -125,17 +125,17 @@ Plover 프로젝트 **초기 부품 주문** 기록.
 
 ## v1.3 대비 추가 구매 필요
 
-[BOM.md §5](../BOM.md#5-미주문--수량-부족-v13-기준)와 동일:
+**2026-06-01 2차 주문으로 아래 항목 발주 완료** — [purchase-2026-06-01-followup.md](purchase-2026-06-01-followup.md). 전체 목록: [BOM.md](../BOM.md).
 
-| MPN | 부족 | 우선순위 |
-|-----|------|----------|
-| ATF1504AS-10JU44 | +1 | **필수** (regfile) |
-| PLCC-44→DIP-44 adapter | +1 | **필수** |
-| 74HC14 (DIP) | +2 | M7 clk |
-| 74HC86 (DIP) | +2 | ALU XOR |
-| 74HC157 (DIP) | +3 | ALU + addr MUX |
-| 74HC04 (DIP) | +2 | ALU + clk |
-| Mono 0.1 µF | +4 | CPLD decap |
+| MPN | 부족 (본 문서 시점) | 2차 후 |
+|-----|---------------------|--------|
+| ATF1504AS-10JU44 | +1 | ✓ |
+| PLCC-44→DIP-44 adapter | +1 | ✓ (AliExpress) |
+| 74HC14 (DIP) | +2 | ✓ |
+| 74HC86 (DIP) | +2 | ✓ |
+| 74HC157 (DIP) | +3 | ✓ |
+| 74HC04 (DIP) | +2 | ✓ |
+| Mono 0.1 µF | +4 | ✓ (+100 Ali) |
 
 *v1.2 ACC+TMP fallback만 조립할 경우 74HC574·157 추가 여유는 있음.*
 
@@ -146,3 +146,4 @@ Plover 프로젝트 **초기 부품 주문** 기록.
 | 날짜 | 내용 |
 |------|------|
 | 2026-06-01 | 디바이스마트 주문 내역 정리 (상품준비중) |
+| 2026-06-01 | 2차 보완 주문 → [purchase-2026-06-01-followup.md](purchase-2026-06-01-followup.md) |

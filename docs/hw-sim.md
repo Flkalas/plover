@@ -77,7 +77,7 @@ Supported parts: `OSC_4M`, `74HC74`, `74HC04`, `74HC283`, `74HC574`, `74HC161`, 
 
 ## Related
 
-- [BOM.md](../BOM.md) — physical parts
+- [BOM.md](../BOM.md) — full procurement list · [purchase-devicesmart.md](purchase-devicesmart.md) — order history
 - [roadmap-next.md](roadmap-next.md) — bring-up track
 - [hw-bringup-b3.md](hw-bringup-b3.md) — bench wiring guide
 

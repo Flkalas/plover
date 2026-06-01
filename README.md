@@ -58,7 +58,7 @@ python tools/run_fib_20000_demo.py
 | 파일 | 내용 |
 |------|------|
 | [docs/README.md](docs/README.md) | v0.1 인덱스 |
-| [BOM.md](BOM.md) | Procurement BOM |
+| [BOM.md](BOM.md) | v0.1 조립용 **완전 구매 목록** |
 | [docs/microcode-spec.md](docs/microcode-spec.md) | 8b CW · ISA |
 | [docs/memory-map.md](docs/memory-map.md) | Mode A/B map |
 
