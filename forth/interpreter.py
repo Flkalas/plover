@@ -31,6 +31,8 @@ class Forth:
         self.rstack: list[int] = []
         self.dict: dict[str, Word] = {}
         self.output: list[str] = []
+        self.blocks: dict[int, bytearray] = {}
+        self.input_bytes: list[int] = []
         self._compile: list[str] | None = None
         self._compile_name: str | None = None
         self._install_core()
@@ -75,6 +77,15 @@ class Forth:
 
         self.word(".", lambda f: f.emit(str(f.pop())))
 
+        # Console I/O (host simulation)
+        self.word("EMIT", self._w_emit)
+        self.word("KEY", self._w_key)
+
+        # Block I/O (256B blocks)
+        self.word("BLK@", self._w_blk_fetch)
+        self.word("BLK!", self._w_blk_store)
+        self.word("FLUSH", lambda _f: None)
+
         # Compilation control
         self.word(":", self._w_colon, immediate=True)
         self.word(";", self._w_semicolon, immediate=True)
@@ -88,6 +99,33 @@ class Forth:
         if self._compile is None:
             raise ForthError("';' outside definition")
         raise ForthError("';' must be handled by parser")
+
+    def _w_emit(self, _f: "Forth") -> None:
+        v = self.pop() & 0xFF
+        self.emit(chr(v))
+
+    def _w_key(self, _f: "Forth") -> None:
+        if not self.input_bytes:
+            raise ForthError("KEY: no input")
+        self.push(self.input_bytes.pop(0) & 0xFF)
+
+    def _get_block(self, n: int) -> bytearray:
+        if n not in self.blocks:
+            self.blocks[n] = bytearray(256)
+        return self.blocks[n]
+
+    def _w_blk_fetch(self, _f: "Forth") -> None:
+        off = self.pop() & 0xFF
+        blk = self.pop() & 0xFFFF
+        b = self._get_block(blk)
+        self.push(b[off])
+
+    def _w_blk_store(self, _f: "Forth") -> None:
+        off = self.pop() & 0xFF
+        blk = self.pop() & 0xFFFF
+        val = self.pop() & 0xFF
+        b = self._get_block(blk)
+        b[off] = val
 
     def _run_token(self, tok: str) -> None:
         u = tok.upper()
