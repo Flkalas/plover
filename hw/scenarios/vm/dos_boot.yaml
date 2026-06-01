@@ -1,11 +1,14 @@
 kind: dos
 actions:
-  - type: dir
-  - type: run
-    name: HELLO.PLR
+  - type: command
+    line: dir
+  - type: command
+    line: run HELLO.PLR
 expect:
   output_contains:
-    - PLDOS
+    - stage1_kernel_ready
+    - stage2_shell_ready
+    - PL-DOS>
     - HELLO
     - R0_7
 

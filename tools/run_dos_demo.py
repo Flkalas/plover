@@ -10,7 +10,13 @@ from plover_vm.dos_scenario import run_dos_scenario
 
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
-    doc = {"kind": "dos", "actions": [{"type": "dir"}, {"type": "run", "name": "HELLO.PLR"}]}
+    doc = {
+        "kind": "dos",
+        "actions": [
+            {"type": "command", "line": "dir"},
+            {"type": "command", "line": "run HELLO.PLR"},
+        ],
+    }
     res = run_dos_scenario(doc, root=root)
     for line in res.output:
         print(line)

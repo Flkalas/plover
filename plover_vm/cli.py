@@ -144,6 +144,27 @@ def cmd_scenario(args: argparse.Namespace) -> int:
     return 0 if ok else 1
 
 
+def cmd_dos_shell(args: argparse.Namespace) -> int:
+    from plover_vm.dos_scenario import _prepare_runtime
+
+    root = Path(__file__).resolve().parents[1]
+    rt = _prepare_runtime(root, img_name=args.image_name)
+    for line in rt.stage1_boot():
+        print(line)
+    for line in rt.stage2_shell_start():
+        print(line)
+    while True:
+        try:
+            line = input(f"{rt.prompt} ")
+        except EOFError:
+            break
+        for item in rt.run_command(line):
+            print(item)
+        if line.strip().lower() == "exit":
+            break
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="plover_vm")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -168,6 +189,10 @@ def main(argv: list[str] | None = None) -> int:
     scen = sub.add_parser("scenario", help="Run YAML scenario")
     scen.add_argument("scenario", type=Path)
     scen.set_defaults(func=cmd_scenario)
+
+    shell = sub.add_parser("dos-shell", help="Interactive PL-DOS shell")
+    shell.add_argument("--image-name", default="dos_boot.img")
+    shell.set_defaults(func=cmd_dos_shell)
 
     args = ap.parse_args(argv)
     return args.func(args)
