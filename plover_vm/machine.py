@@ -74,10 +74,12 @@ class PloverMachine:
         self.macro.pc = entry & 0xFFFF
         self.macro.halted = False
         self.macro._fetch_pending = True
+        self.macro._ret_stack = []
         self.micro.state = self.micro.state.__class__()
         self.fast.pc = entry & 0xFFFF
         self.fast.halted = False
         self.fast.regs = [0, 0, 0, 0]
+        self.fast._ret_stack = []
         self._steps = 0
 
     def step_once(self) -> None:

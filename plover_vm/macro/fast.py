@@ -9,12 +9,14 @@ from plover_vm.macro.isa import (
     OP_ADD_RR,
     OP_BCS,
     OP_BEQ,
+    OP_CALL,
     OP_CMP,
     OP_HALT,
     OP_JMP,
     OP_LDA,
     OP_LDIO,
     OP_MOV,
+    OP_RET,
     OP_STA,
     OP_STIO,
     OP_WADD_RR,
@@ -23,6 +25,8 @@ from plover_vm.macro.isa import (
     WIDE_IMM16_OPS,
 )
 from plover_vm.memory.bus import MemoryBus
+
+WIDE_BRANCH_OPS = frozenset({OP_BEQ, OP_JMP, OP_CALL})
 
 
 class MacroFastPath:
@@ -34,6 +38,7 @@ class MacroFastPath:
         self.flag_z = False
         self.flag_c = False
         self.halted = False
+        self._ret_stack: list[int] = []
 
     def _read_byte(self, addr: int) -> int:
         return self.bus.read_cpu(addr) & 0xFF
@@ -48,6 +53,12 @@ class MacroFastPath:
             imm16 = self._read_byte(fa + 1) | (self._read_byte(fa + 2) << 8)
             self.pc = (fa + 3) & 0xFFFF
             imm = imm16
+        elif op in WIDE_BRANCH_OPS:
+            imm = self._read_byte(fa + 1) | (self._read_byte(fa + 2) << 8)
+            self.pc = (fa + 3) & 0xFFFF
+        elif op in (OP_RET, OP_HALT, OP_ADD_RR):
+            imm = 0
+            self.pc = (fa + 1) & 0xFFFF
         else:
             imm = self._read_byte(fa + 1)
             self.pc = (fa + 2) & 0xFFFF
@@ -95,6 +106,12 @@ class MacroFastPath:
                 self.pc = imm & 0xFFFF
         elif op == OP_JMP:
             self.pc = imm & 0xFFFF
+        elif op == OP_CALL:
+            self._ret_stack.append(self.pc & 0xFFFF)
+            self.pc = imm & 0xFFFF
+        elif op == OP_RET:
+            if self._ret_stack:
+                self.pc = self._ret_stack.pop() & 0xFFFF
         elif op == OP_LDIO:
             self.regs[0] = self._read_byte(imm)
         elif op == OP_STIO:

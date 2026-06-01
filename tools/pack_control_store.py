@@ -76,6 +76,8 @@ def sequences() -> dict[int, list[int]]:
             pack_cw(alu_op=ALU_NOP),
         ],
         OP_JMP: [pack_cw(alu_op=ALU_NOP)],
+        OP_CALL: [pack_cw(alu_op=ALU_NOP)],
+        OP_RET: [pack_cw(alu_op=ALU_NOP)],
         OP_HALT: [pack_cw(alu_op=ALU_NOP)],
     }
 

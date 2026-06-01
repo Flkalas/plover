@@ -60,9 +60,9 @@ Verify: `python tools/verify_control_store.py`.
 | STA `0x03` | 2 | 12, 13 | `04`, `01` | packed |
 | BEQ `0x04` | 2 | 16, 17 | `24`, `00` | packed |
 | JMP `0x05` | 1 | 20 | `00` | packed |
+| CALL `0x06` | 1 | 24 | `00` | packed |
+| RET `0x07` | 1 | 28 | `00` | packed |
 | HALT `0x0A` | 1 | 40 | `00` | packed |
-| CALL `0x06` | — | — | — | TBD |
-| RET `0x07` | — | — | — | TBD |
 | LDIO `0x08` | — | — | — | TBD |
 | STIO `0x09` | — | — | — | TBD |
 
