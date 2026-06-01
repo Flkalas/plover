@@ -89,6 +89,25 @@ def test_monitor_ram_and_vfdd():
     assert "VFDD_FILES_" in out and "VFDD_USED_SECT_" in out
 
 
+def test_monitor_gpio_dev_serial():
+    import subprocess
+    import sys
+
+    root = Path(__file__).resolve().parents[1]
+    proc = subprocess.run(
+        [sys.executable, "-m", "plover_vm", "dos-shell"],
+        cwd=root,
+        input="mon dev\nmon gpio\nmon serial\nexit\n",
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    out = proc.stdout
+    assert "DEV_SLOT_" in out
+    assert "GPIO_PORTA_" in out
+    assert "SERIAL_SIG_D4" in out
+
+
 def test_ldrun_and_link_monitors():
     import subprocess
     import sys

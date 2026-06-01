@@ -154,6 +154,22 @@ class DosRuntime:
                 for e in entries:
                     used += (e.size_bytes + 511) // 512
                 self._emit(f"VFDD_FILES_{len(entries)} VFDD_USED_SECT_{used} VFDD_TOTAL_SECT_64", out)
+            elif parts[1].lower() == "gpio":
+                port = self.kernel.gpio.read_port()
+                self._emit(f"GPIO_PORTA_{port:02X}", out)
+            elif parts[1].lower() == "serial":
+                st = self.kernel.serial.status()
+                self._emit(
+                    f"SERIAL_SIG_{self.kernel.serial.signature:02X} STATUS_{st:02X} TXQ_{len(self.kernel.serial.tx_fifo)} RXQ_{len(self.kernel.serial.rx_fifo)}",
+                    out,
+                )
+            elif parts[1].lower() == "dev":
+                if not self.kernel.state.device_table:
+                    self._emit("DEV empty", out)
+                else:
+                    for slot, drv in sorted(self.kernel.state.device_table.items()):
+                        sig = self.kernel.state.slot_signatures.get(slot, 0xFF)
+                        self._emit(f"DEV_SLOT_{slot} SIG_{sig:02X} DRV_{drv}", out)
             elif parts[1].lower() == "map":
                 if not self.last_link_map:
                     self._emit("MAP empty", out)
@@ -168,7 +184,7 @@ class DosRuntime:
             elif parts[1].lower() == "rel":
                 self._emit(f"RELOC_APPLIED_{self.last_link_reloc_count}", out)
             else:
-                self._emit("ERR usage: mon [cpu|ram|vfdd|map|sym|rel]", out)
+                self._emit("ERR usage: mon [cpu|ram|vfdd|gpio|serial|dev|map|sym|rel]", out)
         elif cmd == "asmrun":
             if len(parts) < 2:
                 self._emit("ERR usage: asmrun <path.asm>", out)
@@ -195,7 +211,10 @@ class DosRuntime:
                     plr = pack_plr(PlrImage(load_addr=0x2800, entry_off=0, code=bytes(res.bytes)))
                     self._run_plr_bytes("CCRUN.PLR", plr, out)
         elif cmd == "help":
-            self._emit("dir run ldrun type del mon [cpu|ram|vfdd|map|sym|rel] asmrun ccrun help exit", out)
+            self._emit(
+                "dir run ldrun type del mon [cpu|ram|vfdd|gpio|serial|dev|map|sym|rel] asmrun ccrun help exit",
+                out,
+            )
         elif cmd == "exit":
             self._emit("BYE", out)
             return out
