@@ -18,6 +18,10 @@ Design notes and **hwsim** for Plover — **v0.1 CPU** (574×4 GPR + ATF1504AS s
 | [plans/](plans/) | Active bring-up plans (B3) |
 | [alu-opcodes-timing.md](alu-opcodes-timing.md) | ALU comb delay |
 | [hw-sim.md](hw-sim.md) | `python -m hwsim` · `plover_vm` |
+| [hw-bringup-alu8-assembly-spec.md](hw-bringup-alu8-assembly-spec.md) | ALU8 단계별 조립 — **Phase B2** (16 IC, `153_L`, `7485`) |
+| [hw-bringup-cpld-programming.md](hw-bringup-cpld-programming.md) | CPLD ATF1504 소각·ISP |
+| [hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md) | GPR 574×4 ↔ ALU 배선 |
+| [hw-bringup-b3.md](hw-bringup-b3.md) | ALU + 574 ACC + 2 MHz |
 | [reviewer-handoff.md](reviewer-handoff.md) | **검토자 인수인계** |
 | [roadmap-next.md](roadmap-next.md) | Roadmap |
 | [fpga-target-guide.md](fpga-target-guide.md) | **FPGA / Verilog** 타깃·교육 보드·외부 ROM/RAM (기준 문서) |

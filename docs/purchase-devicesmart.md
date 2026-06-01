@@ -9,6 +9,21 @@ Plover 프로젝트 **초기 부품 주문** 기록.
 | 대상 | v0.1 **1차** 실구매 · [BOM.md](../BOM.md) |
 | 주문 상태 | 상품준비중 (전 품목) |
 
+### Phase B2 delta (ALU vs 1차 주문 above)
+
+현행 [BOM.md](../BOM.md): ALU **16** DIP IC (Phase B2 Gigatron `153_L`). Relative to quantities in the table below (1차 주문 시점):
+
+| Part | Δ (1차 주문 대비 현행 BOM) |
+|------|---------------------------|
+| 74HC153 | **+4** (총 **8**: `153_B`×4 + logic×4) |
+| 74HC85 | **+2** (CMP) |
+| 74HC157 | **−3** (B3 addr MUX 제외 시 ALU **2** only) |
+| 74HC86 | **0** (1차 2개 — **B2에서 ALU 미사용**, 여유/반환) |
+| 74HC08 / 32 | **0** (1차 각 2 — **B2에서 ALU 미사용**) |
+| 74HC04 | **+1** (~B only; NOT용 04 제거) |
+
+*이전 Phase A(24 IC) 대비 B2: −08×2, −32×2, −86×2, −157_OUT×2, −04 NOT×2.*
+
 ---
 
 ## 품목 목록

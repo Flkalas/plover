@@ -68,6 +68,8 @@ Details: [bootloader.md](bootloader.md) · [memory-map.md](memory-map.md).
 | [memory-map.md](memory-map.md) | Address map, Mode A/B |
 | [rom-architecture.md](rom-architecture.md) | Control / Boot / Utility segments |
 | [cpld-system-controller.md](cpld-system-controller.md) | CPLD ports, decode, GPR load |
+| [hw-bringup-cpld-programming.md](hw-bringup-cpld-programming.md) | ATF1504 ISP·소각 시방 |
+| [hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md) | 574×4 GPR ↔ ALU 배선 |
 | [microcode-spec.md](microcode-spec.md) | 8b CW, ISA, Reg_Sel table |
 | [mailbox-protocol.md](mailbox-protocol.md) | `$FF00` MMIO, polling |
 | [rp2350-coprocessor.md](rp2350-coprocessor.md) | Copro board, firmware contract |

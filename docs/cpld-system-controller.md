@@ -1,7 +1,9 @@
 ﻿# CPLD System Controller v0.1
 
 **Device:** ATF1504AS-10JU44 · **Role:** passive comb decode + GPR load enables  
-**Replaces:** [cpld-hybrid-v1.3.md](cpld-hybrid-v1.3.md) (GPR-in-CPLD — **superseded**)
+**Replaces:** [cpld-hybrid-v1.3.md](archive/pre-v0.1/cpld-hybrid-v1.3.md) (GPR-in-CPLD — **superseded**)
+
+**Bring-up:** [hw-bringup-cpld-programming.md](hw-bringup-cpld-programming.md) (JTAG/소각) · [hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md) (574↔ALU 배선)
 
 ---
 

@@ -1,5 +1,7 @@
 # Archived documentation
 
+> **Note:** Some files describe **pre–Phase A** ALU bring-up (22 IC, `86_INV` / `157_B`, `net_sub_en`). Current design: [alu8.md](../../hw/netlist/blocks/alu8.md), [BOM.md](../../BOM.md).
+
 Material kept for reference but not part of the active **hwsim** electrical-simulation workflow.
 
 | Path | Contents |

@@ -51,6 +51,7 @@ Verification: `python -m hwsim run --all` (15) · `python -m pytest tests/ -q` �
 - 574×4 GPR + ATF1504AS decode + 64 KB SRAM + single NOR
 - MAP_MODE switch, reset @ `$FFFC`
 - Gate: mem decode matches [memory-map.md](memory-map.md)
+- Wiring: [hw-bringup-cpld-programming.md](hw-bringup-cpld-programming.md) · [hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md)
 
 ### M3 — Microcode + macro bring-up
 

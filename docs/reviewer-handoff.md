@@ -61,13 +61,15 @@ python -m pytest tests/ -q
 ### 4.1 실행
 
 ```bash
-python -m hwsim run --all              # 17 tests
+python -m hwsim run --all              # 16 tests (see hw-sim.md)
 python -m hwsim run hw/tests/alu8_full.yaml
 python -m hwsim run hw/tests/mem_decode.yaml
 ```
 
 아티팩트: `build/hwsim/<test>/` — `report.html`, `waves.json`, `timing_report.json`  
 뷰어: [hw/viewer/index.html](../hw/viewer/index.html)
+
+**ALU netlist regen (Phase B2):** `gen_alu_decode_netlist.py` → `gen_alu8_netlist.py` → `gen_alu_b3_netlist.py` → `gen_alu_b3_clock_netlist.py` → `gen_alu8_full_test.py` → `gen_alu8_opcode_timing.py` → `gen_opcode_cheatsheet.py` — see [hw-sim.md](hw-sim.md). ALU breadboard: **16** DIP IC ([BOM.md](../BOM.md)).
 
 ### 4.2 v2 회귀 테스트 (5건)
 
@@ -276,7 +278,7 @@ firmware/rp2350/mailbox_stub/main.c   RP2350 stub (normative doc 참조)
 ## 10. 검토 체크리스트 (제안)
 
 1. **명세** — [system-architecture.md](system-architecture.md) vs [BOM.md](../BOM.md) vs [memory-map.md](memory-map.md) 일치  
-2. **hwsim** — `python -m hwsim run --all` → **17/17 PASS**  
+2. **hwsim** — `python -m hwsim run --all` → **16/16 PASS**  
 3. **VM** — `python -m pytest tests/ -q` → **23/23 PASS**  
 4. **Decode** — `v2_mem_decode` 파형 vs [MapDecoder](../plover_vm/decode.py) truth table  
 5. **CW** — [pack_control_store.py](../tools/pack_control_store.py) 8b map vs [microcode-spec.md](microcode-spec.md)  
@@ -291,7 +293,7 @@ firmware/rp2350/mailbox_stub/main.c   RP2350 stub (normative doc 참조)
 python -m hwsim run --all && python -m pytest tests/ -q && python tools/run_fib_demo.py && python tools/run_fib_20000_demo.py
 ```
 
-성공 시: hwsim 17 PASS, pytest 23 PASS, Fib last=144, Fib16 last=17711.
+성공 시: hwsim 16 PASS, pytest 23 PASS, Fib last=144, Fib16 last=17711.
 
 ---
 

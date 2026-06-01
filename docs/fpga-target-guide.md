@@ -56,7 +56,7 @@ FPGA 구현의 **정합성 검증 1차 기준**은 `python -m pytest tests/ -q` 
 
 | 블록 | TTL v0.1 | FPGA 권장 매핑 |
 |------|----------|----------------|
-| **alu8** | 74HC 22 IC | 단일 **8b ALU** 모듈 (12 opcode, [alu-opcodes-timing.md](alu-opcodes-timing.md)) |
+| **alu8** | 74HC **24** IC (TTL) | 단일 **8b ALU** 모듈 (12 opcode + 병렬 CMP, [alu-opcodes-timing.md](alu-opcodes-timing.md)) |
 | **GPR** | 574×4 | 레지스터 파일 **32 bit** + MBR/PCH/flags |
 | **system_ctrl** | ATF1504AS ≤64 MC | **조합** decode (상태 레지스터 없음, [cpld-system-controller.md](cpld-system-controller.md)) |
 | **CW** | SST39 @ `$4000` + `{opcode,phase}` | **BRAM** 또는 외부 SPI/병렬 Flash |
@@ -201,7 +201,7 @@ Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있
 
 ### 6.2 ALU 타이밍
 
-조합 ALU worst **169 ns @ max** ([alu-opcodes-timing.md](alu-opcodes-timing.md)) — **2 MHz** (250 ns 반주기) **충분**. **50 MHz** (20 ns)에서는 **행위적 단일 사이클 ALU** 가 일반적.
+조합 ALU worst **151 ns @ max** (SUB Y; B1 arith path, [alu-opcodes-timing.md](alu-opcodes-timing.md)) — **2 MHz** (250 ns 반주기) **충분** (slack ~99 ns). Logic opcodes **46 ns** (B2 `153_L`). CMP flags via **comparator** (~65 ns). **50 MHz** (20 ns)에서는 **행위적 단일 사이클 ALU** 가 일반적.
 
 ---
 
