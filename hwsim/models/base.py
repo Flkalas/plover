@@ -376,47 +376,10 @@ class Hc138(ChipModel):
             self._drive(f"Y{i}", y, t, "decode")
 
 
-class Hc85(ChipModel):
-    """74HC85 4-bit magnitude comparator with cascade inputs."""
+class AluCmpFromSub(ChipModel):
+    """CMP flags from SUB datapath: Z = (Y==0), C_GE = net_c_hi (no 74HC85 on breadboard)."""
 
-    part = "74HC85"
-
-    def on_start(self) -> None:
-        self._update()
-
-    def on_net_change(self, net: str) -> None:
-        self._update()
-
-    def _nibble(self, prefix: str) -> int | None:
-        bits = [self.read_bit(f"{prefix}{i}") for i in range(4)]
-        if any(b > 1 for b in bits):
-            return None
-        v = 0
-        for i, b in enumerate(bits):
-            v |= b << i
-        return v
-
-    def _update(self) -> None:
-        a = self._nibble("A")
-        b = self._nibble("B")
-        ci_gt = self.read_bit("IAB_GT")
-        ci_lt = self.read_bit("IAB_LT")
-        ci_eq = self.read_bit("IAB_EQ")
-        if a is None or b is None or ci_gt > 1 or ci_lt > 1 or ci_eq > 1:
-            return
-        o_eq = 1 if (ci_eq and a == b) else 0
-        o_gt = 1 if (ci_gt or (ci_eq and a > b)) else 0
-        o_lt = 1 if (ci_lt or (ci_eq and a < b)) else 0
-        t = self.t_pd("74HC85", "t_pd", default=25)
-        self._drive("OAB_GT", o_gt, t, "cmp")
-        self._drive("OAB_LT", o_lt, t, "cmp")
-        self._drive("OAB_EQ", o_eq, t, "cmp")
-
-
-class AluCmpMerge(ChipModel):
-    """Merge cascaded 7485 outputs into 8-bit Z and unsigned A>=B (C)."""
-
-    part = "ALU_CMP_MERGE"
+    part = "ALU_CMP_SUB"
 
     def on_start(self) -> None:
         self._update()
@@ -425,16 +388,20 @@ class AluCmpMerge(ChipModel):
         self._update()
 
     def _update(self) -> None:
-        pins = ("LO_GT", "LO_LT", "LO_EQ", "HI_GT", "HI_LT", "HI_EQ")
-        vals = [self.read_bit(p) for p in pins]
-        if any(v > 1 for v in vals):
+        b_sel = self.read_bit("B_SEL")
+        cin = self.read_bit("CIN")
+        if b_sel != 1 or cin != 1:
             return
-        lo_gt, lo_lt, lo_eq, hi_gt, hi_lt, hi_eq = vals
-        z = 1 if (lo_eq and hi_eq) else 0
-        c_ge = 1 if (hi_gt or (hi_eq and lo_gt) or (hi_eq and lo_eq)) else 0
-        t = self.t_pd("ALU_CMP_MERGE", "t_pd", default=5)
-        self._drive("Z", z, t, "cmp_merge")
-        self._drive("C_GE", c_ge, t, "cmp_merge")
+        ys = [self.read_bit(f"Y{i}") for i in range(8)]
+        if any(y > 1 for y in ys):
+            return
+        z = 1 if all(y == 0 for y in ys) else 0
+        c_hi = self.read_bit("C_HI")
+        if c_hi > 1:
+            return
+        t = self.t_pd("ALU_CMP_SUB", "t_pd", default=151)
+        self._drive("Z", z, t, "cmp_sub")
+        self._drive("C_GE", c_hi, t, "cmp_sub")
 
 
 class Hc153Slice(ChipModel):
@@ -724,8 +691,7 @@ def create_model(ref: str, part: str, pins: dict[str, str], ctx: SimContext) -> 
         "74HC153": Hc153,
         "ALU_153_SLICE": Hc153Slice,
         "74HC157": Hc157,
-        "74HC85": Hc85,
-        "ALU_CMP_MERGE": AluCmpMerge,
+        "ALU_CMP_SUB": AluCmpFromSub,
         "ALU_Y_MUX_SEL": AluYMuxSel,
         "74HC08": Hc08,
         "74HC32": Hc32,

@@ -1,6 +1,6 @@
 netlist: ../netlist/blocks/alu8.yaml
 timing: max
-duration_ns: 900
+duration_ns: 1400
 stimulus:
   - at_ns: 0
     set:
@@ -20,8 +20,8 @@ stimulus:
       net_b5: 0
       net_b6: 0
       net_b7: 0
-      net_cin: 0
-      net_b_sel: 0
+      net_cin: 1
+      net_b_sel: 1
       net_b_const_sel: 0
       net_153_s0: 0
       net_153_s1: 0
@@ -29,14 +29,7 @@ stimulus:
       net_lgc1: 0
       net_lgc2: 0
       net_lgc3: 0
-      net_b_const_bit1: 0
-      net_b_const_bit2: 0
-      net_b_const_bit3: 0
-      net_b_const_bit4: 0
-      net_b_const_bit5: 0
-      net_b_const_bit6: 0
-      net_b_const_bit7: 0
-  - at_ns: 400
+  - at_ns: 500
     set:
       net_b0: 0
       net_b1: 0
@@ -47,9 +40,9 @@ stimulus:
       net_b6: 0
       net_b7: 0
 expect:
-  - at_ns: 350
+  - at_ns: 600
     net_cmp_z: 1
     net_cmp_c_ge: 1
-  - at_ns: 750
+  - at_ns: 1200
     net_cmp_z: 0
     net_cmp_c_ge: 0

@@ -25,13 +25,9 @@ ALU_153_SLICE:
   t_pd: {typ_ns: 17, max_ns: 28}
   source: "Gigatron ALU bit-slice (one 4:1 mux of 74HC153)"
 
-74HC85:
-  t_pd: {typ_ns: 20, max_ns: 30}
-  source: "Nexperia 74HC85 — compare to output"
-
-ALU_CMP_MERGE:
-  t_pd: {typ_ns: 2, max_ns: 5}
-  source: "Combinational flag merge (CPLD or 08/32 glue in hardware)"
+ALU_CMP_SUB:
+  t_pd: {typ_ns: 95, max_ns: 151}
+  source: "CMP flags from SUB Y and net_c_hi (same order as SUB critical path)"
 
 ALU_Y_MUX_SEL:
   t_pd: {typ_ns: 2, max_ns: 5}

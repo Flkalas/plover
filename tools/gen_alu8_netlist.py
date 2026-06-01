@@ -68,20 +68,17 @@ def _emit_157_ybp(lines: list[str], chip: int) -> None:
     lines += ["      S: net_y_mux_sel", "      OE: pwr_gnd", "      VCC: pwr_vcc", "      GND: pwr_gnd"]
 
 
-def _emit_85(lines: list[str], tag: str, a_lo: int, ia_gt: str, ia_lt: str, ia_eq: str, o_gt: str, o_lt: str, o_eq: str) -> None:
-    lines += [f"  - ref: U_ALU_85_{tag}", "    part: 74HC85", "    pins:"]
-    for i in range(4):
-        lines.append(f"      A{i}: net_a{a_lo + i}")
-        lines.append(f"      B{i}: net_b{a_lo + i}")
+def _emit_cmp_sub(lines: list[str]) -> None:
+    """CMP Z/C_GE from SUB result (Y==0, c_hi); no 74HC85 on breadboard."""
+    lines += ["  - ref: U_ALU_CMP_SUB", "    part: ALU_CMP_SUB", "    pins:"]
+    for i in range(8):
+        lines.append(f"      Y{i}: net_y{i}")
     lines += [
-        f"      IAB_GT: {ia_gt}",
-        f"      IAB_LT: {ia_lt}",
-        f"      IAB_EQ: {ia_eq}",
-        f"      OAB_GT: {o_gt}",
-        f"      OAB_LT: {o_lt}",
-        f"      OAB_EQ: {o_eq}",
-        "      VCC: pwr_vcc",
-        "      GND: pwr_gnd",
+        "      C_HI: net_c_hi",
+        "      B_SEL: net_b_sel",
+        "      CIN: net_cin",
+        "      Z: net_cmp_z",
+        "      C_GE: net_cmp_c_ge",
     ]
 
 
@@ -120,32 +117,7 @@ def main() -> None:
         "      SEL: net_y_mux_sel",
     ]
 
-    _emit_85(lines, "LO", 0, "pwr_gnd", "pwr_gnd", "pwr_vcc", "net_cmp_lo_gt", "net_cmp_lo_lt", "net_cmp_lo_eq")
-    _emit_85(
-        lines,
-        "HI",
-        4,
-        "net_cmp_lo_gt",
-        "net_cmp_lo_lt",
-        "net_cmp_lo_eq",
-        "net_cmp_hi_gt",
-        "net_cmp_hi_lt",
-        "net_cmp_hi_eq",
-    )
-
-    lines += [
-        "  - ref: U_ALU_CMP_MERGE",
-        "    part: ALU_CMP_MERGE",
-        "    pins:",
-        "      LO_GT: net_cmp_lo_gt",
-        "      LO_LT: net_cmp_lo_lt",
-        "      LO_EQ: net_cmp_lo_eq",
-        "      HI_GT: net_cmp_hi_gt",
-        "      HI_LT: net_cmp_hi_lt",
-        "      HI_EQ: net_cmp_hi_eq",
-        "      Z: net_cmp_z",
-        "      C_GE: net_cmp_c_ge",
-    ]
+    _emit_cmp_sub(lines)
 
     lines.append("nets:")
     for i in range(8):
@@ -161,12 +133,6 @@ def main() -> None:
         "net_lgc2",
         "net_lgc3",
         "net_y_mux_sel",
-        "net_cmp_lo_gt",
-        "net_cmp_lo_lt",
-        "net_cmp_lo_eq",
-        "net_cmp_hi_gt",
-        "net_cmp_hi_lt",
-        "net_cmp_hi_eq",
     ):
         lines += [f"  - name: {name}", "    width: 1"]
     lines += [
