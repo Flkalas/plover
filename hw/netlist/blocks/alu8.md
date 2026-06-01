@@ -1,82 +1,91 @@
 # 8-bit ALU block (`alu8.yaml`)
 
-BOM **20** 74HC IC (hwsim **52** gate-level instances), 12 `alu_sel` operations per [microcode-spec](../../../archive/verilog-sim/docs/microcode-spec.md).
+BOM **16** 74HC DIP IC (hwsim **~30** instances + behavioral glue), 12 `alu_sel` operations per [microcode-spec](../../../archive/verilog-sim/docs/microcode-spec.md).
 
-Integrated with 574: [`alu_b3.yaml`](alu_b3.yaml) · bring-up: [`docs/hw-bringup-b3.md`](../../../docs/hw-bringup-b3.md).
+**Phase A:** `153_B` B-path MUX · **CMP:** `7485`×2 + `ALU_CMP_MERGE`.  
+**Phase B1:** `153_B`→`283` 직결 · 산술 Y **`157_YBP`** (sum bypass).  
+**Phase B2:** Gigatron **`153_L`** bit-slices (`ALU_153_SLICE`) — **08/32/86/04_N/157_OUT 제거**.
+
+Integrated with 574: [`alu_b3.yaml`](alu_b3.yaml) · design: [`docs/alu8-phase-b.md`](../../../docs/alu8-phase-b.md) · bring-up: [`docs/hw-bringup-alu8-assembly-spec.md`](../../../docs/hw-bringup-alu8-assembly-spec.md).
 
 ## IC map (physical)
 
 | Ref prefix | Part | Qty | Role |
 |------------|------|-----|------|
 | `U_ALU_283_LO/HI` | 74HC283 | 2 | 8-bit ripple adder |
-| `U_ALU_153_0..3` | 74HC153 | 4 | Per-bit 4:1 output MUX (sum/and/or/xor-or-not) |
-| `U_ALU_86_INV_*` | 74HC86 | 2 (8 gates) | `B[i] XOR sub_en` for subtract |
-| `U_ALU_86_XOR_*` | 74HC86 | 2 (8 gates) | `A[i] XOR B[i]` for XOR op |
-| `U_ALU_08_*`, `U_ALU_32_*` | 74HC08/32 | 2 each | 8-bit AND / OR |
-| `U_ALU_04_N*` | 74HC04 | 2 (8 inv) | 8-bit NOT (~A) |
-| `U_ALU_157_B_*` | 74HC157 | 2 | Stage-1: register B vs ~B |
-| `U_ALU_157_B2_*` | 74HC157 | 2 | Stage-2: path vs INC/DEC constant → `net_b_add*` |
-| `U_ALU_157_OUT_*` | 74HC157 | 2 | XOR vs ~A into 153 C3 |
+| `U_ALU_153_B_0..3` | 74HC153 | 4 | B-path 4:1: B, ~B, INC `0x01`, DEC `0xFF` |
+| `U_ALU_153_L_0..7` | ALU_153_SLICE | 8 | Gigatron logic mux → `net_y_logic` (1 mux / bit) |
+| `U_ALU_157_YBP_*` | 74HC157 | 2 | Arith bypass: sum vs `net_y_logic` → `net_y` |
+| `U_ALU_Y_MUX_SEL` | *(behavioral)* | 1 | `net_y_mux_sel` = `153_s0 \| 153_s1` |
+| `U_ALU_04_BINV_*` | 74HC04 | 8 (gates) | `~B[i]` for 153_B C1 |
+| `U_ALU_85_LO/HI` | 74HC85 | 2 | CMP unsigned compare (parallel to SUB) |
+| `U_ALU_CMP_MERGE` | *(behavioral)* | 1 | `cmp_z`, `cmp_c_ge` from cascaded 85 |
 
-Regenerate netlist: `python tools/gen_alu8_netlist.py`
+Breadboard: map eight `ALU_153_SLICE` models to **four** 74HC153 packages (one 4:1 mux per DIP) or eight singles — see [`docs/alu8-phase-b.md`](../../../docs/alu8-phase-b.md).
 
-## Control nets (VLIW / test stimulus)
+Regenerate:
+
+```bash
+python tools/gen_alu_decode_netlist.py
+python tools/gen_alu8_netlist.py
+```
+
+## B-path select (`153_B`)
+
+`A` = `net_b_sel`, `B` = `net_b_const_sel` → `sel = b_sel | (b_const_sel<<1)`:
+
+| sel | `b_const_sel` | `b_sel` | Input |
+|-----|---------------|---------|--------|
+| 0 | 0 | 0 | B |
+| 1 | 0 | 1 | ~B |
+| 2 | 1 | 0 | INC (`C2`: bit0=1, else 0) |
+| 3 | 1 | 1 | DEC (`C3`: all 1) |
+
+SUB/CMP: `b_sel=1`, `cin=1` (no `net_sub_en`).
+
+## Gigatron logic (`153_L`)
+
+Per bit: `sel = net_a[i] | (net_b[i]<<1)`; `C0..C3` = `net_lgc0..3` from decode ([`alu_decode.yaml`](alu_decode.yaml)) or test stimulus.
+
+| Pattern `lgc3:0` | Op |
+|------------------|-----|
+| `0001` | AND, PASS_A/B |
+| `0111` | OR |
+| `0110` | XOR |
+| `1000` | NOT (B=0 in vectors) |
+
+`net_153_s0/s1` → `net_y_mux_sel` → **157_YBP** picks sum vs logic.
+
+## CMP (`7485`)
+
+Parallel to SUB Y path; see [`alu8_cmp_85.yaml`](../../tests/alu8_cmp_85.yaml).
+
+## Control nets
 
 | Net | Role |
 |-----|------|
-| `net_a0..7`, `net_b0..7` | Operands (B register; INC/DEC use cascade, not direct B drive) |
-| `net_sub_en` | 1 → invert B through `86_INV` |
-| `net_cin` | 283 cascade carry in |
-| `net_b_sel` | 157 B stage-1: 0=B, 1=~B |
-| `net_b_const_sel` | 157 B2: 0=path, 1=INC/DEC constant pattern |
-| `net_b_const_bit1..7` | INC=0, DEC=1 (bit0 tied VCC in netlist) |
-| `net_b_add0..7` | 283 B inputs (after B2 cascade) |
-| `net_153_s0/s1` | Output MUX select (00=sum, 01=and, 10=or, 11=C3) |
-| `net_c3_sel` | 157 OUT: 0=xor on C3, 1=~A on C3 (NOT) |
-
-## `alu_sel` → control (block tests)
-
-| sel | Op | sub | cin | b_sel | b_const_sel | s1:s0 | c3_sel | B into adder |
-|-----|-----|-----|-----|-------|-------------|-------|--------|--------------|
-| 0 | NOP | 0 | 0 | 0 | 0 | 00 | 0 | 0 |
-| 1 | ADD | 0 | 0 | 0 | 0 | 00 | 0 | B |
-| 2 | SUB | 1 | 1 | 1 | 0 | 00 | 0 | ~B |
-| 3 | AND | 0 | 0 | 0 | 0 | 01 | 0 | — |
-| 4 | OR | 0 | 0 | 0 | 0 | 10 | 0 | — |
-| 5 | XOR | 0 | 0 | 0 | 0 | 11 | 0 | — |
-| 6 | NOT | 0 | 0 | 0 | 0 | 11 | 1 | — |
-| 7 | PASS_A | 0 | 0 | 0 | 0 | 01 | 0 | B=0xFF |
-| 8 | PASS_B | 0 | 0 | 0 | 0 | 01 | 0 | A=0xFF |
-| 9 | INC | 0 | 0 | 0 | **1** | 00 | 0 | **0x01** via B2 |
-| 10 | DEC | 0 | 0 | 0 | **1** | 00 | 0 | **0xFF** via B2 |
-| 11 | CMP | 1 | 1 | 1 | 0 | 00 | 0 | ~B |
-
-PASS uses AND with `0xFF` mask; SUB borrow flag is `~carry_hi` (see microcode C flag).
+| `net_lgc0..3` | 153_L constant inputs (Gigatron) |
+| `net_153_s0/s1` | Logic enable → `157_YBP` |
+| `net_b_sel`, `net_b_const_sel`, `net_cin` | B-path / carry |
 
 ## Critical paths (hwsim @ max, bit0)
 
-| Opcode | Path (ref.pin hops) |
-|--------|---------------------|
-| **SUB** | `86_INV_0.A` → `Y` → `157_B_0.1B` → `1Y` → `157_B2_0.1A` → `1Y` → `283_LO.B0` → `C4` → `283_HI.C4` → `153_0.1C0` → `1Y` |
-| **XOR** | `86_XOR_0.A` → `Y` → `157_OUT_0.4A` → `4Y` → `153_0.1C3` → `1Y` |
-
-Output-pin delay sum @ max: SUB **~169 ns**, XOR **~61 ns** (within 250 ns @ 2 MHz typ).
-
-Full opcode × delay tables: [`docs/alu-opcodes-timing.md`](../../../docs/alu-opcodes-timing.md).
+| Opcode | Path | max (ns) |
+|--------|------|----------|
+| **SUB / CMP** | `net_b0` → `04_BINV` → `153_B` → `283` → `157_YBP` | **151** |
+| **ADD / INC** | `283` → `157_YBP` | **108** |
+| **AND / OR / XOR / NOT / PASS** | `153_L` → `157_YBP` | **46** |
 
 ## Tests
 
 ```bash
 python -m hwsim run hw/tests/alu8_full.yaml
-python -m hwsim run hw/tests/alu8_timing.yaml
+python -m hwsim run hw/tests/alu8_opcode_timing.yaml
 python -m hwsim run hw/tests/alu_b3_sub_critical.yaml
-python -m hwsim run hw/tests/alu_b3_xor_critical.yaml
-python -m hwsim run hw/tests/alu_b3_latch.yaml
-python -m hwsim run hw/tests/alu_b3_inc_dec.yaml
 ```
 
-Sub-block adder only: [`alu283.yaml`](alu283.yaml).
+Vectors: [`tools/alu8_cases.py`](../../../tools/alu8_cases.py)
 
-## BOM delta
+## BOM
 
-ALU IC counts vs legacy 12-IC ALU: +2×86, +4×157, +2×04. Full buy list: [BOM.md](../../../BOM.md).
+[ BOM.md](../../../BOM.md) — ALU **16** DIP IC (system **36** 74HC).

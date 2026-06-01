@@ -1,18 +1,18 @@
 """v0.2 alu_op[3:0] → ALU control nets + cmp_n (from alu8_cases)."""
 from __future__ import annotations
 
-from alu8_cases import CASES
+from alu8_cases import CASES, LOGIC_C
 
 # Maps alu8_cases ctrl() keys to ALU net names.
 CTRL_NETS = [
-    "net_sub_en",
     "net_cin",
     "net_153_s0",
     "net_153_s1",
     "net_b_sel",
-    "net_c3_sel",
     "net_b_const_sel",
 ]
+
+LGC_NETS = ["net_lgc0", "net_lgc1", "net_lgc2", "net_lgc3"]
 
 B_CONST_HI_KEY = "b_const_hi"  # drives net_b_const_bit1..7 together
 
@@ -31,6 +31,9 @@ def opcode_control(op: int) -> dict[str, int]:
         break
     out["b_const_hi"] = hi
     out["net_cmp_n"] = 0 if op == 11 else 1
+    cpat = LOGIC_C.get(op, (0, 0, 0, 0))
+    for i, net in enumerate(LGC_NETS):
+        out[net] = cpat[i]
     return out
 
 
