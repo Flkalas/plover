@@ -75,6 +75,18 @@ def cmd_scenario(args: argparse.Namespace) -> int:
         print(f"stack: {res.stack}")
         print(f"output: {res.output}")
         return 1
+    if doc.get("kind") == "kernel":
+        from plover_vm.kernel_scenario import run_kernel_scenario
+
+        res = run_kernel_scenario(doc)
+        if res.ok:
+            print("PASS")
+            return 0
+        print("FAIL")
+        if res.error:
+            print(f"ERROR: {res.error}")
+        print(f"output: {res.output}")
+        return 1
     m = PloverMachine(engine=doc.get("engine", "fast"))
     root = Path(__file__).resolve().parents[1]
     for key, rel in doc.get("load", {}).items():

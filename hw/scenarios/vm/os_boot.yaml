@@ -1,0 +1,8 @@
+kind: kernel
+actions:
+  - type: boot
+expect:
+  output_contains:
+    - kernel_boot
+    - kernel_help
+
