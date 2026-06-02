@@ -33,6 +33,11 @@ ALU_Y_MUX_SEL:
   t_pd: {typ_ns: 2, max_ns: 5}
   source: "Combinational OR of 153_s0|153_s1 for 157 Y bypass (glue or 32 in hardware)"
 
+Y_BUS_BUF:
+  t_pd: {typ_ns: 8, max_ns: 11}
+  t_pz: {typ_ns: 8, max_ns: 12}
+  source: "74HC245-class Y→D buffer (CW Y_OE); per-bit tri-state"
+
 74HC151:
   t_pd: {typ_ns: 17, max_ns: 28}
   source: "Nexperia 74HC151 — select to Y"

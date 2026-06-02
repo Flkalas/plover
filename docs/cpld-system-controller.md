@@ -14,6 +14,8 @@
 3. Bus phase (φ1/φ2) from **74HC74** — CPLD combines with gates only.
 4. **GPR storage** is external **74HC574×4** — CPLD outputs `LOAD_R0..3` only.
 
+**hwsim:** `CPLD_SYSTEM_CTRL` is an **ideal comb stub** (`t_pd=0`). Micro-phases, CW, and clock live in [`plover_vm`](../plover_vm/) — not event-simulated with OSC.
+
 ---
 
 ## 2. Port list (draft)
@@ -41,6 +43,16 @@
 | `LOAD_R0..LOAD_R3` | 574 clock enables |
 | `bus_dir`, `bus_oe` | 245 / CPU vs RP2350 |
 | `y_oe`, `mem_rd`, `mem_wr` | From CW bits (buffered) |
+
+**Optional — CMP/BEQ bus safety:** If Flash CW is mis-programmed with `Y_OE=1` during compare, force the buffered output low:
+
+```vhdl
+-- ALU_OP from CW B7–B4; BEQ compare = opcode 0x04 phase 0
+CMP_ACTIVE <= (ALU_OP = x"B") or (OPCODE = x"04" and PHASE = "00");
+Y_OE_OUT   <= CW_Y_OE and (not CMP_ACTIVE);
+```
+
+Primary fix is microcode ([`CW_CMP_EXEC`](../tools/pack_control_store.py) `0xB0`, BEQ ph0 `0x20`); this CPLD term is a hardware fuse.
 
 ---
 

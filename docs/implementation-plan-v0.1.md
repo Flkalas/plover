@@ -27,7 +27,7 @@ Verification: `python -m hwsim run --all` (15) · `python -m pytest tests/ -q` �
 
 | Milestone | Status | Evidence |
 |-----------|--------|----------|
-| ALU bringup hwsim | Done | 10 tests — `alu8_*`, `alu_b3_*`, `bringup_b3c_clock` |
+| ALU bringup hwsim | Done | 17 tests — `alu8_*`, `alu_b3_*`, `cmp_y_oe_bus`; B3c clock = scope only |
 | Normative docs v0.1 | Done | 8 unversioned specs + BOM |
 | CPU gate hwsim | Done | `cpld_gpr_decode`, `regfile_574`, `mem_decode`, `monitor_poll`, `boot_handoff` |
 | Control store pack | Done | `tools/pack_control_store.py` → `cw.hex` (ADD–HALT packed) |

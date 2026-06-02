@@ -58,8 +58,8 @@ python tools/run_fib_20000_demo.py
 | 파일 | 내용 |
 |------|------|
 | [docs/README.md](docs/README.md) | v0.1 인덱스 |
-| [BOM.md](BOM.md) | v0.1 **5 V 빵판** 구매 목록 |
-| [BOM-3v3.md](BOM-3v3.md) | v0.1 **3.3 V PCB** 구매 목록 ([BOM.md](BOM.md) 대응) |
+| [BOM.md](BOM.md) | v0.1 **5 V 빵판** 부품 명세 (1세트) |
+| [BOM-3v3.md](BOM-3v3.md) | v0.1 **3.3 V PCB** 부품 명세 ([BOM.md](BOM.md) 대응) |
 | [docs/microcode-spec.md](docs/microcode-spec.md) | 8b CW · ISA |
 | [docs/memory-map.md](docs/memory-map.md) | Mode A/B map |
 | [docs/fpga-target-guide.md](docs/fpga-target-guide.md) | FPGA 타깃 · 교육 보드 · 향후 RTL 기준 |

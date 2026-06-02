@@ -93,4 +93,4 @@ Vectors: [`tools/alu8_cases.py`](../../../tools/alu8_cases.py)
 
 ## BOM
 
-[ BOM.md](../../../BOM.md) — ALU **14** DIP IC (system **34** 74HC).
+[ BOM.md](../../../BOM.md) — ALU **14** DIP IC · [bom-maintenance.md](../../../docs/bom-maintenance.md) — 검산/이력.

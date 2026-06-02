@@ -35,6 +35,7 @@ PHASE_COUNTS: dict[int, int] = {
     OP_LDIO: 2,
     OP_STIO: 2,
     OP_HALT: 1,
+    OP_CMP: 3,
 }
 
 

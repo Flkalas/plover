@@ -293,6 +293,38 @@ def _run_check(chk: dict[str, Any], ctx: SimContext, duration: int, errors: list
             errors.extend(ctx.violations)
         return {"type": ctype, "passed": ok, "violations": list(ctx.violations)}
 
+    if ctype == "y_bus_gate":
+        y_net = str(chk["y_net"])
+        d_net = str(chk["d_net"])
+        y_oe = int(chk.get("y_oe", 1))
+        at_ns = int(chk.get("at_ns", 600))
+        y_val = _net_at_time(ctx, y_net, at_ns)
+        d_val = _net_at_time(ctx, d_net, at_ns)
+        if y_oe == 1:
+            ok = y_val in (0, 1) and d_val == y_val
+            if not ok:
+                errors.append(
+                    f"y_bus_gate @ {at_ns}ns Y_OE=1: {d_net}={VALUE_NAMES.get(d_val, d_val)} "
+                    f"expected to follow {y_net}={VALUE_NAMES.get(y_val, y_val)}"
+                )
+        else:
+            ok = y_val in (0, 1) and d_val == 3
+            if not ok:
+                errors.append(
+                    f"y_bus_gate @ {at_ns}ns Y_OE=0: {d_net}={VALUE_NAMES.get(d_val, d_val)} "
+                    f"expected Z (bus isolated); {y_net}={VALUE_NAMES.get(y_val, y_val)} still driven by ALU"
+                )
+        return {
+            "type": ctype,
+            "passed": ok,
+            "at_ns": at_ns,
+            "y_oe": y_oe,
+            "y_net": y_net,
+            "d_net": d_net,
+            "y_value": VALUE_NAMES.get(y_val, y_val),
+            "d_value": VALUE_NAMES.get(d_val, d_val),
+        }
+
     return {"type": ctype, "passed": True}
 
 

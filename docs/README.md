@@ -66,4 +66,4 @@ Pre-v0.1 specs (v0.2 / v1.x): [archive/pre-v0.1/](archive/pre-v0.1/README.md)
 ## Project root
 
 - [../README.md](../README.md)
-- [../BOM.md](../BOM.md) (5 V 빵판) · [../BOM-3v3.md](../BOM-3v3.md) (3.3 V PCB)
+- [../BOM.md](../BOM.md) · [../BOM-3v3.md](../BOM-3v3.md) (부품 명세) · [bom-maintenance.md](bom-maintenance.md) (검산·이력·발주)

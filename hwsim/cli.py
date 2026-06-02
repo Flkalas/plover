@@ -14,6 +14,23 @@ from hwsim.pinout import format_pinout_table, list_parts, load_pinout
 from hwsim.netlist import load_netlist, validate_netlist
 from hwsim.report import write_report
 from hwsim.simulator import run_test
+from hwsim import yaml_util
+
+# OSC / recurring clock netlists — not simulated (VM + scope on real hardware).
+_CLOCK_NETLIST_MARKERS = ("b3_clock", "blocks/clock.yaml")
+
+
+def _clock_test_blocked(test_path: Path) -> str | None:
+    data = yaml_util.load_file(str(test_path))
+    if not isinstance(data, dict):
+        return None
+    rel = str(data.get("netlist", ""))
+    if any(m in rel for m in _CLOCK_NETLIST_MARKERS):
+        return (
+            "Clock/OSC hwsim is disabled (recurring toggle exhausts RAM). "
+            "Use plover_vm for micro-phases; alu_b3_latch for one 574 CP edge; scope for B3c."
+        )
+    return None
 
 
 def repo_root() -> Path:
@@ -52,6 +69,11 @@ def cmd_run(args: argparse.Namespace) -> int:
             tp = root / tp if (root / tp).exists() else tests_dir / tp.name
         if not tp.is_file():
             print(f"Missing test {tp}", file=sys.stderr)
+            failed += 1
+            continue
+        blocked = _clock_test_blocked(tp)
+        if blocked:
+            print(f"BLOCKED: {tp.stem} — {blocked}", file=sys.stderr)
             failed += 1
             continue
         result = run_test(tp, root)

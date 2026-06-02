@@ -11,7 +11,7 @@ Plover 프로젝트 **초기 부품 주문** 기록.
 
 ### Phase B2 delta (ALU vs 1차 주문 above)
 
-현행 [BOM.md](../BOM.md): ALU **14** DIP IC (Phase B2; CMP flags from SUB, **no 7485**). Relative to quantities in the table below (1차 주문 시점):
+현행 [BOM.md](../BOM.md) / [bom-maintenance.md](bom-maintenance.md): ALU **14** DIP IC (Phase B2; no 7485). Relative to quantities in the table below (1차 주문 시점):
 
 | Part | Δ (1차 주문 대비 현행 BOM) |
 |------|---------------------------|
@@ -139,10 +139,10 @@ Plover 프로젝트 **초기 부품 주문** 기록.
 
 ## v1.3 대비 추가 구매 필요
 
-**2026-06-01 2차 주문으로 아래 항목 발주 완료** — [purchase-2026-06-01-followup.md](purchase-2026-06-01-followup.md). 전체 목록: [BOM.md](../BOM.md).
+**2026-06-01 2차 · 2026-06-02 3차(주문 C)** — [purchase-2026-06-01-followup.md](purchase-2026-06-01-followup.md). 전체 목록: [BOM.md](../BOM.md).
 
-| MPN | 부족 (본 문서 시점) | 2차 후 |
-|-----|---------------------|--------|
+| MPN | 부족 (본 문서 시점) | 2·3차 후 |
+|-----|---------------------|----------|
 | ATF1504AS-10JU44 | +1 | ✓ |
 | PLCC-44→DIP-44 adapter | +1 | ✓ (AliExpress) |
 | 74HC14 (DIP) | +2 | ✓ |
@@ -150,6 +150,8 @@ Plover 프로젝트 **초기 부품 주문** 기록.
 | 74HC157 (DIP) | +3 | ✓ |
 | 74HC04 (DIP) | +2 | ✓ |
 | Mono 0.1 µF | +4 | ✓ (+100 Ali) |
+| 74HC153 (DIP) | +4 (ALU 총 8) | ✓ (주문 C) |
+| MAP_MODE / RESET switch | +1 each | ✓ slide×10 · tact×10 (주문 C) |
 
 *v1.2 ACC+TMP fallback만 조립할 경우 74HC574·157 추가 여유는 있음.*
 
@@ -161,3 +163,4 @@ Plover 프로젝트 **초기 부품 주문** 기록.
 |------|------|
 | 2026-06-01 | 디바이스마트 주문 내역 정리 (상품준비중) |
 | 2026-06-01 | 2차 보완 주문 → [purchase-2026-06-01-followup.md](purchase-2026-06-01-followup.md) |
+| 2026-06-02 | 3차 주문 C (153·스위치) → 동일 followup 문서 |

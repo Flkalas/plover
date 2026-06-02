@@ -58,7 +58,8 @@ Verify: `python tools/verify_control_store.py`.
 | ADD `0x01` | 3 | 4, 5, 6 | `14`, `14`, `1C` | packed |
 | LDA `0x02` | 2 | 8, 9 | `02`, `08` | packed |
 | STA `0x03` | 2 | 12, 13 | `04`, `01` | packed |
-| BEQ `0x04` | 2 | 16, 17 | `24`, `00` | packed |
+| BEQ `0x04` | 2 | 16, 17 | `20`, `00` | packed |
+| CMP `0x0D` | 3 | 52, 53, 54 | `B0`, `B0`, `00` | packed |
 | JMP `0x05` | 1 | 20 | `00` | packed |
 | CALL `0x06` | 1 | 24 | `00` | packed |
 | RET `0x07` | 1 | 28 | `00` | packed |
@@ -100,12 +101,27 @@ CW `00` means all control bits deasserted (ALU NOP). Unprogrammed slots also rea
 
 ### BEQ (`0x04`)
 
-Compare via ALU SUB; branch decision uses latched **Z** from phase 0 (macro engine).
+Compare via ALU SUB; branch decision uses latched **Z** from phase 0 (macro engine).  
+**Y_OE=0** on compare phase — flags only; ALU Y must not drive the data bus.
 
 | Ph | Idx | Flash | CW | Reg_Sel | ALU | REG_WE | Y_OE | MEM_RD | MEM_WR | Action |
 |----|-----|-------|-----|---------|-----|--------|------|--------|--------|--------|
-| 0 | 16 | `$4010` | `24` | 00 | SUB | 0 | 1 | 0 | 0 | R0 − imm → Y; update Z |
+| 0 | 16 | `$4010` | `20` | 00 | SUB | 0 | **0** | 0 | 0 | R0 − imm; update Z/C (no bus drive) |
 | 1 | 17 | `$4011` | `00` | 00 | NOP | 0 | 0 | 0 | 0 | Macro: PC ← target if Z |
+
+---
+
+### CMP (`0x0D`)
+
+R0 − imm; **flags only** (discard Y). Uses **`CW_CMP_EXEC`** = `0xB0` (`ALU_OP=CMP`, `Y_OE=0`, `REG_WE=0`).
+
+| Ph | Idx | Flash | CW | Reg_Sel | ALU | REG_WE | Y_OE | MEM_RD | MEM_WR | Action |
+|----|-----|-------|-----|---------|-----|--------|------|--------|--------|--------|
+| 0 | 52 | `$4034` | `B0` | 00 (R0) | CMP | 0 | **0** | 0 | 0 | A ← R0 |
+| 1 | 53 | `$4035` | `B0` | 01 (imm) | CMP | 0 | **0** | 0 | 0 | B ← imm; SUB flags settle |
+| 2 | 54 | `$4036` | `00` | — | NOP | 0 | 0 | 0 | 0 | (optional FLG latch ph — CPLD) |
+
+hwsim bus gate: [`cmp_y_oe_bus`](../hw/tests/cmp_y_oe_bus.yaml) — `Y_OE=1` drives `net_d*`; `Y_OE=0` → tri-state.
 
 ---
 
@@ -192,5 +208,6 @@ Maps to [alu8](hw/netlist/blocks/alu8.md) `alu_sel`:
 
 | Date | Note |
 |------|------|
+| 2026-06-02 | BEQ ph0 `Y_OE=0` (`20`); CMP `0x0D` packed (`B0`×2); `cmp_y_oe_bus` hwsim |
 | 2026-06-01 | 8b CW; external 574 GPR |
 | 2026-06-01 | §3 full packed table (ADD–HALT); CALL/RET/LDIO/STIO draft |

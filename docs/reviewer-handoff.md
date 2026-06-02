@@ -61,7 +61,7 @@ python -m pytest tests/ -q
 ### 4.1 실행
 
 ```bash
-python -m hwsim run --all              # 16 tests (see hw-sim.md)
+python -m hwsim run --all              # 17 tests (see hw-sim.md; no clock OSC)
 python -m hwsim run hw/tests/alu8_full.yaml
 python -m hwsim run hw/tests/mem_decode.yaml
 ```
@@ -278,7 +278,7 @@ firmware/rp2350/mailbox_stub/main.c   RP2350 stub (normative doc 참조)
 ## 10. 검토 체크리스트 (제안)
 
 1. **명세** — [system-architecture.md](system-architecture.md) vs [BOM.md](../BOM.md) vs [memory-map.md](memory-map.md) 일치  
-2. **hwsim** — `python -m hwsim run --all` → **16/16 PASS**  
+2. **hwsim** — `python -m hwsim run --all` → **17/17 PASS** (74HC comb; no OSC — VM + scope for clock/CPLD timing)  
 3. **VM** — `python -m pytest tests/ -q` → **23/23 PASS**  
 4. **Decode** — `v2_mem_decode` 파형 vs [MapDecoder](../plover_vm/decode.py) truth table  
 5. **CW** — [pack_control_store.py](../tools/pack_control_store.py) 8b map vs [microcode-spec.md](microcode-spec.md)  

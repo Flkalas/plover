@@ -23,10 +23,12 @@ OP_RET = 0x07
 OP_LDIO = 0x08
 OP_STIO = 0x09
 OP_HALT = 0x0A
+OP_CMP = 0x0D
 
 ALU_NOP = 0
 ALU_ADD = 1
 ALU_SUB = 2
+ALU_CMP = 11
 
 
 def pack_cw(
@@ -43,6 +45,11 @@ def pack_cw(
         | ((mem_rd & 1) << 1)
         | (mem_wr & 1)
     )
+
+
+# Compare / flag-only execute — ALU runs, result must not drive the data bus.
+CW_CMP_EXEC = pack_cw(alu_op=ALU_CMP, y_oe=0)  # 0xB0
+CW_BEQ_CMP = pack_cw(alu_op=ALU_SUB, y_oe=0)  # 0x20
 
 
 def cs_index(opcode: int, phase: int) -> int:
@@ -72,12 +79,15 @@ def sequences() -> dict[int, list[int]]:
             pack_cw(alu_op=ALU_NOP, mem_wr=1),
         ],
         OP_BEQ: [
-            pack_cw(alu_op=ALU_SUB, y_oe=1),
+            CW_BEQ_CMP,
+            pack_cw(alu_op=ALU_NOP),
+        ],
+        OP_CMP: [
+            CW_CMP_EXEC,
+            CW_CMP_EXEC,
             pack_cw(alu_op=ALU_NOP),
         ],
         OP_JMP: [pack_cw(alu_op=ALU_NOP)],
-        OP_CALL: [pack_cw(alu_op=ALU_NOP)],
-        OP_RET: [pack_cw(alu_op=ALU_NOP)],
         OP_HALT: [pack_cw(alu_op=ALU_NOP)],
     }
 

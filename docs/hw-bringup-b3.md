@@ -11,7 +11,7 @@ Electrical behavior is validated in hwsim before wiring.
 |-------|---------|-------|
 | **B3a** | [`alu8.yaml`](../hw/netlist/blocks/alu8.yaml) | `alu8_full.yaml` |
 | **B3b** | [`alu_b3.yaml`](../hw/netlist/blocks/alu_b3.yaml) | `alu_b3_latch.yaml` |
-| **B3c** | [`alu_b3_clock.yaml`](../hw/netlist/blocks/alu_b3_clock.yaml) | `bringup_b3c_clock.yaml` |
+| **B3c** | [`alu_b3_clock.yaml`](../hw/netlist/blocks/alu_b3_clock.yaml) | Wiring only — **scope** @ 2 MHz (no hwsim OSC) |
 
 Target clock (B3c): **2 MHz** — 500 ns period, **250 ns** comb budget before posedge.
 
@@ -133,12 +133,12 @@ Or reuse **B1** clock board; connect **`net_clk2` → `574 CP`** (remove push bu
 | 574 setup | `net_d0` | `net_clk2` | D stable ≥ 5 ns before ↑ |
 | MSB margin | `net_y7` | clk | SUB vector, MSB settled |
 
-**No scope:** `python -m hwsim run hw/tests/bringup_b3c_clock.yaml --report` → [`hw/viewer/index.html`](../hw/viewer/index.html).
+**B3c timing:** oscilloscope on real hardware — **not hwsim** (recurring OSC disabled). Pre-B3c comb margin: [`alu_b3_latch`](../hw/tests/alu_b3_latch.yaml) + [`alu_b3_sub_critical`](../hw/tests/alu_b3_sub_critical.yaml). Micro-phases / CW: `plover_vm` + [`microcode-spec.md`](microcode-spec.md).
 
-### hwsim
+### hwsim (comb only — no clock)
 
 ```bash
-python -m hwsim run hw/tests/bringup_b3c_clock.yaml
+python -m hwsim run hw/tests/alu_b3_latch.yaml
 python -m hwsim run --all
 ```
 
@@ -182,6 +182,6 @@ Full ALU refs: [`alu8.md`](../hw/netlist/blocks/alu8.md).
 | Y wrong (B3a) | Re-check cheat sheet; INC/DEC via **153_B** (`b_const_sel`); arith uses **157_YBP** |
 | Q ≠ Y after CP | Setup violation — slow CP edge or delay pulse until Y stable |
 | Q wrong @ 2 MHz | Scope Y vs clk; lower clock or shorten wires |
-| hwsim FAIL | `python -m hwsim run hw/tests/bringup_b3c_clock.yaml --report` |
+| hwsim FAIL | `python -m hwsim run hw/tests/alu_b3_latch.yaml --report`; B3c → scope |
 
 Regenerate (after `alu8` change): `gen_alu_decode_netlist.py` → `gen_alu8_netlist.py` → `gen_alu_b3_netlist.py` → `gen_alu_b3_clock_netlist.py` → `gen_alu8_full_test.py` → `gen_alu8_opcode_timing.py` → `gen_opcode_cheatsheet.py` — full order in [hw-sim.md](hw-sim.md).

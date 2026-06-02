@@ -1,18 +1,18 @@
 ATF1504AS:
   t_pd:
-    typ_ns: 10
-    max_ns: 15
+    typ_ns: 0
+    max_ns: 0
   t_clk_to_q:
-    typ_ns: 10
-    max_ns: 15
+    typ_ns: 0
+    max_ns: 0
   t_setup:
-    typ_ns: 5
-    max_ns: 8
-  source: "ATF1504AS-10 order-of-magnitude — v0.1 system controller"
+    typ_ns: 0
+    max_ns: 0
+  source: "Ideal comb in hwsim — real ATF1504AS timing validated on hardware / not event-simulated"
 
 CPLD_SYSTEM_CTRL:
-  t_pd: {typ_ns: 8, max_ns: 15}
-  source: "ATF1504AS comb decode — v0.1 system controller"
+  t_pd: {typ_ns: 0, max_ns: 0}
+  source: "Ideal system CPLD stub — micro-phases and clock in plover_vm"
 
 REGFILE_574_GPR:
   t_pd_q: {typ_ns: 15, max_ns: 23}
@@ -20,5 +20,5 @@ REGFILE_574_GPR:
   source: "74HC574 GPR behavioral"
 
 MAILBOX_MMIO:
-  t_pd: {typ_ns: 8, max_ns: 12}
-  source: "MMIO mailbox stub"
+  t_pd: {typ_ns: 0, max_ns: 0}
+  source: "MMIO mailbox ideal stub"

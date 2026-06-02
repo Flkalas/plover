@@ -11,11 +11,15 @@ sys.path.insert(0, str(ROOT))
 
 from tools.pack_control_store import (  # noqa: E402
     ALU_ADD,
+    ALU_CMP,
     ALU_NOP,
     ALU_SUB,
+    CW_BEQ_CMP,
+    CW_CMP_EXEC,
     CW_FLASH_BASE,
     OP_ADD,
     OP_BEQ,
+    OP_CMP,
     OP_HALT,
     OP_JMP,
     OP_LDA,
@@ -44,8 +48,11 @@ SPEC_DOC_ROWS = {
     (OP_LDA, 1): {"alu_op": ALU_NOP, "reg_we": 1, "y_oe": 0, "mem_rd": 0, "mem_wr": 0},
     (OP_STA, 0): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 1, "mem_rd": 0, "mem_wr": 0},
     (OP_STA, 1): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 1},
-    (OP_BEQ, 0): {"alu_op": ALU_SUB, "reg_we": 0, "y_oe": 1, "mem_rd": 0, "mem_wr": 0},
+    (OP_BEQ, 0): {"alu_op": ALU_SUB, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 0},
     (OP_BEQ, 1): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 0},
+    (OP_CMP, 0): {"alu_op": ALU_CMP, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 0},
+    (OP_CMP, 1): {"alu_op": ALU_CMP, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 0},
+    (OP_CMP, 2): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 0},
     (OP_JMP, 0): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 0},
     (OP_HALT, 0): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 0},
 }
@@ -122,6 +129,11 @@ def main() -> int:
     # 5. Flash base
     if CW_FLASH_BASE != 0x4000:
         errors.append(f"CW_FLASH_BASE = 0x{CW_FLASH_BASE:X}, spec says $4000")
+
+    if CW_CMP_EXEC != 0xB0:
+        errors.append(f"CW_CMP_EXEC = 0x{CW_CMP_EXEC:02X}, expected 0xB0")
+    if CW_BEQ_CMP != 0x20:
+        errors.append(f"CW_BEQ_CMP = 0x{CW_BEQ_CMP:02X}, expected 0x20 (SUB, Y_OE=0)")
 
     # 6. Packer must cover every packed spec row; no extra undocumented rows
     documented_keys = set(SPEC_DOC_ROWS.keys())

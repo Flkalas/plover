@@ -428,6 +428,42 @@ class Hc153Slice(ChipModel):
         self._drive("Y", val, t, "mux")
 
 
+class YBusBuf(ChipModel):
+    """CW Y_OE → tri-state ALU Y onto data bus (74HC245-style per bit)."""
+
+    part = "Y_BUS_BUF"
+
+    def on_start(self) -> None:
+        self._update()
+
+    def on_net_change(self, net: str) -> None:
+        if net == self.net_for("Y_OE"):
+            self._update()
+            return
+        for i in range(8):
+            pin = f"Y{i}"
+            if pin in self.pin_nets and net == self.net_for(pin):
+                self._update()
+                return
+
+    def _update(self) -> None:
+        oe = self.read_bit("Y_OE")
+        t = self.t_pd("Y_BUS_BUF", "t_pd", default=11)
+        if oe > 1:
+            return
+        for i in range(8):
+            pin_y, pin_d = f"Y{i}", f"D{i}"
+            if pin_y not in self.pin_nets or pin_d not in self.pin_nets:
+                continue
+            if oe == 1:
+                y = self.read_bit(pin_y)
+                if y > 1:
+                    return
+                self._drive(pin_d, y, t, "y_bus")
+            else:
+                self._drive(pin_d, 3, t, "high-z")
+
+
 class AluYMuxSel(ChipModel):
     """157 Y bypass select: SEL = S0|S1 (logic → B=net_y_logic, arith → A=net_sum)."""
 
@@ -513,7 +549,7 @@ _REG_SEL_TABLE: dict[tuple[int, int], int] = {
 
 
 class CpldSystemCtrl(ChipModel):
-    """Behavioral ATF1504AS system decode — comb only, no internal state."""
+    """Ideal comb ATF1504AS decode — zero internal state; t_pd=0 in hwsim (VM owns phase/clock)."""
 
     part = "CPLD_SYSTEM_CTRL"
 
@@ -536,7 +572,7 @@ class CpldSystemCtrl(ChipModel):
         return op & 0xF, ph & 3
 
     def _update(self, delay: int) -> None:
-        t = delay or self.t_pd("CPLD_SYSTEM_CTRL", "t_pd", default=8)
+        t = delay if delay else self.t_pd("CPLD_SYSTEM_CTRL", "t_pd", default=0)
         a = self._addr()
         rst = self.read_bit("RESET_N") == 0
         mb = 0xFF00 <= a <= 0xFFFB
@@ -692,6 +728,7 @@ def create_model(ref: str, part: str, pins: dict[str, str], ctx: SimContext) -> 
         "ALU_153_SLICE": Hc153Slice,
         "74HC157": Hc157,
         "ALU_CMP_SUB": AluCmpFromSub,
+        "Y_BUS_BUF": YBusBuf,
         "ALU_Y_MUX_SEL": AluYMuxSel,
         "74HC08": Hc08,
         "74HC32": Hc32,
