@@ -1,0 +1,13 @@
+netlist: ../../netlist/blocks/datapath_p1.yaml
+driver: micro
+opcode: 0x01
+operand: 0x34
+phases: 3
+init:
+  gpr:
+    0: 0x12
+    1: 0x34
+expect:
+  - at_phase: 2
+    gpr:
+      2: 0x46

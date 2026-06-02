@@ -7,6 +7,7 @@ Event-driven block-level simulator for **74HC TTL comb paths**. **Python 3.10+ s
 | Layer | Tool | Notes |
 |-------|------|-------|
 | **74HC ALU / decode** | **hwsim** | Datasheet `t_pd`, operand→Y slack @ 2 MHz budget |
+| **Gate netlist @ micro phase** | **[cyclesim](../cyclesim/)** | Zero-delay comb + 574 CP↑; see [cyclesim.md](cyclesim.md) |
 | **574 latch (one CP ↑)** | **hwsim** | Manual `net_clk` pulse — [`alu_b3_latch`](hw/tests/alu_b3_latch.yaml) |
 | **CPLD decode** | **hwsim ideal** | `CPLD_SYSTEM_CTRL` **t_pd=0** — comb truth table only |
 | **Micro-phases, CW, flags, branches** | **[plover_vm](../plover_vm/)** | Flash CW, `REG_WE`, `Y_OE`, CMP/BEQ |
@@ -110,9 +111,18 @@ Supported parts: `74HC74` (manual CP only in tests), `74HC04`, `74HC283`, `74HC5
 
 `OSC_4M` exists for netlist validate / wiring export only — **do not run timing tests** with recurring OSC.
 
+## cyclesim (structural, micro-phase)
+
+```bash
+python -m cyclesim run --all
+```
+
+Tests under `hw/tests/cyclesim/`. Full doc: [cyclesim.md](cyclesim.md).
+
 ## Related
 
 - [BOM.md](../BOM.md) — shopping list (5 V breadboard) · [bom-maintenance.md](bom-maintenance.md) — BOM audit/history · [purchase-devicesmart.md](purchase-devicesmart.md) — orders
+- [cyclesim.md](cyclesim.md) — netlist gate review vs plover_vm / hwsim
 - [alu-opcodes-timing.md](alu-opcodes-timing.md) — opcode slack table
 - [microcode-spec.md](microcode-spec.md) — CW / phases (VM)
 - [hw-bringup-b3.md](hw-bringup-b3.md) — breadboard bring-up

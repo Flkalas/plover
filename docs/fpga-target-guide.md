@@ -222,7 +222,7 @@ Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있
 | 등급 | 설명 | 검증 |
 |------|------|------|
 | **L0** | ALU8 단독 | hwsim opcode 표 · cocotb/iverilog |
-| **L1** | MicroEngine 1 phase = 1 clk | `plover_vm` micro vs RTL cycle compare |
+| **L1** | MicroEngine 1 phase = 1 clk | `plover_vm` micro vs [cyclesim](../cyclesim/) netlist vs RTL |
 | **L2** | Macro + fetch + [memory-map.md](memory-map.md) | `pytest` + hex 프로그램 |
 | **L3** | SDRAM/QSPI 메모리 래퍼 | 보드 특화; timing constraints |
 | **L4** | Mailbox + RP2350 | 시스템 통합 |
@@ -265,7 +265,7 @@ RTL 상단에서 **백엔드**만 교체할 수 있게 한다.
 | RTL sim | (예정) Verilator/Icarus + `hw/fixtures/sram/*.hex` |
 | FPGA on-board | (예정) SignalTap / LED — Fib 데모·단일 명령 스텝 |
 
-**Parity 목표:** 동일 hex 로드 시 **PC·GPR·Z/C·halt** 가 `plover_vm` micro/macro 와 일치 (fast 엔진과의 diff는 문서화).
+**Parity 목표:** 동일 hex 로드 시 **PC·GPR·Z/C·halt** 가 `plover_vm` micro/macro 와 일치 (fast 엔진과의 diff는 문서화). Execute 슬라이스: `python -m cyclesim run hw/tests/cyclesim/datapath_add_imm.yaml` + `pytest tests/test_cyclesim_parity.py`.
 
 ---
 

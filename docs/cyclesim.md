@@ -1,0 +1,72 @@
+# cyclesim — micro-phase structural simulator
+
+**Python 3.10+ stdlib only.** Sits between [plover_vm](../plover_vm/) (functional ISA) and [hwsim](../hwsim/) (ns `t_pd` timing).
+
+## Role
+
+| Tool | Time axis | ALU internals |
+|------|-----------|---------------|
+| plover_vm | micro phase | `alu8()` black box |
+| **cyclesim** | **micro phase** | **YAML netlist chips (zero-delay comb)** |
+| hwsim | nanoseconds | Same netlist + datasheet delays |
+
+One **tick** = one micro phase: apply CW / stimulus → combinational fixpoint → optional **574 CP ↑** when `REG_WE` and `LOAD_R*`.
+
+## Commands
+
+```bash
+python -m cyclesim validate hw/netlist/blocks/datapath_p1.yaml
+python -m cyclesim run --all
+python -m cyclesim run hw/tests/cyclesim/datapath_add_imm.yaml
+```
+
+Artifacts: `build/cyclesim/<test>/waves.json` (probe values keyed by **phase** index).
+
+## Test YAML
+
+```yaml
+netlist: ../../netlist/blocks/alu8_decode.yaml
+driver: stimulus   # or micro
+stimulus:
+  - at_phase: 0
+    set:
+      net_alu_op0: 1
+expect:
+  - at_phase: 0
+    net_y0: 1
+```
+
+Micro driver:
+
+```yaml
+driver: micro
+opcode: 0x01
+operand: 0x34
+phases: 3
+init:
+  gpr:
+    0: 0x12
+    1: 0x34
+expect:
+  - at_phase: 2
+    gpr:
+      2: 0x46
+```
+
+## Netlists
+
+| Block | Generator |
+|-------|-----------|
+| `datapath_p1.yaml` | `python tools/gen_datapath_p1_netlist.py` |
+| `alu8_decode.yaml` | `python tools/gen_alu8_netlist.py` (existing) |
+
+## Regeneration
+
+```bash
+python tools/gen_datapath_p1_netlist.py
+python tools/gen_cyclesim_decode_test.py
+python -m cyclesim run --all
+pytest tests/test_cyclesim_parity.py -q
+```
+
+See also [hw-sim.md](hw-sim.md).
