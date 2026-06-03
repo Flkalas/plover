@@ -15,7 +15,7 @@ class ExecResult:
     r0: int
 
 
-def spawn(machine: PloverMachine, fs: Plfs, name: str, *, engine: str = "micro") -> ExecResult:
+def spawn(machine: PloverMachine, fs: Plfs, name: str, *, engine: str = "fast") -> ExecResult:
     plr = unpack_plr(fs.read(name))
     machine.engine = engine
     machine.load_ram_bytes(plr.code, plr.load_addr)

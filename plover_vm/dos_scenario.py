@@ -71,7 +71,7 @@ class DosRuntime:
             self.fs.delete(plr_name)
         self.fs.create(plr_name, plr_bytes)
         self._reset_exec_state()
-        r = spawn(self.machine, self.fs, plr_name, engine="micro")
+        r = spawn(self.machine, self.fs, plr_name)
         self._emit(f"R0_{r.r0}", out)
 
     def _run_linked_plx(self, plx_paths: list[Path], out: list[str]) -> None:
@@ -108,7 +108,7 @@ class DosRuntime:
                         self._run_linked_plx([src], out)
                 else:
                     self._reset_exec_state()
-                    r = spawn(self.machine, self.fs, target, engine="micro")
+                    r = spawn(self.machine, self.fs, target)
                     self._emit(f"R0_{r.r0}", out)
         elif cmd == "ldrun":
             if len(parts) < 2:
@@ -235,7 +235,10 @@ def _prepare_runtime(root: Path, *, img_name: str = "dos_boot.img") -> DosRuntim
     fs.drv.write_sector(0, stage1)
 
     # HELLO.PLR app
-    res = assemble("        .ORG 0\n        ADD 7\n        HALT\n", origin=0)
+    res = assemble(
+        "        .ORG 0\n        ADD 7\n        MOV 2\n        HALT\n",
+        origin=0,
+    )
     hello = pack_plr(PlrImage(load_addr=0x2800, entry_off=0, code=bytes(res.bytes)))
     fs.create("HELLO.PLR", hello)
     fs.create("README.TXT", b"PL-DOS VM")
