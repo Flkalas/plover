@@ -5,6 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
+from hw.logic import cpld_decode, gates
 from hwsim.netlist import delay_ns
 
 if TYPE_CHECKING:
@@ -227,16 +228,10 @@ class Hc283(ChipModel):
             self._update()
 
     def _update(self) -> None:
-        a = sum(self.read_bit(f"A{i}") << i for i in range(4))
-        b = sum(self.read_bit(f"B{i}") << i for i in range(4))
-        c0 = self.read_bit("C0")
-        if any(self.read(f"A{i}") > 1 for i in range(4)):
+        result = gates.eval_hc283(self.read_bit, self.read)
+        if result is None:
             return
-        if any(self.read(f"B{i}") > 1 for i in range(4)):
-            return
-        total = a + b + c0
-        s = total & 0xF
-        cout = (total >> 4) & 1
+        s, cout = result
         t_sum = self.t_pd("74HC283", "t_pd", "sum", default=30)
         t_cout = self.t_pd("74HC283", "t_pd", "cout", default=30)
         for i in range(4):
@@ -388,17 +383,10 @@ class AluCmpFromSub(ChipModel):
         self._update()
 
     def _update(self) -> None:
-        b_sel = self.read_bit("B_SEL")
-        cin = self.read_bit("CIN")
-        if b_sel != 1 or cin != 1:
+        result = gates.eval_alu_cmp_from_sub(self.read_bit)
+        if result is None:
             return
-        ys = [self.read_bit(f"Y{i}") for i in range(8)]
-        if any(y > 1 for y in ys):
-            return
-        z = 1 if all(y == 0 for y in ys) else 0
-        c_hi = self.read_bit("C_HI")
-        if c_hi > 1:
-            return
+        z, c_hi = result
         t = self.t_pd("ALU_CMP_SUB", "t_pd", default=151)
         self._drive("Z", z, t, "cmp_sub")
         self._drive("C_GE", c_hi, t, "cmp_sub")
@@ -416,15 +404,10 @@ class Hc153Slice(ChipModel):
         self._update()
 
     def _update(self) -> None:
+        val = gates.eval_alu_153_slice(self.read_bit)
+        if val is None:
+            return
         t = self.t_pd("ALU_153_SLICE", "t_pd", default=17)
-        g = self.read_bit("G")
-        if g == 1:
-            self._drive("Y", 0, t, "disabled")
-            return
-        sel = self.read_bit("A") | (self.read_bit("B") << 1)
-        val = self.read_bit(f"C{sel}")
-        if val > 1:
-            return
         self._drive("Y", val, t, "mux")
 
 
@@ -447,21 +430,15 @@ class YBusBuf(ChipModel):
                 return
 
     def _update(self) -> None:
-        oe = self.read_bit("Y_OE")
         t = self.t_pd("Y_BUS_BUF", "t_pd", default=11)
-        if oe > 1:
+        drives = gates.eval_y_bus_buf(
+            self.read_bit,
+            lambda p: p in self.pin_nets,
+        )
+        if drives is None:
             return
-        for i in range(8):
-            pin_y, pin_d = f"Y{i}", f"D{i}"
-            if pin_y not in self.pin_nets or pin_d not in self.pin_nets:
-                continue
-            if oe == 1:
-                y = self.read_bit(pin_y)
-                if y > 1:
-                    return
-                self._drive(pin_d, y, t, "y_bus")
-            else:
-                self._drive(pin_d, 3, t, "high-z")
+        for pin_d, val in drives.items():
+            self._drive(pin_d, val, t, "y_bus" if val != gates.Z else "high-z")
 
 
 class AluYMuxSel(ChipModel):
@@ -476,11 +453,9 @@ class AluYMuxSel(ChipModel):
         self._update()
 
     def _update(self) -> None:
-        s0 = self.read_bit("S0")
-        s1 = self.read_bit("S1")
-        if s0 > 1 or s1 > 1:
+        sel = gates.eval_alu_y_mux_sel(self.read_bit)
+        if sel is None:
             return
-        sel = 1 if (s0 or s1) else 0
         t = self.t_pd("ALU_Y_MUX_SEL", "t_pd", default=5)
         self._drive("SEL", sel, t, "y_mux_sel")
 
@@ -540,14 +515,6 @@ class Hc86(Hc08):
         self._drive("Y", fn(a, b), t, "xor")
 
 
-# v0.1 — opcode×phase → Reg_Sel (see microcode-spec.md)
-_REG_SEL_TABLE: dict[tuple[int, int], int] = {
-    (0x1, 0): 0,  # ADD phase 0 → R0
-    (0x1, 1): 1,
-    (0x1, 2): 2,
-}
-
-
 class CpldSystemCtrl(ChipModel):
     """Ideal comb ATF1504AS decode — zero internal state; t_pd=0 in hwsim (VM owns phase/clock)."""
 
@@ -575,47 +542,24 @@ class CpldSystemCtrl(ChipModel):
         t = delay if delay else self.t_pd("CPLD_SYSTEM_CTRL", "t_pd", default=0)
         a = self._addr()
         rst = self.read_bit("RESET_N") == 0
-        mb = 0xFF00 <= a <= 0xFFFB
-        a15 = (a >> 15) & 1
         map_mode = self.read_bit("MAP_MODE")
-
-        self._drive("MAILBOX_EN", 1 if mb else 0, t, "mailbox")
-
-        rom_en = False
-        ram1_en = False
-        ram2_en = False
-        if not rst and not mb:
-            if map_mode == 0:
-                if a < 0x0800 or a >= 0xFFFC:
-                    rom_en = True
-                elif a15 == 0:
-                    ram1_en = True
-                else:
-                    ram2_en = True
-            else:
-                if a15 == 0:
-                    ram1_en = True
-                else:
-                    ram2_en = True
-
-        self._drive("RAM1_CS_N", 0 if ram1_en else 1, t, "ram1")
-        self._drive("RAM2_CS_N", 0 if ram2_en else 1, t, "ram2")
-        self._drive("ROM_CS_N", 0 if rom_en else 1, t, "rom")
-
-        fffc_force = 1 if rst else 0
-        self._drive("ADDR_FORCE_FFFC", fffc_force, t, "reset_vec")
+        mem = cpld_decode.decode_addr(a, map_mode, rst)
+        self._drive("MAILBOX_EN", mem.mailbox_en, t, "mailbox")
+        self._drive("RAM1_CS_N", mem.ram1_cs_n, t, "ram1")
+        self._drive("RAM2_CS_N", mem.ram2_cs_n, t, "ram2")
+        self._drive("ROM_CS_N", mem.rom_cs_n, t, "rom")
+        self._drive("ADDR_FORCE_FFFC", mem.addr_force_fffc, t, "reset_vec")
 
         op, ph = self._opcode_phase()
-        reg_sel = _REG_SEL_TABLE.get((op, ph), 0)
         reg_we = self.read_bit("REG_WE") if "REG_WE" in self.pin_nets else 0
+        gpr = cpld_decode.decode_gpr(op, ph, reg_we)
         for r in range(4):
             pin = f"LOAD_R{r}"
             if pin in self.pin_nets:
-                load = 1 if (reg_sel == r and reg_we) else 0
-                self._drive(pin, load, t, f"load_r{r}")
+                self._drive(pin, gpr.load_r[r], t, f"load_r{r}")
         if "REG_SEL0" in self.pin_nets:
-            self._drive("REG_SEL0", reg_sel & 1, t, "sel")
-            self._drive("REG_SEL1", (reg_sel >> 1) & 1, t, "sel")
+            self._drive("REG_SEL0", gpr.reg_sel0, t, "sel")
+            self._drive("REG_SEL1", gpr.reg_sel1, t, "sel")
 
 
 class Regfile574Gpr(ChipModel):
@@ -651,21 +595,17 @@ class Regfile574Gpr(ChipModel):
         for i in range(8):
             if not self.ctx.check_setup(self.ref, "CLK", f"D{i}", t_su):
                 return
-        val = sum(self.read_bit(f"D{i}") << i for i in range(8))
-        for r in range(4):
-            pin = f"LOAD_R{r}"
-            if pin in self.pin_nets and self.read_bit(pin):
-                self._regs[r] = val & 0xFF
-                return
-
-    def _sel(self, prefix: str) -> int:
-        return self.read_bit(f"{prefix}0") | (self.read_bit(f"{prefix}1") << 1)
+        updated = gates.regfile_maybe_write(
+            self._regs,
+            self.read_bit,
+            lambda p: p in self.pin_nets,
+        )
+        if updated is not None:
+            self._regs = updated
 
     def _read_out(self, delay: int) -> None:
         t = delay or self.t_pd("74HC574", "t_pd_q", default=15)
-        ra = self._sel("RA") & 3
-        rb = self._sel("RB") & 3
-        qa, qb = self._regs[ra], self._regs[rb]
+        qa, qb = gates.regfile_read_ports(self._regs, self.read_bit)
         for i in range(8):
             self._drive(f"QA{i}", (qa >> i) & 1, t, "qa")
             self._drive(f"QB{i}", (qb >> i) & 1, t, "qb")

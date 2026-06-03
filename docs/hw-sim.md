@@ -2,6 +2,18 @@
 
 Event-driven block-level simulator for **74HC TTL comb paths**. **Python 3.10+ stdlib only** — no pip, no make, no Verilog.
 
+## Truth hierarchy (verification stack)
+
+**hwsim is the source of truth** for gate-level behavior on YAML netlists (including ideal CPLD @ 0 ns). Shared tables and comb logic live under [`hw/micro/`](../hw/micro/) and [`hw/logic/`](../hw/logic/).
+
+| Layer | Tool | Aligns to |
+|-------|------|-----------|
+| Electrical + slack | **hwsim** | Datasheet `t_pd`, netlist YAML |
+| Structural @ micro phase | [cyclesim](../cyclesim/) | Same netlist + `hw/logic` (zero delay) |
+| ISA / programs | [plover_vm](../plover_vm/) | cyclesim phase semantics + microcode-spec |
+
+When cyclesim and plover_vm disagree, **cyclesim wins** (hwsim-backed netlist). When cyclesim and hwsim disagree on comb meaning, **hwsim wins**.
+
 ## Scope (what hwsim is / is not)
 
 | Layer | Tool | Notes |

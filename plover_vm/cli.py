@@ -10,6 +10,21 @@ from pathlib import Path
 from plover_vm.machine import PloverMachine
 
 
+def _apply_init_regs(m: PloverMachine, regs: list[int]) -> None:
+    r = [int(v) & 0xFF for v in regs[:4]]
+    while len(r) < 4:
+        r.append(0)
+    m.micro.state.regs = list(r)
+    m.fast.regs = list(r)
+
+
+def _apply_init_pc(m: PloverMachine, pc: int) -> None:
+    pc &= 0xFFFF
+    m.macro.pc = pc
+    m.macro._fetch_pending = True
+    m.fast.pc = pc
+
+
 def cmd_run(args: argparse.Namespace) -> int:
     m = PloverMachine(engine=args.engine)
     root = Path(__file__).resolve().parents[1]
@@ -118,9 +133,16 @@ def cmd_scenario(args: argparse.Namespace) -> int:
         for i, b in enumerate(item.get("bytes", [])):
             m.bus.ram.write(addr + i, b)
     m.bus.map_mode = doc.get("map_mode", 0)
+    init = doc.get("init", {})
+    init_regs = init.get("regs")
+    init_pc = init.get("pc")
     for action in doc.get("actions", []):
         if action["type"] == "reset":
             m.reset(action.get("map_mode", m.bus.map_mode))
+            if init_regs is not None:
+                _apply_init_regs(m, init_regs)
+            if init_pc is not None:
+                _apply_init_pc(m, int(init_pc))
         elif action["type"] == "set_map":
             m.set_map_mode(action["mode"])
         elif action["type"] == "run":

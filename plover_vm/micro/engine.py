@@ -65,9 +65,6 @@ class MicroEngine:
         if cw.reg_we and sel < 4:
             if op == 0x02 and ph == 1:
                 st.regs[sel] = st.bus_data & 0xFF
-            elif op == 0x01 and ph == 2:
-                dst = 0 if st.operand else sel
-                st.regs[dst] = st.alu_y & 0xFF
             else:
                 st.regs[sel] = st.alu_y & 0xFF
 

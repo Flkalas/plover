@@ -2,6 +2,14 @@
 
 **Python 3.10+ stdlib only.** Sits between [plover_vm](../plover_vm/) (functional ISA) and [hwsim](../hwsim/) (ns `t_pd` timing).
 
+## Truth hierarchy
+
+1. **[hwsim](../hwsim/)** — netlist + datasheet delays (authoritative gate behavior).
+2. **cyclesim** — same netlist, [`hw/logic/`](../hw/logic/) comb/seq @ zero delay, one tick = one micro phase.
+3. **[plover_vm](../plover_vm/)** — must match cyclesim for CW, Reg_Sel, GPR latch, and ALU results on normative opcodes (`0x01`–`0x0A`, `0x0D` CMP).
+
+Reg_Sel: [`hw/micro/reg_sel.py`](../hw/micro/reg_sel.py). Parity: `pytest tests/test_cyclesim_parity.py tests/test_alu_netlist_parity.py`.
+
 ## Role
 
 | Tool | Time axis | ALU internals |

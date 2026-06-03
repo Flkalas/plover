@@ -1,10 +1,11 @@
-"""Combinational 74HC and ALU glue models."""
+"""Combinational 74HC and ALU glue models (logic from hw.logic.gates)."""
 
 from __future__ import annotations
 
-from typing import Any, Callable
+from typing import Callable
 
 from cyclesim.models.base import CycleModel, H, L, X, Z
+from hw.logic import gates
 
 
 class Hc04(CycleModel):
@@ -77,20 +78,8 @@ class Hc153Slice(CycleModel):
     part = "ALU_153_SLICE"
 
     def eval_comb(self) -> bool:
-        g = self.read_bit("G")
-        if g == 1:
-            return self.ctx.drive_net(self.net_for("Y"), L, self.ref)
-        a, b = self.read_bit("A"), self.read_bit("B")
-        if a > 1 or b > 1:
-            return False
-        sel = a | (b << 1)
-        if sel > 3:
-            return False
-        c_pin = f"C{sel}"
-        if c_pin not in self.pin_nets:
-            return False
-        val = self.read_bit(c_pin)
-        if val > 1:
+        val = gates.eval_alu_153_slice(self.read_bit)
+        if val is None:
             return False
         return self.ctx.drive_net(self.net_for("Y"), val, self.ref)
 
@@ -124,16 +113,10 @@ class Hc283(CycleModel):
     part = "74HC283"
 
     def eval_comb(self) -> bool:
-        if any(self.read(f"A{i}") > 1 for i in range(4)):
+        result = gates.eval_hc283(self.read_bit, self.read)
+        if result is None:
             return False
-        if any(self.read(f"B{i}") > 1 for i in range(4)):
-            return False
-        a = sum(self.read_bit(f"A{i}") << i for i in range(4))
-        b = sum(self.read_bit(f"B{i}") << i for i in range(4))
-        c0 = self.read_bit("C0")
-        total = a + b + c0
-        s = total & 0xF
-        cout = (total >> 4) & 1
+        s, cout = result
         changed = False
         for i in range(4):
             changed |= self.ctx.drive_net(self.net_for(f"S{i}"), (s >> i) & 1, self.ref)
@@ -145,10 +128,9 @@ class AluYMuxSel(CycleModel):
     part = "ALU_Y_MUX_SEL"
 
     def eval_comb(self) -> bool:
-        s0, s1 = self.read_bit("S0"), self.read_bit("S1")
-        if s0 > 1 or s1 > 1:
+        sel = gates.eval_alu_y_mux_sel(self.read_bit)
+        if sel is None:
             return False
-        sel = H if (s0 or s1) else L
         return self.ctx.drive_net(self.net_for("SEL"), sel, self.ref)
 
 
@@ -156,15 +138,10 @@ class AluCmpFromSub(CycleModel):
     part = "ALU_CMP_SUB"
 
     def eval_comb(self) -> bool:
-        if self.read_bit("B_SEL") != 1 or self.read_bit("CIN") != 1:
+        result = gates.eval_alu_cmp_from_sub(self.read_bit)
+        if result is None:
             return False
-        ys = [self.read_bit(f"Y{i}") for i in range(8)]
-        if any(y > 1 for y in ys):
-            return False
-        z = H if all(y == 0 for y in ys) else L
-        c_hi = self.read_bit("C_HI")
-        if c_hi > 1:
-            return False
+        z, c_hi = result
         changed = self.ctx.drive_net(self.net_for("Z"), z, self.ref)
         changed |= self.ctx.drive_net(self.net_for("C_GE"), c_hi, self.ref)
         return changed
@@ -176,19 +153,13 @@ class YBusBuf(CycleModel):
     part = "Y_BUS_BUF"
 
     def eval_comb(self) -> bool:
-        oe = self.read_bit("Y_OE")
-        if oe > 1:
+        drives = gates.eval_y_bus_buf(
+            self.read_bit,
+            lambda p: p in self.pin_nets,
+        )
+        if drives is None:
             return False
         changed = False
-        for i in range(8):
-            pin_y, pin_d = f"Y{i}", f"D{i}"
-            if pin_y not in self.pin_nets or pin_d not in self.pin_nets:
-                continue
-            if oe == 1:
-                y = self.read_bit(pin_y)
-                if y > 1:
-                    continue
-                changed |= self.ctx.drive_net(self.net_for(pin_d), y, self.ref)
-            else:
-                changed |= self.ctx.drive_net(self.net_for(pin_d), Z, self.ref)
+        for pin_d, val in drives.items():
+            changed |= self.ctx.drive_net(self.net_for(pin_d), val, self.ref)
         return changed

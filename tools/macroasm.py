@@ -80,8 +80,8 @@ def main() -> None:
         fixtures.mkdir(parents=True, exist_ok=True)
         prog = "\n".join(
             [
-                "ADD 5",
-                "ADD 3",
+                "; normative ADD: R2 <- R0+R1, imm -> R1 (init R0=0x12 in scenario)",
+                "ADD 0x34",
                 "HALT",
             ]
         )

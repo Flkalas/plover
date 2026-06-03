@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from plover_vm.alu import alu8
 from plover_vm.alu16 import add16, cmp16_u
+from plover_vm.micro.normative import apply_add, apply_beq_compare, apply_cmp_flags
 from plover_vm.macro.isa import (
     OP_ADD,
     OP_ADD_RR,
@@ -66,10 +67,7 @@ class MacroFastPath:
         if op == OP_HALT:
             self.halted = True
         elif op == OP_ADD:
-            r = alu8(self.regs[0], imm, 1)
-            self.regs[0] = r.y
-            self.flag_z = r.zero
-            self.flag_c = r.cout
+            self.regs, self.flag_z, self.flag_c = apply_add(self.regs, imm)
         elif op == OP_ADD_RR:
             r = alu8(self.regs[0], self.regs[1], 1)
             self.regs[2] = r.y
@@ -79,9 +77,7 @@ class MacroFastPath:
             dst, src = (imm >> 4) & 3, imm & 3
             self.regs[dst] = self.regs[src] & 0xFF
         elif op == OP_CMP:
-            r = alu8(self.regs[0], imm, 2)
-            self.flag_z = r.zero
-            self.flag_c = r.cout
+            self.flag_z, self.flag_c = apply_cmp_flags(self.regs, imm)
         elif op == OP_WADD_RR:
             r = add16(self.regs16[0], self.regs16[1])
             self.regs16[2] = r.y
@@ -102,6 +98,7 @@ class MacroFastPath:
         elif op == OP_STA:
             self.bus.write_cpu(imm, self.regs[0])
         elif op == OP_BEQ:
+            self.flag_z, self.flag_c = apply_beq_compare(self.regs, imm)
             if self.flag_z:
                 self.pc = imm & 0xFFFF
         elif op == OP_JMP:

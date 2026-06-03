@@ -21,9 +21,12 @@ from cyclesim.models.comb import (
     Hc86,
     YBusBuf,
 )
+from cyclesim.models.cpld import CpldSystemCtrl
 from cyclesim.models.seq import Regfile574Gpr
 
 _COMB: dict[str, type[CycleModel]] = {
+    "CPLD_SYSTEM_CTRL": CpldSystemCtrl,
+    "ATF1504AS": CpldSystemCtrl,
     "74HC04": Hc04,
     "74HC08": Hc08,
     "74HC32": Hc32,

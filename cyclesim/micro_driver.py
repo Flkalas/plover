@@ -7,7 +7,7 @@ from pathlib import Path
 
 from cyclesim.engine import CycleContext
 from plover_vm.micro.cw import ControlWord
-from plover_vm.micro.reg_sel import reg_sel
+from hw.micro.reg_sel import reg_sel
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:

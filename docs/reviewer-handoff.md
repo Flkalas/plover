@@ -8,14 +8,17 @@
 
 ## 1. 이 문서의 목적
 
-본 저장소에는 **두 종류의 시뮬레이터**가 공존합니다.
+본 저장소에는 **세 계층 시뮬레이터**가 있습니다 (진리 원천: **hwsim → cyclesim → plover_vm**).
 
 | 도구 | 역할 | 검증 대상 |
 |------|------|-----------|
 | **`hwsim/`** | ns 단위 **전기·타이밍** 시뮬 (74HC netlist) | ALU critical path, CPLD decode, GPR latch setup |
-| **`plover_vm/`** | **로직 VM** (ROM/RAM/Mailbox + ISA 실행) | 프로그램·부트·Mailbox 프로토콜 bring-up |
+| **`cyclesim/`** | micro phase **구조(netlist)** 시뮬 (`hw/logic`, 지연 0) | CW·Reg_Sel·datapath·574 래치 vs hwsim |
+| **`plover_vm/`** | **로직 VM** (ROM/RAM/Mailbox + ISA 실행) | 프로그램·부트·Mailbox; normative ISA는 cyclesim과 동치 |
 
-검토 시 **명세(v0.1 normative docs)** ↔ **hwsim(회로)** ↔ **plover_vm(소프트웨어)** 의 정합성을 함께 보시면 됩니다.
+공유: [`hw/micro/reg_sel.py`](../hw/micro/reg_sel.py), [`hw/logic/`](../hw/logic/). CI: `hwsim run --all`, `cyclesim run --all`, `pytest tests/test_*parity*.py tests/test_alu_netlist_parity.py`.
+
+검토 시 **명세** ↔ **hwsim** ↔ **cyclesim** ↔ **plover_vm** 정합성을 함께 보시면 됩니다.
 
 ---
 
@@ -195,7 +198,7 @@ python tools/macroasm.py --build-fixtures
 python -m plover_vm scenario hw/scenarios/vm/add_imm.yaml
 ```
 
-**기대:** `halted=true`, `regs[0]=8` (5+3)
+**기대:** `halted=true`, `regs=[0x12,0x34,0x46,0]` (normative ADD: R2←R0+R1, imm→R1)
 
 ### 7.2 Fibonacci — 8-bit, 200 이하
 
@@ -268,7 +271,7 @@ firmware/rp2350/mailbox_stub/main.c   RP2350 stub (normative doc 참조)
 | **실기 B3/B4 breadboard** | 미착수 |
 | **cpu 통합 netlist** (ALU+GPR+CPLD+SRAM 한 블록) | stub만 ([cpu.yaml](../hw/netlist/blocks/cpu.yaml)) |
 | **12 opcode × phase Reg_Sel 전表** | ADD 등 draft; [reg_sel.py](../plover_vm/micro/reg_sel.py) 부분 |
-| **micro vs fast 완전 동치** | ADD imm 등 fast 편의 semantics; parity는 R0만 검증 |
+| **micro vs fast** | normative `0x01`–`0x0A` / CMP `0x0D`: `test_engine_parity.py` (ADD → R2) |
 | **16-bit VM opcode** | 실기 비규격; 데모 전용 |
 | **ns 타이밍 in VM** | hwsim 전담 |
 | **RP2350 GPU/HID** | Mailbox sector stub만 |

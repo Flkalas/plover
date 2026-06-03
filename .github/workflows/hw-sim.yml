@@ -6,7 +6,14 @@ on:
     paths:
       - "hw/**"
       - "hwsim/**"
+      - "cyclesim/**"
+      - "plover_vm/**"
+      - "hw/logic/**"
+      - "hw/micro/**"
+      - "tests/test_*parity*.py"
+      - "tests/test_alu_netlist_parity.py"
       - "docs/hw-sim.md"
+      - "docs/cyclesim.md"
       - "docs/hw-schematic.md"
       - ".github/workflows/hw-sim.yml"
   pull_request:
@@ -14,7 +21,14 @@ on:
     paths:
       - "hw/**"
       - "hwsim/**"
+      - "cyclesim/**"
+      - "plover_vm/**"
+      - "hw/logic/**"
+      - "hw/micro/**"
+      - "tests/test_*parity*.py"
+      - "tests/test_alu_netlist_parity.py"
       - "docs/hw-sim.md"
+      - "docs/cyclesim.md"
       - "docs/hw-schematic.md"
       - ".github/workflows/hw-sim.yml"
 
@@ -43,6 +57,16 @@ jobs:
         shell: bash
         run: |
           python -m hwsim run --all
+
+      - name: Run cyclesim structural tests
+        shell: bash
+        run: |
+          python -m cyclesim run --all
+
+      - name: Simulator parity (cyclesim / netlist / VM)
+        shell: bash
+        run: |
+          python -m pytest tests/test_cyclesim_parity.py tests/test_alu_netlist_parity.py -q
 
       - name: KiCad netlist diff (clock sample)
         shell: bash
