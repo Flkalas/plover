@@ -2,6 +2,13 @@
 
 from __future__ import annotations
 
+from plover_vm.memory.apu import (
+    CMD_APU_CH_OFF,
+    CMD_APU_CH_SYNC,
+    CMD_APU_CH_WRITE,
+    CMD_APU_SET_CTRL,
+    ApuState,
+)
 from plover_vm.memory.vdu import (
     CMD_GFX_BLIT,
     CMD_GFX_CLS,
@@ -37,6 +44,7 @@ CMD_WRITE = 0x02
 ST_READY = 0x01
 ST_BUSY = 0x02
 ST_ERROR = 0x04
+ST_APU_READY = 0x08
 
 _VDU_CMDS = frozenset(
     {
@@ -60,6 +68,15 @@ _VDU_CMDS = frozenset(
     }
 )
 
+_APU_CMDS = frozenset(
+    {
+        CMD_APU_SET_CTRL,
+        CMD_APU_CH_WRITE,
+        CMD_APU_CH_SYNC,
+        CMD_APU_CH_OFF,
+    }
+)
+
 
 class Mailbox:
     def __init__(self) -> None:
@@ -70,11 +87,20 @@ class Mailbox:
         self._buffer = bytearray(248)
         self._sector = bytearray(512)
         self.vdu = VduState()
+        self.apu = ApuState()
+        self._apu_ready = True
+        self._vfdd_busy = False
+
+    def _status_byte(self) -> int:
+        base = self._status & 0xFF
+        if self._apu_ready:
+            base |= ST_APU_READY
+        return base & 0xFF
 
     def read(self, addr: int) -> int:
         a = addr & 0xFFFF
         if a == MB_STATUS:
-            return self._status & 0xFF
+            return self._status_byte()
         if a == MB_CMD:
             return self._cmd & 0xFF
         if a == MB_PARAM:
@@ -98,23 +124,36 @@ class Mailbox:
         elif MB_BUFFER <= a <= 0xFFFB:
             self._buffer[a - MB_BUFFER] = v
 
+    def _handle_apu(self, cmd: int) -> None:
+        if self._vfdd_busy or (self._status & ST_BUSY):
+            return
+        if self.apu.dispatch(cmd, self._param, self._buffer):
+            self._apu_ready = True
+
     def _handle_cmd(self) -> None:
         cmd = self._cmd
         if cmd == CMD_NOP:
             return
         if cmd == CMD_READ:
+            self._vfdd_busy = True
             self._status = ST_BUSY
             sector = self._param & 0xFF
             src = self._sector[sector * 512 : (sector + 1) * 512]
             self._buffer[:248] = src[:248]
+            self._vfdd_busy = False
             self._status = ST_READY
             self._cmd = CMD_NOP
         elif cmd == CMD_WRITE:
+            self._vfdd_busy = True
             self._status = ST_BUSY
             sector = self._param & 0xFF
             off = sector * 512
             self._sector[off : off + min(248, len(self._buffer))] = self._buffer[:248]
+            self._vfdd_busy = False
             self._status = ST_READY
+            self._cmd = CMD_NOP
+        elif cmd in _APU_CMDS:
+            self._handle_apu(cmd)
             self._cmd = CMD_NOP
         elif cmd in _VDU_CMDS:
             self._status = ST_BUSY
@@ -142,6 +181,20 @@ class Mailbox:
         """Host helper: prime PARAM/AUX/BUFFER and dispatch one VDU/GFX command."""
         self._param = param & 0xFF
         self._aux = aux & 0xFF
+        if buffer is not None:
+            self._buffer[: len(buffer)] = buffer[:248]
+        self._cmd = cmd & 0xFF
+        self._handle_cmd()
+
+    def issue_apu(
+        self,
+        cmd: int,
+        param: int = 0,
+        *,
+        buffer: bytes | bytearray | None = None,
+    ) -> None:
+        """Host helper: prime PARAM/BUFFER and dispatch one APU command."""
+        self._param = param & 0xFF
         if buffer is not None:
             self._buffer[: len(buffer)] = buffer[:248]
         self._cmd = cmd & 0xFF

@@ -67,12 +67,13 @@ def test_mov_parity():
 
 
 def test_ldio_stio_parity():
-    # LDIO $00 (STATUS); STIO $04 (CMD) with R0=0xAB
+    # LDIO $00 (STATUS); STIO $04 (BUFFER[0]) with R0=0xAB
     prog = [0x08, 0x00, 0x09, 0x04, 0x0A]
     init = [0xAB, 0, 0, 0]
     fast = _run_program("fast", prog, init)
     micro = _run_program("micro", prog, init)
-    assert fast == micro == [0, 0, 0, 0]
+    # STATUS includes APU_READY (bit3) at idle
+    assert fast == micro == [0x08, 0, 0, 0]
 
 
 def test_sta16_parity():
