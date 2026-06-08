@@ -10,10 +10,20 @@
 | Function | Description |
 |----------|-------------|
 | **VDU** | 40×25 text, 320×240@30 → 640×480@60 HDMI — [display-console.md](display-console.md) |
+| **APU** | 4ch PSG, 22.05 kHz mix — [audio-apu.md](audio-apu.md) |
 | **HID** | Keyboard/mouse events → Mailbox |
 | **vFDD** | Virtual floppy — sector read/write for boot and OS |
 
 CPU remains **master** for program execution; RP2350 serves MMIO Mailbox only (no IRQ).
+
+### Core split (v0.1)
+
+| Core | Workload |
+|------|----------|
+| **Core0** | vFDD, **APU** (PSG mix, PWM), USB/HID (future) |
+| **Core1** | VDU compose, HSTX HDMI |
+
+During vFDD **Busy**, APU Mailbox commands are **silent dropped**. APU param queue ≤ **1 KiB** on RP2350 SRAM.
 
 ---
 
@@ -34,8 +44,8 @@ Reference implementation: [`firmware/rp2350/mailbox_stub/main.c`](../firmware/rp
 - Polls `MB_CMD` when CPU writes command.
 - READ: load 512 B from SD → `MB_BUFFER` (chunked), set DataReady.
 - WRITE: reverse path.
-- GPU/HID: stub loops set status bits for hwsim bring-up.
-- VDU target: [display-console.md](display-console.md) (firmware TBD).
+- VDU: [display-console.md](display-console.md) (firmware TBD).
+- APU: [audio-apu.md](audio-apu.md) (PWM synthesis TBD on Core0).
 
 ---
 
@@ -51,3 +61,4 @@ Reference implementation: [`firmware/rp2350/mailbox_stub/main.c`](../firmware/rp
 | Date | Note |
 |------|------|
 | 2026-06-01 | Mailbox-centric copro contract |
+| 2026-06-08 | Core0 APU; vFDD/APU exclusion |

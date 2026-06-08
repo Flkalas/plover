@@ -26,6 +26,14 @@ Normative geometry: **40×25** — [display-console.md](display-console.md). VDU
 | `GRECT` | `( x y w h color -- )` | GFX_FILLRECT |
 | `GVSYNC` | `( -- )` | VDU_VSYNC |
 
+## Audio (when `MemoryBus` attached)
+
+Normative PSG — [audio-apu.md](audio-apu.md) · [mailbox-protocol.md](mailbox-protocol.md) §2.4.
+
+| Word | Stack | Mailbox |
+|------|-------|---------|
+| `BEEP` | `( period duration -- )` | APU ch0 square + SYNC; duration stored in VM state |
+
 ## Tests
 
 - `tests/test_forth_blocks.py`

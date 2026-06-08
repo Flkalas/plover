@@ -11,7 +11,7 @@ Polling only — **no IRQ**.
 
 | Offset | Name | R/W | Description |
 |--------|------|-----|-------------|
-| `$FF00` | `MB_STATUS` | R | Bit0 **DataReady** · Bit1 **Busy** · Bit2 **Error** |
+| `$FF00` | `MB_STATUS` | R | Bit0 **DataReady** · Bit1 **Busy** · Bit2 **Error** · Bit3 **APU_READY** |
 | `$FF01` | `MB_CMD` | W | Command to RP2350 |
 | `$FF02` | `MB_PARAM` | W | Parameter (e.g. sector LSB) |
 | `$FF03` | `MB_AUX` | W | VDU/GFX sub-parameter (e.g. cursor row) |
@@ -67,6 +67,23 @@ Bitmap layer: **320×200**, RGB565. Coordinates in `MB_BUFFER`.
 
 On **Error**, CPU issues `CMD_NOP` after handling. VDU/GFX commands use the same Busy → DataReady handshake as vFDD.
 
+### 2.4 APU / PSG (`0x50–0x53`)
+
+See [audio-apu.md](audio-apu.md). **Silent drop** on invalid/busy — no `ST_ERROR`.
+
+| Value | Name | PARAM | BUFFER | Action |
+|-------|------|-------|--------|--------|
+| `0x50` | APU_SET_CTRL | — | `[0]` master vol 0–15, `[1]` flags bit0=mute | Global control |
+| `0x51` | APU_CH_WRITE | — | ch, period LE, vol, wave | Stage channel (0–3) |
+| `0x52` | APU_CH_SYNC | — | — | Apply staged channels |
+| `0x53` | APU_CH_OFF | channel | — | Mute channel immediately |
+
+**Wave:** `0`=off, `1`=square (ch0–2 only), `2`=noise (ch3 only).
+
+**MB_STATUS bit3 `APU_READY`:** `1` when APU command queue accepts writes.
+
+**Reserved:** `0x40–0x4F` HID · `0x54–0x5F` PCM (v0.2).
+
 ---
 
 ## 3. CPU poll sequence
@@ -108,3 +125,4 @@ CPLD asserts `MAILBOX_EN` for `$FF00–$FFFB` only; RAM_2 `/CE` negated in this 
 |------|------|
 | 2026-06-01 | 252 B window; cmd 0/1/2 |
 | 2026-06-08 | MB_AUX; VDU/GFX cmds 0x10–0x31 |
+| 2026-06-08 | APU_READY bit3; PSG cmds 0x50–0x53 |
