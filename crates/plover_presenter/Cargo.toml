@@ -1,0 +1,17 @@
+[package]
+name = "plover_presenter"
+version.workspace = true
+edition.workspace = true
+
+[features]
+default = []
+sdl = ["dep:sdl2"]
+audio = ["dep:cpal"]
+
+[dependencies]
+plover_copro = { path = "../plover_copro" }
+sdl2 = { version = "0.37", optional = true, default-features = false, features = ["bundled"] }
+cpal = { version = "0.15", optional = true }
+
+[dev-dependencies]
+png = "0.17"
