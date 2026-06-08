@@ -128,6 +128,19 @@ def cmd_scenario(args: argparse.Namespace) -> int:
             print(f"ERROR: {res.error}")
         print(f"output: {res.output}")
         return 1
+    if doc.get("kind") == "apu":
+        from plover_vm.apu_scenario import run_apu_scenario
+
+        root = Path(__file__).resolve().parents[1]
+        res = run_apu_scenario(doc, root=root)
+        if res.ok:
+            print("PASS")
+            return 0
+        print("FAIL")
+        if res.error:
+            print(f"ERROR: {res.error}")
+        print(f"output: {res.output}")
+        return 1
     m = PloverMachine(engine=doc.get("engine", "fast"))
     root = Path(__file__).resolve().parents[1]
     for key, rel in doc.get("load", {}).items():
@@ -233,6 +246,23 @@ def cmd_dos_shell(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_apu_demo(_args: argparse.Namespace) -> int:
+    from kern.audio import AudioDriver
+
+    root = Path(__file__).resolve().parents[1]
+    m = PloverMachine(engine="fast")
+    m.load_cw(root / "hw" / "fixtures" / "control" / "cw.hex")
+    aud = AudioDriver(m.bus)
+    aud.set_master(15)
+    aud.beep(22, 0)
+    apu = m.bus.mailbox.apu
+    samples = apu.mix_samples(100)
+    peak = max(abs(b - 128) for b in samples)
+    print(f"ch0 period={apu.channels[0].period} vol={apu.channels[0].volume}")
+    print(f"mix peak deviation={peak} apu_ready={aud.apu_ready()}")
+    return 0
+
+
 def cmd_vdu_demo(_args: argparse.Namespace) -> int:
     from kern.video import VideoDriver
 
@@ -282,6 +312,9 @@ def main(argv: list[str] | None = None) -> int:
 
     vdu = sub.add_parser("vdu-demo", help="VDU text + GFX smoke on host")
     vdu.set_defaults(func=cmd_vdu_demo)
+
+    apu = sub.add_parser("apu-demo", help="APU PSG ch0 tone smoke on host")
+    apu.set_defaults(func=cmd_apu_demo)
 
     args = ap.parse_args(argv)
     return args.func(args)
