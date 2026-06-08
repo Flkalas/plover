@@ -141,6 +141,19 @@ def cmd_scenario(args: argparse.Namespace) -> int:
             print(f"ERROR: {res.error}")
         print(f"output: {res.output}")
         return 1
+    if doc.get("kind") == "hid":
+        from plover_vm.hid_scenario import run_hid_scenario
+
+        root = Path(__file__).resolve().parents[1]
+        res = run_hid_scenario(doc, root=root)
+        if res.ok:
+            print("PASS")
+            return 0
+        print("FAIL")
+        if res.error:
+            print(f"ERROR: {res.error}")
+        print(f"output: {res.output}")
+        return 1
     m = PloverMachine(engine=doc.get("engine", "fast"))
     root = Path(__file__).resolve().parents[1]
     for key, rel in doc.get("load", {}).items():
@@ -246,6 +259,23 @@ def cmd_dos_shell(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_hid_demo(_args: argparse.Namespace) -> int:
+    from kern.input import InputDriver
+
+    root = Path(__file__).resolve().parents[1]
+    m = PloverMachine(engine="fast")
+    m.load_cw(root / "hw" / "fixtures" / "control" / "cw.hex")
+    inp = InputDriver(m.bus)
+    inp.inject_key(ord("H"))
+    inp.inject_mouse(0x01, 5, -3)
+    kd, md = inp.poll()
+    ch = inp.read_key()
+    buttons, dx, dy = inp.read_mouse()
+    print(f"poll key={kd} mouse={md} char={chr(ch)!r} btn={buttons} dx={dx} dy={dy}")
+    print(f"pending key={inp.key_pending()} mouse={inp.mouse_pending()}")
+    return 0
+
+
 def cmd_apu_demo(_args: argparse.Namespace) -> int:
     from kern.audio import AudioDriver
 
@@ -315,6 +345,9 @@ def main(argv: list[str] | None = None) -> int:
 
     apu = sub.add_parser("apu-demo", help="APU PSG ch0 tone smoke on host")
     apu.set_defaults(func=cmd_apu_demo)
+
+    hid = sub.add_parser("hid-demo", help="HID keyboard/mouse queue smoke on host")
+    hid.set_defaults(func=cmd_hid_demo)
 
     args = ap.parse_args(argv)
     return args.func(args)
