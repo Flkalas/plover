@@ -195,7 +195,7 @@ class DosRuntime:
                 else:
                     res = assemble_file(str(src), origin=0)
                     plr = pack_plr(PlrImage(load_addr=0x2800, entry_off=0, code=bytes(res.bytes)))
-                    self._run_plr_bytes("ASMRUN.PLR", plr, out)
+                    self._run_plr_bytes("PLSRUN.PLR", plr, out)
         elif cmd == "ccrun":
             if len(parts) < 2:
                 self._emit("ERR usage: ccrun <path.c>", out)
@@ -212,7 +212,7 @@ class DosRuntime:
                     self._run_plr_bytes("CCRUN.PLR", plr, out)
         elif cmd == "help":
             self._emit(
-                "dir run ldrun type del mon [cpu|ram|vfdd|gpio|serial|dev|map|sym|rel] plsrun ccrun help exit",
+                "dir type del run ldrun plsrun ccrun mon [cpu|ram|vfdd|gpio|serial|dev|map|sym|rel] help exit",
                 out,
             )
         elif cmd == "exit":
