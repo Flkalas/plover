@@ -312,6 +312,10 @@ def cmd_vdu_demo(_args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    print(
+        "Note: Python plover_vm is deprecated; use Rust CLI: cargo run -p plover_vm -- <cmd>",
+        file=sys.stderr,
+    )
     ap = argparse.ArgumentParser(prog="plover_vm")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
