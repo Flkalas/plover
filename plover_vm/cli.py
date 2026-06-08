@@ -115,6 +115,19 @@ def cmd_scenario(args: argparse.Namespace) -> int:
             print(f"ERROR: {res.error}")
         print(f"output: {res.output}")
         return 1
+    if doc.get("kind") == "vdu":
+        from plover_vm.vdu_scenario import run_vdu_scenario
+
+        root = Path(__file__).resolve().parents[1]
+        res = run_vdu_scenario(doc, root=root)
+        if res.ok:
+            print("PASS")
+            return 0
+        print("FAIL")
+        if res.error:
+            print(f"ERROR: {res.error}")
+        print(f"output: {res.output}")
+        return 1
     m = PloverMachine(engine=doc.get("engine", "fast"))
     root = Path(__file__).resolve().parents[1]
     for key, rel in doc.get("load", {}).items():
@@ -220,6 +233,24 @@ def cmd_dos_shell(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_vdu_demo(_args: argparse.Namespace) -> int:
+    from kern.video import VideoDriver
+
+    root = Path(__file__).resolve().parents[1]
+    m = PloverMachine(engine="fast")
+    m.load_cw(root / "hw" / "fixtures" / "control" / "cw.hex")
+    vid = VideoDriver(m.bus)
+    vid.cls()
+    vid.print("PLOVER VDU DEMO")
+    vid.fill_rect(10, 10, 40, 30, 0x001F)
+    vid.plot(50, 50, 0xF800)
+    vid.vsync()
+    text = m.bus.mailbox.vdu.compose_text()
+    print(text.split("\n")[0][:40])
+    print(f"frame={m.bus.mailbox.vdu.frame} pixel@10,10=0x{m.bus.mailbox.vdu.bitmap[10*320+10]:04X}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="plover_vm")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -248,6 +279,9 @@ def main(argv: list[str] | None = None) -> int:
     shell = sub.add_parser("dos-shell", help="Interactive PL-DOS shell")
     shell.add_argument("--image-name", default="dos_boot.img")
     shell.set_defaults(func=cmd_dos_shell)
+
+    vdu = sub.add_parser("vdu-demo", help="VDU text + GFX smoke on host")
+    vdu.set_defaults(func=cmd_vdu_demo)
 
     args = ap.parse_args(argv)
     return args.func(args)

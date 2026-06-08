@@ -2,10 +2,32 @@
 
 from __future__ import annotations
 
+from plover_vm.memory.vdu import (
+    CMD_GFX_BLIT,
+    CMD_GFX_CLS,
+    CMD_GFX_FILLRECT,
+    CMD_GFX_GETPIX,
+    CMD_GFX_HLINE,
+    CMD_GFX_PLOT,
+    CMD_GFX_TILE8,
+    CMD_VDU_ATTR,
+    CMD_VDU_CLS,
+    CMD_VDU_CURSORGET,
+    CMD_VDU_GOTO,
+    CMD_VDU_MODE,
+    CMD_VDU_PAL_TEXT,
+    CMD_VDU_PRINT,
+    CMD_VDU_PUTCH,
+    CMD_VDU_SCROLL,
+    CMD_VDU_VSYNC,
+    VduState,
+)
+
 MB_BASE = 0xFF00
 MB_STATUS = 0xFF00
 MB_CMD = 0xFF01
 MB_PARAM = 0xFF02
+MB_AUX = 0xFF03
 MB_BUFFER = 0xFF04
 
 CMD_NOP = 0x00
@@ -16,14 +38,38 @@ ST_READY = 0x01
 ST_BUSY = 0x02
 ST_ERROR = 0x04
 
+_VDU_CMDS = frozenset(
+    {
+        CMD_VDU_CLS,
+        CMD_VDU_PUTCH,
+        CMD_VDU_GOTO,
+        CMD_VDU_ATTR,
+        CMD_VDU_PRINT,
+        CMD_VDU_SCROLL,
+        CMD_VDU_CURSORGET,
+        CMD_VDU_PAL_TEXT,
+        CMD_GFX_CLS,
+        CMD_GFX_PLOT,
+        CMD_GFX_HLINE,
+        CMD_GFX_FILLRECT,
+        CMD_GFX_BLIT,
+        CMD_GFX_GETPIX,
+        CMD_GFX_TILE8,
+        CMD_VDU_VSYNC,
+        CMD_VDU_MODE,
+    }
+)
+
 
 class Mailbox:
     def __init__(self) -> None:
         self._status = 0
         self._cmd = 0
         self._param = 0
+        self._aux = 0
         self._buffer = bytearray(248)
         self._sector = bytearray(512)
+        self.vdu = VduState()
 
     def read(self, addr: int) -> int:
         a = addr & 0xFFFF
@@ -33,6 +79,8 @@ class Mailbox:
             return self._cmd & 0xFF
         if a == MB_PARAM:
             return self._param & 0xFF
+        if a == MB_AUX:
+            return self._aux & 0xFF
         if MB_BUFFER <= a <= 0xFFFB:
             return self._buffer[a - MB_BUFFER]
         return 0xFF
@@ -45,6 +93,8 @@ class Mailbox:
             self._handle_cmd()
         elif a == MB_PARAM:
             self._param = v
+        elif a == MB_AUX:
+            self._aux = v
         elif MB_BUFFER <= a <= 0xFFFB:
             self._buffer[a - MB_BUFFER] = v
 
@@ -66,9 +116,33 @@ class Mailbox:
             self._sector[off : off + min(248, len(self._buffer))] = self._buffer[:248]
             self._status = ST_READY
             self._cmd = CMD_NOP
+        elif cmd in _VDU_CMDS:
+            self._status = ST_BUSY
+            self.vdu.dispatch(cmd, self._param, self._aux, self._buffer)
+            if self.vdu.last_error:
+                self._status = ST_ERROR
+            else:
+                self._status = ST_READY
+            self._cmd = CMD_NOP
         else:
             self._status = ST_ERROR
             self._cmd = CMD_NOP
 
     def set_sector_stub(self, data: bytes) -> None:
         self._sector[: len(data)] = data[:512]
+
+    def issue_vdu(
+        self,
+        cmd: int,
+        param: int = 0,
+        *,
+        aux: int = 0,
+        buffer: bytes | bytearray | None = None,
+    ) -> None:
+        """Host helper: prime PARAM/AUX/BUFFER and dispatch one VDU/GFX command."""
+        self._param = param & 0xFF
+        self._aux = aux & 0xFF
+        if buffer is not None:
+            self._buffer[: len(buffer)] = buffer[:248]
+        self._cmd = cmd & 0xFF
+        self._handle_cmd()

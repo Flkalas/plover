@@ -9,11 +9,10 @@ from dataclasses import dataclass, field
 
 from kern.gpio import GpioController
 from kern.serial import SIG_UART, SerialModule
+from kern.video import SIG_VIDEO, VideoDriver
 from plover_vm.memory.bus import MemoryBus
-from plover_vm.memory.mailbox import MB_BUFFER
 
 SIG_FDD = 0xA1
-SIG_VIDEO = 0xB2
 SIG_GPIO = 0xC3
 
 DRIVER_BY_SIG = {
@@ -39,13 +38,12 @@ class Kernel:
         self.state = KernelState()
         self.gpio = GpioController()
         self.serial = SerialModule()
+        self.video = VideoDriver(bus)
 
     def kprint(self, s: str) -> None:
-        # Simulated console: append to log and mirror into mailbox buffer for visibility.
         self.state.output.append(s)
         self.serial.write((s + "\n").encode("ascii", errors="replace"))
-        for i, ch in enumerate(s.encode("ascii", errors="replace")[:248]):
-            self.bus.write_cpu(MB_BUFFER + i, ch)
+        self.video.print(s)
 
     def kmalloc(self, n: int) -> int:
         if n <= 0:
@@ -68,7 +66,7 @@ class Kernel:
     def boot(self) -> None:
         if not self.state.slot_signatures:
             # default teaching/demo topology: vfdd, gpio, serial
-            self.state.slot_signatures = {0: SIG_FDD, 1: SIG_GPIO, 2: SIG_UART}
+            self.state.slot_signatures = {0: SIG_FDD, 1: SIG_GPIO, 2: SIG_UART, 3: SIG_VIDEO}
         self.kprint("kernel_boot")
         self.devmgr_scan()
         self.kprint("kernel_help")

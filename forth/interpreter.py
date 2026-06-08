@@ -8,7 +8,11 @@ primitives, colon definitions, and a QUIT-like line evaluator.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from kern.video import VideoDriver
+    from plover_vm.memory.bus import MemoryBus
 
 
 class ForthError(RuntimeError):
@@ -26,7 +30,7 @@ class Word:
 
 
 class Forth:
-    def __init__(self) -> None:
+    def __init__(self, bus: MemoryBus | None = None) -> None:
         self.data: list[int] = []
         self.rstack: list[int] = []
         self.dict: dict[str, Word] = {}
@@ -35,6 +39,11 @@ class Forth:
         self.input_bytes: list[int] = []
         self._compile: list[str] | None = None
         self._compile_name: str | None = None
+        self._video: VideoDriver | None = None
+        if bus is not None:
+            from kern.video import VideoDriver
+
+            self._video = VideoDriver(bus)
         self._install_core()
 
     def emit(self, s: str) -> None:
@@ -86,6 +95,14 @@ class Forth:
         self.word("BLK!", self._w_blk_store)
         self.word("FLUSH", lambda _f: None)
 
+        if self._video is not None:
+            self.word("VCLS", self._w_vcls)
+            self.word("VPUT", self._w_vput)
+            self.word("VGOTO", self._w_vgoto)
+            self.word("GPLOT", self._w_gplot)
+            self.word("GRECT", self._w_grect)
+            self.word("GVSYNC", self._w_gvsync)
+
         # Compilation control
         self.word(":", self._w_colon, immediate=True)
         self.word(";", self._w_semicolon, immediate=True)
@@ -102,7 +119,43 @@ class Forth:
 
     def _w_emit(self, _f: "Forth") -> None:
         v = self.pop() & 0xFF
+        if self._video is not None:
+            self._video.putch(v)
         self.emit(chr(v))
+
+    def _w_vcls(self, _f: "Forth") -> None:
+        if self._video is not None:
+            self._video.cls()
+
+    def _w_vput(self, _f: "Forth") -> None:
+        if self._video is not None:
+            self._video.putch(self.pop() & 0xFF)
+
+    def _w_vgoto(self, _f: "Forth") -> None:
+        if self._video is not None:
+            row = self.pop() & 0xFF
+            col = self.pop() & 0xFF
+            self._video.goto(col, row)
+
+    def _w_gplot(self, _f: "Forth") -> None:
+        if self._video is not None:
+            color = self.pop() & 0xFFFF
+            y = self.pop() & 0xFF
+            x = self.pop() & 0xFF
+            self._video.plot(x, y, color)
+
+    def _w_grect(self, _f: "Forth") -> None:
+        if self._video is not None:
+            color = self.pop() & 0xFFFF
+            h = self.pop() & 0xFF
+            w = self.pop() & 0xFF
+            y = self.pop() & 0xFF
+            x = self.pop() & 0xFF
+            self._video.fill_rect(x, y, w, h, color)
+
+    def _w_gvsync(self, _f: "Forth") -> None:
+        if self._video is not None:
+            self._video.vsync()
 
     def _w_key(self, _f: "Forth") -> None:
         if not self.input_bytes:

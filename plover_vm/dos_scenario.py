@@ -40,6 +40,8 @@ class DosRuntime:
     last_link_reloc_count: int = 0
 
     def _emit(self, s: str, acc: list[str]) -> None:
+        if len(s) > 40:
+            s = s[:40]
         self.output.append(s)
         acc.append(s)
 
@@ -183,8 +185,17 @@ class DosRuntime:
                     self._emit("SYM " + " ".join(sorted(self.last_link_map.keys())), out)
             elif parts[1].lower() == "rel":
                 self._emit(f"RELOC_APPLIED_{self.last_link_reloc_count}", out)
+            elif parts[1].lower() == "vdu":
+                v = self.kernel.bus.mailbox.vdu
+                self._emit(
+                    f"VDU_MODE_{v.mode} CUR_{v.cursor_col}_{v.cursor_row} FRAME_{v.frame}",
+                    out,
+                )
+                row0 = bytes(v.chars[0]).decode("ascii", errors="replace").rstrip()
+                if row0:
+                    self._emit(row0, out)
             else:
-                self._emit("ERR usage: mon [cpu|ram|vfdd|gpio|serial|dev|map|sym|rel]", out)
+                self._emit("ERR usage: mon [cpu|ram|vfdd|gpio|serial|dev|map|sym|rel|vdu]", out)
         elif cmd == "plsrun":
             if len(parts) < 2:
                 self._emit("ERR usage: plsrun <path.pls>", out)
@@ -212,7 +223,7 @@ class DosRuntime:
                     self._run_plr_bytes("CCRUN.PLR", plr, out)
         elif cmd == "help":
             self._emit(
-                "dir type del run ldrun plsrun ccrun mon [cpu|ram|vfdd|gpio|serial|dev|map|sym|rel] help exit",
+                "dir type del run ldrun plsrun ccrun mon [cpu|ram|vfdd|gpio|serial|dev|map|sym|rel|vdu] help exit",
                 out,
             )
         elif cmd == "exit":
@@ -249,7 +260,7 @@ def _prepare_runtime(root: Path, *, img_name: str = "dos_boot.img") -> DosRuntim
 
     m = PloverMachine(engine="micro")
     m.load_cw(root / "hw" / "fixtures" / "control" / "cw.hex")
-    k = Kernel(MemoryBus())
+    k = Kernel(m.bus)
     return DosRuntime(fs=fs, machine=m, kernel=k, root=root, output=[])
 
 

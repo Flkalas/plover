@@ -1,0 +1,33 @@
+name: vdu_smoke
+kind: vdu
+description: VDU text + GFX fillrect + VSYNC mailbox smoke
+
+actions:
+  - type: vdu_cls
+    attr: 0x07
+  - type: vdu_print
+    text: HELLO
+  - type: gfx_fillrect
+    x: 10
+    y: 10
+    w: 4
+    h: 4
+    color: 0xF800
+  - type: vsync
+  - type: run_pls
+    path: hw/fixtures/sw/vdu_smoke.pls
+    origin: 0x00E0
+    max_steps: 200
+
+expect:
+  text_contains:
+    - H
+  pixel:
+    x: 10
+    y: 10
+    color: 0xF800
+  frame: 2
+  char_at:
+    row: 0
+    col: 0
+    char: 0x48
