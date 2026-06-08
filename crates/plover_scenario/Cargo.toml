@@ -1,0 +1,14 @@
+[package]
+name = "plover_scenario"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+plover_mmu = { path = "../plover_mmu" }
+plover_core = { path = "../plover_core" }
+plover_copro = { path = "../plover_copro" }
+plover_os = { path = "../plover_os" }
+plover_forth = { path = "../plover_forth" }
+serde = { version = "1", features = ["derive"] }
+serde_yaml = "0.9"
+serde_json = "1"
