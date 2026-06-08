@@ -1,6 +1,6 @@
 /**
  * RP2350 mailbox coprocessor stub — v2.0 bring-up
- * vFDD + VDU/GFX + APU handshake (poll-based, no IRQ)
+ * vFDD + VDU/GFX + HID + APU handshake (poll-based, no IRQ)
  * Core1 HDMI compose — TODO
  */
 #include <stdint.h>
@@ -13,10 +13,12 @@
 #define MB_AUX       (MB_BASE + 0x03u)
 #define MB_BUFFER    (MB_BASE + 0x04u)
 
-#define MB_ST_READY     0x01u
-#define MB_ST_BUSY      0x02u
-#define MB_ST_ERROR     0x04u
-#define MB_ST_APU_READY 0x08u
+#define MB_ST_READY           0x01u
+#define MB_ST_BUSY            0x02u
+#define MB_ST_ERROR           0x04u
+#define MB_ST_APU_READY       0x08u
+#define MB_ST_HID_KEY_PENDING 0x10u
+#define MB_ST_HID_MOUSE_PENDING 0x20u
 
 #define CMD_NOP      0x00u
 #define CMD_READ     0x01u
@@ -25,6 +27,10 @@
 /* VDU text 0x10–0x17, GFX 0x20–0x26, system 0x30–0x31 — see docs/mailbox-protocol.md */
 #define CMD_VDU_MIN  0x10u
 #define CMD_VDU_MAX  0x31u
+
+/* HID 0x40–0x43 — see docs/mailbox-protocol.md §2.5 */
+#define CMD_HID_MIN  0x40u
+#define CMD_HID_MAX  0x43u
 
 /* APU PSG 0x50–0x53 — see docs/mailbox-protocol.md §2.4 */
 #define CMD_APU_MIN  0x50u
@@ -69,6 +75,15 @@ static void handle_vdu(uint8_t cmd)
     mb_set_status(MB_ST_READY);
 }
 
+static void handle_hid(uint8_t cmd)
+{
+    (void)cmd;
+    (void)*mb_param;
+    /* TODO: Core0 TinyUSB HID → FIFO queues */
+    mb_set_status(MB_ST_BUSY);
+    mb_set_status(MB_ST_READY | MB_ST_APU_READY);
+}
+
 static void handle_apu(uint8_t cmd)
 {
     (void)cmd;
@@ -81,6 +96,11 @@ static void handle_apu(uint8_t cmd)
 static int is_vdu_cmd(uint8_t cmd)
 {
     return cmd >= CMD_VDU_MIN && cmd <= CMD_VDU_MAX;
+}
+
+static int is_hid_cmd(uint8_t cmd)
+{
+    return cmd >= CMD_HID_MIN && cmd <= CMD_HID_MAX;
 }
 
 static int is_apu_cmd(uint8_t cmd)
@@ -111,6 +131,8 @@ int main(void)
         default:
             if (is_vdu_cmd(cmd)) {
                 handle_vdu(cmd);
+            } else if (is_hid_cmd(cmd)) {
+                handle_hid(cmd);
             } else if (is_apu_cmd(cmd)) {
                 handle_apu(cmd);
             } else {
