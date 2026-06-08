@@ -20,10 +20,10 @@ CPU remains **master** for program execution; RP2350 serves MMIO Mailbox only (n
 
 | Core | Workload |
 |------|----------|
-| **Core0** | vFDD, **APU** (PSG mix, PWM), USB/HID (future) |
+| **Core0** | vFDD, **APU** (PSG mix, PWM), **HID** (USB keyboard/mouse) |
 | **Core1** | VDU compose, HSTX HDMI |
 
-During vFDD **Busy**, APU Mailbox commands are **silent dropped**. APU param queue ≤ **1 KiB** on RP2350 SRAM.
+During vFDD **Busy**, APU and HID Mailbox commands are **silent dropped**. APU param queue ≤ **1 KiB**; HID key/mouse FIFOs on RP2350 SRAM.
 
 ---
 
@@ -46,6 +46,7 @@ Reference implementation: [`firmware/rp2350/mailbox_stub/main.c`](../firmware/rp
 - WRITE: reverse path.
 - VDU: [display-console.md](display-console.md) (firmware TBD).
 - APU: [audio-apu.md](audio-apu.md) (PWM synthesis TBD on Core0).
+- HID: [input-hid.md](input-hid.md) (TinyUSB TBD on Core0).
 
 ---
 
@@ -62,3 +63,4 @@ Reference implementation: [`firmware/rp2350/mailbox_stub/main.c`](../firmware/rp
 |------|------|
 | 2026-06-01 | Mailbox-centric copro contract |
 | 2026-06-08 | Core0 APU; vFDD/APU exclusion |
+| 2026-06-08 | Core0 HID; vFDD/HID exclusion |

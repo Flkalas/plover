@@ -107,7 +107,7 @@ Source 1×1     HDMI 2×2 block
 | Font + text matrix 40×25 | Core1 | Internal `char_buf[25][40]` + attributes |
 | 320×240 compose @ 30 Hz | Core1 | Double-buffer flip |
 | HSTX / DVI HDMI 640×480@60 | Core1 PIO/HSTX | Spatial + temporal upscale |
-| HID → Mailbox | Core1 | Keyboard injects into console input queue |
+| HID → Mailbox | Core0 | USB keyboard/mouse → FIFO; CPU polls READ cmds |
 
 VDU/GFX mailbox commands are normative in [mailbox-protocol.md](mailbox-protocol.md) §2.1–2.3 (`0x10–0x31`). CPU writes text via `VDU_PUTCH` / `VDU_PRINT` and bitmap via `GFX_PLOT` / `GFX_BLIT`; RP2350 composes layers into the 320×240 back buffer.
 

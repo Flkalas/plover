@@ -11,7 +11,7 @@ Polling only — **no IRQ**.
 
 | Offset | Name | R/W | Description |
 |--------|------|-----|-------------|
-| `$FF00` | `MB_STATUS` | R | Bit0 **DataReady** · Bit1 **Busy** · Bit2 **Error** · Bit3 **APU_READY** |
+| `$FF00` | `MB_STATUS` | R | Bit0 **DataReady** · Bit1 **Busy** · Bit2 **Error** · Bit3 **APU_READY** · Bit4 **HID_KEY_PENDING** · Bit5 **HID_MOUSE_PENDING** |
 | `$FF01` | `MB_CMD` | W | Command to RP2350 |
 | `$FF02` | `MB_PARAM` | W | Parameter (e.g. sector LSB) |
 | `$FF03` | `MB_AUX` | W | VDU/GFX sub-parameter (e.g. cursor row) |
@@ -82,7 +82,21 @@ See [audio-apu.md](audio-apu.md). **Silent drop** on invalid/busy — no `ST_ERR
 
 **MB_STATUS bit3 `APU_READY`:** `1` when APU command queue accepts writes.
 
-**Reserved:** `0x40–0x4F` HID · `0x54–0x5F` PCM (v0.2).
+### 2.5 HID / input (`0x40–0x43`)
+
+See [input-hid.md](input-hid.md). **Silent drop** on vFDD busy / invalid inject — no `ST_ERROR`.
+
+| Value | Name | BUFFER | Action |
+|-------|------|--------|--------|
+| `0x40` | HID_POLL | out `[0]` key_depth, `[1]` mouse_depth | Queue depths (cap 255) |
+| `0x41` | HID_KEY_READ | out `[0]` ASCII char; `0` if empty | Dequeue one key |
+| `0x42` | HID_MOUSE_READ | out `[0]` buttons, `[1]` dx, `[2]` dy | Dequeue mouse; zeros if empty |
+| `0x43` | HID_INJECT | `[0]` type: 0=key/`[1]` char, 1=mouse/`[1..3]` | Enqueue (VM/test; copro on hw) |
+
+**MB_STATUS bit4 `HID_KEY_PENDING`:** keyboard queue non-empty.  
+**MB_STATUS bit5 `HID_MOUSE_PENDING`:** mouse queue non-empty.
+
+**Reserved:** `0x44–0x4F` HID extension · `0x54–0x5F` PCM (v0.2).
 
 ---
 
@@ -126,3 +140,4 @@ CPLD asserts `MAILBOX_EN` for `$FF00–$FFFB` only; RAM_2 `/CE` negated in this 
 | 2026-06-01 | 252 B window; cmd 0/1/2 |
 | 2026-06-08 | MB_AUX; VDU/GFX cmds 0x10–0x31 |
 | 2026-06-08 | APU_READY bit3; PSG cmds 0x50–0x53 |
+| 2026-06-08 | HID_KEY/MOUSE_PENDING bit4/5; HID cmds 0x40–0x43 |

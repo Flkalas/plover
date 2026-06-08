@@ -54,7 +54,7 @@ See [mailbox-protocol.md](mailbox-protocol.md) §2.4.
 | `0x52` | APU_CH_SYNC | Commit staged channels |
 | `0x53` | APU_CH_OFF | Immediate mute one channel |
 
-**Reserved:** `0x40–0x4F` HID · `0x54–0x5F` future PCM/extension.
+**Reserved:** `0x54–0x5F` future PCM/extension. HID: [input-hid.md](input-hid.md) (`0x40–0x43`).
 
 ---
 

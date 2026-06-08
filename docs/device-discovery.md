@@ -11,6 +11,7 @@ Discovery uses **standard bus slot windows** and a fixed signature register.
 
 - `0xA1` => vFDD
 - `0x41` => Audio (APU)
+- `0x48` => HID (keyboard/mouse)
 - `0xB2` => Video
 - `0xC3` => GPIO
 - `0xD4` => Serial (UART module)
