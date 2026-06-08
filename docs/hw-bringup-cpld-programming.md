@@ -1,5 +1,7 @@
 # CPLD 프로그래밍 시방서 (ATF1504AS)
 
+> **Canonical:** [hw-bringup/M2a-cpld-decode.md](hw-bringup/M2a-cpld-decode.md) (상세) · Boot G1–G5 → [M4b-boot-hardware.md](hw-bringup/M4b-boot-hardware.md).
+
 | 항목 | 내용 |
 |------|------|
 | **대상 IC** | **ATF1504AS-10JU44** (PLCC-44, 64 매크로셀) |
@@ -145,7 +147,21 @@ flowchart TD
   D --> E[ALU Y → D bus + LOAD_R*]
   E --> F[8b CW / REG_WE / opcode·phase]
   F --> G[SRAM + ROM + 2 MHz clk]
+  G --> H[Boot ROM JMP smoke]
+  H --> I[Recovery: manual Run handoff]
 ```
+
+### 6.1 Boot ROM bring-up (JMP product path)
+
+| Step | Action | Gate |
+|------|--------|------|
+| **G1** | NOR: `boot_rom.hex` + `cw.hex` + `boot_vector.hex` | `python tools/gen_boot_fixtures.py` |
+| **G2** | `MAP_MODE=0`, RESET → fetch `$0000` (ROM) | Logic probe / `plover_vm scenario hw/scenarios/vm/boot_jmp_handoff.yaml` |
+| **G3** | RP2350 + vFDD: sector 0 READ → RAM `$0800` | Mailbox Busy/DataReady LED or serial log |
+| **G4** | Auto `JMP $0800` — kernel HALT / GPIO | `tests/test_boot_jmp_handoff.py` |
+| **G5** | Recovery: `boot_rom_manual.hex` or DIP Run + RESET | `tests/test_boot_handoff.py` |
+
+Normative flow: [boot-jmp-handoff.md](boot-jmp-handoff.md). ROM layout: `hw/fixtures/sw/boot_rom_head.asm`, copy @ `$0120`, tail @ `$0600`.
 
 GPR·ALU 상세: **[hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md)**.
 

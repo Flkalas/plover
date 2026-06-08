@@ -6,13 +6,13 @@
 | **규모** | 74HC DIP **14개** (Phase B2: `153_B`×4, `153_L`×4, `157_YBP`×2, `283`×2, `04`×2; CMP via SUB) |
 | **전원** | **5 V** 단일 레일 (본 문서는 5 V 빵판 ALU만) |
 | **목표** | 신호 흐름 순으로 IC를 **한 덩어리씩** 올려, 매 단계에서 **LED로 검증** |
-| **후속** | CPLD 소각 → [GPR↔ALU](hw-bringup-gpr-alu.md) → 574 래치(B3b) · 2 MHz(B3c) → [hw-bringup-b3.md](hw-bringup-b3.md) |
+| **후속** | [M1-b3-procedure](hw-bringup/M1-b3-procedure.md) → [M2a](hw-bringup/M2a-cpld-decode.md) → [M2b-gpr-datapath](hw-bringup/M2b-gpr-datapath.md) |
 
 **관련 문서**
 
 | 문서 | 용도 |
 |------|------|
-| [hw-bringup-b3.md](hw-bringup-b3.md) | B3a/b/c 전체 브링업 |
+| [hw-bringup/M1-b3-procedure.md](hw-bringup/M1-b3-procedure.md) | B3a/b/c 전체 브링업 |
 | [hw-bringup-b3-opcode.md](hw-bringup-b3-opcode.md) | 12 opcode DIP/타이 값 |
 | [hw-bringup-cpld-programming.md](hw-bringup-cpld-programming.md) | CPLD 플래싱 |
 | [hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md) | GPR–ALU 연결 |

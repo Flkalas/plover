@@ -1,5 +1,8 @@
 # B3 — ALU + 574 accumulator bring-up (phased)
 
+> **Canonical:** [hw-bringup/M1-b3-procedure.md](hw-bringup/M1-b3-procedure.md) (상세 절차) · [hw-bringup/M1-alu.md](hw-bringup/M1-alu.md) (sign-off).  
+> 이 파일은 레거시 복사본 — 신규 편집은 `hw-bringup/` 쪽을 우선합니다.
+
 Breadboard procedure in three steps: **B3a** (comb Y) → **B3b** (manual latch) → **B3c** (2 MHz clock).  
 Electrical behavior is validated in hwsim before wiring.
 

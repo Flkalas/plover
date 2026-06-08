@@ -1,5 +1,7 @@
 # GPR(574×4) ↔ ALU 연결 시방서
 
+> **Canonical:** [hw-bringup/M2b-gpr-datapath.md](hw-bringup/M2b-gpr-datapath.md) (G0–G6) · [M2b-memory.md](hw-bringup/M2b-memory.md) · fetch → [M3b-fetch-execute.md](hw-bringup/M3b-fetch-execute.md).
+
 | 항목 | 내용 |
 |------|------|
 | **범위** | v0.1 CPU 데이터패스 — **R0–R3 (74HC574×4)** 와 **alu8 (74HC×16, Phase B2)** 연결 |
