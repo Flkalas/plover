@@ -12,7 +12,8 @@ Host-side minimal Forth core used as the behavioral reference for later VM and n
 
 ## Implementation
 
-- Interpreter: `forth/interpreter.py`
+- Python reference: `forth/interpreter.py`
+- Rust port: `crates/plover_forth` (`cargo test -p plover_forth`)
 - Scenario kind: `kind: forth` in `hw/scenarios/vm/*.yaml`
 - Runner: `python tools/run_forth_demo.py`
 
@@ -21,5 +22,6 @@ Host-side minimal Forth core used as the behavioral reference for later VM and n
 - `tests/test_forth_primitives.py`
 - `tests/test_forth_interpret.py`
 - `tests/test_forth_normative.py` (micro engine regression guard)
-- `python -m plover_vm scenario hw/scenarios/vm/forth_boot.yaml`
+- `cargo run -p plover_vm -- scenario hw/scenarios/vm/forth_boot.yaml`
+- `python -m plover_vm scenario hw/scenarios/vm/forth_boot.yaml` (oracle)
 

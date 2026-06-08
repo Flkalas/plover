@@ -15,3 +15,13 @@ In v0.1 bring-up the shell is represented by a scripted scenario that exercises:
 - `tests/test_dos_shell.py`
 - `python tools/run_dos_demo.py`
 
+## Rust (plover_os)
+
+```bash
+cargo test -p plover_os
+cargo run -p plover_vm -- dos-shell
+cargo run -p plover_vm -- scenario hw/scenarios/vm/dos_boot.yaml
+```
+
+Interactive shell: prompt `PL-DOS>`, lines truncated to 40 characters (Python parity). `plsrun`/`ccrun`/`ldrun` require Python on `PATH`.
+

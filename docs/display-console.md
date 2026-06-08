@@ -128,7 +128,22 @@ Normative PL-DOS `dir` formatting (future): trim padding, insert `.` before exte
 
 ---
 
-## 6. VM / bring-up (until HDMI)
+## 6. MODE_BOTH compositing (Presenter / Rust VM)
+
+When `VDU_MODE = 2` (text + bitmap):
+
+| Layer | Rule |
+|-------|------|
+| Bitmap | 320×200 RGB565 base |
+| Text | 40×25 × 8×8 cells over bitmap |
+| Transparency | Text **fg palette index 0** → show bitmap pixel (chroma key) |
+| Opaque text | Non-zero fg draws over cell; bg attr fills cell background |
+
+Normative Presenter implementation: [vm-rust.md](vm-rust.md). Python `VduState` stores layers separately; compositing runs in `plover_presenter` only.
+
+---
+
+## 7. VM / bring-up (until HDMI)
 
 | Layer | Console |
 |-------|---------|
@@ -143,3 +158,4 @@ Normative PL-DOS `dir` formatting (future): trim padding, insert `.` before exte
 | Date | Note |
 |------|------|
 | 2026-06-08 | v0.1 normative: 40×25, 320×240@30 → 640×480@60 HDMI on RP2350B |
+| 2026-06-08 | MODE_BOTH chroma-key compositing for Presenter |

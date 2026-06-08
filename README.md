@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 |------|------|
 | **지금** | ALU hwsim + CPU gate + **plover_vm** logic VM |
-| **시뮬** | [hwsim](docs/hw-sim.md) (15 tests) · [plover_vm](docs/reviewer-handoff.md#5-plover_vm--로직-vm) |
+| **시뮬** | [hwsim](docs/hw-sim.md) (15 tests) · [plover_vm Rust](docs/vm-rust.md) · [Python VM](docs/reviewer-handoff.md#5-plover_vm--로직-vm) |
 | **CPU** | 574×4 GPR · 8b microcode CW · 2×32K SRAM (64 KB) |
 | **BOM** | ~48 74HC + **ATF1504AS** + **SST39×1** + **IS62×2** |
 
@@ -42,6 +42,20 @@ python -m hwsim run hw/tests/mem_decode.yaml
 ---
 
 ## plover_vm (로직 VM)
+
+**Rust runtime (v0.1):** [docs/vm-rust.md](docs/vm-rust.md)
+
+```bash
+cargo test --workspace
+cargo run -p plover_vm -- run hw/fixtures/sram/add_imm.sram.hex --map run --engine fast
+cargo run -p plover_vm -- scenario hw/scenarios/vm/add_imm.yaml
+cargo run -p plover_vm -- scenario hw/scenarios/vm/forth_boot.yaml
+cargo run -p plover_vm -- dos-shell
+cargo run -p plover_vm -- vdu-demo
+cargo run -p plover_vm -- play --pls hw/fixtures/sw/vdu_smoke.pls --headless
+```
+
+Python VM (deprecated oracle during transition):
 
 ```bash
 python -m pytest tests/ -q

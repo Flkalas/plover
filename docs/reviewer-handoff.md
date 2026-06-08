@@ -46,7 +46,9 @@ RP2350B                    Mailbox copro (펌웨어 stub만)
 | 항목 | 값 |
 |------|-----|
 | Python | **3.10+** |
-| 외부 패키지 | **없음** (stdlib + pytest만 선택) |
+| Python VM deps | **없음** (stdlib + pytest만 선택) |
+| Rust VM | **1.70+** ([vm-rust.md](vm-rust.md)); `cargo test --workspace` |
+| Presenter (optional) | SDL2 + cpal via Cargo features `sdl`, `audio` |
 | OS | Windows / Linux 동일 |
 | 작업 디렉터리 | 저장소 **루트** (`D:\Github\plover` 등) |
 
@@ -55,6 +57,7 @@ RP2350B                    Mailbox copro (펌웨어 stub만)
 python --version
 python -m hwsim run --all
 python -m pytest tests/ -q
+cargo test --workspace
 ```
 
 ---
