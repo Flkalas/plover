@@ -1,6 +1,6 @@
 /**
  * RP2350 mailbox coprocessor stub — v2.0 bring-up
- * vFDD + VDU/GFX handshake (poll-based, no IRQ)
+ * vFDD + VDU/GFX + APU handshake (poll-based, no IRQ)
  * Core1 HDMI compose — TODO
  */
 #include <stdint.h>
@@ -13,9 +13,10 @@
 #define MB_AUX       (MB_BASE + 0x03u)
 #define MB_BUFFER    (MB_BASE + 0x04u)
 
-#define MB_ST_READY  0x01u
-#define MB_ST_BUSY   0x02u
-#define MB_ST_ERROR  0x04u
+#define MB_ST_READY     0x01u
+#define MB_ST_BUSY      0x02u
+#define MB_ST_ERROR     0x04u
+#define MB_ST_APU_READY 0x08u
 
 #define CMD_NOP      0x00u
 #define CMD_READ     0x01u
@@ -24,6 +25,10 @@
 /* VDU text 0x10–0x17, GFX 0x20–0x26, system 0x30–0x31 — see docs/mailbox-protocol.md */
 #define CMD_VDU_MIN  0x10u
 #define CMD_VDU_MAX  0x31u
+
+/* APU PSG 0x50–0x53 — see docs/mailbox-protocol.md §2.4 */
+#define CMD_APU_MIN  0x50u
+#define CMD_APU_MAX  0x53u
 
 static volatile uint8_t *const mb_status = (uint8_t *)MB_STATUS;
 static volatile uint8_t *const mb_cmd = (uint8_t *)MB_CMD;
@@ -64,15 +69,29 @@ static void handle_vdu(uint8_t cmd)
     mb_set_status(MB_ST_READY);
 }
 
+static void handle_apu(uint8_t cmd)
+{
+    (void)cmd;
+    (void)*mb_param;
+    /* TODO: Core0 PSG mix @ 22.05 kHz, PWM GPIO */
+    mb_set_status(MB_ST_BUSY);
+    mb_set_status(MB_ST_READY | MB_ST_APU_READY);
+}
+
 static int is_vdu_cmd(uint8_t cmd)
 {
     return cmd >= CMD_VDU_MIN && cmd <= CMD_VDU_MAX;
 }
 
+static int is_apu_cmd(uint8_t cmd)
+{
+    return cmd >= CMD_APU_MIN && cmd <= CMD_APU_MAX;
+}
+
 int main(void)
 {
     memset(sector_stub, 0xA5, sizeof(sector_stub));
-    mb_set_status(0);
+    mb_set_status(MB_ST_APU_READY);
 
     for (;;) {
         uint8_t cmd = *mb_cmd;
@@ -92,6 +111,8 @@ int main(void)
         default:
             if (is_vdu_cmd(cmd)) {
                 handle_vdu(cmd);
+            } else if (is_apu_cmd(cmd)) {
+                handle_apu(cmd);
             } else {
                 mb_set_status(MB_ST_ERROR);
             }
