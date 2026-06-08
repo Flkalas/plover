@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from kern.audio import SIG_AUDIO, AudioDriver
 from kern.gpio import GpioController
 from kern.serial import SIG_UART, SerialModule
 from kern.video import SIG_VIDEO, VideoDriver
@@ -17,6 +18,7 @@ SIG_GPIO = 0xC3
 
 DRIVER_BY_SIG = {
     SIG_FDD: "vfdd",
+    SIG_AUDIO: "audio",
     SIG_VIDEO: "video",
     SIG_GPIO: "gpio",
     SIG_UART: "serial",
@@ -39,6 +41,7 @@ class Kernel:
         self.gpio = GpioController()
         self.serial = SerialModule()
         self.video = VideoDriver(bus)
+        self.audio = AudioDriver(bus)
 
     def kprint(self, s: str) -> None:
         self.state.output.append(s)
@@ -66,7 +69,13 @@ class Kernel:
     def boot(self) -> None:
         if not self.state.slot_signatures:
             # default teaching/demo topology: vfdd, gpio, serial
-            self.state.slot_signatures = {0: SIG_FDD, 1: SIG_GPIO, 2: SIG_UART, 3: SIG_VIDEO}
+            self.state.slot_signatures = {
+                0: SIG_FDD,
+                1: SIG_GPIO,
+                2: SIG_UART,
+                3: SIG_VIDEO,
+                4: SIG_AUDIO,
+            }
         self.kprint("kernel_boot")
         self.devmgr_scan()
         self.kprint("kernel_help")

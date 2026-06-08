@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from typing import Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from kern.audio import AudioDriver
     from kern.video import VideoDriver
     from plover_vm.memory.bus import MemoryBus
 
@@ -40,10 +41,13 @@ class Forth:
         self._compile: list[str] | None = None
         self._compile_name: str | None = None
         self._video: VideoDriver | None = None
+        self._audio: AudioDriver | None = None
         if bus is not None:
+            from kern.audio import AudioDriver
             from kern.video import VideoDriver
 
             self._video = VideoDriver(bus)
+            self._audio = AudioDriver(bus)
         self._install_core()
 
     def emit(self, s: str) -> None:
@@ -103,6 +107,9 @@ class Forth:
             self.word("GRECT", self._w_grect)
             self.word("GVSYNC", self._w_gvsync)
 
+        if self._audio is not None:
+            self.word("BEEP", self._w_beep)
+
         # Compilation control
         self.word(":", self._w_colon, immediate=True)
         self.word(";", self._w_semicolon, immediate=True)
@@ -156,6 +163,12 @@ class Forth:
     def _w_gvsync(self, _f: "Forth") -> None:
         if self._video is not None:
             self._video.vsync()
+
+    def _w_beep(self, _f: "Forth") -> None:
+        if self._audio is not None:
+            duration = self.pop() & 0xFFFF
+            period = self.pop() & 0xFFFF
+            self._audio.beep(period, duration)
 
     def _w_key(self, _f: "Forth") -> None:
         if not self.input_bytes:
