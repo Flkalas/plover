@@ -12,6 +12,7 @@ from typing import Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from kern.audio import AudioDriver
+    from kern.input import InputDriver
     from kern.video import VideoDriver
     from plover_vm.memory.bus import MemoryBus
 
@@ -42,12 +43,15 @@ class Forth:
         self._compile_name: str | None = None
         self._video: VideoDriver | None = None
         self._audio: AudioDriver | None = None
+        self._input: InputDriver | None = None
         if bus is not None:
             from kern.audio import AudioDriver
+            from kern.input import InputDriver
             from kern.video import VideoDriver
 
             self._video = VideoDriver(bus)
             self._audio = AudioDriver(bus)
+            self._input = InputDriver(bus)
         self._install_core()
 
     def emit(self, s: str) -> None:
@@ -110,6 +114,9 @@ class Forth:
         if self._audio is not None:
             self.word("BEEP", self._w_beep)
 
+        if self._input is not None:
+            self.word("MOUSE?", self._w_mouse_q)
+
         # Compilation control
         self.word(":", self._w_colon, immediate=True)
         self.word(";", self._w_semicolon, immediate=True)
@@ -171,9 +178,23 @@ class Forth:
             self._audio.beep(period, duration)
 
     def _w_key(self, _f: "Forth") -> None:
+        if self._input is not None and self._input.key_pending():
+            self.push(self._input.read_key() & 0xFF)
+            return
         if not self.input_bytes:
             raise ForthError("KEY: no input")
         self.push(self.input_bytes.pop(0) & 0xFF)
+
+    def _w_mouse_q(self, _f: "Forth") -> None:
+        if self._input is not None and self._input.mouse_pending():
+            buttons, dx, dy = self._input.read_mouse()
+            self.push(buttons & 0xFFFF)
+            self.push(dx & 0xFFFF)
+            self.push(dy & 0xFFFF)
+            return
+        self.push(0)
+        self.push(0)
+        self.push(0)
 
     def _get_block(self, n: int) -> bytearray:
         if n not in self.blocks:

@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 
 from kern.audio import SIG_AUDIO, AudioDriver
 from kern.gpio import GpioController
+from kern.input import SIG_HID, InputDriver
 from kern.serial import SIG_UART, SerialModule
 from kern.video import SIG_VIDEO, VideoDriver
 from plover_vm.memory.bus import MemoryBus
@@ -18,6 +19,7 @@ SIG_GPIO = 0xC3
 
 DRIVER_BY_SIG = {
     SIG_FDD: "vfdd",
+    SIG_HID: "hid",
     SIG_AUDIO: "audio",
     SIG_VIDEO: "video",
     SIG_GPIO: "gpio",
@@ -42,6 +44,7 @@ class Kernel:
         self.serial = SerialModule()
         self.video = VideoDriver(bus)
         self.audio = AudioDriver(bus)
+        self.input = InputDriver(bus)
 
     def kprint(self, s: str) -> None:
         self.state.output.append(s)
@@ -75,6 +78,7 @@ class Kernel:
                 2: SIG_UART,
                 3: SIG_VIDEO,
                 4: SIG_AUDIO,
+                5: SIG_HID,
             }
         self.kprint("kernel_boot")
         self.devmgr_scan()
