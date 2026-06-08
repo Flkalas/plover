@@ -8,7 +8,7 @@ Normative RAM regions for Forth, kernel, PL-DOS on the 64 KiB map (`plover_vm` a
 
 | Region | Range | Owner | Notes |
 |--------|-------|-------|-------|
-| Boot / vectors | `$0000–$07FF`, `$FFFC` | ROM | [bootloader.md](bootloader.md) |
+| Boot / vectors | `$0000–$07FF`, `$FFFC` | ROM | [bootloader.md](bootloader.md) · [boot-jmp-handoff.md](boot-jmp-handoff.md) |
 | Kernel + Forth dict | `$0800–$27FF` | S3 / S6 | Entry @ `$0800` Run mode |
 | **PLR load arena** | `$2800–$5FFF` | S7c | Spawn targets |
 | Heap / FS cache | `$6000–$DFFF` | S6 / S7b | Bump allocator, dir window |
