@@ -53,11 +53,10 @@ Supersedes archived pre-v0.1 specs — see [archive/pre-v0.1/](archive/pre-v0.1/
 
 1. Power on — **MAP_MODE=Boot** (DIP default).
 2. **RESET** — CPLD forces fetch @ **`$FFFC`** → ROM vector → boot @ `$0000–$07FF`.
-3. Bootloader: POST → vFDD load (Mailbox) → copy kernel/utility to **RAM `$0800+`** → write RAM vector @ `$FFFC` → **halt**.
-4. Operator: DIP → **Run**, press **RESET**.
-5. Fetch `$FFFC` from **RAM** → kernel execute.
+3. Bootloader: POST → vFDD load (Mailbox) → copy kernel/utility to **RAM `$0800+`** → optional RAM vector @ `$FFFC` → **`JMP $0800`** (product) or **halt** (bring-up).
+4. **Manual path only:** operator DIP → **Run**, press **RESET** → fetch `$FFFC` from **RAM** → kernel execute.
 
-Details: [bootloader.md](bootloader.md) · [memory-map.md](memory-map.md).
+Details: [bootloader.md](bootloader.md) · [boot-jmp-handoff.md](boot-jmp-handoff.md) · [memory-map.md](memory-map.md).
 
 ---
 
@@ -68,8 +67,9 @@ Details: [bootloader.md](bootloader.md) · [memory-map.md](memory-map.md).
 | [memory-map.md](memory-map.md) | Address map, Mode A/B |
 | [rom-architecture.md](rom-architecture.md) | Control / Boot / Utility segments |
 | [cpld-system-controller.md](cpld-system-controller.md) | CPLD ports, decode, GPR load |
-| [hw-bringup-cpld-programming.md](hw-bringup-cpld-programming.md) | ATF1504 ISP·소각 시방 |
-| [hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md) | 574×4 GPR ↔ ALU 배선 |
+| [hw-bringup/README.md](hw-bringup/README.md) | **M1–M5 breadboard bring-up index** |
+| [hw-bringup-cpld-programming.md](hw-bringup-cpld-programming.md) | M2a detail — ATF1504 ISP |
+| [hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md) | M2b detail — GPR ↔ ALU |
 | [microcode-spec.md](microcode-spec.md) | 8b CW, ISA, Reg_Sel table |
 | [mailbox-protocol.md](mailbox-protocol.md) | `$FF00` MMIO, polling |
 | [rp2350-coprocessor.md](rp2350-coprocessor.md) | Copro board, firmware contract |

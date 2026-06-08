@@ -14,14 +14,17 @@ Design notes and **hwsim** for Plover — **v0.1 CPU** (574×4 GPR + ATF1504AS s
 | [mailbox-protocol.md](mailbox-protocol.md) | MMIO `$FF00` |
 | [rp2350-coprocessor.md](rp2350-coprocessor.md) | Copro board |
 | [bootloader.md](bootloader.md) | Boot · Run handoff |
+| [boot-jmp-handoff.md](boot-jmp-handoff.md) | **JMP chain load** (no DIP/RESET) |
 | [implementation-plan-v0.1.md](implementation-plan-v0.1.md) | Milestones |
+| **[hw-bringup/](hw-bringup/README.md)** | **M1–M5 breadboard 시방서** — [M1-b3](hw-bringup/M1-b3-procedure.md) · [M2b datapath](hw-bringup/M2b-gpr-datapath.md) · [M3b fetch](hw-bringup/M3b-fetch-execute.md) |
 | [plans/](plans/) | Active bring-up plans (B3) |
 | [alu-opcodes-timing.md](alu-opcodes-timing.md) | ALU comb delay |
 | [hw-sim.md](hw-sim.md) | `python -m hwsim` · `plover_vm` |
-| [hw-bringup-alu8-assembly-spec.md](hw-bringup-alu8-assembly-spec.md) | ALU8 단계별 조립 — **Phase B2** (14 IC, `153_L`, CMP via SUB) |
-| [hw-bringup-cpld-programming.md](hw-bringup-cpld-programming.md) | CPLD ATF1504 소각·ISP |
-| [hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md) | GPR 574×4 ↔ ALU 배선 |
-| [hw-bringup-b3.md](hw-bringup-b3.md) | ALU + 574 ACC + 2 MHz |
+| [hw-bringup/](hw-bringup/README.md) | Milestone bring-up index (M1–M5) |
+| [hw-bringup-alu8-assembly-spec.md](hw-bringup-alu8-assembly-spec.md) | M1 detail — ALU8 조립 (Phase B2) |
+| [hw-bringup-cpld-programming.md](hw-bringup-cpld-programming.md) | M2a detail — CPLD ISP |
+| [hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md) | M2b/M3b detail — GPR ↔ ALU |
+| [hw-bringup-b3.md](hw-bringup-b3.md) | M1 detail — B3 phased procedure |
 | [reviewer-handoff.md](reviewer-handoff.md) | **검토자 인수인계** |
 | [roadmap-next.md](roadmap-next.md) | Roadmap |
 | [fpga-target-guide.md](fpga-target-guide.md) | **FPGA / Verilog** 타깃·교육 보드·외부 ROM/RAM (기준 문서) |

@@ -73,6 +73,7 @@ python tools/run_fib_20000_demo.py
 - [x] ALU bringup hwsim (10 tests)
 - [x] **v0.1** normative docs · BOM
 - [x] CPU gate hwsim: GPR 574, mem decode, mailbox, boot handoff
+- [x] JMP boot chain-load (`boot_rom.hex`, LDIO/STA16, `test_boot_jmp_handoff`)
 - [x] **plover_vm** logic VM + Fibonacci 데모 (8b/16b)
 - [ ] B3 실기 · full `cpu` netlist integration
 

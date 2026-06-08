@@ -82,7 +82,8 @@ python -m hwsim run hw/tests/mem_decode.yaml
 | `v2_regfile_574` | 574×4 dual-read GPR |
 | `v2_mem_decode` | Mode A/B, A15 bank, Mailbox `$FF00` |
 | `v2_monitor_poll` | MMIO STATUS / CMD stub |
-| `v2_boot_handoff` | Reset `$FFFC`, Run mode RAM vector |
+| `v2_boot_handoff` | Reset `$FFFC`, Run mode RAM vector (manual) |
+| `boot_jmp_handoff` (VM) | JMP `$0800` @ `MAP_MODE=0` — [boot-jmp-handoff.md](boot-jmp-handoff.md) |
 
 레거시 baseline: ALU 12건 + `cpld_regfile_dual_read` (v1.3 CPLD regfile)
 
@@ -126,6 +127,8 @@ plover_vm/
 python -m plover_vm run hw/fixtures/sram/add_imm.sram.hex --engine fast --map run --max-steps 500
 python -m plover_vm scenario hw/scenarios/vm/add_imm.yaml
 python -m plover_vm scenario hw/scenarios/vm/boot_run.yaml
+python -m plover_vm scenario hw/scenarios/vm/boot_jmp_handoff.yaml
+python -m pytest tests/test_boot_jmp_handoff.py -q
 ```
 
 ### 5.3 pytest (23 tests)
@@ -140,7 +143,8 @@ python -m pytest tests/ -q
 | `test_alu.py` / `test_alu16.py` | ALU 8/16-bit |
 | `test_micro_add.py` | R2 ← R0+R1 (micro) |
 | `test_add_imm.py` | add_imm.sram.hex → HALT |
-| `test_boot_handoff.py` | Run + RESET → PC=$0800 |
+| `test_boot_handoff.py` | Manual ROM: Run + RESET → PC=$0800 |
+| `test_boot_jmp_handoff.py` | Product ROM: JMP chain @ Boot mode |
 | `test_monitor_poll.py` | Mailbox READ sector |
 | `test_engine_parity.py` | fast vs micro (R0 일치) |
 
@@ -248,7 +252,7 @@ hw/fixtures/
   control/        cw.hex, nor_cw_region.hex
   sram/           add_imm, fib_to_200, fib_to_20000 (.sram.hex)
   sw/             *.asm (macroasm 소스)
-hw/scenarios/vm/  add_imm.yaml, boot_run.yaml
+hw/scenarios/vm/  add_imm.yaml, boot_run.yaml, boot_jmp_handoff.yaml, boot_jmp_kernel.yaml
 firmware/rp2350/mailbox_stub/main.c   RP2350 stub (normative doc 참조)
 ```
 

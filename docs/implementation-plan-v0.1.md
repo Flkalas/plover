@@ -40,36 +40,50 @@ Verification: `python -m hwsim run --all` (15) · `python -m pytest tests/ -q` �
 
 ## 3. Work packages
 
+**Breadboard 시방서 (canonical):** [hw-bringup/README.md](hw-bringup/README.md)
+
 ### M1 — B3 real hardware
 
-- Wire ALU per [hw-bringup-b3.md](hw-bringup-b3.md) and [alu-opcodes-timing.md](alu-opcodes-timing.md)
+- 시방: [hw-bringup/M1-alu.md](hw-bringup/M1-alu.md) · [alu-opcodes-timing.md](alu-opcodes-timing.md)
 - Scope: 12-opcode ALU + 2 MHz clock divider
 - Gate: DSO checks on critical paths (SUB, XOR, INC/DEC)
 
 ### M2 — CPU gate on breadboard
 
-- 574×4 GPR + ATF1504AS decode + 64 KB SRAM + single NOR
-- MAP_MODE switch, reset @ `$FFFC`
-- Gate: mem decode matches [memory-map.md](memory-map.md)
-- Wiring: [hw-bringup-cpld-programming.md](hw-bringup-cpld-programming.md) · [hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md)
+Split into two bring-up packages:
+
+| Sub | 시방 | Scope |
+|-----|------|-------|
+| **M2a** | [hw-bringup/M2a-cpld-decode.md](hw-bringup/M2a-cpld-decode.md) | CPLD ISP·소각, `LOAD_R*`, memory CS, reset `$FFFC` |
+| **M2b** | [hw-bringup/M2b-gpr-memory.md](hw-bringup/M2b-gpr-memory.md) | 574×4 GPR, MUX, SRAM, NOR socket, MAP_MODE |
+
+- Gate: mem decode matches [memory-map.md](memory-map.md); `cpld_gpr_decode` + `regfile_574`
 
 ### M3 — Microcode + macro bring-up
 
-- Pack remaining opcodes: CALL, RET, LDIO, STIO ([microcode-spec.md](microcode-spec.md) §3 TBD)
-- Macro assembler / VM parity for normative ISA `0x01–0x0A`
-- Gate: `verify_control_store.py` + `test_engine_parity.py`
+| Sub | 시방 | Scope |
+|-----|------|-------|
+| **M3a** | [hw-bringup/M3a-control-store.md](hw-bringup/M3a-control-store.md) | CW pack, `cw.hex`, NOR `$4000`, verify |
+| **M3b** | [hw-bringup/M3b-fetch-execute.md](hw-bringup/M3b-fetch-execute.md) | Fetch path, phase counter, first stored program |
+
+- Pack remaining opcodes: CALL, RET ([microcode-spec.md](microcode-spec.md) §3 TBD)
+- **Done (partial):** LDIO, STIO, MOV, STA16 (`0x0F`) — [boot-jmp-handoff.md](boot-jmp-handoff.md)
+- Gate: `verify_control_store.py` + `test_engine_parity.py` + M3b bench F6
 
 ### M4 — Boot + Mailbox
 
-- ROM image per [bootloader.md](bootloader.md)
-- Handoff: Boot → Run, RAM vector @ `$FFFC`
-- RP2350 firmware stub per [mailbox-protocol.md](mailbox-protocol.md)
+| Sub | 시방 | Scope |
+|-----|------|-------|
+| **M4a** | [hw-bringup/M4a-boot-sim.md](hw-bringup/M4a-boot-sim.md) | JMP handoff sim gates (**done**) |
+| **M4b** | [hw-bringup/M4b-boot-hardware.md](hw-bringup/M4b-boot-hardware.md) | NOR + RP2350 breadboard smoke G1–G5 |
+
+- Normative: [boot-jmp-handoff.md](boot-jmp-handoff.md) · manual recovery [bootloader.md](bootloader.md) §3
 
 ### M5 — Integrated cpu netlist
 
+- 시방: [hw-bringup/M5-cpu-e2e.md](hw-bringup/M5-cpu-e2e.md)
 - Expand [cpu.yaml](../hw/netlist/blocks/cpu.yaml): ALU + GPR + CPLD + dual SRAM + NOR fetch
-- End-to-end hwsim scenario (fetch → execute micro-phase)
-- Gate: new hwsim test in `hw/tests/`
+- Gate: `hw/tests/cpu_e2e.yaml` (TBD)
 
 ---
 
@@ -105,3 +119,5 @@ flowchart TB
 | Date | Note |
 |------|------|
 | 2026-06-01 | v0.1 unified plan — rebrand from v2.0 baseline |
+| 2026-06-08 | M1–M5 breadboard 시방서 — [hw-bringup/](hw-bringup/README.md) |
+| 2026-06-08 | 상세화 — M1-b3, M2b split, M3b F0–F6, 작업자 워크스루 |

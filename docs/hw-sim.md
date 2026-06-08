@@ -102,6 +102,8 @@ python -m hwsim run --all
 | `monitor_poll` | sram256_dual | MMIO STATUS poll stub |
 | `boot_handoff` | cpld_system_ctrl | Reset $FFFC + Run mode |
 
+**Software boot (plover_vm):** JMP chain-load — `boot_rom.hex` (product) vs `boot_rom_manual.hex` (recovery). See [boot-jmp-handoff.md](boot-jmp-handoff.md); gates: `test_boot_jmp_handoff`, `hw/scenarios/vm/boot_jmp_handoff.yaml`.
+
 ### ALU bringup (12)
 
 | Test | Block | Focus |
