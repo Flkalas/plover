@@ -124,7 +124,7 @@ class Assembler:
                 op = MNEMONICS[mnem]
                 if mnem in ("RET", "HALT", "ADD_RR"):
                     self.pc += 1
-                elif mnem == "JMP" or mnem == "BEQ" or mnem == "CALL":
+                elif mnem in ("JMP", "BEQ", "CALL", "STA16"):
                     self.pc += 3
                 else:
                     self.pc += 2
@@ -185,7 +185,7 @@ class Assembler:
                     self._emit(op)
                     line_bytes.append(op)
                     self.pc = start_pc + 1
-                elif mnem in ("JMP", "BEQ", "CALL"):
+                elif mnem in ("JMP", "BEQ", "CALL", "STA16"):
                     self._emit(op)
                     imm = self._operand() & 0xFFFF
                     self._emit(imm & 0xFF)

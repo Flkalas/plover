@@ -23,7 +23,9 @@ OP_RET = 0x07
 OP_LDIO = 0x08
 OP_STIO = 0x09
 OP_HALT = 0x0A
+OP_MOV = 0x0C
 OP_CMP = 0x0D
+OP_STA16 = 0x0F
 
 ALU_NOP = 0
 ALU_ADD = 1
@@ -89,6 +91,19 @@ def sequences() -> dict[int, list[int]]:
         ],
         OP_JMP: [pack_cw(alu_op=ALU_NOP)],
         OP_HALT: [pack_cw(alu_op=ALU_NOP)],
+        OP_LDIO: [
+            pack_cw(alu_op=ALU_NOP, mem_rd=1),
+            pack_cw(alu_op=ALU_NOP, reg_we=1),
+        ],
+        OP_STIO: [
+            pack_cw(alu_op=ALU_NOP, y_oe=1),
+            pack_cw(alu_op=ALU_NOP, mem_wr=1),
+        ],
+        OP_MOV: [pack_cw(alu_op=ALU_NOP)],
+        OP_STA16: [
+            pack_cw(alu_op=ALU_NOP, y_oe=1),
+            pack_cw(alu_op=ALU_NOP, mem_wr=1),
+        ],
     }
 
 

@@ -2,11 +2,19 @@
 
 from __future__ import annotations
 
-from plover_vm.macro.isa import OP_BEQ, OP_CALL, OP_HALT, OP_JMP, OP_RET, phase_count
+from plover_vm.macro.isa import (
+    OP_BEQ,
+    OP_CALL,
+    OP_HALT,
+    OP_JMP,
+    OP_MOV,
+    OP_RET,
+    OP_STA16,
+    WIDE_ABS16_OPS,
+    phase_count,
+)
 from plover_vm.memory.bus import MemoryBus
 from plover_vm.micro.engine import MicroEngine
-
-WIDE_BRANCH_OPS = frozenset({OP_BEQ, OP_JMP, OP_CALL})
 
 
 class MacroEngine:
@@ -24,7 +32,7 @@ class MacroEngine:
     def fetch_insn(self) -> None:
         fa = self.bus.fetch_addr(self.pc)
         op = self.bus.read_cpu(fa)
-        if op in WIDE_BRANCH_OPS:
+        if op in WIDE_ABS16_OPS:
             lo = self.bus.read_cpu((fa + 1) & 0xFFFF)
             hi = self.bus.read_cpu((fa + 2) & 0xFFFF)
             operand = lo | (hi << 8)
@@ -34,7 +42,12 @@ class MacroEngine:
             insn_len = 2 if op != OP_RET and op != OP_HALT else 1
         self._current_op = op
         self._current_operand = operand
-        self.micro.reset_micro(op, operand if op not in WIDE_BRANCH_OPS else operand & 0xFF)
+        op16 = operand if op in WIDE_ABS16_OPS else 0
+        self.micro.reset_micro(
+            op,
+            operand & 0xFF,
+            operand16=op16 if op == OP_STA16 else 0,
+        )
         self.pc = (fa + insn_len) & 0xFFFF
         self._fetch_pending = False
         if op == OP_HALT:
@@ -53,6 +66,9 @@ class MacroEngine:
         elif op == OP_RET:
             if self._ret_stack:
                 self.pc = self._ret_stack.pop() & 0xFFFF
+        elif op == OP_MOV:
+            dst, src = (imm >> 4) & 3, imm & 3
+            self.micro.state.regs[dst] = self.micro.state.regs[src] & 0xFF
 
     def step(self) -> None:
         if self.halted:

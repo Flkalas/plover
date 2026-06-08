@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from plover_vm.alu import alu8
+from plover_vm.macro.isa import OP_LDIO, OP_STA16, OP_STIO
+from plover_vm.macro.mmio import mmio_addr
 from plover_vm.memory.bus import MemoryBus
 from plover_vm.micro.cw import lookup_cw
 from plover_vm.micro.reg_sel import reg_sel
@@ -14,6 +16,7 @@ from plover_vm.micro.reg_sel import reg_sel
 class MicroState:
     opcode: int = 0
     operand: int = 0
+    operand16: int = 0
     phase: int = 0
     regs: list[int] = field(default_factory=lambda: [0, 0, 0, 0])
     alu_a: int = 0
@@ -30,9 +33,10 @@ class MicroEngine:
         self.bus = bus
         self.state = MicroState()
 
-    def reset_micro(self, opcode: int, operand: int) -> None:
+    def reset_micro(self, opcode: int, operand: int, operand16: int = 0) -> None:
         self.state.opcode = opcode & 0xFF
         self.state.operand = operand & 0xFF
+        self.state.operand16 = operand16 & 0xFFFF
         self.state.phase = 0
         self.state.alu_a = 0
         self.state.alu_b = 0
@@ -44,7 +48,10 @@ class MicroEngine:
         sel = reg_sel(op, ph)
 
         if cw.mem_rd:
-            st.eff_addr = st.operand & 0xFFFF
+            if op == OP_LDIO:
+                st.eff_addr = mmio_addr(st.operand)
+            else:
+                st.eff_addr = st.operand & 0xFFFF
             st.bus_data = self.bus.read_cpu(st.eff_addr)
 
         if op == 0x01 and cw.alu_op:
@@ -63,14 +70,19 @@ class MicroEngine:
             st.flag_c = res.cout
 
         if cw.reg_we and sel < 4:
-            if op == 0x02 and ph == 1:
+            if op in (0x02, OP_LDIO) and ph == 1:
                 st.regs[sel] = st.bus_data & 0xFF
             else:
                 st.regs[sel] = st.alu_y & 0xFF
 
         if cw.mem_wr:
             val = st.alu_y if cw.y_oe else st.regs[0]
-            addr = st.eff_addr if st.eff_addr else (st.operand & 0xFFFF)
+            if op == OP_STIO:
+                addr = mmio_addr(st.operand)
+            elif op == OP_STA16:
+                addr = st.operand16 & 0xFFFF
+            else:
+                addr = st.eff_addr if st.eff_addr else (st.operand & 0xFFFF)
             self.bus.write_cpu(addr, val)
 
         st.phase += 1

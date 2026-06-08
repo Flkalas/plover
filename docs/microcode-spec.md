@@ -161,20 +161,20 @@ hwsim bus gate: [`cmp_y_oe_bus`](../hw/tests/cmp_y_oe_bus.yaml) — `Y_OE=1` dri
 
 ---
 
-### LDIO (`0x08`) — planned, not packed
+### LDIO (`0x08`) — packed
 
-Same CW pattern as LDA; effective address in MMIO window `$FF00–$FFFB` (CPLD `MAILBOX_EN`).
+Same CW pattern as LDA; effective address `0xFF00 | (imm8 & 0xFF)` (CPLD `MAILBOX_EN`).
 
 | Ph | Reg_Sel | ALU | REG_WE | Y_OE | MEM_RD | MEM_WR | Action (draft) |
 |----|---------|-----|--------|------|--------|--------|----------------|
 | 0 | 00 | NOP | 0 | 0 | 1 | 0 | MMIO read → bus |
 | 1 | 00 | NOP | 1 | 0 | 0 | 0 | Bus → R0 |
 
-*Expected packed CW when implemented: ph0 `02`, ph1 `08` (same as LDA).*
+Packed: ph0 `02`, ph1 `08` (same as LDA).
 
 ---
 
-### STIO (`0x09`) — planned, not packed
+### STIO (`0x09`) — packed
 
 Same CW pattern as STA; MMIO write via CPLD decode.
 
@@ -183,7 +183,26 @@ Same CW pattern as STA; MMIO write via CPLD decode.
 | 0 | 00 | NOP | 0 | 1 | 0 | 0 | R0 → bus |
 | 1 | 00 | NOP | 0 | 0 | 0 | 1 | Write bus to MMIO `[operand]` |
 
-*Expected packed CW when implemented: ph0 `04`, ph1 `01` (same as STA).*
+Packed: ph0 `04`, ph1 `01` (same as STA).
+
+---
+
+### MOV (`0x0C`) — packed
+
+| Ph | Idx | Flash | CW | Action |
+|----|-----|-------|-----|--------|
+| 0 | 48 | `$4030` | `00` | Macro: `R[dst] ← R[src]` (`imm = (dst<<4)|src`) |
+
+---
+
+### STA16 (`0x0F`) — packed (boot)
+
+| Ph | Idx | Flash | CW | Reg_Sel | ALU | REG_WE | Y_OE | MEM_RD | MEM_WR | Action |
+|----|-----|-------|-----|---------|-----|--------|------|--------|--------|--------|
+| 0 | 60 | `$403C` | `04` | 00 | NOP | 0 | 1 | 0 | 0 | R0 → bus |
+| 1 | 61 | `$403D` | `01` | 00 | NOP | 0 | 0 | 0 | 1 | Write bus to **abs16** operand |
+
+3-byte insn: `op, addr_lo, addr_hi`. Used by Boot ROM block-copy ([boot-jmp-handoff.md](boot-jmp-handoff.md)).
 
 ---
 

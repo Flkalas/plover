@@ -34,13 +34,17 @@ Polling only — **no IRQ**.
 ## 3. CPU poll sequence
 
 ```asm
-; Minimal poll loop (conceptual)
+; Minimal poll loop (normative LDIO offset encoding)
 poll:
-    LDA  $FF00          ; MB_STATUS
-    AND  #$01           ; DataReady
-    BEQ  poll
-    LDA  $FF01          ; handle CMD / read buffer...
+    LDIO $00            ; MB_STATUS @ $FF00
+    CMP  $01            ; DataReady
+    BEQ  ready
+    JMP  poll
+ready:
+    LDIO $04            ; MB_BUFFER[0] @ $FF04
 ```
+
+`LDIO` / `STIO` operand is **offset** from `$FF00` (not the full 16-bit address). Example: `STIO $01` → `$FF01` (`MB_CMD`).
 
 Full OS loop: interleave poll with main scheduler — see `hw/fixtures/sw/monitor_poll.asm`.
 

@@ -50,7 +50,7 @@ def tokenize(text: str) -> list[Token]:
                 word = m.group(0).upper()
                 kind = "MNEM" if word in {
                     "ADD", "LDA", "STA", "BEQ", "JMP", "CALL", "RET",
-                    "LDIO", "STIO", "HALT", "ADD_RR", "MOV", "CMP", "BCS",
+                    "LDIO", "STIO", "STA16", "HALT", "ADD_RR", "MOV", "CMP", "BCS",
                 } or word in {"ORG", "EQU", "DB", "DW"} else "IDENT"
                 tokens.append(Token(kind, word, lineno))
                 pos += m.end()

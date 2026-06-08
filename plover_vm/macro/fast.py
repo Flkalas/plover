@@ -19,15 +19,16 @@ from plover_vm.macro.isa import (
     OP_MOV,
     OP_RET,
     OP_STA,
+    OP_STA16,
     OP_STIO,
     OP_WADD_RR,
     OP_WCMP16,
     OP_WMOV,
+    WIDE_ABS16_OPS,
     WIDE_IMM16_OPS,
 )
+from plover_vm.macro.mmio import mmio_addr
 from plover_vm.memory.bus import MemoryBus
-
-WIDE_BRANCH_OPS = frozenset({OP_BEQ, OP_JMP, OP_CALL})
 
 
 class MacroFastPath:
@@ -54,7 +55,7 @@ class MacroFastPath:
             imm16 = self._read_byte(fa + 1) | (self._read_byte(fa + 2) << 8)
             self.pc = (fa + 3) & 0xFFFF
             imm = imm16
-        elif op in WIDE_BRANCH_OPS:
+        elif op in WIDE_ABS16_OPS:
             imm = self._read_byte(fa + 1) | (self._read_byte(fa + 2) << 8)
             self.pc = (fa + 3) & 0xFFFF
         elif op in (OP_RET, OP_HALT, OP_ADD_RR):
@@ -97,6 +98,8 @@ class MacroFastPath:
             self.regs[0] = self._read_byte(imm)
         elif op == OP_STA:
             self.bus.write_cpu(imm, self.regs[0])
+        elif op == OP_STA16:
+            self.bus.write_cpu(imm, self.regs[0])
         elif op == OP_BEQ:
             self.flag_z, self.flag_c = apply_beq_compare(self.regs, imm)
             if self.flag_z:
@@ -110,9 +113,9 @@ class MacroFastPath:
             if self._ret_stack:
                 self.pc = self._ret_stack.pop() & 0xFFFF
         elif op == OP_LDIO:
-            self.regs[0] = self._read_byte(imm)
+            self.regs[0] = self._read_byte(mmio_addr(imm))
         elif op == OP_STIO:
-            self.bus.write_cpu(imm, self.regs[0])
+            self.bus.write_cpu(mmio_addr(imm), self.regs[0])
 
     def step(self) -> None:
         self.fetch_decode_execute()

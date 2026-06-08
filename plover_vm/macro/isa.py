@@ -16,6 +16,7 @@ OP_ADD_RR = 0x0B  # R2 <- R0 + R1
 OP_MOV = 0x0C  # imm: (dst<<4)|src
 OP_CMP = 0x0D  # R0 - imm, set flags
 OP_BCS = 0x0E  # branch if carry (unsigned >=)
+OP_STA16 = 0x0F  # store R0 to abs16 (3-byte insn)
 
 # 16-bit wide register ops (fast-path); WCMP16 is 3 bytes: op, imm_lo, imm_hi
 OP_WADD_RR = 0x10  # W2 <- W0 + W1
@@ -35,8 +36,12 @@ PHASE_COUNTS: dict[int, int] = {
     OP_LDIO: 2,
     OP_STIO: 2,
     OP_HALT: 1,
+    OP_MOV: 1,
     OP_CMP: 3,
+    OP_STA16: 2,
 }
+
+WIDE_ABS16_OPS = frozenset({OP_BEQ, OP_JMP, OP_CALL, OP_STA16})
 
 
 def phase_count(opcode: int) -> int:

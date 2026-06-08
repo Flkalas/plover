@@ -14,6 +14,7 @@ from plover_vm.macro.isa import (
     OP_MOV,
     OP_RET,
     OP_STA,
+    OP_STA16,
     OP_STIO,
 )
 
@@ -32,6 +33,7 @@ MNEMONICS: dict[str, int] = {
     "MOV": OP_MOV,
     "CMP": OP_CMP,
     "BCS": OP_BCS,
+    "STA16": OP_STA16,
 }
 
 PSEUDO = frozenset({"ORG", "EQU", "DB", "DW"})

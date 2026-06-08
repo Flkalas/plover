@@ -23,7 +23,11 @@ from tools.pack_control_store import (  # noqa: E402
     OP_HALT,
     OP_JMP,
     OP_LDA,
+    OP_LDIO,
     OP_STA,
+    OP_STA16,
+    OP_STIO,
+    OP_MOV,
     build_all,
     cs_index,
     pack_cw,
@@ -55,10 +59,17 @@ SPEC_DOC_ROWS = {
     (OP_CMP, 2): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 0},
     (OP_JMP, 0): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 0},
     (OP_HALT, 0): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 0},
+    (OP_LDIO, 0): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 0, "mem_rd": 1, "mem_wr": 0},
+    (OP_LDIO, 1): {"alu_op": ALU_NOP, "reg_we": 1, "y_oe": 0, "mem_rd": 0, "mem_wr": 0},
+    (OP_STIO, 0): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 1, "mem_rd": 0, "mem_wr": 0},
+    (OP_STIO, 1): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 1},
+    (OP_MOV, 0): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 0},
+    (OP_STA16, 0): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 1, "mem_rd": 0, "mem_wr": 0},
+    (OP_STA16, 1): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 1},
 }
 
 # §3 draft rows — documented as TBD, intentionally absent from packer
-SPEC_TBD_OPCODES = {0x06, 0x07, 0x08, 0x09}
+SPEC_TBD_OPCODES = {0x06, 0x07}
 
 
 def decode_cw(raw: int) -> dict[str, int]:

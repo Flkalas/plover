@@ -14,7 +14,8 @@
 |----------|-------|---------|
 | ADD | 2 | imm8 |
 | LDA, STA, LDIO, STIO, CMP | 2 | addr8 |
-| BEQ, JMP, CALL | 3 | addr16 LE |
+| BEQ, JMP, CALL, STA16 | 3 | addr16 LE |
+| LDIO, STIO | 2 | MMIO **offset** from `$FF00` |
 | RET, HALT, ADD_RR | 1 | — |
 
 Branch targets use **absolute** 16-bit addresses (label or `$hex`).
