@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_add_imm_byte_exact():
-    src = (ROOT / "hw" / "fixtures" / "sw" / "add_imm.asm").read_text(encoding="utf-8")
+    src = (ROOT / "hw" / "fixtures" / "sw" / "add_imm.pls").read_text(encoding="utf-8")
     result = assemble(src, origin=0)
     assert result.bytes == [0x01, 0x05, 0x0C, 0x02, 0x01, 0x03, 0x0C, 0x02, 0x0A]
 
@@ -27,7 +27,7 @@ done:   HALT
 
 
 def test_build_fixture_matches_golden():
-    src = (ROOT / "hw" / "fixtures" / "sw" / "add_imm.asm").read_text(encoding="utf-8")
+    src = (ROOT / "hw" / "fixtures" / "sw" / "add_imm.pls").read_text(encoding="utf-8")
     result = assemble(src, origin=0)
     out = ROOT / "hw" / "fixtures" / "sram" / "add_imm.sram.hex"
     write_hex(result, out)

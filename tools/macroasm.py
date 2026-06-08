@@ -70,7 +70,7 @@ def write_hex(bytes_: list[int], path: Path) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("input", type=Path, nargs="?", help=".asm source")
+    ap.add_argument("input", type=Path, nargs="?", help=".pls source")
     ap.add_argument("-o", "--out", type=Path)
     ap.add_argument("--build-fixtures", action="store_true")
     args = ap.parse_args()

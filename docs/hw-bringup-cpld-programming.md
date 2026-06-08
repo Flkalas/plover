@@ -161,7 +161,7 @@ flowchart TD
 | **G4** | Auto `JMP $0800` — kernel HALT / GPIO | `tests/test_boot_jmp_handoff.py` |
 | **G5** | Recovery: `boot_rom_manual.hex` or DIP Run + RESET | `tests/test_boot_handoff.py` |
 
-Normative flow: [boot-jmp-handoff.md](boot-jmp-handoff.md). ROM layout: `hw/fixtures/sw/boot_rom_head.asm`, copy @ `$0120`, tail @ `$0600`.
+Normative flow: [boot-jmp-handoff.md](boot-jmp-handoff.md). ROM layout: `hw/fixtures/sw/boot_rom_head.pls`, copy @ `$0120`, tail @ `$0600`.
 
 GPR·ALU 상세: **[hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md)**.
 

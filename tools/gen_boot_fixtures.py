@@ -53,8 +53,8 @@ def _place(rom: list[int], offset: int, data: list[int]) -> None:
 
 def build_boot_rom() -> list[int]:
     rom = [0x00] * 0x800
-    head = _assemble_file(SW / "boot_rom_head.asm")
-    tail = _assemble_file(SW / "boot_rom_tail.asm")
+    head = _assemble_file(SW / "boot_rom_head.pls")
+    tail = _assemble_file(SW / "boot_rom_tail.pls")
     _place(rom, 0x0000, head)
     _place(rom, 0x0600, tail)
 
@@ -77,7 +77,7 @@ def build_boot_rom() -> list[int]:
 
 def build_manual_rom() -> list[int]:
     rom = [0x00] * 0x800
-    core = _assemble_file(SW / "boot_rom_manual.asm")
+    core = _assemble_file(SW / "boot_rom_manual.pls")
     for i, b in enumerate(core):
         rom[i] = b
     _patch_jmp(rom, 0x0000, 0x0100)
@@ -99,7 +99,7 @@ def write_boot() -> None:
 def write_kernel() -> None:
     from plover_asm.assemble import assemble_file
 
-    res = assemble_file(SW / "kernel_boot.asm")
+    res = assemble_file(SW / "kernel_boot.pls")
     write_hex(SRAM / "kernel_boot.sram.hex", list(res.bytes))
     ram = [0x00] * 0x100
     for i, b in enumerate(res.bytes):

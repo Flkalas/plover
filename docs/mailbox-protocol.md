@@ -46,7 +46,7 @@ ready:
 
 `LDIO` / `STIO` operand is **offset** from `$FF00` (not the full 16-bit address). Example: `STIO $01` → `$FF01` (`MB_CMD`).
 
-Full OS loop: interleave poll with main scheduler — see `hw/fixtures/sw/monitor_poll.asm`.
+Full OS loop: interleave poll with main scheduler — see `hw/fixtures/sw/monitor_poll.pls`.
 
 ---
 

@@ -31,7 +31,7 @@ def fib_upto(limit: int) -> list[int]:
 
 
 def main() -> None:
-    asm = (ROOT / "hw" / "fixtures" / "sw" / "fib_to_20000.asm").read_text(encoding="utf-8")
+    asm = (ROOT / "hw" / "fixtures" / "sw" / "fib_to_20000.pls").read_text(encoding="utf-8")
     prog = assemble(asm)
     out = ROOT / "hw" / "fixtures" / "sram" / "fib_to_20000.sram.hex"
     write_hex(prog, out)

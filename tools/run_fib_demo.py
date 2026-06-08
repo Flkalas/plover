@@ -18,7 +18,7 @@ LIMIT = 200
 
 
 def main() -> None:
-    asm = (ROOT / "hw" / "fixtures" / "sw" / "fib_to_200.asm").read_text(encoding="utf-8")
+    asm = (ROOT / "hw" / "fixtures" / "sw" / "fib_to_200.pls").read_text(encoding="utf-8")
     prog = assemble(asm)
     out = ROOT / "hw" / "fixtures" / "sram" / "fib_to_200.sram.hex"
     write_hex(prog, out)

@@ -15,13 +15,13 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="plover_asm")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
-    build = sub.add_parser("build", help="Assemble .asm to .sram.hex")
+    build = sub.add_parser("build", help="Assemble .pls to .sram.hex")
     build.add_argument("inputs", nargs="+", type=Path)
     build.add_argument("-o", "--out", type=Path, required=True)
     build.add_argument("--origin", type=lambda x: int(x, 0), default=0)
     build.set_defaults(func=_cmd_build)
 
-    obj = sub.add_parser("obj", help="Assemble .asm to .plx object")
+    obj = sub.add_parser("obj", help="Assemble .pls to .plx object")
     obj.add_argument("inputs", nargs="+", type=Path)
     obj.add_argument("-o", "--out", type=Path, required=True)
     obj.add_argument("--origin", type=lambda x: int(x, 0), default=0)

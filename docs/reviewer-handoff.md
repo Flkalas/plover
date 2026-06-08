@@ -184,7 +184,7 @@ python -m pytest tests/ -q
 ### 6.3 어셈블 · CW 패킹
 
 ```bash
-python tools/macroasm.py hw/fixtures/sw/fib_to_200.asm -o out.hex
+python tools/macroasm.py hw/fixtures/sw/fib_to_200.pls -o out.hex
 python tools/pack_control_store.py --build-fixtures   # hw/fixtures/control/cw.hex
 python tools/gen_boot_fixtures.py                        # hw/fixtures/boot/*.hex
 ```
@@ -214,7 +214,7 @@ python tools/run_fib_demo.py
 |------|-----|
 | 마지막 항 (≤200) | **144** |
 | 스텝 | ~85 |
-| 소스 | [hw/fixtures/sw/fib_to_200.asm](../hw/fixtures/sw/fib_to_200.asm) |
+| 소스 | [hw/fixtures/sw/fib_to_200.pls](../hw/fixtures/sw/fib_to_200.pls) |
 
 초기값: RAM `0x20=0`, `0x21=1` (스크립트가 설정)
 
@@ -229,7 +229,7 @@ python tools/run_fib_20000_demo.py
 | 마지막 항 (≤20000) | **17711** (0x452F) |
 | 종료 직전 W2 | **28657** (>20000) |
 | 스텝 | ~152 |
-| 소스 | [hw/fixtures/sw/fib_to_20000.asm](../hw/fixtures/sw/fib_to_20000.asm) |
+| 소스 | [hw/fixtures/sw/fib_to_20000.pls](../hw/fixtures/sw/fib_to_20000.pls) |
 
 초기값: `W0=0`, `W1=1` (스크립트가 설정). `WCMP16 20001` + `BCS`로 루프 종료.
 
@@ -251,7 +251,7 @@ hw/fixtures/
   boot/           boot_rom.hex, boot_vector.hex, ram_kernel.hex
   control/        cw.hex, nor_cw_region.hex
   sram/           add_imm, fib_to_200, fib_to_20000 (.sram.hex)
-  sw/             *.asm (macroasm 소스)
+  sw/             *.pls (Plover assembly 소스)
 hw/scenarios/vm/  add_imm.yaml, boot_run.yaml, boot_jmp_handoff.yaml, boot_jmp_kernel.yaml
 firmware/rp2350/mailbox_stub/main.c   RP2350 stub (normative doc 참조)
 ```

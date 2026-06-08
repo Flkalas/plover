@@ -39,14 +39,14 @@ def test_shell_monitor_and_compile_commands():
     proc = subprocess.run(
         [sys.executable, "-m", "plover_vm", "dos-shell"],
         cwd=root,
-        input="mon\nasmrun hw/fixtures/sw/add_imm.asm\nccrun hw/fixtures/sw/cc_smoke.c\nexit\n",
+        input="mon\nplsrun hw/fixtures/sw/add_imm.pls\nccrun hw/fixtures/sw/cc_smoke.c\nexit\n",
         text=True,
         capture_output=True,
         check=True,
     )
     out = proc.stdout
     assert "PC_" in out and "R0_" in out
-    # add_imm.asm => R0 should end at 8
+    # add_imm.pls => R0 should end at 8
     assert "R0_8" in out
     # cc_smoke.c => return add(2,3) = 5
     assert "R0_5" in out
@@ -60,7 +60,7 @@ def test_run_hello_after_asm_cc_is_stable():
     proc = subprocess.run(
         [sys.executable, "-m", "plover_vm", "dos-shell"],
         cwd=root,
-        input="asmrun hw/fixtures/sw/add_imm.asm\nccrun hw/fixtures/sw/cc_smoke.c\nrun HELLO.PLR\nexit\n",
+        input="plsrun hw/fixtures/sw/add_imm.pls\nccrun hw/fixtures/sw/cc_smoke.c\nrun HELLO.PLR\nexit\n",
         text=True,
         capture_output=True,
         check=True,
@@ -113,7 +113,7 @@ def test_ldrun_and_link_monitors():
     import sys
 
     root = Path(__file__).resolve().parents[1]
-    obj = root / "hw" / "fixtures" / "sw" / "add_imm.asm"
+    obj = root / "hw" / "fixtures" / "sw" / "add_imm.pls"
     build_dir = root / "build" / "tmp_obj"
     build_dir.mkdir(parents=True, exist_ok=True)
     subprocess.run(

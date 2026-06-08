@@ -12,7 +12,7 @@ def test_cmp_after_kernel_boot_sets_zero_flag():
     import sys
 
     subprocess.run([sys.executable, str(ROOT / "tools" / "gen_boot_fixtures.py")], check=True)
-    sector = bytes(assemble_file(ROOT / "hw" / "fixtures" / "sw" / "kernel_boot.asm").bytes).ljust(512, b"\x00")
+    sector = bytes(assemble_file(ROOT / "hw" / "fixtures" / "sw" / "kernel_boot.pls").bytes).ljust(512, b"\x00")
     m = PloverMachine(engine="fast")
     load_boot_fixtures(m, ROOT)
     simulate_sector_load(m.bus, sector)

@@ -1,6 +1,6 @@
 # Plover assembler (S1)
 
-**Package:** `plover_asm/` · **CLI:** `python -m plover_asm build hw/fixtures/sw/*.asm -o hw/fixtures/sram/`
+**Package:** `plover_asm/` · **Source extension:** `.pls` (Plover Language Source) · **CLI:** `python -m plover_asm build hw/fixtures/sw/*.pls -o hw/fixtures/sram/`
 
 ## Syntax
 

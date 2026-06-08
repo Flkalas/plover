@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_plover_asm_object_emit(tmp_path: Path):
-    src = ROOT / "hw" / "fixtures" / "sw" / "add_imm.asm"
+    src = ROOT / "hw" / "fixtures" / "sw" / "add_imm.pls"
     out_dir = tmp_path / "obj"
     subprocess.run(
         [sys.executable, "-m", "plover_asm", "obj", str(src), "-o", str(out_dir)],

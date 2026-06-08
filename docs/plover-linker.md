@@ -50,7 +50,7 @@ Each relocation record:
 
 ```bash
 python -m plover_cc foo.c -c -o build/foo.plx
-python -m plover_asm obj hw/fixtures/sw/add_imm.asm -o build/
+python -m plover_asm obj hw/fixtures/sw/add_imm.pls -o build/
 python -m plover_ld build/a.plx build/b.plx -o build/app.plr --map build/app.map
 ```
 

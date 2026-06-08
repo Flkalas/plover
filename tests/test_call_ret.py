@@ -18,7 +18,7 @@ def _ensure_cw():
 
 
 def test_call_ret_fast():
-    src = (ROOT / "hw" / "fixtures" / "sw" / "call_ret.asm").read_text(encoding="utf-8")
+    src = (ROOT / "hw" / "fixtures" / "sw" / "call_ret.pls").read_text(encoding="utf-8")
     result = assemble(src, origin=0)
     prog = ROOT / "hw" / "fixtures" / "sram" / "call_ret.sram.hex"
     write_hex(result, prog)

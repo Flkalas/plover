@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def _kernel_sector() -> bytes:
-    img = bytes(assemble_file(ROOT / "hw" / "fixtures" / "sw" / "kernel_boot.asm").bytes)
+    img = bytes(assemble_file(ROOT / "hw" / "fixtures" / "sw" / "kernel_boot.pls").bytes)
     return img.ljust(512, b"\x00")
 
 

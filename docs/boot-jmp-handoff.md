@@ -124,9 +124,9 @@ Targets **`$0800+`**, **`$0E00`/`$0F00`** use **`LDIO`** (Mailbox offset) + **`S
 
 | Source | Role |
 |--------|------|
-| `hw/fixtures/sw/boot_rom_head.asm` | POST, READ poll, `JMP $0120` |
+| `hw/fixtures/sw/boot_rom_head.pls` | POST, READ poll, `JMP $0120` |
 | Generated copy @ `$0120` | 248× `LDIO`/`STA16` + `JMP $0600` |
-| `hw/fixtures/sw/boot_rom_tail.asm` | Sanitize, SP/RP, `JMP $0800` |
+| `hw/fixtures/sw/boot_rom_tail.pls` | Sanitize, SP/RP, `JMP $0800` |
 | ROM constants @ `$00F0` | `LDA` reach band (generator patches) |
 
 ### 5.3 Minimum kernel entry stub

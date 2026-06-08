@@ -185,9 +185,9 @@ class DosRuntime:
                 self._emit(f"RELOC_APPLIED_{self.last_link_reloc_count}", out)
             else:
                 self._emit("ERR usage: mon [cpu|ram|vfdd|gpio|serial|dev|map|sym|rel]", out)
-        elif cmd == "asmrun":
+        elif cmd == "plsrun":
             if len(parts) < 2:
-                self._emit("ERR usage: asmrun <path.asm>", out)
+                self._emit("ERR usage: plsrun <path.pls>", out)
             else:
                 src = (self.root / parts[1]).resolve() if not Path(parts[1]).is_absolute() else Path(parts[1])
                 if not src.is_file():
@@ -212,7 +212,7 @@ class DosRuntime:
                     self._run_plr_bytes("CCRUN.PLR", plr, out)
         elif cmd == "help":
             self._emit(
-                "dir run ldrun type del mon [cpu|ram|vfdd|gpio|serial|dev|map|sym|rel] asmrun ccrun help exit",
+                "dir run ldrun type del mon [cpu|ram|vfdd|gpio|serial|dev|map|sym|rel] plsrun ccrun help exit",
                 out,
             )
         elif cmd == "exit":
