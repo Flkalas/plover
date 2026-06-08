@@ -1,0 +1,9 @@
+[package]
+name = "plover_forth"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+plover_mmu = { path = "../plover_mmu" }
+plover_copro = { path = "../plover_copro" }
+serde_yaml = "0.9"
