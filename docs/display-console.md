@@ -109,7 +109,9 @@ Source 1×1     HDMI 2×2 block
 | HSTX / DVI HDMI 640×480@60 | Core1 PIO/HSTX | Spatial + temporal upscale |
 | HID → Mailbox | Core1 | Keyboard injects into console input queue |
 
-Reference stub today: [`firmware/rp2350/mailbox_stub/main.c`](../firmware/rp2350/mailbox_stub/main.c) (vFDD only). VDU commands are **TBD** in mailbox §VDU extension.
+VDU/GFX mailbox commands are normative in [mailbox-protocol.md](mailbox-protocol.md) §2.1–2.3 (`0x10–0x31`). CPU writes text via `VDU_PUTCH` / `VDU_PRINT` and bitmap via `GFX_PLOT` / `GFX_BLIT`; RP2350 composes layers into the 320×240 back buffer.
+
+Reference stub: [`firmware/rp2350/mailbox_stub/main.c`](../firmware/rp2350/mailbox_stub/main.c) (vFDD + VDU handshake). VM model: [`plover_vm/memory/vdu.py`](../plover_vm/memory/vdu.py).
 
 ---
 
