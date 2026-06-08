@@ -9,6 +9,13 @@ from plover_vm.memory.apu import (
     CMD_APU_SET_CTRL,
     ApuState,
 )
+from plover_vm.memory.hid import (
+    CMD_HID_INJECT,
+    CMD_HID_KEY_READ,
+    CMD_HID_MOUSE_READ,
+    CMD_HID_POLL,
+    HidState,
+)
 from plover_vm.memory.vdu import (
     CMD_GFX_BLIT,
     CMD_GFX_CLS,
@@ -45,6 +52,8 @@ ST_READY = 0x01
 ST_BUSY = 0x02
 ST_ERROR = 0x04
 ST_APU_READY = 0x08
+ST_HID_KEY_PENDING = 0x10
+ST_HID_MOUSE_PENDING = 0x20
 
 _VDU_CMDS = frozenset(
     {
@@ -77,6 +86,15 @@ _APU_CMDS = frozenset(
     }
 )
 
+_HID_CMDS = frozenset(
+    {
+        CMD_HID_POLL,
+        CMD_HID_KEY_READ,
+        CMD_HID_MOUSE_READ,
+        CMD_HID_INJECT,
+    }
+)
+
 
 class Mailbox:
     def __init__(self) -> None:
@@ -88,6 +106,7 @@ class Mailbox:
         self._sector = bytearray(512)
         self.vdu = VduState()
         self.apu = ApuState()
+        self.hid = HidState()
         self._apu_ready = True
         self._vfdd_busy = False
 
@@ -95,6 +114,10 @@ class Mailbox:
         base = self._status & 0xFF
         if self._apu_ready:
             base |= ST_APU_READY
+        if self.hid.key_pending:
+            base |= ST_HID_KEY_PENDING
+        if self.hid.mouse_pending:
+            base |= ST_HID_MOUSE_PENDING
         return base & 0xFF
 
     def read(self, addr: int) -> int:
@@ -130,6 +153,11 @@ class Mailbox:
         if self.apu.dispatch(cmd, self._param, self._buffer):
             self._apu_ready = True
 
+    def _handle_hid(self, cmd: int) -> None:
+        if self._vfdd_busy or (self._status & ST_BUSY):
+            return
+        self.hid.dispatch(cmd, self._buffer)
+
     def _handle_cmd(self) -> None:
         cmd = self._cmd
         if cmd == CMD_NOP:
@@ -151,6 +179,9 @@ class Mailbox:
             self._sector[off : off + min(248, len(self._buffer))] = self._buffer[:248]
             self._vfdd_busy = False
             self._status = ST_READY
+            self._cmd = CMD_NOP
+        elif cmd in _HID_CMDS:
+            self._handle_hid(cmd)
             self._cmd = CMD_NOP
         elif cmd in _APU_CMDS:
             self._handle_apu(cmd)
@@ -194,6 +225,20 @@ class Mailbox:
         buffer: bytes | bytearray | None = None,
     ) -> None:
         """Host helper: prime PARAM/BUFFER and dispatch one APU command."""
+        self._param = param & 0xFF
+        if buffer is not None:
+            self._buffer[: len(buffer)] = buffer[:248]
+        self._cmd = cmd & 0xFF
+        self._handle_cmd()
+
+    def issue_hid(
+        self,
+        cmd: int,
+        param: int = 0,
+        *,
+        buffer: bytes | bytearray | None = None,
+    ) -> None:
+        """Host helper: prime PARAM/BUFFER and dispatch one HID command."""
         self._param = param & 0xFF
         if buffer is not None:
             self._buffer[: len(buffer)] = buffer[:248]
