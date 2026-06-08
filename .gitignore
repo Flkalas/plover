@@ -10,3 +10,6 @@ web/dist/
 archive/verilog-sim/web/dist/
 *.vvp
 .cursor/
+
+# vFDD runtime image (recreated by dos-shell / PLFS format)
+hw/fixtures/vfdd/dos_boot.img
