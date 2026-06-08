@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_add_imm_byte_exact():
     src = (ROOT / "hw" / "fixtures" / "sw" / "add_imm.asm").read_text(encoding="utf-8")
     result = assemble(src, origin=0)
-    assert result.bytes == [0x01, 0x05, 0x01, 0x03, 0x0A]
+    assert result.bytes == [0x01, 0x05, 0x0C, 0x02, 0x01, 0x03, 0x0C, 0x02, 0x0A]
 
 
 def test_labels_and_jmp():
@@ -32,4 +32,4 @@ def test_build_fixture_matches_golden():
     out = ROOT / "hw" / "fixtures" / "sram" / "add_imm.sram.hex"
     write_hex(result, out)
     lines = out.read_text(encoding="utf-8").strip().splitlines()
-    assert lines == ["01", "05", "01", "03", "0A"]
+    assert lines == ["01", "05", "0C", "02", "01", "03", "0C", "02", "0A"]

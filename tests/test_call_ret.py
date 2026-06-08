@@ -54,9 +54,11 @@ def test_nested_call_fast():
         CALL a
         HALT
 a:      ADD 1
+        MOV 2
         CALL b
         RET
 b:      ADD 2
+        MOV 2
         RET
 """
     result = assemble(src, origin=0)

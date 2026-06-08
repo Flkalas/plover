@@ -34,7 +34,7 @@ Normative acceptance uses `--engine micro` where applicable.
 | S3 | `test_forth_primitives`, `test_forth_interpret` |
 | S4 | `test_forth_blocks` |
 | S5 | `test_plover_cc` |
-| S6 | `test_kernel_boot` |
+| S6 | `test_kernel_boot`, `test_boot_jmp_handoff`, `test_boot_handoff` |
 | S7a–d | `test_vfdd_io`, `test_fat_fs`, `test_plr_exec`, `dos_boot.yaml` |
 
 Tests are never removed; only extended.

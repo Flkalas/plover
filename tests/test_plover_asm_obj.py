@@ -17,5 +17,5 @@ def test_plover_asm_object_emit(tmp_path: Path):
     )
     obj = read_plx(out_dir / "add_imm.plx")
     assert obj.name == "add_imm"
-    assert len(obj.text) == 5
+    assert len(obj.text) == 9
 

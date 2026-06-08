@@ -12,7 +12,7 @@ def test_boot_to_run_handoff():
     subprocess.run([sys.executable, str(ROOT / "tools" / "gen_boot_fixtures.py")], check=True)
 
     m = PloverMachine(engine="fast")
-    m.load_nor(ROOT / "hw" / "fixtures" / "boot" / "boot_rom.hex", 0)
+    m.load_nor(ROOT / "hw" / "fixtures" / "boot" / "boot_rom_manual.hex", 0)
     m.load_nor(ROOT / "hw" / "fixtures" / "boot" / "boot_vector.hex", 0xFFFC)
     m.load_cw(ROOT / "hw" / "fixtures" / "control" / "cw.hex")
 

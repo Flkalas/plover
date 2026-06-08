@@ -17,7 +17,7 @@ def test_plr_exec_via_plfs(tmp_path: Path):
     fs = Plfs(VfddDriver(dev))
     fs.format()
 
-    asm = "        .ORG 0\n        ADD 7\n        HALT\n"
+    asm = "        .ORG 0\n        ADD 7\n        MOV 2\n        HALT\n"
     res = assemble(asm, origin=0)
     plr = pack_plr(PlrImage(load_addr=0x2800, entry_off=0, code=bytes(res.bytes)))
     fs.create("HELLO.PLR", plr)
