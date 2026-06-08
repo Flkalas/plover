@@ -1,3 +1,4 @@
+/target/
 build/
 sim/wave.vcd
 archive/verilog-sim/sim/wave.vcd

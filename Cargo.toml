@@ -1,0 +1,17 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/plover_mmu",
+    "crates/plover_copro",
+    "crates/plover_core",
+    "crates/plover_os",
+    "crates/plover_forth",
+    "crates/plover_presenter",
+    "crates/plover_scenario",
+    "crates/plover_vm",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
