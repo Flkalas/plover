@@ -17,6 +17,8 @@ Normative RAM regions for Forth, kernel, PL-DOS on the 64 KiB map (`plover_vm` a
 | TIB | `$1000–$10FF` | Forth | 256 B line buffer |
 | Mailbox | `$FF00–$FFFB` | I/O | [mailbox-protocol.md](mailbox-protocol.md) |
 
+**Framebuffer:** not on the 64 KiB CPU map — RP2350 VDU (320×240 internal, HDMI 640×480) per [display-console.md](display-console.md).
+
 ## Forth cells (16-bit LE in RAM)
 
 | Symbol | Address | Purpose |

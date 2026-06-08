@@ -9,7 +9,7 @@
 
 | Function | Description |
 |----------|-------------|
-| **VDU** | HDMI/framebuffer via HSTX |
+| **VDU** | 40×25 text, 320×240@30 → 640×480@60 HDMI — [display-console.md](display-console.md) |
 | **HID** | Keyboard/mouse events → Mailbox |
 | **vFDD** | Virtual floppy — sector read/write for boot and OS |
 
@@ -35,6 +35,7 @@ Reference implementation: [`firmware/rp2350/mailbox_stub/main.c`](../firmware/rp
 - READ: load 512 B from SD → `MB_BUFFER` (chunked), set DataReady.
 - WRITE: reverse path.
 - GPU/HID: stub loops set status bits for hwsim bring-up.
+- VDU target: [display-console.md](display-console.md) (firmware TBD).
 
 ---
 

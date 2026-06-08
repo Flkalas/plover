@@ -13,6 +13,7 @@ Design notes and **hwsim** for Plover — **v0.1 CPU** (574×4 GPR + ATF1504AS s
 | [microcode-spec.md](microcode-spec.md) | 8b CW · ISA |
 | [mailbox-protocol.md](mailbox-protocol.md) | MMIO `$FF00` |
 | [rp2350-coprocessor.md](rp2350-coprocessor.md) | Copro board |
+| [display-console.md](display-console.md) | **40×25** · 320×240@30 → HDMI 640×480@60 |
 | [bootloader.md](bootloader.md) | Boot · Run handoff |
 | [boot-jmp-handoff.md](boot-jmp-handoff.md) | **JMP chain load** (no DIP/RESET) |
 | [implementation-plan-v0.1.md](implementation-plan-v0.1.md) | Milestones |
@@ -54,6 +55,7 @@ TTL/PCB 실기와 **병렬** — [implementation-plan-v0.1.md](implementation-pl
 | [plover-fat.md](plover-fat.md) | PLFS on-disk (S7b) |
 | [program-loader.md](program-loader.md) | `.PLR` format (S7c) |
 | [dos-shell.md](dos-shell.md) | PL-DOS shell (S7d) |
+| [display-console.md](display-console.md) | Text console · HDMI VDU |
 
 ## Archive
 
