@@ -1,0 +1,21 @@
+engine: fast
+map_mode: 0
+load:
+  nor: hw/fixtures/boot/boot_rom.hex
+  cw: hw/fixtures/control/cw.hex
+actions:
+  - type: boot_sector_load
+    image: hw/fixtures/sram/kernel_boot.sram.hex
+  - type: reset
+    map_mode: 0
+  - type: run
+    max_steps: 80000
+expect:
+  map_mode: 0
+  pc: 0x0806
+  halted: true
+  ram:
+    - addr: 0x0E00
+      bytes: [0x00, 0xE0]
+    - addr: 0x0F00
+      bytes: [0x00, 0xF6]

@@ -24,6 +24,8 @@ class MachineState:
     halted: bool = False
     phase: int = 0
     opcode: int = 0
+    flag_z: bool = False
+    flag_c: bool = False
 
 
 class PloverMachine:
@@ -137,6 +139,8 @@ class PloverMachine:
                 regs=list(self.fast.regs),
                 map_mode=self.bus.map_mode,
                 halted=self.fast.halted,
+                flag_z=self.fast.flag_z,
+                flag_c=self.fast.flag_c,
             )
         st = self.micro.state
         return MachineState(
@@ -146,6 +150,8 @@ class PloverMachine:
             halted=self.macro.halted,
             phase=st.phase,
             opcode=self.macro.opcode,
+            flag_z=st.flag_z,
+            flag_c=st.flag_c,
         )
 
     @classmethod

@@ -137,30 +137,61 @@ def cmd_scenario(args: argparse.Namespace) -> int:
     init_regs = init.get("regs")
     init_pc = init.get("pc")
     for action in doc.get("actions", []):
-        if action["type"] == "reset":
+        typ = action["type"]
+        if typ == "reset":
             m.reset(action.get("map_mode", m.bus.map_mode))
             if init_regs is not None:
                 _apply_init_regs(m, init_regs)
             if init_pc is not None:
                 _apply_init_pc(m, int(init_pc))
-        elif action["type"] == "set_map":
+        elif typ == "set_map":
             m.set_map_mode(action["mode"])
-        elif action["type"] == "run":
+        elif typ == "boot_sector_load":
+            from plover_vm.boot_handoff import simulate_sector_load
+            from plover_vm.loader import load_hex
+
+            img_path = root / action.get("image", "hw/fixtures/vfdd/dos_boot.img")
+            if img_path.is_file() and img_path.suffix.lower() == ".hex":
+                data, _ = load_hex(img_path, 0)
+                data = bytes(data)
+            elif img_path.is_file():
+                data = img_path.read_bytes()
+            else:
+                data = bytes([action.get("fill", 0)] * 512)
+            simulate_sector_load(m.bus, data[:512])
+        elif typ == "run":
             m.run(max_steps=action.get("max_steps", 10_000))
     exp = doc.get("expect", {})
     snap = m.snapshot()
     ok = True
-    if "pc" in exp and snap.pc != exp["pc"]:
+    if "pc" in exp and snap.pc != (int(exp["pc"], 0) if isinstance(exp["pc"], str) else int(exp["pc"])):
         print(f"FAIL pc: {snap.pc} != {exp['pc']}")
         ok = False
     if "halted" in exp and snap.halted != exp["halted"]:
         print(f"FAIL halted: {snap.halted} != {exp['halted']}")
+        ok = False
+    if "map_mode" in exp and snap.map_mode != exp["map_mode"]:
+        print(f"FAIL map_mode: {snap.map_mode} != {exp['map_mode']}")
+        ok = False
+    if "flag_z" in exp and snap.flag_z != exp["flag_z"]:
+        print(f"FAIL flag_z: {snap.flag_z} != {exp['flag_z']}")
+        ok = False
+    if "flag_c" in exp and snap.flag_c != exp["flag_c"]:
+        print(f"FAIL flag_c: {snap.flag_c} != {exp['flag_c']}")
         ok = False
     if "regs" in exp:
         for i, v in enumerate(exp["regs"]):
             if snap.regs[i] != v:
                 print(f"FAIL regs[{i}]: {snap.regs[i]} != {v}")
                 ok = False
+    if "ram" in exp:
+        for item in exp["ram"]:
+            addr = int(item["addr"], 0) if isinstance(item["addr"], str) else item["addr"]
+            for i, v in enumerate(item.get("bytes", [])):
+                got = m.bus.read_cpu(addr + i)
+                if got != v:
+                    print(f"FAIL ram[0x{addr + i:04X}]: 0x{got:02X} != 0x{v:02X}")
+                    ok = False
     if ok:
         print("PASS")
     return 0 if ok else 1
@@ -174,14 +205,16 @@ def cmd_dos_shell(args: argparse.Namespace) -> int:
     for line in rt.stage1_boot():
         print(line)
     for line in rt.stage2_shell_start():
-        print(line)
+        if line != rt.prompt:
+            print(line)
     while True:
         try:
             line = input(f"{rt.prompt} ")
         except EOFError:
             break
         for item in rt.run_command(line):
-            print(item)
+            if item != rt.prompt:
+                print(item)
         if line.strip().lower() == "exit":
             break
     return 0

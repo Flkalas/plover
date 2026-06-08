@@ -1,0 +1,16 @@
+engine: micro
+map_mode: 0
+load:
+  nor: hw/fixtures/boot/boot_rom.hex
+  cw: hw/fixtures/control/cw.hex
+actions:
+  - type: boot_sector_load
+    image: hw/fixtures/sram/kernel_boot.sram.hex
+  - type: reset
+    map_mode: 0
+  - type: run
+    max_steps: 200000
+expect:
+  pc: 0x0806
+  halted: true
+  flag_z: true
