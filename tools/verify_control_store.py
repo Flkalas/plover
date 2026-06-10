@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from hw.micro.reg_sel import reg_sel  # noqa: E402
 from tools.pack_control_store import (  # noqa: E402
     ALU_ADD,
     ALU_CMP,
@@ -30,6 +31,8 @@ from tools.pack_control_store import (  # noqa: E402
     OP_MOV,
     build_all,
     cs_index,
+    cw_hi,
+    cw_lo,
     pack_cw,
     sequences,
 )
@@ -72,23 +75,26 @@ SPEC_DOC_ROWS = {
 SPEC_TBD_OPCODES = {0x06, 0x07}
 
 
-def decode_cw(raw: int) -> dict[str, int]:
+def decode_cw(word: int) -> dict[str, int]:
+    lo = cw_lo(word)
     return {
-        "alu_op": (raw >> 4) & 0xF,
-        "reg_we": (raw >> 3) & 1,
-        "y_oe": (raw >> 2) & 1,
-        "mem_rd": (raw >> 1) & 1,
-        "mem_wr": raw & 1,
+        "reg_sel": cw_hi(word),
+        "alu_op": (lo >> 4) & 0xF,
+        "reg_we": (lo >> 3) & 1,
+        "y_oe": (lo >> 2) & 1,
+        "mem_rd": (lo >> 1) & 1,
+        "mem_wr": lo & 1,
     }
 
 
-def pack_from_fields(fields: dict[str, int]) -> int:
+def pack_from_fields(op: int, ph: int, fields: dict[str, int]) -> int:
     return pack_cw(
         alu_op=fields["alu_op"],
         reg_we=fields["reg_we"],
         y_oe=fields["y_oe"],
         mem_rd=fields["mem_rd"],
         mem_wr=fields["mem_wr"],
+        reg_sel_val=reg_sel(op, ph),
     )
 
 
@@ -96,10 +102,10 @@ def main() -> int:
     errors: list[str] = []
     warnings: list[str] = []
 
-    # 1. pack_cw matches spec bit map
-    probe = pack_cw(alu_op=0xA, reg_we=1, y_oe=1, mem_rd=1, mem_wr=1)
-    if probe != 0xAF:
-        errors.append(f"pack_cw bit layout: expected 0xAF, got 0x{probe:02X}")
+    # 1. pack_cw matches spec bit map (lo byte)
+    probe = pack_cw(alu_op=0xA, reg_we=1, y_oe=1, mem_rd=1, mem_wr=1, reg_sel_val=0)
+    if cw_lo(probe) != 0xAF:
+        errors.append(f"pack_cw lo layout: expected 0xAF, got 0x{cw_lo(probe):02X}")
 
     # 2. cs_index matches rom-architecture {opcode[3:0], phase[1:0]}
     for op, ph, want in [(0x01, 0, 4), (0x0A, 0, 40), (0x03, 1, 13)]:
@@ -130,12 +136,17 @@ def main() -> int:
             errors.append(f"packer missing sequence for documented op 0x{op:02X} phase {ph}")
             continue
         packed = seq[op][ph]
-        want = pack_from_fields(fields)
+        want = pack_from_fields(op, ph, fields)
         if packed != want:
-            errors.append(f"packer 0x{op:02X} ph{ph}: 0x{packed:02X} != spec 0x{want:02X}")
+            errors.append(
+                f"packer 0x{op:02X} ph{ph}: 0x{packed:04X} != spec 0x{want:04X}"
+            )
         idx = cs_index(op, ph)
-        if built[idx] != want:
-            errors.append(f"store[{idx}] = 0x{built[idx]:02X}, spec wants 0x{want:02X}")
+        if built[2 * idx] != cw_lo(want) or built[2 * idx + 1] != cw_hi(want):
+            errors.append(
+                f"store slot {idx}: lo=0x{built[2*idx]:02X} hi=0x{built[2*idx+1]:02X} "
+                f"!= 0x{cw_lo(want):02X}/0x{cw_hi(want):02X}"
+            )
 
     # 5. Flash base
     if CW_FLASH_BASE != 0x4000:
@@ -165,35 +176,33 @@ def main() -> int:
             warnings.append(f"opcode 0x{op:02X} documented as TBD in spec §3 (not in cw.hex)")
 
     # 8. Non-zero store summary
-    print("Control Store v0.1 verification")
+    print("Control Store v1.0 verification (10b CW)")
     print("=" * 60)
     print(f"Flash base: 0x{CW_FLASH_BASE:04X}  store size: {len(built)} bytes")
     print(f"cs_index: ((opcode & 0xF) << 2) | (phase & 3)")
     print()
     print("Non-zero entries (packer):")
-    for i, w in enumerate(built):
-        if w:
-            op = (i >> 2) & 0xF
-            ph = i & 3
-            dec = decode_cw(w)
+    for idx in range(0, len(built) // 2):
+        lo, hi = built[2 * idx], built[2 * idx + 1]
+        if lo or hi:
+            op = (idx >> 2) & 0xF
+            ph = idx & 3
+            word = lo | (hi << 8)
+            dec = decode_cw(word)
             print(
-                f"  idx={i:4d} Flash=0x{CW_FLASH_BASE + i:04X} "
-                f"op_nib=0x{op:X} ph={ph} raw=0x{w:02X} "
-                f"ALU={dec['alu_op']} REG_WE={dec['reg_we']} Y_OE={dec['y_oe']} "
-                f"MEM_RD={dec['mem_rd']} MEM_WR={dec['mem_wr']}"
+                f"  idx={idx:4d} Flash=0x{CW_FLASH_BASE + 2*idx:04X} "
+                f"op=0x{op:X} ph={ph} lo=0x{lo:02X} hi=0x{hi:02X} "
+                f"REG_SEL={dec['reg_sel']} ALU={dec['alu_op']}"
             )
 
     print()
     print("Documented packed rows (microcode-spec.md §3):")
     for (op, ph), fields in sorted(SPEC_DOC_ROWS.items()):
         idx = cs_index(op, ph)
-        raw = built[idx]
-        dec = decode_cw(raw)
-        match = dec == fields
-        print(
-            f"  0x{op:02X} ph{ph} idx={idx} match={match} "
-            f"raw=0x{raw:02X} {dec}"
-        )
+        word = built[2 * idx] | (built[2 * idx + 1] << 8)
+        dec = decode_cw(word)
+        match = {k: dec[k] for k in fields} == fields and dec["reg_sel"] == reg_sel(op, ph)
+        print(f"  0x{op:02X} ph{ph} idx={idx} match={match} {dec}")
         if not match:
             errors.append(f"decoded store != spec for 0x{op:02X} ph{ph}")
 
