@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Milestone** | M2a |
-| **IC** | ATF1504AS (100-TQFP) |
+| **IC** | ATF1504AS-10JU44 (PLCC-44) |
 | **Goal** | JED 소각 + 벤치에서 CPLD **GPR** (`q_a`/`q_b`, `REG_SEL` from CW_H) 확인 |
 | **Normative** | [cpld-system-controller.md](../hardware/cpld-system-controller.md) v1.0 |
 | **hwsim** | `cpld_gpr_decode_breadboard` |

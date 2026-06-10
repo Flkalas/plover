@@ -1,7 +1,7 @@
 # Plover hardware bring-up index
 
 > **Normative v1.0:** CPLD GPR + 138×2 + 10b CW — [system-architecture.md](../hardware/system-architecture.md).  
-> Wiring reference: [breadboard-wiring.md](breadboard-wiring.md).
+> **실구매 패키지:** [parts-on-hand.md](../project/parts-on-hand.md) · Wiring: [breadboard-wiring.md](breadboard-wiring.md).
 
 **마일스톤 계획:** [implementation-plan-v0.1.md](../project/implementation-plan-v0.1.md)  
 **아키텍처:** [system-architecture.md](../hardware/system-architecture.md) v1.0
