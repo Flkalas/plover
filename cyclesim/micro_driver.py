@@ -27,7 +27,10 @@ def _cw_store() -> list[int]:
 
 def lookup_cw(opcode: int, phase: int) -> ControlWord:
     idx = cs_index(opcode & 0xF, phase & 3)
-    return ControlWord(_cw_store()[idx])
+    store = _cw_store()
+    lo = store[2 * idx]
+    hi = store[2 * idx + 1]
+    return ControlWord(lo | (hi << 8))
 
 
 def apply_micro_phase(
@@ -38,7 +41,7 @@ def apply_micro_phase(
 ) -> None:
     """Apply CW + Reg_Sel read ports + optional ADD operand→R1 (VM ph0 rule)."""
     cw = lookup_cw(opcode, phase)
-    sel = reg_sel(opcode, phase)
+    sel = cw.reg_sel
 
     for i in range(4):
         ctx.set_net(f"net_alu_op{i}", (cw.alu_op >> i) & 1, stuck=True)
@@ -82,4 +85,4 @@ def _read_ports(opcode: int, phase: int, operand: int) -> tuple[int, int]:
 
 def should_pulse_clock(ctx: CycleContext, opcode: int, phase: int) -> bool:
     cw = lookup_cw(opcode, phase)
-    return bool(cw.reg_we and reg_sel(opcode, phase) < 4)
+    return bool(cw.reg_we and cw.reg_sel < 4)

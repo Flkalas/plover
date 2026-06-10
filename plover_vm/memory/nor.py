@@ -36,7 +36,11 @@ class NorFlash:
         return 0xFF
 
     def read_cw(self, store_index: int) -> int:
-        return self.read(CW_FLASH_BASE + (store_index & 0x7FF))
+        """10-bit CW: lo @ 2*idx, hi (REG_SEL) @ 2*idx+1."""
+        idx = (store_index & 0x7FF) * 2
+        lo = self.read(CW_FLASH_BASE + idx)
+        hi = self.read(CW_FLASH_BASE + idx + 1)
+        return lo | (hi << 8)
 
     def patch_cw_region(self, words: list[int], base: int = CW_FLASH_BASE) -> None:
         for i, w in enumerate(words):

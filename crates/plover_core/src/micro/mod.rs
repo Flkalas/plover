@@ -49,7 +49,7 @@ impl MicroEngine {
         let op = self.state.opcode;
         let ph = self.state.phase;
         let cw = lookup_cw(|idx| self.bus.nor.read_cw(idx), op, ph);
-        let sel = reg_sel::reg_sel(op, ph);
+        let sel = cw.reg_sel();
 
         if cw.mem_rd() {
             if op == OP_LDIO {

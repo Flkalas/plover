@@ -7,7 +7,7 @@ pub struct TraceEntry {
     pub pc: u16,
     pub phase: u8,
     pub opcode: u8,
-    pub cw: u8,
+    pub cw: u16,
     pub regs: [u8; 4],
     pub halted: bool,
 }
@@ -23,7 +23,7 @@ impl Tracer {
         pc: u16,
         phase: u8,
         opcode: u8,
-        cw: u8,
+        cw: u16,
         regs: [u8; 4],
         halted: bool,
     ) {

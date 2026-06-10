@@ -9,7 +9,6 @@ from plover_vm.macro.isa import OP_LDIO, OP_STA16, OP_STIO
 from plover_vm.macro.mmio import mmio_addr
 from plover_vm.memory.bus import MemoryBus
 from plover_vm.micro.cw import lookup_cw
-from plover_vm.micro.reg_sel import reg_sel
 
 
 @dataclass
@@ -45,7 +44,7 @@ class MicroEngine:
         st = self.state
         op, ph = st.opcode, st.phase
         cw = lookup_cw(self.bus.nor.read_cw, op, ph)
-        sel = reg_sel(op, ph)
+        sel = cw.reg_sel
 
         if cw.mem_rd:
             if op == OP_LDIO:

@@ -1,4 +1,4 @@
-"""8-bit control word fields."""
+"""10-bit control word fields (lo = bus/ALU, hi = REG_SEL)."""
 
 from __future__ import annotations
 
@@ -12,24 +12,32 @@ class ControlWord:
     raw: int
 
     @property
+    def lo(self) -> int:
+        return self.raw & 0xFF
+
+    @property
+    def reg_sel(self) -> int:
+        return (self.raw >> 8) & 3
+
+    @property
     def alu_op(self) -> int:
-        return (self.raw >> 4) & 0xF
+        return (self.lo >> 4) & 0xF
 
     @property
     def reg_we(self) -> bool:
-        return bool((self.raw >> 3) & 1)
+        return bool((self.lo >> 3) & 1)
 
     @property
     def y_oe(self) -> bool:
-        return bool((self.raw >> 2) & 1)
+        return bool((self.lo >> 2) & 1)
 
     @property
     def mem_rd(self) -> bool:
-        return bool((self.raw >> 1) & 1)
+        return bool((self.lo >> 1) & 1)
 
     @property
     def mem_wr(self) -> bool:
-        return bool(self.raw & 1)
+        return bool(self.lo & 1)
 
 
 def cs_index(opcode: int, phase: int) -> int:

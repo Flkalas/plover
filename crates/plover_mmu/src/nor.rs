@@ -37,8 +37,11 @@ impl NorFlash {
         }
     }
 
-    pub fn read_cw(&self, store_index: usize) -> u8 {
-        self.read(CW_FLASH_BASE + (store_index & 0x7FF))
+    pub fn read_cw(&self, store_index: usize) -> u16 {
+        let idx = (store_index & 0x7FF) * 2;
+        let lo = self.read(CW_FLASH_BASE + idx) as u16;
+        let hi = self.read(CW_FLASH_BASE + idx + 1) as u16;
+        lo | (hi << 8)
     }
 
     pub fn patch_cw_region(&mut self, words: &[u8], base: usize) {
