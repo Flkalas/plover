@@ -1,6 +1,7 @@
 ﻿# Plover — 구매 목록 (v1.0 breadboard, 1세트)
 
 **Normative:** [docs/hardware/system-architecture.md](docs/hardware/system-architecture.md) v1.0  
+**실구매 패키지:** [docs/project/parts-on-hand.md](docs/project/parts-on-hand.md)  
 **1세트 부품 명세** · 5 V · 74HC DIP 빵판 · **CPLD GPR ~40 MC + 138×2 + 10b CW**  
 PCB 3.3 V 대응 목록: [BOM-3v3.md](BOM-3v3.md) (**중복 주문 금지**)  
 이력 · 검산 · 발주 기록: [docs/project/bom-maintenance.md](docs/project/bom-maintenance.md)
@@ -11,9 +12,8 @@ PCB 3.3 V 대응 목록: [BOM-3v3.md](BOM-3v3.md) (**중복 주문 금지**)
 |------|---|-----|-------------|-----|-------------|------|
 | 인프라 · 배선 | 1 | SZH-BBAD-002 | Breadboard 830-pin MB-102 | 4 | CPU·ALU·메모리·CPLD를 나란히 올릴 작업 면 | |
 | 인프라 · 배선 | 2 | *(0.6 mm solid wire)* | 3-color jumper wire 1 m | 6 | 전원·점퍼·버스 물리 배선 | |
-| 인프라 · 배선 | 3a | *(SOP28/SSOP28 dual)* | SOP28↔DIP adapter | 2 | SOP SRAM을 빵판 DIP에 꽂기 | #19 |
-| 인프라 · 배선 | 3b | *(TSOP-32→DIP)* | TSOP-32↔DIP adapter | 0–1 | TSOP Flash를 빵판에 꽂기 | PDIP Flash면 생략 |
-| 인프라 · 배선 | 3c | *(SOIC-24→DIP)* | SOIC-24↔DIP adapter | 3 | SOIC 레벨시프터를 빵판에 꽂기 | #24 |
+| 인프라 · 배선 | 3a | *(SOP28/SSOP28 dual)* | SOP28↔DIP adapter | 2 | **#19 SRAM** SOP → 빵판 DIP | |
+| 인프라 · 배선 | 3c | *(SOIC-24→DIP)* | SOIC-24↔DIP adapter | 3 | **#24 LVC245** SOIC → 빵판 DIP | |
 | ALU | 4 | 74HC283N | 4-bit binary full adder | 2 | 8비트 덧셈·뺄셈·증감 연산 | |
 | ALU | 5 | 74HC153 | Dual 4-to-1 line data selector/multiplexer | 8 | B 피연산자 경로 선택 + 논리 연산 결과 선택 | |
 | ALU | 6 | 74HC157 | Quad 2-line to 1-line data selector/multiplexer | 2 | 산술 결과와 논리 결과 중 ALU 출력 선택 | |
@@ -23,11 +23,11 @@ PCB 3.3 V 대응 목록: [BOM-3v3.md](BOM-3v3.md) (**중복 주문 금지**)
 | CPU · 주소 | 11b | 74HC08 / 74HC32 | AND / OR | 2 each | CE glue + mailbox/MAP + BEQ | |
 | CPU · 주소 | 12 | 74HC161 | 4-bit synchronous binary counter | 3 | PC 하위·명령 실행 단계(phase) 카운트 | |
 | CPU · 주소 | 13 | 74HC157 | Quad 2-line to 1-line data selector/multiplexer | 2 | 주소 버스 하위 8비트 선택 | #6과 합산 4 |
-| CPLD · 스위치 | 14 | ATF1504AS (100-TQFP) | CPLD, 64 MC — **GPR only ~40 MC** | 1 | R0–R3 FF; Reg_Sel from CW | PLCC-44 보유 → TQFP 권장 |
-| CPLD · 스위치 | 15 | *(TQFP-100 breakout)* | ATF1504 0.5 mm → 2.54 mm | 1 | CPLD 빵판 장착 | |
+| CPLD · 스위치 | 14 | ATF1504AS-10JU44 | CPLD, 64 MC — **GPR only ~40 MC** | 1 | R0–R3 FF; Reg_Sel from CW | PLCC-44 |
+| CPLD · 스위치 | 15 | *(PLCC-44→DIP)* | PLCC-44 → 2.54 mm DIP 어댑터 | 1 | #14 CPLD 빵판 장착 | |
 | CPLD · 스위치 | 16 | *(1C2P slide or DIP-1)* | Single-pole 2-position switch | 1 | Boot/Run MAP_MODE | |
 | 버스 · 메모리 | 17 | 74HC245 | Octal bus transceiver | 1 | SRAM 데이터 버스 ↔ CPU 버스 레지스터 | |
-| 버스 · 메모리 | 18 | SST39SF010A-70-4C-PHE | 128K×8 parallel NOR Flash | 1 | 부트·10b CW·유틸리티 | |
+| 버스 · 메모리 | 18 | SST39SF010A-70-4C-PHE | 128K×8 parallel NOR Flash | 1 | 부트·10b CW·유틸리티 | PDIP-32 직결 |
 | 버스 · 메모리 | 19 | IS62C256AL-45ULI-TR | 32K×8 static RAM | 2 | 실행 RAM 64 KB | |
 | 클록 | 20 | *(4 MHz half-can osc)* | Crystal oscillator, 4.000 MHz, HC-49 half | 1 | 마스터 클록 | |
 | 클록 | 21 | 74HC74 | Dual D-type flip-flop | 1 | 4 MHz → 2 MHz 분주 | |
