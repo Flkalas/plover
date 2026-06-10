@@ -1,4 +1,9 @@
-# GPR(574×4) ↔ ALU 연결 시방서
+# GPR ↔ ALU 연결 시방서 (archived — external 574×4)
+
+> **v1.0 normative:** CPLD GPR — [M2b-gpr-datapath.md](hw-bringup/M2b-gpr-datapath.md) · [breadboard-wiring.md](hw-bringup/breadboard-wiring.md).  
+> Below documents **legacy external GPR** ([archive/pre-v0.1/](archive/pre-v0.1/README.md)).
+
+# GPR(574×4) ↔ ALU 연결 시방서 (legacy)
 
 > **Canonical:** [hw-bringup/M2b-gpr-datapath.md](hw-bringup/M2b-gpr-datapath.md) (G0–G6) · [M2b-memory.md](hw-bringup/M2b-memory.md) · fetch → [M3b-fetch-execute.md](hw-bringup/M3b-fetch-execute.md).
 

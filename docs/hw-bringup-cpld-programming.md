@@ -8,7 +8,7 @@
 | **역할** | 시스템 디코드, 메모리 CS, 메일박스, **`LOAD_R0..3`**, `REG_SEL`, 리셋 시 `$FFFC` |
 | **논리 사양** | [cpld-system-controller.md](cpld-system-controller.md) |
 | **hwsim** | [`cpld_system_ctrl.yaml`](../hw/netlist/blocks/cpld_system_ctrl.yaml) · `python -m hwsim run hw/tests/cpld_gpr_decode.yaml` |
-| **GPR 저장** | CPLD **내부에 없음** — **74HC574×4** 가 R0–R3 보유 |
+| **GPR 저장** | **v1.0:** CPLD 내부 FF — [cpld-system-controller.md](cpld-system-controller.md). Legacy 574×4: [archive/pre-v0.1/](archive/pre-v0.1/README.md) |
 
 > **저장소 상태:** v0.1 기준 **ABEL/JED/핀 락 파일은 아직 리포지터리에 없음**. 본 문서는 **하드웨어·툴체인·검증 절차** 시방이며, 비트스트림 확정 후 `hw/cpld/` 에 산출물을 추가하는 것을 권장합니다.
 
@@ -142,7 +142,7 @@ python -m hwsim run hw/tests/cpld_gpr_decode.yaml
 ```mermaid
 flowchart TD
   A[CPLD JED 소각] --> B[디코드 벤치]
-  B --> C[574×4 GPR 배선]
+  B --> C[CPLD GPR 배선]
   C --> D[GPR read mux → ALU A/B]
   D --> E[ALU Y → D bus + LOAD_R*]
   E --> F[8b CW / REG_WE / opcode·phase]

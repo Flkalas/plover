@@ -11,7 +11,7 @@ Single active milestone document. Supersedes archived [v0.2 / v1.x plans](archiv
 
 Deliver a **breadboard-prototype 8-bit CPU** with:
 
-- 574×4 GPR + ATF1504AS system CPLD
+- CPLD GPR + 138×2 + 10b CW (v1.0 — see [system-architecture.md](system-architecture.md); legacy 574 path in [archive/pre-v0.1/](archive/pre-v0.1/README.md))
 - Single SST39SF010A (boot + 8b CW + utility)
 - 2× IS62C256 (64 KB via A15)
 - MMIO Mailbox @ `$FF00` (polling, no IRQ)
@@ -55,7 +55,7 @@ Split into two bring-up packages:
 | Sub | 시방 | Scope |
 |-----|------|-------|
 | **M2a** | [hw-bringup/M2a-cpld-decode.md](hw-bringup/M2a-cpld-decode.md) | CPLD ISP·소각, `LOAD_R*`, memory CS, reset `$FFFC` |
-| **M2b** | [hw-bringup/M2b-gpr-memory.md](hw-bringup/M2b-gpr-memory.md) | 574×4 GPR, MUX, SRAM, NOR socket, MAP_MODE |
+| **M2b** | [hw-bringup/M2b-gpr-memory.md](hw-bringup/M2b-gpr-memory.md) | CPLD GPR, 138×2, SRAM, NOR, MAP_MODE |
 
 - Gate: mem decode matches [memory-map.md](memory-map.md); `cpld_gpr_decode` + `regfile_574`
 

@@ -3,10 +3,10 @@
 | Field | Value |
 |-------|-------|
 | **Milestone** | M2a |
-| **IC** | ATF1504AS-10JU44 (PLCC-44) |
-| **Goal** | JED 소각 + 벤치에서 `LOAD_R*`, 메모리 CS, RESET `$FFFC` 확인 |
-| **Normative** | [cpld-system-controller.md](../cpld-system-controller.md) |
-| **hwsim** | `cpld_gpr_decode`, `mem_decode` |
+| **IC** | ATF1504AS (100-TQFP) |
+| **Goal** | JED 소각 + 벤치에서 CPLD **GPR** (`q_a`/`q_b`, `REG_SEL` from CW_H) 확인 |
+| **Normative** | [cpld-system-controller.md](../cpld-system-controller.md) v1.0 |
+| **hwsim** | `cpld_gpr_decode_breadboard` |
 
 > **저장소:** ABEL/JED는 아직 리포에 없을 수 있음. 본 문서는 **배선·검증 절차**. JED 확정 후 `hw/cpld/` 에 추가.
 
@@ -16,9 +16,9 @@
 
 | 순서 | 이유 |
 |------|------|
-| ALU(B3a) 이후 | 메모리 CS 없이 SRAM/ROM을 붙이면 버스 충돌 위험 |
-| GPR 이전 | `LOAD_R0..3` 없으면 574에 쓸 수 없음 |
-| M2b 이전 | `RAM1_CS`, `ROM_CS`, `MAILBOX_EN` 으로 잘못된 CS 방지 |
+| ALU(B3a) 이후 | GPR/메모리 붙이기 전 ALU 경로 검증 |
+| M2b 이전 | CPLD GPR JED로 `q_a`/`q_b` dual-read 확인 |
+| CE | **138×2 + glue** — CPLD 밖 ([breadboard-wiring.md](breadboard-wiring.md)) |
 
 **선행:** [M1-alu.md](M1-alu.md) B3a 완료 (B3b/c와 병렬 가능).
 

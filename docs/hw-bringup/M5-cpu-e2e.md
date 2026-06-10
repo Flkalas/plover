@@ -25,7 +25,7 @@ M1–M4b는 **수동 단계**로 CPU를 올립니다. M5는 그 결과를:
 ```1:9:hw/netlist/blocks/cpu.yaml
 version: 1
 block: cpu
-description: "v0.1 CPU datapath — 574×4 GPR + ATF1504AS system CPLD (composite stub)"
+description: "v1.0 CPU datapath — CPLD GPR + 138×2 breadboard (composite stub)"
 includes:
   - regfile_574.yaml
   - cpld_system_ctrl.yaml

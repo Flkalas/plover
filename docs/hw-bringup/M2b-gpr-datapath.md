@@ -6,14 +6,14 @@
 | **선행** | [M2a](M2a-cpld-decode.md), [M1 B3c](M1-b3-procedure.md#b3c--2-mhz-클록-타이밍-마진) |
 | **메모리 배선** | [M2b-memory.md](M2b-memory.md) (병렬 또는 G4 이후) |
 
-574×4, read MUX, ALU 연결, **수동** opcode/phase/CW로 ADD 3-phase @ 2 MHz.
+CPLD GPR (`q_a`/`q_b`), **REG_SEL** from CW_H, ALU 연결 — **수동** CW로 ADD 3-phase @ 2 MHz.
 
 ---
 
 ## 1. 신호 흐름
 
 ```
-CPLD (LOAD_R*, REG_SEL) ──► 574×4 GPR ──► 157 MUX ──► ALU A/B
+CW_H (REG_SEL) ──► CPLD GPR ──► q_a / q_b ──► ALU A/B
                               ▲              │
                               └── Y_OE ── ALU Y ── net_d0..7
 ```

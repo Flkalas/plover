@@ -10,20 +10,22 @@
 
 ## 1. 개념 (작업자용)
 
-CPU는 매크로 opcode마다 **1~3 micro-phase** 를 실행합니다. 각 phase마다 Flash `$4000` 대역에서 **8비트 제어어(CW)** 를 읽습니다.
+CPU는 매크로 opcode마다 **1~3 micro-phase** 를 실행합니다. 각 phase마다 Flash `$4000` 대역에서 **10비트 CW (2바이트)** 를 읽습니다.
 
 ```
-CW 주소 인덱스 = (opcode[3:0] << 2) | phase[1:0]
-Flash 물리주소 = $4000 + 인덱스
+index = (opcode[3:0] << 2) | phase[1:0]
+Flash_lo = $4000 + 2*index      → 574 CW_L
+Flash_hi = $4000 + 2*index + 1  → 574 CW_H (REG_SEL[1:0])
 ```
 
-| CW bit | 신호 |
-|--------|------|
-| B7–B4 | ALU_OP |
-| B3 | REG_WE |
-| B2 | Y_OE |
-| B1 | MEM_RD |
-| B0 | MEM_WR |
+| CW bit | 신호 | Latch |
+|--------|------|-------|
+| B9–B8 | REG_SEL | CW_H → CPLD |
+| B7–B4 | ALU_OP | CW_L |
+| B3 | REG_WE | CW_L |
+| B2 | Y_OE | CW_L |
+| B1 | MEM_RD | CW_L |
+| B0 | MEM_WR | CW_L |
 
 ---
 
@@ -40,7 +42,7 @@ python tools/pack_control_store.py --build-fixtures
 
 | 파일 | 내용 |
 |------|------|
-| `hw/fixtures/control/cw.hex` | 2048바이트 CW |
+| `hw/fixtures/control/cw.hex` | 4096바이트 (2048 슬롯 × 2) |
 | `hw/fixtures/control/nor_cw_region.hex` | Flash `$4000` 오프셋 포함 슬라이스 |
 
 ### 2.2 검증

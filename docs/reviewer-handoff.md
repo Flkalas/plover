@@ -28,7 +28,7 @@
 SST39SF010A (128K NOR)     boot $0000–$07FF + 8b CW @ Flash $4000
 2× IS62C256AL (A15 bank)   64 KB RAM
 ATF1504AS                  decode · MAP_MODE · LOAD_R0..3 (조합만)
-74HC574×4                  R0–R3 GPR
+ATF1504 GPR                R0–R3 (internal FF)
 MMIO Mailbox               $FF00–$FFFB (폴링, IRQ 없음)
 RP2350B                    Mailbox copro (펌웨어 stub만)
 ```
@@ -82,7 +82,7 @@ python -m hwsim run hw/tests/mem_decode.yaml
 | 테스트 | 검증 |
 |--------|------|
 | `v2_cpld_gpr_decode` | ADD opcode×phase → Reg_Sel, LOAD_R2 |
-| `v2_regfile_574` | 574×4 dual-read GPR |
+| `cpld_regfile_dual_read` | CPLD GPR dual-read (v1.0) |
 | `v2_mem_decode` | Mode A/B, A15 bank, Mailbox `$FF00` |
 | `v2_monitor_poll` | MMIO STATUS / CMD stub |
 | `v2_boot_handoff` | Reset `$FFFC`, Run mode RAM vector (manual) |
