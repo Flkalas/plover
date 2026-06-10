@@ -1,6 +1,7 @@
 # 디바이스마트 보완 구매 (2026-06-01 ~ 06-02)
 
-Plover **v0.1 BOM 보완** (historical) · **normative v0.2:** [hardware-architecture-synthesis.md](../hardware/hardware-architecture-synthesis.md)  
+Plover **v0.1 BOM 보완** (historical) · **normative v1.0:** [system-architecture.md](../hardware/system-architecture.md)  
+**패키지·어댑터 해석:** [parts-on-hand.md](parts-on-hand.md) (본 표 수량은 역사 기록).  
 1차 주문: [purchase-devicesmart.md](purchase-devicesmart.md)
 
 | 항목 | 내용 |
@@ -124,7 +125,7 @@ ALU Phase B2 delta: [bom-maintenance.md](bom-maintenance.md) — **1차 153×4 +
 | OSC 2M / 1M (HALF) | 각 1 | §1은 **4 MHz** 마스터 osc — 용도·호환 확인 필요 |
 | FT232H (TYPE-C) | 1 | USB·JTAG·FIFO — CPLD/Flash 프로그래밍 보조 (BOM §4 JTAG 별도) |
 | 74HC02 (DIP) ×10 | 1 lot | BOM 미포함 (NOR); 실험용 |
-| SOP28 adapter | +10 | 1차 4 + 본 10 → **14** (§1 qty 4 초과) |
+| SOP28 adapter | +10 | 1차 4 + 본 10 → **14** — **SRAM (#19)** 어댑터 여유 ([parts-on-hand.md](parts-on-hand.md)) |
 | KEYESTUDIO 830 kit | 1 | 브레드보드·전원·점퍼 세트 — 1차 MB-102·PWR080015와 중복 가능 |
 
 ### 여전히 §1 대비 미확인

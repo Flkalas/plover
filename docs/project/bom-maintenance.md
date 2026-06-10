@@ -5,6 +5,7 @@
 | 문서 | 용도 |
 |------|------|
 | [BOM.md](../BOM.md) | 무엇을 몇 개 살지 — 장바구니 |
+| [parts-on-hand.md](parts-on-hand.md) | **실구매 확정** — 패키지·어댑터·재주문 |
 | [BOM-3v3.md](../BOM-3v3.md) | PCB 3.3 V 쇼핑 목록 |
 | [purchase-devicesmart.md](purchase-devicesmart.md) | 디바이스마트 **1차** 주문 |
 | [purchase-2026-06-01-followup.md](purchase-2026-06-01-followup.md) | 디바이스마트 **2·3차** · AliExpress |
@@ -95,7 +96,7 @@ v0.1 [system-architecture.md](../hardware/system-architecture.md) · [alu8.md](.
 
 | 구분 | 수량 |
 |------|------|
-| 표 라인 (#1–#36, #3a–c) | 38종 |
+| 표 라인 (#1–#36, #3a+c) | 37종 |
 | 74HC DIP IC | **34** (ALU **14** + CPU 12 + 버스 1 + 클록 4 + 595×3) |
 | 74HC153 / 157 / 04 | **8** / **4** / **3** (ALU 153·157 + CPU #13, ALU·클록 04) |
 | SMD (+ #3 어댑터) | Flash×1, SRAM×2, LVC245×3, CPLD×1 |
@@ -105,7 +106,7 @@ v0.1 [system-architecture.md](../hardware/system-architecture.md) · [alu8.md](.
 | # | [BOM.md](../BOM.md) Qty | 검산 | 비고 |
 |---|-------------------------|------|------|
 | **0.1 µF** | **38** | 74HC **30** (34−595×3) + CPLD **4** | 어댑터 **+6** 여유 권장 → **~44** |
-| **SMD 어댑터** | **6** (#3a+b+c) | SRAM 2 + Flash 0–1 + LVC 3 | 32-PDIP Flash 시 #3b 생략 |
+| **SMD 어댑터** | **6** (#3a+c + #15) | SRAM 2 + LVC 3 + PLCC 1 | Flash PDIP 직결 |
 | 10 µF / bead / SIP / axial | 각 **10** | 설계 여유 | |
 | 브레드보드 ×4 · 점퍼 6 m | | ✓ | |
 
@@ -132,7 +133,7 @@ v0.1 [system-architecture.md](../hardware/system-architecture.md) · [alu8.md](.
 | ATF1504 | 1 | 1 | ✓ |
 | MAP_MODE switch | 1 | 10× slide (C) | 1개 조립 |
 | RESET tact | 1 (선택) | 10× (C) | ITS-1103 |
-| 7485 | **0** | — | **구매 금지** (설계 제거) |
+| 7485 | **0** | — | ALU 설계 미포함 |
 
 ---
 
@@ -140,13 +141,14 @@ v0.1 [system-architecture.md](../hardware/system-architecture.md) · [alu8.md](.
 
 | Item | v1.0 |
 |------|------|
-| GPR | **CPLD internal** (ATF1504 ~40 MC) |
+| CPLD package | **ATF1504AS-10JU44** PLCC-44 + #15 adapter |
+| Flash package | **SST39SF010A-70-4C-PHE** PDIP-32 직결 |
+| GPR | **CPLD internal** (~40 MC) |
 | CE / mailbox | **74HC138×2** + 08/32/04 glue |
 | CW | **10b** — 574 **CW_L + CW_H** (+ PC/MBR/FLG → **5×574** seq) |
 | 138 | **2** total (+1 order from 1차) |
-| GAL / larger CPLD | **Do not buy** |
 
-See [hardware-architecture-synthesis.md](../hardware/hardware-architecture-synthesis.md) · [hw-bringup/breadboard-wiring.md](../hw-bringup/breadboard-wiring.md).
+See [parts-on-hand.md](parts-on-hand.md) · [hardware-architecture-synthesis.md](../hardware/hardware-architecture-synthesis.md) · [hw-bringup/breadboard-wiring.md](../hw-bringup/breadboard-wiring.md).
 
 ---
 
@@ -160,3 +162,4 @@ See [hardware-architecture-synthesis.md](../hardware/hardware-architecture-synth
 | 2026-06-02 | BOM | Phase B2 / SUB Phase A 이력 (중간 단계) |
 | 2026-06-01 | BOM | 수량 검산 · 어댑터 6 |
 | 2026-06-01 | BOM-3v3 | PCB 3.3 V 목록 최초 분리 |
+| 2026-06-10 | parts-on-hand | v1.0 패키지 확정 — PLCC CPLD, PDIP Flash, 어댑터 검산 |
