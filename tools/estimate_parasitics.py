@@ -124,7 +124,7 @@ def build_variants() -> list[ArchVariant]:
         dip_74hc=34,
         cpld=1,
         gal=0,
-        smd_adapters=6,  # 2 SRAM + 1 Flash + 3 LVC245
+        smd_adapters=6,  # 2 SRAM + 3 LVC245 + PLCC (Flash PDIP direct)
         notes="Tier 0 bring-up; archived system-architecture-v0.1.",
         nets=[
             NetModel("GPR.Q → ALU.A", 8, hops=2, contacts=6, fanout=1),
@@ -268,7 +268,7 @@ def build_variants() -> list[ArchVariant]:
             NetModel("ADDR[15:0]", 16, hops=2, contacts=6, fanout=2),
             NetModel("DATA bus", 8, hops=3, contacts=8, fanout=4, extra_pf=10),
             NetModel("CW_L[7:0] + CW_H[1:0]", 10, hops=2, contacts=6, fanout=3,
-                     adapter_nh=NH_SOIC_BREAKOUT),
+                     adapter_nh=0.0),  # Flash PDIP direct
             NetModel("138×2 Y* → /CE glue", 3, hops=1, contacts=4, fanout=2),
             NetModel("FLG 574 (Z/C)", 2, hops=2, contacts=4, fanout=2),
             NetModel("BEQ glue 08/32", 1, hops=2, contacts=4, fanout=1),
@@ -277,7 +277,7 @@ def build_variants() -> list[ArchVariant]:
         ],
     )
 
-    gpr_gal.notes += " [REJECTED — do not buy]"
+    gpr_gal.notes += " [archived comparison variant]"
     v01_gpr.notes += " [archived Tier 0 — hw/tests/archive/tier0]"
 
     return [v1_breadboard, v01_gpr, cpld_gpr, acc_tmp, acc_only, gpr_gal, gpr_138]

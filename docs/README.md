@@ -7,7 +7,7 @@ Design notes and simulators for Plover — **v1.0 breadboard CPU** (CPLD GPR ~40
 - Project overview: [../README.md](../README.md)
 - Electrical sim: `python -m hwsim run --all` — [simulation/hw-sim.md](simulation/hw-sim.md)
 - Logic VM: `cargo run -p plover_vm` — [simulation/vm-rust.md](simulation/vm-rust.md)
-- BOM: [../BOM.md](../BOM.md) · maintenance [project/bom-maintenance.md](project/bom-maintenance.md)
+- BOM: [../BOM.md](../BOM.md) · packages [project/parts-on-hand.md](project/parts-on-hand.md) · maintenance [project/bom-maintenance.md](project/bom-maintenance.md)
 
 ---
 
@@ -105,6 +105,7 @@ Design notes and simulators for Plover — **v1.0 breadboard CPU** (CPLD GPR ~40
 |----------|-------------|
 | [project/implementation-plan-v0.1.md](project/implementation-plan-v0.1.md) | Milestones M1–M5 |
 | [project/roadmap-next.md](project/roadmap-next.md) | Roadmap |
+| [project/parts-on-hand.md](project/parts-on-hand.md) | **Purchased packages** (v1.0 breadboard) |
 | [project/bom-maintenance.md](project/bom-maintenance.md) | BOM history & checks |
 | [project/purchase-devicesmart.md](project/purchase-devicesmart.md) | DeviceSmart order log |
 | [project/purchase-2026-06-01-followup.md](project/purchase-2026-06-01-followup.md) | 2026-06-01 follow-up |

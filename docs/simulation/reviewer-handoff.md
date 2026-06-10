@@ -22,22 +22,22 @@
 
 ---
 
-## 2. v0.1 아키텍처 요약
+## 2. v1.0 아키텍처 요약
 
 ```
-SST39SF010A (128K NOR)     boot $0000–$07FF + 8b CW @ Flash $4000
-2× IS62C256AL (A15 bank)   64 KB RAM
-ATF1504AS                  decode · MAP_MODE · LOAD_R0..3 (조합만)
-ATF1504 GPR                R0–R3 (internal FF)
-MMIO Mailbox               $FF00–$FFFB (폴링, IRQ 없음)
-RP2350B                    Mailbox copro (펌웨어 stub만)
+SST39SF010A-70-4C-PHE (PDIP)  boot $0000–$07FF + 10b CW @ Flash $4000 (2 B/slot)
+2× IS62C256AL (A15 bank)      64 KB RAM
+ATF1504AS-10JU44 (PLCC-44)    GPR R0–R3 (internal FF); REG_SEL from CW_H
+74HC138×2 + 08/32/04          CE / mailbox / MAP glue
+MMIO Mailbox                  $FF00–$FFFB (폴링, IRQ 없음)
+RP2350B                       Mailbox copro (펌웨어 stub만)
 ```
 
 - **Mode A (Boot):** `$0000–$07FF` ROM, `$FFFC` 벡터 → ROM  
 - **Mode B (Run):** 전 영역 RAM, `$FFFC` 벡터 → RAM (운영자 DIP + RESET)  
-- **8-bit CW:** B7–B4 ALU_OP, B3 REG_WE, B2 Y_OE, B1 MEM_RD, B0 MEM_WR  
+- **10-bit CW:** B9–B8 REG_SEL, B7–B4 ALU_OP, B3 REG_WE, B2 Y_OE, B1 MEM_RD, B0 MEM_WR  
 
-상세: [memory-map.md](../hardware/memory-map.md), [microcode-spec.md](../hardware/microcode-spec.md)
+상세: [memory-map.md](../hardware/memory-map.md), [microcode-spec.md](../hardware/microcode-spec.md), [parts-on-hand.md](../project/parts-on-hand.md)
 
 ---
 
@@ -112,7 +112,7 @@ plover_vm/
   alu.py, alu16.py          # 8-bit / 16-bit ALU (combinational)
   decode.py                   # MapDecoder (CpldSystemCtrl 포팅)
   memory/                     # NorFlash, Ram64K, Mailbox, MemoryBus
-  micro/                      # 8b CW micro-phase engine
+  micro/                      # 10b CW micro-phase engine
   macro/                      # MacroEngine + MacroFastPath
   machine.py                  # PloverMachine (run/reset/snapshot)
   cli.py                      # run · step · scenario
@@ -122,7 +122,7 @@ plover_vm/
 
 | `--engine` | 설명 |
 |------------|------|
-| `micro` | 8b CW micro-phase (pack_control_store 연동) |
+| `micro` | 10b CW micro-phase (pack_control_store 연동) |
 | `macro` | micro와 동일 (MacroEngine 위임) |
 | `fast` | ISA 직접 실행 (bring-up·데모용, **기본 권장**) |
 
@@ -182,7 +182,7 @@ python -m pytest tests/ -q
 | WMOV | 0x11 | 16-bit MOV |
 | WCMP16 | 0x12 | W0 vs imm16 (**3바이트** 명령) |
 
-> **검토 포인트:** 위 확장 opcode는 **실기 ISA가 아니라 VM bring-up·데모용**입니다. 실제 v0.1 하드웨어는 8b CW + micro-phase만 normative입니다.
+> **검토 포인트:** 위 확장 opcode는 **실기 ISA가 아니라 VM bring-up·데모용**입니다. 실제 v1.0 하드웨어는 **10b CW** + micro-phase가 normative입니다.
 
 ### 6.3 어셈블 · CW 패킹
 
