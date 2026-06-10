@@ -1,9 +1,9 @@
-﻿# Plover v0.1 — System Architecture
+﻿# Plover v1.0 — System Architecture
 
-**Version:** 0.1 · **Date:** 2026-06-01  
-**Status:** Active normative specification
+**Version:** 1.0 (pre-release) · **Date:** 2026-06-10  
+**Status:** Active normative specification (breadboard)
 
-Supersedes archived pre-v0.1 specs — see [archive/pre-v0.1/](archive/pre-v0.1/README.md).
+Supersedes [v0.2](archive/pre-v1.0/system-architecture-v0.2.md). Design rationale: [hardware-architecture-synthesis.md](hardware-architecture-synthesis.md).
 
 ---
 
@@ -11,9 +11,11 @@ Supersedes archived pre-v0.1 specs — see [archive/pre-v0.1/](archive/pre-v0.1/
 
 | Item | Specification |
 |------|---------------|
-| **CPU** | 8-bit TTL datapath: custom ALU (74HC) + **4×GPR (74HC574)** |
-| **Control** | Microcoded — **8-bit CW** from single parallel NOR |
-| **System CPLD** | **ATF1504AS** — decode, bus arb, timing, GPR `LOAD_*` (no GPR storage) |
+| **CPU** | 8-bit TTL datapath: custom ALU (74HC) + **4×GPR in ATF1504** |
+| **Control** | Microcoded — **10-bit CW** from parallel NOR (`REG_SEL` in CW B9–B8) |
+| **System CPLD** | **ATF1504AS (100-TQFP)** — **GPR only** (~40 MC) |
+| **CE decode** | **74HC138×2** + **74HC08/32/04** glue → RAM/ROM `/CE` |
+| **Flags / branch** | **574×1 FLG** (Z/C) + **08/32** BEQ glue — **no GAL** |
 | **RAM** | **2× IS62C256AL** — 64 KB via **A15** bank |
 | **ROM** | **1× SST39SF010A** — boot, utility, microcode table |
 | **I/O** | MMIO **Mailbox** @ `$FF00–$FFFB` — polling only, **no IRQ** |
@@ -24,27 +26,22 @@ Supersedes archived pre-v0.1 specs — see [archive/pre-v0.1/](archive/pre-v0.1/
 ## 2. Design philosophy
 
 - **Deterministic:** no IRQ; operator-visible mode switches.
-- **Passive CPLD:** reset vector and memory map use **combinatorial logic only** — no map/boot state registers inside CPLD.
+- **Passive map:** mailbox/MAP qualifiers in **discrete gates**; CPLD holds GPR only.
 - **ROM as law:** CPU executes; ROM holds boot, control tables, and fixed assets ([rom-architecture.md](rom-architecture.md)).
-- **Logic VM:** [`plover_vm/`](../plover_vm/) — functional simulator with NOR/RAM/Mailbox for program bring-up ([hw-sim.md](hw-sim.md#plover-logic-vm-plover_vm)).
+- **Logic VM:** [`plover_vm/`](../plover_vm/) — functional simulator ([hw-sim.md](hw-sim.md#plover-logic-vm-plover_vm)).
 
 ---
 
 ## 3. Block diagram
 
-```
-                    ┌── ATF1504AS (system_ctrl) ──┐
-  4MHz ──÷2── 2MHz  │ decode · arb · LOAD_R*    │
-                    └───┬──────┬──────┬─────────┘
-                        │      │      │
-    ┌───────────────────┘      │      └──────────────────┐
-    ▼                          ▼                         ▼
- 574×4 GPR                  2× SRAM                 SST39SF010A
- R0–R3                     64 KB                    boot+CW+utility
-    │                          │                         │
-    └──────── alu8 ────────────┴──────── MBR/PC ────────┘
-                                      │
-                              MMIO $FF00 ↔ RP2350B
+```text
+  Flash CW (10b) ──► 574 CW_L/CW_H ──┬── B7-B0 ──► 245 / MEM / Y_OE
+                                    └── B9-B8 ──► CPLD GPR w_sel/r_sel
+
+  A[15:0] ──► 08/32 mailbox·MAP ──► 74HC138×2 ──► /CE ──► SRAM×2 + SST39
+
+  ATF1504 ── q_a/q_b ──► alu8 ◄── MBR/PC (574)
+  FLG (574×1) ── BEQ glue ── 161
 ```
 
 ---
@@ -52,11 +49,11 @@ Supersedes archived pre-v0.1 specs — see [archive/pre-v0.1/](archive/pre-v0.1/
 ## 4. Boot workflow
 
 1. Power on — **MAP_MODE=Boot** (DIP default).
-2. **RESET** — CPLD forces fetch @ **`$FFFC`** → ROM vector → boot @ `$0000–$07FF`.
-3. Bootloader: POST → vFDD load (Mailbox) → copy kernel/utility to **RAM `$0800+`** → optional RAM vector @ `$FFFC` → **`JMP $0800`** (product) or **halt** (bring-up).
-4. **Manual path only:** operator DIP → **Run**, press **RESET** → fetch `$FFFC` from **RAM** → kernel execute.
+2. **RESET** — fetch @ **`$FFFC`** (157 addr MUX or CPLD stub) → ROM vector → boot @ `$0000–$07FF`.
+3. Bootloader: POST → vFDD load (Mailbox) → copy kernel to **RAM `$0800+`** → **`JMP $0800`** or halt.
+4. Operator DIP → **Run**, **RESET** → fetch `$FFFC` from **RAM**.
 
-Details: [bootloader.md](bootloader.md) · [boot-jmp-handoff.md](boot-jmp-handoff.md) · [memory-map.md](memory-map.md).
+Details: [bootloader.md](bootloader.md) · [memory-map.md](memory-map.md).
 
 ---
 
@@ -64,17 +61,12 @@ Details: [bootloader.md](bootloader.md) · [boot-jmp-handoff.md](boot-jmp-handof
 
 | Document | Content |
 |----------|---------|
-| [memory-map.md](memory-map.md) | Address map, Mode A/B |
-| [rom-architecture.md](rom-architecture.md) | Control / Boot / Utility segments |
-| [cpld-system-controller.md](cpld-system-controller.md) | CPLD ports, decode, GPR load |
-| [hw-bringup/README.md](hw-bringup/README.md) | **M1–M5 breadboard bring-up index** |
-| [hw-bringup-cpld-programming.md](hw-bringup-cpld-programming.md) | M2a detail — ATF1504 ISP |
-| [hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md) | M2b detail — GPR ↔ ALU |
-| [microcode-spec.md](microcode-spec.md) | 8b CW, ISA, Reg_Sel table |
-| [mailbox-protocol.md](mailbox-protocol.md) | `$FF00` MMIO, polling |
-| [rp2350-coprocessor.md](rp2350-coprocessor.md) | Copro board, firmware contract |
-| [bootloader.md](bootloader.md) | ROM image, handoff |
-| [alu-opcodes-timing.md](alu-opcodes-timing.md) | ALU comb delay (unchanged) |
+| [memory-map.md](memory-map.md) | Address map, 138×2 + gate decode |
+| [cpld-system-controller.md](cpld-system-controller.md) | CPLD GPR ports (~40 MC) |
+| [microcode-spec.md](microcode-spec.md) | 10b CW, ISA |
+| [hw-bringup/README.md](hw-bringup/README.md) | M1–M5 breadboard bring-up |
+| [hw-bringup/breadboard-wiring.md](hw-bringup/breadboard-wiring.md) | 138×2, gates, CW latch |
+| [hardware-architecture-synthesis.md](hardware-architecture-synthesis.md) | Decisions, parasitics |
 
 ---
 
@@ -82,9 +74,12 @@ Details: [bootloader.md](bootloader.md) · [boot-jmp-handoff.md](boot-jmp-handof
 
 | Layer | Tool |
 |-------|------|
-| hwsim gate + ALU bringup | `python -m hwsim run --all` (15 tests) |
+| hwsim | `python -m hwsim run --all` |
+| Breadboard gates | `cpld_regfile_dual_read`, `mem_decode_breadboard`, `cpld_gpr_decode_breadboard` |
+| cyclesim | `python -m cyclesim run hw/tests/cyclesim/cpld_regfile_dual_read.yaml` |
 | Logic VM | `python -m pytest tests/ -q` |
-| Microcode pack | `python tools/verify_control_store.py` |
+| CE parity | `pytest tests/test_mem_decode_breadboard.py` |
+| CW pack | `python tools/verify_control_store.py` |
 
 ---
 
@@ -92,4 +87,6 @@ Details: [bootloader.md](bootloader.md) · [boot-jmp-handoff.md](boot-jmp-handof
 
 | Date | Note |
 |------|------|
-| 2026-06-01 | v0.1 baseline — GPR 574×4, single NOR, system CPLD |
+| 2026-06-01 | v0.1 — archived |
+| 2026-06-10 | v0.2 — archived ([pre-v1.0](archive/pre-v1.0/README.md)) |
+| 2026-06-10 | **v1.0** — single breadboard: CPLD GPR ~40 MC + 138×2 + 10b CW |

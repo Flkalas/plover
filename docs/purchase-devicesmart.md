@@ -6,7 +6,7 @@ Plover 프로젝트 **초기 부품 주문** 기록.
 | 항목 | 내용 |
 |------|------|
 | 판매처 | [디바이스마트](https://www.devicesmart.co.kr/) |
-| 대상 | v0.1 **1차** 실구매 · [BOM.md](../BOM.md) |
+| 대상 | v0.1 **1차** 실구매 · [BOM.md](../BOM.md) (→ **v1.0 breadboard** see [hardware-architecture-synthesis.md](hardware-architecture-synthesis.md)) |
 | 주문 상태 | 상품준비중 (전 품목) |
 
 ### Phase B2 delta (ALU vs 1차 주문 above)
@@ -98,7 +98,7 @@ Plover 프로젝트 **초기 부품 주문** 기록.
 | 74HC157 | *(위)* | +2 (addr) | 합계 8 필요 → **−3** |
 | 74HC161 | 4 | 3 | +1 여유 |
 | 74HC245 | 2 | 1 | +1 여유 |
-| 74HC138 | 1 | 1 | ✓ |
+| 74HC138 | 1 | 1 | ✓ · **v1.0 needs ×2 (+1 order)** |
 | 74HC74 | 1 | 1 | ✓ |
 | 74HC04 | *(위)* | +1 (clk) | clk 포함 **−2** |
 | SST39SF010 | 2 | 2 | ✓ |

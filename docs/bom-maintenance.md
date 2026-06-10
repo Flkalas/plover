@@ -1,4 +1,4 @@
-# BOM 유지보수 · 검토 (v0.1 5 V 빵판)
+# BOM 유지보수 · 검토 (v1.0 5 V 빵판)
 
 **[BOM.md](../BOM.md)** 는 **쇼핑·발주 전용**입니다. 개정 이력, 수량 검산, 설계 단계(Phase) 메모, 발주 대조는 **본 문서**에 둡니다.
 
@@ -8,6 +8,7 @@
 | [BOM-3v3.md](../BOM-3v3.md) | PCB 3.3 V 쇼핑 목록 |
 | [purchase-devicesmart.md](purchase-devicesmart.md) | 디바이스마트 **1차** 주문 |
 | [purchase-2026-06-01-followup.md](purchase-2026-06-01-followup.md) | 디바이스마트 **2·3차** · AliExpress |
+| [hardware-architecture-synthesis.md](hardware-architecture-synthesis.md) | 아키텍처 종합 — **v1.0 breadboard: CPLD GPR + 138×2 + 10b CW** |
 
 ---
 
@@ -132,6 +133,20 @@ v0.1 [system-architecture.md](system-architecture.md) · [alu8.md](../hw/netlist
 | MAP_MODE switch | 1 | 10× slide (C) | 1개 조립 |
 | RESET tact | 1 (선택) | 10× (C) | ITS-1103 |
 | 7485 | **0** | — | **구매 금지** (설계 제거) |
+
+---
+
+## v1.0 breadboard checklist
+
+| Item | v1.0 |
+|------|------|
+| GPR | **CPLD internal** (ATF1504 ~40 MC) |
+| CE / mailbox | **74HC138×2** + 08/32/04 glue |
+| CW | **10b** — 574 **CW_L + CW_H** (+ PC/MBR/FLG → **5×574** seq) |
+| 138 | **2** total (+1 order from 1차) |
+| GAL / larger CPLD | **Do not buy** |
+
+See [hardware-architecture-synthesis.md](hardware-architecture-synthesis.md) · [hw-bringup/breadboard-wiring.md](hw-bringup/breadboard-wiring.md).
 
 ---
 

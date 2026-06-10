@@ -1,6 +1,6 @@
 # 디바이스마트 보완 구매 (2026-06-01 ~ 06-02)
 
-Plover **v1.3 / v0.1 BOM 보완** 및 **실험·프로그래밍**용 추가 주문.  
+Plover **v0.1 BOM 보완** (historical) · **normative v0.2:** [hardware-architecture-synthesis.md](hardware-architecture-synthesis.md)  
 1차 주문: [purchase-devicesmart.md](purchase-devicesmart.md)
 
 | 항목 | 내용 |
@@ -133,7 +133,7 @@ ALU Phase B2 delta: [bom-maintenance.md](bom-maintenance.md) — **1차 153×4 +
 |-----|------|
 | OSC 4.000 MHz (half-can) | 1차에 4M×1 보유; 2M/1M은 대체 아님 |
 | ~~MAP_MODE DIP-1~~ | **주문 C** — MSL-1C2P 1C2P ×10 (슬라이드) |
-| 74HC138 | 1차 1개 보유 — v0.1 §1에는 **0** (CPLD decode) |
+| 74HC138 | 1차 1개 보유 — **v1.0 breadboard needs ×2 (+1)** |
 
 ---
 

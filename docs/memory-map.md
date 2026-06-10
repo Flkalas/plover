@@ -1,4 +1,4 @@
-﻿# Memory Map v0.1
+﻿# Memory Map v1.0
 
 **Related:** [cpld-system-controller.md](cpld-system-controller.md) · [mailbox-protocol.md](mailbox-protocol.md)
 
@@ -24,7 +24,16 @@
 | **RAM_1** | `A15=0` | `$0000–$7FFF` |
 | **RAM_2** | `A15=1` ∧ ¬`MAILBOX_EN` | `$8000–$FFFF` (except mailbox window) |
 
-See CPLD pseudo-VHDL in [cpld-system-controller.md](cpld-system-controller.md).
+### 2.1 Breadboard — 74HC138×2 + discrete glue
+
+| Block | Role |
+|-------|------|
+| **08/32/04** | `MAILBOX_EN`, MAP×A11 boot ROM, final `/CE` combine |
+| **74HC138 #2** | Half-select: low 32 KiB vs high 32 KiB (A15, MAP-gated) |
+| **74HC138 #1** | CBA = A15,A14,A13 → coarse Y*; E = `!MAILBOX_EN` |
+| **ATF1504** | GPR only — **no** address decode |
+
+Reference: [`decode_ce_breadboard()`](../hw/logic/cpld_decode.py) · [breadboard-wiring.md](hw-bringup/breadboard-wiring.md).
 
 ---
 
@@ -43,8 +52,8 @@ No automatic map switch from software — operator toggles DIP, then **RESET**.
 
 | Access | Address source |
 |--------|----------------|
-| Instruction fetch (Mode A boot) | PC → `$0000–$07FF` / `$FFFC` via CPLD |
-| Microcode CW | `{opcode, phase}` → Flash `$4000+` |
+| Instruction fetch (Mode A boot) | PC → decode glue |
+| Microcode CW | `{opcode,phase}` → Flash `$4000 + 2×index` (10b CW) |
 | Utility read | PC or boot copy loops |
 
 ---
@@ -54,3 +63,4 @@ No automatic map switch from software — operator toggles DIP, then **RESET**.
 | Date | Note |
 |------|------|
 | 2026-06-01 | 64 KB A15 bank; mailbox window |
+| 2026-06-10 | **v1.0** — 138×2 + gates; CPLD GPR only |
