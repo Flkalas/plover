@@ -3,7 +3,7 @@
 **Device:** ATF1504AS-10JU44 · **Role:** passive comb decode + GPR load enables  
 **Archived:** Tier 0. Active: [cpld-system-controller.md](../../cpld-system-controller.md) v0.2.
 
-**Bring-up:** [hw-bringup-cpld-programming.md](hw-bringup-cpld-programming.md) (JTAG/소각) · [hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md) (574↔ALU 배선)
+**Bring-up:** [hw-bringup-cpld-programming.md](archive/bringup-legacy/hw-bringup-cpld-programming.md) (JTAG/소각) · [hw-bringup-gpr-alu.md](archive/bringup-legacy/hw-bringup-gpr-alu.md) (574↔ALU 배선)
 
 ---
 

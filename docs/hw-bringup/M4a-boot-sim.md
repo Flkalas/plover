@@ -103,7 +103,7 @@ python -m pytest tests/test_boot_handoff.py -v
 python -m plover_vm scenario hw/scenarios/vm/boot_run.yaml
 ```
 
-`boot_rom_manual.hex` — HALT 후 operator Run+RESET 경로 ([bootloader.md](../bootloader.md) §3).
+`boot_rom_manual.hex` — HALT 후 operator Run+RESET 경로 ([bootloader.md](../boot/bootloader.md) §3).
 
 ---
 

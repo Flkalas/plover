@@ -7,9 +7,12 @@ Material kept for reference but not part of the active **hwsim** electrical-simu
 | Path | Contents |
 |------|----------|
 | [gemini/](gemini/) | Original Gemini design conversation exports (architecture, BOM, timing notes) |
-| [pre-v0.1/](pre-v0.1/) | Superseded v0.2 / v1.x normative specs |
+| [pre-v0.1/](pre-v0.1/) | Superseded v0.1 external-GPR normative specs |
+| [pre-v1.0/](pre-v1.0/) | Superseded v0.2 Tier 2 CPLD-all-in specs |
+| [bringup-legacy/](bringup-legacy/) | Superseded root-level bring-up copies |
+| [sessions/](sessions/) | Completed work-session handoff notes |
 | [plans/](plans/) | Completed Cursor implementation plans |
 
 Active plans: [../plans/README.md](../plans/README.md)
 
-Active docs: [../README.md](../README.md), [../hw-sim.md](../hw-sim.md), [../roadmap-next.md](../roadmap-next.md).
+Active docs: [../README.md](../README.md), [../simulation/hw-sim.md](../simulation/hw-sim.md), [../project/roadmap-next.md](../project/roadmap-next.md).

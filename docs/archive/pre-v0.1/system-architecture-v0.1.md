@@ -26,7 +26,7 @@ Supersedes archived pre-v0.1 specs — see [archive/pre-v0.1/](archive/pre-v0.1/
 - **Deterministic:** no IRQ; operator-visible mode switches.
 - **Passive CPLD:** reset vector and memory map use **combinatorial logic only** — no map/boot state registers inside CPLD.
 - **ROM as law:** CPU executes; ROM holds boot, control tables, and fixed assets ([rom-architecture.md](rom-architecture.md)).
-- **Logic VM:** [`plover_vm/`](../plover_vm/) — functional simulator with NOR/RAM/Mailbox for program bring-up ([hw-sim.md](hw-sim.md#plover-logic-vm-plover_vm)).
+- **Logic VM:** [`plover_vm/`](../plover_vm/) — functional simulator with NOR/RAM/Mailbox for program bring-up ([hw-sim.md](../../simulation/hw-sim.md#plover-logic-vm-plover_vm)).
 
 ---
 
@@ -56,7 +56,7 @@ Supersedes archived pre-v0.1 specs — see [archive/pre-v0.1/](archive/pre-v0.1/
 3. Bootloader: POST → vFDD load (Mailbox) → copy kernel/utility to **RAM `$0800+`** → optional RAM vector @ `$FFFC` → **`JMP $0800`** (product) or **halt** (bring-up).
 4. **Manual path only:** operator DIP → **Run**, press **RESET** → fetch `$FFFC` from **RAM** → kernel execute.
 
-Details: [bootloader.md](bootloader.md) · [boot-jmp-handoff.md](boot-jmp-handoff.md) · [memory-map.md](memory-map.md).
+Details: [bootloader.md](../../boot/bootloader.md) · [boot-jmp-handoff.md](boot-jmp-handoff.md) · [memory-map.md](../../hardware/memory-map.md).
 
 ---
 
@@ -64,18 +64,18 @@ Details: [bootloader.md](bootloader.md) · [boot-jmp-handoff.md](boot-jmp-handof
 
 | Document | Content |
 |----------|---------|
-| [memory-map.md](memory-map.md) | Address map, Mode A/B |
+| [memory-map.md](../../hardware/memory-map.md) | Address map, Mode A/B |
 | [rom-architecture.md](rom-architecture.md) | Control / Boot / Utility segments |
 | [cpld-system-controller.md](cpld-system-controller.md) | CPLD ports, decode, GPR load |
 | [hw-bringup/README.md](hw-bringup/README.md) | **M1–M5 breadboard bring-up index** |
-| [hw-bringup-cpld-programming.md](hw-bringup-cpld-programming.md) | M2a detail — ATF1504 ISP |
-| [hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md) | M2b detail — GPR ↔ ALU |
+| [hw-bringup-cpld-programming.md](archive/bringup-legacy/hw-bringup-cpld-programming.md) | M2a detail — ATF1504 ISP |
+| [hw-bringup-gpr-alu.md](archive/bringup-legacy/hw-bringup-gpr-alu.md) | M2b detail — GPR ↔ ALU |
 | [microcode-spec.md](microcode-spec.md) | 8b CW, ISA, Reg_Sel table |
-| [mailbox-protocol.md](mailbox-protocol.md) | `$FF00` MMIO, polling |
+| [mailbox-protocol.md](../../copro/mailbox-protocol.md) | `$FF00` MMIO, polling |
 | [rp2350-coprocessor.md](rp2350-coprocessor.md) | Copro board, firmware contract |
-| [bootloader.md](bootloader.md) | ROM image, handoff |
+| [bootloader.md](../../boot/bootloader.md) | ROM image, handoff |
 | [alu-opcodes-timing.md](alu-opcodes-timing.md) | ALU comb delay (unchanged) |
-| [hardware-architecture-synthesis.md](hardware-architecture-synthesis.md) | **Breadboard target decided** — CPLD GPR, 138×2, no GAL; Tier 0–3, parasitics |
+| [hardware-architecture-synthesis.md](../../hardware/hardware-architecture-synthesis.md) | **Breadboard target decided** — CPLD GPR, 138×2, no GAL; Tier 0–3, parasitics |
 
 ---
 

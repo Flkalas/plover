@@ -1,6 +1,6 @@
 # Breadboard v1.0 wiring reference
 
-**Normative:** [system-architecture.md](../system-architecture.md) · [memory-map.md](../memory-map.md) · [cpld-system-controller.md](../cpld-system-controller.md)
+**Normative:** [system-architecture.md](../hardware/system-architecture.md) · [memory-map.md](../hardware/memory-map.md) · [cpld-system-controller.md](../hardware/cpld-system-controller.md)
 
 Single breadboard target — **one normative path**. CPLD = GPR only (~40 MC); CE and mailbox = **138×2 + 08/32/04 glue**; control = **10b CW** from Flash via dual **574** latch.
 
@@ -88,7 +88,7 @@ No GAL. BEQ uses **574 FLG** (Z/C) + existing 08/32 glue per [microcode-spec.md]
 
 **Not in CPLD:** opcode/phase decode, `/CE`, `MAILBOX_EN`, bus 245 drive.
 
-Fit target **≤40 MC** — [cpld-system-controller.md](../cpld-system-controller.md). Reset `$FFFC` MUX: **157 recommended** until fit report; optional CPLD stub 4–8 MC.
+Fit target **≤40 MC** — [cpld-system-controller.md](../hardware/cpld-system-controller.md). Reset `$FFFC` MUX: **157 recommended** until fit report; optional CPLD stub 4–8 MC.
 
 ---
 

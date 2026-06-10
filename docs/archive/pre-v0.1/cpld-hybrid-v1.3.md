@@ -1,8 +1,8 @@
 # CPLD hybrid register file — v1.3
 
-> **Superseded by [cpld-system-controller-v2.0.md](cpld-system-controller-v2.0.md)** — v2 uses **external 574×4 GPR**; ATF1504AS is **system controller** only.
+**Active reference** for CPLD GPR ports and hwsim `CPLD_REGFILE` (v0.2 Tier 2). CE decode is **74HC138×2 + glue** — see [cpld-system-controller.md](../../cpld-system-controller.md) v0.2.
 
-**ATF1504AS-10JU44** 한 장으로 8비트 4-GPR 듀얼 포트 레지스터 파일을 구현하는 하이브리드 CPU 경로입니다.  
+**ATF1504AS (100-TQFP target)** 한 장으로 8비트 4-GPR 듀얼 포트 레지스터 파일을 구현하는 하이브리드 CPU 경로입니다.  
 디스크리트 `74HC574×4` GPR 및 `74HC157/153` B-side MUX를 CPLD 내부 논리로 대체합니다.
 
 **관련:** [BOM.md](../BOM.md) · [arch-bom-tradeoffs §8](arch-bom-tradeoffs-v1.1.md) · hwsim [`cpld_regfile.yaml`](../hw/netlist/blocks/cpld_regfile.yaml)

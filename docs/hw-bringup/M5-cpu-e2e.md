@@ -97,7 +97,7 @@ python -m cyclesim run hw/tests/cpu_e2e.yaml   # TBD
 - [ ] `cpu.yaml`에 §3 블록 전부 include
 - [ ] `cpu_e2e.yaml` hwsim PASS
 - [ ] M3b 빵판 F6 trace와 hwsim GPR 일치 (스크린샷/로그 보관)
-- [ ] [hw-sim.md](../hw-sim.md)에 regen 명령 문서화
+- [ ] [hw-sim.md](../simulation/hw-sim.md)에 regen 명령 문서화
 - [ ] `implementation-plan-v0.1.md` §2 M5 행 갱신
 
 ---

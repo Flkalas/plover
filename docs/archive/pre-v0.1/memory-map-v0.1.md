@@ -2,7 +2,7 @@
 
 **Status:** Archived Tier 0 reference. Active: [memory-map.md](../../memory-map.md) v0.2.
 
-**Related:** [cpld-system-controller.md](cpld-system-controller.md) · [mailbox-protocol.md](mailbox-protocol.md)
+**Related:** [cpld-system-controller.md](cpld-system-controller.md) · [mailbox-protocol.md](../../copro/mailbox-protocol.md)
 
 ---
 

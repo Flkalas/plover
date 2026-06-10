@@ -30,7 +30,7 @@ Supersedes [v0.1 Tier 0 bring-up](archive/pre-v0.1/system-architecture-v0.1.md).
 - **Deterministic:** no IRQ; operator-visible mode switches.
 - **Passive CPLD:** reset vector and memory map use **combinatorial logic only** — no map/boot state registers inside CPLD.
 - **ROM as law:** CPU executes; ROM holds boot, control tables, and fixed assets ([rom-architecture.md](rom-architecture.md)).
-- **Logic VM:** [`plover_vm/`](../plover_vm/) — functional simulator with NOR/RAM/Mailbox for program bring-up ([hw-sim.md](hw-sim.md#plover-logic-vm-plover_vm)).
+- **Logic VM:** [`plover_vm/`](../plover_vm/) — functional simulator with NOR/RAM/Mailbox for program bring-up ([hw-sim.md](../../simulation/hw-sim.md#plover-logic-vm-plover_vm)).
 
 ---
 
@@ -59,7 +59,7 @@ Supersedes [v0.1 Tier 0 bring-up](archive/pre-v0.1/system-architecture-v0.1.md).
 3. Bootloader: POST → vFDD load (Mailbox) → copy kernel/utility to **RAM `$0800+`** → optional RAM vector @ `$FFFC` → **`JMP $0800`** (product) or **halt** (bring-up).
 4. **Manual path only:** operator DIP → **Run**, press **RESET** → fetch `$FFFC` from **RAM** → kernel execute.
 
-Details: [bootloader.md](bootloader.md) · [boot-jmp-handoff.md](boot-jmp-handoff.md) · [memory-map.md](memory-map.md).
+Details: [bootloader.md](../../boot/bootloader.md) · [boot-jmp-handoff.md](../../boot/boot-jmp-handoff.md) · [memory-map.md](../../hardware/memory-map.md).
 
 ---
 
@@ -67,7 +67,7 @@ Details: [bootloader.md](bootloader.md) · [boot-jmp-handoff.md](boot-jmp-handof
 
 | Document | Content |
 |----------|---------|
-| [memory-map.md](memory-map.md) | Address map, 138×2 decode partition |
+| [memory-map.md](../../hardware/memory-map.md) | Address map, 138×2 decode partition |
 | [cpld-system-controller.md](cpld-system-controller.md) | CPLD ports, GPR, 138 enables |
 | [archive/pre-v0.1/cpld-hybrid-v1.3.md](archive/pre-v0.1/cpld-hybrid-v1.3.md) | CPLD GPR port / timing reference |
 | [hw-bringup/README.md](hw-bringup/README.md) | M1–M5 bring-up (Tier 0 legacy + Tier 2 migration) |

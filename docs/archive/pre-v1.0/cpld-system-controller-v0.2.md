@@ -3,7 +3,7 @@
 **Device:** ATF1504AS (**100-TQFP** target) · **Role:** GPR (R0–R3) + comb decode glue + Reg_Sel  
 **GPR ports:** [cpld-hybrid-v1.3.md](archive/pre-v0.1/cpld-hybrid-v1.3.md) · **CE tree:** 74HC138×2 + 08/32/04
 
-**Bring-up:** [hw-bringup/tier2-migration.md](hw-bringup/tier2-migration.md) · Tier 0 legacy: [cpld-system-controller-v0.1.md](archive/pre-v0.1/cpld-system-controller-v0.1.md)
+**Bring-up:** [hw-bringup/tier2-migration.md](tier2-migration.md) · Tier 0 legacy: [cpld-system-controller-v0.1.md](archive/pre-v0.1/cpld-system-controller-v0.1.md)
 
 **CPLD bitstream:** draft until MC fit report (escape: **ATF1508** if > 64 MC).
 
@@ -55,7 +55,7 @@
 | `138_coarse_en` | Enable 138 #1 (gated by `!MAILBOX_EN`) |
 | `map_a11_qual` | Mode A boot ROM window glue (A11 + MAP) |
 
-Final **`RAM1_CS_N`**, **`RAM2_CS_N`**, **`ROM_CS_N`** = 138 Y* + 08/32/04 (see [memory-map.md](memory-map.md) §2.1).
+Final **`RAM1_CS_N`**, **`RAM2_CS_N`**, **`ROM_CS_N`** = 138 Y* + 08/32/04 (see [memory-map.md](../../hardware/memory-map.md) §2.1).
 
 ### Outputs — bus (unchanged)
 
@@ -88,7 +88,7 @@ A[15:0] ──► 138 #2 (half: A15 / MAP)
          ──► 08/32/04 ──► RAM1_CS, RAM2_CS, ROM_CS
 ```
 
-Truth table: [memory-map.md](memory-map.md) · reference logic: [`hw/logic/cpld_decode.py`](../hw/logic/cpld_decode.py) `decode_ce_tier2()`.
+Truth table: [memory-map.md](../../hardware/memory-map.md) · reference logic: [`hw/logic/cpld_decode.py`](../hw/logic/cpld_decode.py) `decode_ce_tier2()`.
 
 ---
 

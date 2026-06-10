@@ -1,7 +1,7 @@
 # Tier 2 migration (574 GPR → CPLD GPR + 138×2)
 
-**Normative target:** [system-architecture.md](../system-architecture.md) v0.2  
-**Decisions:** [hardware-architecture-synthesis.md](../hardware-architecture-synthesis.md) §10.1
+**Normative target:** [system-architecture.md](../../hardware/system-architecture.md) v0.2  
+**Decisions:** [hardware-architecture-synthesis.md](../../hardware/hardware-architecture-synthesis.md) §10.1
 
 ---
 
@@ -59,7 +59,7 @@ Verify: `python -m hwsim run hw/tests/cpld_regfile_dual_read.yaml`
 
 ## Do not buy
 
-- **ATF16V8B GAL** — redundant with 138×2; no parasitic win ([synthesis §5.3](../hardware-architecture-synthesis.md)).
+- **ATF16V8B GAL** — redundant with 138×2; no parasitic win ([synthesis §5.3](../../hardware/hardware-architecture-synthesis.md)).
 
 ---
 

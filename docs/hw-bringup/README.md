@@ -1,10 +1,10 @@
 # Plover hardware bring-up index
 
-> **Normative v1.0:** CPLD GPR + 138×2 + 10b CW — [system-architecture.md](../system-architecture.md).  
+> **Normative v1.0:** CPLD GPR + 138×2 + 10b CW — [system-architecture.md](../hardware/system-architecture.md).  
 > Wiring reference: [breadboard-wiring.md](breadboard-wiring.md).
 
-**마일스톤 계획:** [implementation-plan-v0.1.md](../implementation-plan-v0.1.md)  
-**아키텍처:** [system-architecture.md](../system-architecture.md) v1.0
+**마일스톤 계획:** [implementation-plan-v0.1.md](../project/implementation-plan-v0.1.md)  
+**아키텍처:** [system-architecture.md](../hardware/system-architecture.md) v1.0
 
 초보 작업자도 **문서만 따라** 빵판 CPU를 올릴 수 있도록 단계별 시방서입니다.
 

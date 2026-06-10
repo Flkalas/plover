@@ -5,7 +5,7 @@
 | **Milestone** | M2a |
 | **IC** | ATF1504AS (100-TQFP) |
 | **Goal** | JED 소각 + 벤치에서 CPLD **GPR** (`q_a`/`q_b`, `REG_SEL` from CW_H) 확인 |
-| **Normative** | [cpld-system-controller.md](../cpld-system-controller.md) v1.0 |
+| **Normative** | [cpld-system-controller.md](../hardware/cpld-system-controller.md) v1.0 |
 | **hwsim** | `cpld_gpr_decode_breadboard` |
 
 > **저장소:** ABEL/JED는 아직 리포에 없을 수 있음. 본 문서는 **배선·검증 절차**. JED 확정 후 `hw/cpld/` 에 추가.
@@ -56,13 +56,13 @@ ATF1504 패드 배치는 **사용 어댑터 데이터시트**와 대조.
 
 ### 4.1 HDL 구현 체크리스트
 
-[cpld-system-controller.md](../cpld-system-controller.md) §2–§6:
+[cpld-system-controller.md](../hardware/cpld-system-controller.md) §2–§6:
 
 - [ ] `LOAD_R0..3` ← `REG_WE` ∧ Reg_Sel 디코드
 - [ ] `Reg_Sel[1:0]` ← `opcode[3:0]`, `phase[1:0]` ([microcode-spec.md](../microcode-spec.md) · [`reg_sel.py`](../../hw/micro/reg_sel.py))
 - [ ] `RESET_N=0` → `ADDR_FORCE_FFFC`
 - [ ] `MAILBOX_EN` = `$FF00–$FFFB` 만; `$FFFC` 제외
-- [ ] RAM1/RAM2 CS — [memory-map.md](../memory-map.md)
+- [ ] RAM1/RAM2 CS — [memory-map.md](../hardware/memory-map.md)
 
 ```vhdl
 LOAD_R0 <= (not Reg_Sel(1) and not Reg_Sel(0)) and REG_WE;
@@ -138,7 +138,7 @@ hwsim 벡터 [`cpld_gpr_decode.yaml`](../../hw/tests/cpld_gpr_decode.yaml) 와 *
 | `$FFFC` | 0 | 1 | `MAILBOX_EN` | **0** |
 | any | any | 0 | addr override | `$FFFC` 경로 |
 
-상세: [memory-map.md](../memory-map.md).
+상세: [memory-map.md](../hardware/memory-map.md).
 
 ### 5.5 hwsim Gate (배선 전·후)
 

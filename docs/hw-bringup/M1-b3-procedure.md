@@ -5,8 +5,8 @@
 | **마일스톤** | M1 |
 | **선행** | 없음 (첫 하드웨어 단계) |
 | **완료 체크** | [M1-alu.md](M1-alu.md) § sign-off |
-| **조립 상세** | [ALU8 단계별 조립](../hw-bringup-alu8-assembly-spec.md) (14 IC, 한국어) |
-| **Opcode DIP** | [hw-bringup-b3-opcode.md](../hw-bringup-b3-opcode.md) |
+| **조립 상세** | [ALU8 단계별 조립](../hw-bringup/alu8-assembly-spec.md) (14 IC, 한국어) |
+| **Opcode DIP** | [hw-bringup-b3-opcode.md](../hw-bringup/b3-opcode.md) |
 
 빵판 절차 3단계: **B3a** (조합 Y) → **B3b** (수동 래치) → **B3c** (2 MHz 클록).  
 배선 전 **hwsim**으로 동작을 확인합니다.
@@ -33,7 +33,7 @@ python -m hwsim export-schematic hw/netlist/blocks/alu8.yaml -o build/alu8-schem
 ## 공통 — 전원·디커플링
 
 - **0.1 µF / IC 1개**, 5 V 레일에 **10 µF** 벌크.
-- 제어 입력: [opcode 치트시트](../hw-bringup-b3-opcode.md). 시트에 없는 제어 넷은 **GND** (VCC 예외만 시트 참조).
+- 제어 입력: [opcode 치트시트](../hw-bringup/b3-opcode.md). 시트에 없는 제어 넷은 **GND** (VCC 예외만 시트 참조).
 - **INC/DEC:** `net_b0..7` 을 피연산자로 쓰지 말 것. `net_b_const_sel` + `net_b_const_bit1..7` 만 사용 (bit0 상수는 netlist에서 VCC).
 
 ---
@@ -46,7 +46,7 @@ python -m hwsim export-schematic hw/netlist/blocks/alu8.yaml -o build/alu8-schem
 
 | 블록 | IC 수 |
 |------|-------|
-| ALU 코어 | **14~24** — [alu8.md](../../hw/netlist/blocks/alu8.md) · [조립 시방](../hw-bringup-alu8-assembly-spec.md) |
+| ALU 코어 | **14~24** — [alu8.md](../../hw/netlist/blocks/alu8.md) · [조립 시방](../hw-bringup/alu8-assembly-spec.md) |
 
 574, OSC, 74HC74 **없음**.
 
@@ -63,7 +63,7 @@ python -m hwsim export-schematic hw/netlist/blocks/alu8.yaml -o build/alu8-schem
 
 ### 작업 절차
 
-1. [치트시트](../hw-bringup-b3-opcode.md)에서 opcode 행을 찾는다.
+1. [치트시트](../hw-bringup/b3-opcode.md)에서 opcode 행을 찾는다.
 2. A, B, 제어 DIP/타이를 설정한다.
 3. **Y LED**를 읽는다 — 클록 없음, 조합 안정 후 ~µs 이내.
 
@@ -204,7 +204,7 @@ python -m hwsim run hw/tests/alu_b3_sub_critical.yaml
 | 2 MHz에서 Q 틀림 | 스코프 Y vs clk; 배선 단축 또는 클록 하향 |
 | hwsim FAIL | `--report` 옵션; B3c는 스코프 |
 
-netlist 변경 후 regen: [hw-sim.md](../hw-sim.md) § ALU regen chain.
+netlist 변경 후 regen: [hw-sim.md](../simulation/hw-sim.md) § ALU regen chain.
 
 ---
 

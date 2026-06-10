@@ -3,10 +3,10 @@ name: B3a-c 실기 단계
 overview: B3 브레드보드를 B3a(조합 Y) → B3b(574 수동 clk) → B3c(2 MHz clk) 3단계로 쪼개고, opcode→제어선 치트시트와 B3c hwsim 통합 테스트를 추가해 클럭 기반 진행 경로를 만듭니다.
 todos:
   - id: cheatsheet-gen
-    content: tools/gen_opcode_cheatsheet.py + docs/hw-bringup-b3-opcode.md (CASES DRY)
+    content: tools/gen_opcode_cheatsheet.py + docs/hw-bringup/b3-opcode.md (CASES DRY)
     status: completed
   - id: bringup-phases
-    content: docs/hw-bringup-b3.md B3a/b/c 3단계 재구성 + docs/README 링크
+    content: docs/archive/bringup-legacy/hw-bringup-b3.md B3a/b/c 3단계 재구성 + docs/README 링크
     status: completed
   - id: b3c-netlist
     content: tools/gen_alu_b3_clock_netlist.py → hw/netlist/blocks/alu_b3_clock.yaml
@@ -15,7 +15,7 @@ todos:
     content: hw/tests/bringup_b3c_clock.yaml — 2MHz toggle, latch, setup/slack; run --all 10 PASS
     status: completed
   - id: roadmap-b3abc
-    content: docs/roadmap-next.md B3a/b/c 행 및 hwsim 매핑 갱신
+    content: docs/project/roadmap-next.md B3a/b/c 행 및 hwsim 매핑 갱신
     status: completed
 isProject: false
 ---
@@ -28,7 +28,7 @@ isProject: false
 |------|------|
 | ALU 12 opcode | hwsim PASS — [`hw/tests/alu8_full.yaml`](hw/tests/alu8_full.yaml) |
 | B3 통합 (574) | hwsim PASS — [`hw/netlist/blocks/alu_b3.yaml`](hw/netlist/blocks/alu_b3.yaml), 4종 `alu_b3_*` 테스트 |
-| 실기 가이드 | 단일 문서 — [`docs/hw-bringup-b3.md`](docs/hw-bringup-b3.md) (단계 미분리) |
+| 실기 가이드 | 단일 문서 — [`docs/archive/bringup-legacy/hw-bringup-b3.md`](docs/archive/bringup-legacy/hw-bringup-b3.md) (단계 미분리) |
 | opcode 입력 | **`net_alu_sel` 없음** — 14개 제어선을 DIP로 직접 설정 ([`alu8.md`](hw/netlist/blocks/alu8.md) 표) |
 | 클록 블록 | [`hw/netlist/blocks/clock.yaml`](hw/netlist/blocks/clock.yaml) — `net_clk2` @ 2 MHz, B3의 `net_clk`와 **이름만 다름** |
 
@@ -62,13 +62,13 @@ flowchart LR
 
 | 파일 | 역할 |
 |------|------|
-| [`docs/hw-bringup-b3-opcode.md`](docs/hw-bringup-b3-opcode.md) | **opcode → 제어선 치트시트** (12행, 테스트 벡터, LED 비트 패턴) |
-| [`docs/hw-bringup-b3.md`](docs/hw-bringup-b3.md) | **B3a / B3b / B3c** 3절로 재구성 (기존 내용 이전·정리) |
+| [`docs/hw-bringup/b3-opcode.md`](docs/hw-bringup/b3-opcode.md) | **opcode → 제어선 치트시트** (12행, 테스트 벡터, LED 비트 패턴) |
+| [`docs/archive/bringup-legacy/hw-bringup-b3.md`](docs/archive/bringup-legacy/hw-bringup-b3.md) | **B3a / B3b / B3c** 3절로 재구성 (기존 내용 이전·정리) |
 | [`tools/gen_opcode_cheatsheet.py`](tools/gen_opcode_cheatsheet.py) | [`tools/gen_alu8_full_test.py`](tools/gen_alu8_full_test.py) `CASES`에서 치트시트 **자동 생성** (DRY) |
 | [`tools/gen_alu_b3_clock_netlist.py`](tools/gen_alu_b3_clock_netlist.py) | `clock.yaml` + `alu_b3.yaml` flat merge → `net_clk2` → `net_clk` |
 | [`hw/netlist/blocks/alu_b3_clock.yaml`](hw/netlist/blocks/alu_b3_clock.yaml) | B3c 통합 netlist |
 | [`hw/tests/bringup_b3c_clock.yaml`](hw/tests/bringup_b3c_clock.yaml) | 2 MHz recurring toggle + 574 latch + setup/slack |
-| [`docs/roadmap-next.md`](docs/roadmap-next.md) | B3 → **B3a/b/c** 행 분리, 완료 체크리스트 |
+| [`docs/project/roadmap-next.md`](docs/project/roadmap-next.md) | B3 → **B3a/b/c** 행 분리, 완료 체크리스트 |
 
 코드/netlist 변경은 **문서·생성기·B3c 테스트**에 한정. ALU 로직·기존 9테스트는 유지.
 
@@ -82,7 +82,7 @@ flowchart LR
 ### 실장
 - **14 IC** (574·클록 없음; Phase B2 — [`alu8.md`](../hw/netlist/blocks/alu8.md))
 - DIP: `net_a0..7`, `net_b0..7` (INC/DEC는 B DIP 무시 — `153_B` 상수 경로)
-- 제어: `cin`, `153_s0/s1`, `b_sel`, `b_const_sel`, `b_const_bit1..7`, `net_lgc0..3` ([치트시트](../hw-bringup-b3-opcode.md); SUB/CMP `b_sel=1`, `cin=1`)
+- 제어: `cin`, `153_s0/s1`, `b_sel`, `b_const_sel`, `b_const_bit1..7`, `net_lgc0..3` ([치트시트](../hw-bringup/b3-opcode.md); SUB/CMP `b_sel=1`, `cin=1`)
 - **Y → LED ×8** (저항 330Ω~1kΩ); carry는 `net_c_hi` LED 1개(선택)
 
 ### 치트시트 사용법
@@ -152,7 +152,7 @@ flowchart LR
 
 ### 완료 기준
 - [ ] 2 MHz에서 SUB 벡터 Q latch 연속 2주기 이상 OK
-- [ ] scope 또는 hwsim으로 setup margin 기록 (실패 시 ~1.7 MHz로 클록 낮추기 — [`hw-bringup-b3.md`](docs/hw-bringup-b3.md) 기존 가이드)
+- [ ] scope 또는 hwsim으로 setup margin 기록 (실패 시 ~1.7 MHz로 클록 낮추기 — [`hw-bringup-b3.md`](docs/archive/bringup-legacy/hw-bringup-b3.md) 기존 가이드)
 
 ---
 
@@ -191,7 +191,7 @@ sel | Op   | A    | B    | sub cin b_sel b_const s1 s0 c3 | b_const_hi | Y
 
 ## roadmap 갱신
 
-[`docs/roadmap-next.md`](docs/roadmap-next.md) 트랙 B:
+[`docs/project/roadmap-next.md`](docs/project/roadmap-next.md) 트랙 B:
 
 | 단계 | 내용 | hwsim |
 |------|------|-------|
@@ -205,7 +205,7 @@ sel | Op   | A    | B    | sub cin b_sel b_const s1 s0 c3 | b_const_hi | Y
 
 ## 구현 순서
 
-1. `gen_opcode_cheatsheet.py` → `docs/hw-bringup-b3-opcode.md`
+1. `gen_opcode_cheatsheet.py` → `docs/hw-bringup/b3-opcode.md`
 2. `hw-bringup-b3.md` B3a/b/c 재구성
 3. `gen_alu_b3_clock_netlist.py` + `alu_b3_clock.yaml`
 4. `bringup_b3c_clock.yaml` + `run --all` 10 PASS

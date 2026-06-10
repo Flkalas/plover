@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Milestone** | M1 · [implementation-plan](../implementation-plan-v0.1.md) §3 |
+| **Milestone** | M1 · [implementation-plan](../project/implementation-plan-v0.1.md) §3 |
 | **Goal** | 12-opcode `alu8` 검증 + 574 래치 @ 2 MHz |
 | **Breadboard status** | Pending |
 
@@ -12,9 +12,9 @@
 
 | 순서 | 문서 | 하는 일 |
 |------|------|---------|
-| 1 | [hw-bringup-alu8-assembly-spec.md](../hw-bringup-alu8-assembly-spec.md) | ALU 14 IC를 **단계별로** 납땜·배선 (0→4단계, 매단계 LED 확인) |
+| 1 | [hw-bringup-alu8-assembly-spec.md](../hw-bringup/alu8-assembly-spec.md) | ALU 14 IC를 **단계별로** 납땜·배선 (0→4단계, 매단계 LED 확인) |
 | 2 | **[M1-b3-procedure.md](M1-b3-procedure.md)** | B3a → B3b → B3c 검증 (Y LED, 574 래치, 2 MHz) |
-| 3 | [hw-bringup-b3-opcode.md](../hw-bringup-b3-opcode.md) | 12 opcode마다 **어느 DIP를 ON/OFF** 할지 표 |
+| 3 | [hw-bringup-b3-opcode.md](../hw-bringup/b3-opcode.md) | 12 opcode마다 **어느 DIP를 ON/OFF** 할지 표 |
 
 **만들 결과물:** SUB/XOR/INC smoke가 Y LED에서 맞고, B3c에서 2 MHz로 Q가 Y를 따라감.
 
@@ -57,7 +57,7 @@ python -m hwsim run hw/tests/alu_b3_latch.yaml
 
 작업 리더가 아래를 전부 체크한 뒤 M2로 넘깁니다.
 
-- [ ] [조립 시방](../hw-bringup-alu8-assembly-spec.md) 단계 1~6 완료 (또는 동등 14 IC ALU)
+- [ ] [조립 시방](../hw-bringup/alu8-assembly-spec.md) 단계 1~6 완료 (또는 동등 14 IC ALU)
 - [ ] B3a smoke: SUB `12−34=DE`, XOR `12^34=26`, INC `12→13`
 - [ ] (권장) opcode 치트시트 12종
 - [ ] B3b: CP 1회 후 Q = Y (SUB/XOR/INC)

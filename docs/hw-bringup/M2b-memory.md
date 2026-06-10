@@ -5,7 +5,7 @@
 | **마일스톤** | M2b (메모리 절반) |
 | **선행** | [M2a](M2a-cpld-decode.md) (CS 디코드) |
 | **데이터패스** | [M2b-gpr-datapath.md](M2b-gpr-datapath.md) G4 이후 병렬 가능 |
-| **Normative** | [memory-map.md](../memory-map.md) |
+| **Normative** | [memory-map.md](../hardware/memory-map.md) |
 
 2× IS62C256 (64 KB), SST39SF010A 소켓, MAP_MODE DIP. **M3a 전까지 NOR는 소각하지 않음.**
 
