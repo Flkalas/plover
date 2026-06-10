@@ -1,9 +1,9 @@
 # Hardware architecture synthesis (2026-06)
 
 **Status:** **v1.0 breadboard (pre-release, 2026-06-10).** Single normative path.  
-**Active normative:** [system-architecture.md](system-architecture.md) v1.0 — **CPLD GPR ~40 MC + 138×2 + 10b CW, no GAL**.
+**Active normative:** [system-architecture.md](system-architecture.md) v1.0 — **CPLD GPR ~40 MC + 138×2 + 10b CW**.
 
-**Related:** [BOM.md](../BOM.md) · [purchase-devicesmart.md](../project/purchase-devicesmart.md) · [purchase-2026-06-01-followup.md](../project/purchase-2026-06-01-followup.md) · [memory-map.md](memory-map.md) · [cpld-system-controller.md](cpld-system-controller.md) · [alu-opcodes-timing.md](alu-opcodes-timing.md) · [tools/estimate_parasitics.py](../tools/estimate_parasitics.py)
+**Related:** [BOM.md](../BOM.md) · [parts-on-hand.md](../project/parts-on-hand.md) · [purchase-devicesmart.md](../project/purchase-devicesmart.md) · [purchase-2026-06-01-followup.md](../project/purchase-2026-06-01-followup.md) · [memory-map.md](memory-map.md) · [cpld-system-controller.md](cpld-system-controller.md) · [alu-opcodes-timing.md](alu-opcodes-timing.md) · [tools/estimate_parasitics.py](../tools/estimate_parasitics.py)
 
 ---
 
@@ -12,16 +12,16 @@
 | Topic | Conclusion |
 |-------|------------|
 | **SUB / ALU** | Gigatron-style **153+283+2's complement** matches hwsim/cyclesim. Worst-case comb delay **151 ns @ 74HC max** (not Gemini LVC ~30 ns). |
-| **Purchases** | **74HC DIP** breadboard kit — not 74LVC. Phase B2 ALU ICs essentially complete; **ATF1504** ordered; **no GAL**. |
-| **Control split** | **ROM** = **10b CW** (2 B/slot) + boot; **574 CW_L/CW_H** latch; **CPLD** = **GPR only** (~40 MC); **Reg_Sel** in CW B9–B8; **138×2 + 08/32/04** = `/CE` + mailbox; **574 FLG** — **no GAL**. |
-| **Parasitics** | **CPLD GPR** ≈ **−20% wire hops** vs archived 574×4. **138×2** ≈ −8% on CE/map nets. **GAL rejected** (+3% hops, no 138 removal). |
+| **Purchases** | **74HC DIP** breadboard kit — not 74LVC. Phase B2 ALU ICs essentially complete; **ATF1504AS-10JU44** (PLCC-44). |
+| **Control split** | **ROM** = **10b CW** (2 B/slot) + boot; **574 CW_L/CW_H** latch; **CPLD** = **GPR only** (~40 MC); **Reg_Sel** in CW B9–B8; **138×2 + 08/32/04** = `/CE` + mailbox; **574 FLG**. |
+| **Parasitics** | **CPLD GPR** ≈ **−20% wire hops** vs archived external-GPR path. **138×2** ≈ −8% on CE/map nets. |
 | **Breadboard v1.0** | **ATF1504 GPR** + **138×2** + glue + **5×574** (PC/MBR/CW_L/CW_H/FLG) + TTL alu8. **1504 sufficient.** |
 | **PCB track** | Same logic on [BOM-3v3.md](../BOM-3v3.md) (separate BOM). |
 | **138 + map** | 138 = coarse `/CE`; **Mode A/B, mailbox, `$FFFC`** = discrete gates ([memory-map.md](memory-map.md)). |
 
 **Decisions (v1.0):**
 
-1. **ATF1504 TQFP-100** — GPR + `w_sel`/`r_sel` mux only (~36–40 MC).
+1. **ATF1504AS-10JU44** (PLCC-44) — GPR + `w_sel`/`r_sel` mux only (~36–40 MC).
 2. **74HC138×2** — two-stage CE; **+1 purchase** (total 2).
 3. **10b CW** — Reg_Sel packed in Flash; bus control direct from CW_L.
 4. **Single bring-up** — M2a CPLD GPR → M2b 138×2 ([breadboard-wiring.md](../hw-bringup/breadboard-wiring.md)).
@@ -46,8 +46,8 @@ Source: [archive/gemini/TTL로-가장-빠르게-SUB를-구현하는-방법…](.
 | 74**LVC**, ~30 ns total delay | **74HC** @ 5 V, hwsim **151 ns** SUB max |
 | HCT ~111 ns (153-only ~B path) | **151 ns** — extra **04_BINV** hop + **157_YBP** + HC datasheet max |
 | GPR in CPLD (late conversation) | v0.1 normative: **574×4 external**; v1.3 CPLD GPR **superseded** then archived |
-| Flash ×2, 16-bit control bus | **1× SST39**, **8-bit CW** @ `$4000` |
-| ATF16V8B GAL required | **Not purchased**; **74HC138** available |
+| Flash ×2, 16-bit control bus | **1× SST39**, **10-bit CW** (2 B/slot) @ `$4000` |
+| Programmable CE glue | **74HC138×2** + **08/32/04** discrete gates |
 
 ### 2.3 Implementation truth hierarchy
 
@@ -80,7 +80,7 @@ Detailed receipts: [purchase-devicesmart.md](../project/purchase-devicesmart.md)
 - **Phase B2 ALU:** 283×2, **153×8** (1차 4 + 주문 C 4), 157×8 total, 04×3, etc.
 - **574×7**, **161×4**, **SST39×2**, **IS62×2**, **ATF1504×1**, **LVC245×3** (level shift only).
 - **74HC138×1** (on hand) — **order +1** for v1.0 **×2** split; **74HC86/08/32×2** each — **08/32** used for CE/map glue and BEQ; **86 not used in B2 ALU**.
-- **No ATF16V8B GAL** — **decided skip** (§5.3, §10).
+- **Flash** `SST39SF010A-70-4C-PHE` **PDIP-32** — 빵판 직결 ([parts-on-hand.md](../project/parts-on-hand.md)).
 
 ### 3.2 Phase B2 delta vs 1st order
 
@@ -89,12 +89,13 @@ Detailed receipts: [purchase-devicesmart.md](../project/purchase-devicesmart.md)
 | 74HC153 | 4 | **8** | +4 in order C |
 | 74HC574 | 7 | 7 | v0.1 GPR + sequencer headroom |
 | ATF1504 | 0 → +1 | 1 | 2nd/3rd order |
-| 7485 | — | **0** | Never buy — CMP from SUB |
+| 7485 | — | **0** | CMP from SUB — not in ALU BOM |
 
-### 3.3 Still optional / BOM gaps
+### 3.3 Remaining purchase (v1.0)
 
-- CPLD **JTAG/ISP** programmer (FT232H is auxiliary).
-- **PDIP Flash** (if only SOP + adapter — extra ~12 nH/pin in parasitic model).
+| MPN | Qty | Note |
+|-----|-----|------|
+| 74HC138N | **+1** | Total **2** for CE tree |
 
 ---
 
@@ -144,7 +145,7 @@ python tools/estimate_parasitics.py --detail v1.3_cpld_gpr
 | Contact | 2 nH/hop | Breadboard spring |
 | IC hop | 2.5 cm avg | Adjacent DIP |
 | PLCC adapter | +8 nH/pin | ATF1504 |
-| SOIC breakout | +12 nH/pin | SRAM/Flash/LVC245 |
+| SOIC breakout | +12 nH/pin | SRAM/LVC245 adapters |
 
 SSO index in tool is **relative ranking**, not calibrated mV.
 
@@ -155,21 +156,11 @@ SSO index in tool is **relative ranking**, not calibrated mV.
 | **v1_breadboard** (normative) | 31 | **−24%** | **−13%** |
 | v1.3 CPLD GPR (archive) | 28 | **−20%** | **−17%** |
 | v0.1 574 GPR (archive) | 34 | 0% | 0% |
-| v0.1 + GAL (rejected) | 35 | +3% | +4% |
+**Layout mitigations (no arch change):** 4× MB-102 block split; star CLK/control; **33 Ω SIP** + **0.1 µF** at every IC; CPLD **0.1 µF×4** at PLCC adapter; place **138×2 adjacent to SRAM/Flash** for short CE stubs.
 
-**Layout mitigations (no arch change):** 4× MB-102 block split; star CLK/control; **33 Ω SIP** + **0.1 µF** at every IC; CPLD **0.1 µF×4** at TQFP; place **138×2 adjacent to SRAM/Flash** for short CE stubs.
+### 5.3 CE / mailbox decode (v1.0)
 
-### 5.3 GAL vs 138×2 + glue — why no GAL
-
-Two motives often cited for **ATF16V8B** were evaluated against the parasitic model and 2 MHz timing budget:
-
-| Motive | Parasitic / timing impact | v1.0 decision |
-|--------|----------------------------|-----------------|
-| **138 + glue spaghetti** | Affects **CE/map scalar nets** — **moderate**; does **not** move GPR/DATA/ADDR ranking | **138×2** + **08/32/04** glue — **138 near memory** |
-| **FLG + BEQ + CE in one DIP** | **FLG/BEQ** are 1b, low di/dt — **negligible** vs 8b bus SSO; CE benefit duplicated by **138×2** | **574 FLG** + µcode **BEQ** on **08/32** — no GAL |
-| **GAL alongside 138** | Model **+3% wire hops** — extra DIP without removing 138 fan-out | **Do not buy GAL** |
-
-**Net:** Parasitics justify **CPLD GPR** and **138×2**; they do **not** justify adding GAL. Glue complexity is a **wiring/debug** problem — solve with discrete gates + layout, not a third programmable device.
+**74HC138×2** coarse `/CE` plus **74HC08/32/04** glue for Mode A/B, mailbox `$FF00–$FFFB`, and boot enclave `$FFFC`. **574 FLG** holds Z/C for BEQ. Place **138×2 adjacent to SRAM/Flash** for short `/CE` stubs ([memory-map.md](memory-map.md), [`mem_glue.py`](../hw/logic/mem_glue.py)).
 
 ---
 
@@ -182,13 +173,11 @@ Two motives often cited for **ATF16V8B** were evaluated against the parasitic mo
 
 **v1.0 breadboard split:**
 
-- **ATF1504 (100-TQFP):** GPR + `w_sel`/`r_sel` only (~40 MC).
+- **ATF1504AS-10JU44** (PLCC-44): GPR + `w_sel`/`r_sel` only (~40 MC).
 - **74HC138×2:** Coarse `/CE` (order **+1** → total 2).
 - **74HC08/32/04:** Mailbox, Mode A/B, `/CE` glue.
 - **574×5:** PC, MBR, CW_L, CW_H, FLG.
-- **Reset `$FFFC`:** 157 MUX recommended until fit report.
-
-**Do not buy:** GAL, second/larger CPLD, 7485, Flash×2 for parallel CW bus.
+- **Reset `$FFFC`:** **74HC157** address MUX.
 
 ---
 
@@ -204,7 +193,7 @@ Normative map: [memory-map.md](memory-map.md). Reference logic: [cpld_decode.py]
 | `$0000–$07FF` ROM in **Mode A** | **No** — needs **A11** + MAP | **08/32 glue** |
 | `$FF00–$FFFB` **Mailbox** | **No** — compare A[15:0] | **08/32 glue** |
 | `$FFFC–$FFFF` **ROM enclave** | **No** — MAP-dependent | **08/32 glue** (+ 157 MUX reset) |
-| RESET → fetch `$FFFC` | **No** | **157** addr MUX (or minimal CPLD stub) |
+| RESET → fetch `$FFFC` | **No** | **74HC157** addr MUX |
 
 **138 does coarse `/CE` only** — mailbox and Mode A/B live in discrete glue ([`mem_glue.py`](../hw/logic/mem_glue.py)).
 
@@ -286,7 +275,7 @@ A[15:0] ──┬──► 08/32/04 ──► MAILBOX_EN, MAP×A11, /CE glue
 | **Breadboard GPR** | CPLD internal (~40 MC) |
 | **Reg_Sel** | Flash CW B9–B8 → 574 CW_H |
 | **CE / mailbox** | 138×2 + 08/32/04 glue |
-| **GAL / larger CPLD** | Do not buy |
+| **Flash package** | SST39 PHE PDIP-32 ([parts-on-hand.md](../project/parts-on-hand.md)) |
 | **Bring-up** | Single v1.0 path |
 
 ### 10.2 Still open
@@ -294,8 +283,6 @@ A[15:0] ──┬──► 08/32/04 ──► MAILBOX_EN, MAP×A11, /CE glue
 | Item | Notes |
 |------|-------|
 | CPLD bitstream | Draft until MC fit report |
-| Reset `$FFFC` | 157 MUX preferred until fit confirms CPLD stub |
-| Flash package | SOP adapter vs PDIP |
 
 ---
 

@@ -13,9 +13,9 @@ Supersedes [v0.2](../archive/pre-v1.0/system-architecture-v0.2.md). Design ratio
 |------|---------------|
 | **CPU** | 8-bit TTL datapath: custom ALU (74HC) + **4×GPR in ATF1504** |
 | **Control** | Microcoded — **10-bit CW** from parallel NOR (`REG_SEL` in CW B9–B8) |
-| **System CPLD** | **ATF1504AS (100-TQFP)** — **GPR only** (~40 MC) |
+| **System CPLD** | **ATF1504AS-10JU44** (PLCC-44) — **GPR only** (~40 MC) |
 | **CE decode** | **74HC138×2** + **74HC08/32/04** glue → RAM/ROM `/CE` |
-| **Flags / branch** | **574×1 FLG** (Z/C) + **08/32** BEQ glue — **no GAL** |
+| **Flags / branch** | **574×1 FLG** (Z/C) + **08/32** BEQ glue |
 | **RAM** | **2× IS62C256AL** — 64 KB via **A15** bank |
 | **ROM** | **1× SST39SF010A** — boot, utility, microcode table |
 | **I/O** | MMIO **Mailbox** @ `$FF00–$FFFB` — polling only, **no IRQ** |
@@ -49,7 +49,7 @@ Supersedes [v0.2](../archive/pre-v1.0/system-architecture-v0.2.md). Design ratio
 ## 4. Boot workflow
 
 1. Power on — **MAP_MODE=Boot** (DIP default).
-2. **RESET** — fetch @ **`$FFFC`** (157 addr MUX or CPLD stub) → ROM vector → boot @ `$0000–$07FF`.
+2. **RESET** — fetch @ **`$FFFC`** (**74HC157** addr MUX) → ROM vector → boot @ `$0000–$07FF`.
 3. Bootloader: POST → vFDD load (Mailbox) → copy kernel to **RAM `$0800+`** → **`JMP $0800`** or halt.
 4. Operator DIP → **Run**, **RESET** → fetch `$FFFC` from **RAM**.
 
@@ -57,7 +57,13 @@ Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md
 
 ---
 
-## 5. Document index
+## 5. Physical packages (v1.0 breadboard)
+
+CPLD `ATF1504AS-10JU44` + PLCC→DIP (#15); Flash `SST39SF010A-70-4C-PHE` PDIP 직결; SRAM `IS62C256` + SOP28 (#3a)×2; `SN74LVC8T245` + SOIC-24 (#3c)×3. 상세: [parts-on-hand.md](../project/parts-on-hand.md).
+
+---
+
+## 6. Document index
 
 | Document | Content |
 |----------|---------|
@@ -70,7 +76,7 @@ Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md
 
 ---
 
-## 6. Verification
+## 7. Verification
 
 | Layer | Tool |
 |-------|------|

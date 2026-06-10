@@ -125,7 +125,7 @@ R0 − imm; **flags only** (discard Y). Uses **`CW_CMP_EXEC`** = `0xB0` (`ALU_OP
 |----|-----|-------|-----|---------|-----|--------|------|--------|--------|--------|
 | 0 | 52 | `$4034` | `B0` | 00 (R0) | CMP | 0 | **0** | 0 | 0 | A ← R0 |
 | 1 | 53 | `$4035` | `B0` | 01 (imm) | CMP | 0 | **0** | 0 | 0 | B ← imm; SUB flags settle |
-| 2 | 54 | `$4036` | `00` | — | NOP | 0 | 0 | 0 | 0 | (optional FLG latch ph — CPLD) |
+| 2 | 54 | `$4036` | `00` | — | NOP | 0 | 0 | 0 | 0 | — |
 
 hwsim bus gate: [`cmp_y_oe_bus`](../hw/tests/cmp_y_oe_bus.yaml) — `Y_OE=1` drives `net_d*`; `Y_OE=0` → tri-state.
 

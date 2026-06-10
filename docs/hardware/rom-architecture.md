@@ -1,6 +1,6 @@
-﻿# ROM Architecture v0.1
+﻿# ROM Architecture v1.0
 
-**Related:** [system-architecture.md](system-architecture.md) · [memory-map.md](memory-map.md)
+**Related:** [system-architecture.md](system-architecture.md) · [memory-map.md](memory-map.md) · [microcode-spec.md](microcode-spec.md)
 
 ROM is the **code of law** for the system: deterministic rules for boot, datapath control, and fixed assets.
 
@@ -10,7 +10,7 @@ ROM is the **code of law** for the system: deterministic rules for boot, datapat
 
 | Segment | Purpose | CPU visibility |
 |---------|---------|----------------|
-| **Control** | `{opcode, phase}` → **8-bit CW** | Execute phase only (separate Flash addr mux) |
+| **Control** | `{opcode, phase}` → **10-bit CW** | Execute phase only (separate Flash addr mux) |
 | **Boot** | POST, bootloader, reset vector | Mode A: `$0000–$07FF`, `$FFFC` |
 | **Utility** | Fonts, LUTs, fixed routines | ROM in Mode A; shadowed to RAM `$0800+` |
 
@@ -18,47 +18,51 @@ ROM is the **code of law** for the system: deterministic rules for boot, datapat
 
 ## 2. Physical device
 
-**Single** `SST39SF010A-70-4C-PHE` — 128K×8 parallel NOR.
+**Single** `SST39SF010A-70-4C-PHE` — 128K×8 parallel NOR, **PDIP-32** ([parts-on-hand.md](../project/parts-on-hand.md)).
 
 | Property | Rationale |
 |----------|-----------|
 | Parallel | Power-on execute — no SPI init |
-| Single 8-bit | Matches TTL datapath; no Flash×2 glue |
+| Single 8-bit data bus | Matches TTL datapath |
 | 128 KB | Boot + CW + fonts + headroom |
 
-### Flash physical layout (draft)
+### Flash physical layout
 
 | Flash offset | Content | CPU map (Mode A) |
 |--------------|---------|------------------|
 | `$0000–$07FF` | Boot + bootloader | `$0000–$07FF` ROM |
 | `$0800–$3FFF` | Utility (fonts, tables) | Copy source |
-| `$4000–$47FF` | **8b microcode store** (2048×8) | Exec addr `{opcode,phase}` |
+| `$4000–$4FFF` | **10b microcode store** (2048×2 B) | Exec addr `{opcode,phase}` |
 | `$FFFC–$FFFF` | Reset vector image | `$FFFC` enclave |
 
-Microcode base **`$4000`** is the packer default in `tools/pack_control_store.py`.
+Microcode base **`$4000`** and slot count **2048** match `tools/pack_control_store.py` (`CW_FLASH_BASE`, `STORE_SLOTS`).
 
 ---
 
 ## 3. Control segment
 
-**Addressing (v0.1 packer):**
+**Addressing (v1.0 packer):**
 
 ```
-store_index = ((opcode[3:0] << 2) | phase[1:0])   // 6 bits → 0..63
-Flash_addr  = $4000 + store_index
+store_index = ((opcode[3:0] << 2) | phase[1:0])   // 6 bits → 0..63 active ISA
+Flash_lo    = $4000 + 2 * store_index
+Flash_hi    = $4000 + 2 * store_index + 1        // REG_SEL[1:0] in bits 1:0
 ```
 
 | Property | Value |
 |----------|-------|
 | Logical index width | 6 bits (`opcode[3:0]` × `phase[1:0]`) |
-| Active slots (v0.1 ISA) | 16 opcode nibbles × 4 phases = **64** indices (0–63) |
-| Physical store size | **2048×8** bytes at Flash `$4000–$47FF` |
-| Unindexed region | Indices 64–2047 read as `0x00` unless extended later |
+| Active slots (macro ISA) | 16 opcode nibbles × 4 phases = **64** indices (0–63) |
+| Physical store size | **2048 slots × 2 bytes** = **4096 B** at Flash `$4000–$4FFF` |
+| Unindexed slots | Indices 64–2047 read as `0x00` unless extended later |
 
-The 2048-byte region is a **sparse physical container**: the v0.1 macro ISA (`0x01–0x0A`) uses only the low 64 indices. Future extensions may widen the index (e.g. full `opcode[7:0]`) without changing the Flash base.
+The 4096-byte region is a **sparse physical container**: the macro ISA (`0x01–0x0A`) uses only the low 64 indices. Future extensions may widen the index without changing the Flash base.
 
-- Output: **8-bit CW** — see [microcode-spec.md](microcode-spec.md).
+- Output: **10-bit CW** — B9–B8 `REG_SEL`, B7–B0 per [microcode-spec.md](microcode-spec.md).
+- Latch: **574 CW_L** + **574 CW_H** at execute edge.
 - Not fetched via PC; **execute-phase** address mux drives Flash.
+
+Pack / verify: `python tools/pack_control_store.py` · `python tools/verify_control_store.py`
 
 ---
 
@@ -93,4 +97,5 @@ The 2048-byte region is a **sparse physical container**: the v0.1 macro ISA (`0x
 | Date | Note |
 |------|------|
 | 2026-06-01 | Single NOR; 3-segment model |
-| 2026-06-01 | §3 index: 6-bit sparse map into 2048 B CW region |
+| 2026-06-01 | §3 index: 6-bit sparse map into CW region |
+| 2026-06-10 | **v1.0** — 10b CW, 2048×2 B @ `$4000–$4FFF`; PDIP Flash |
