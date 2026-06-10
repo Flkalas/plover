@@ -21,12 +21,20 @@ from cyclesim.models.comb import (
     Hc86,
     YBusBuf,
 )
-from cyclesim.models.cpld import CpldSystemCtrl
-from cyclesim.models.seq import Regfile574Gpr
+from cyclesim.models.cpld import (
+    CpldGprCtrl,
+    CpldSystemCtrl,
+    CpldSystemCtrlTier2,
+    MemDecodeBreadboard,
+)
+from cyclesim.models.seq import CpldRegfile, Regfile574Gpr
 
 _COMB: dict[str, type[CycleModel]] = {
     "CPLD_SYSTEM_CTRL": CpldSystemCtrl,
-    "ATF1504AS": CpldSystemCtrl,
+    "MEM_DECODE_BREADBOARD": MemDecodeBreadboard,
+    "CPLD_GPR_CTRL": CpldGprCtrl,
+    "CPLD_SYSTEM_CTRL_TIER2": CpldSystemCtrlTier2,
+    "ATF1504AS": CpldGprCtrl,
     "74HC04": Hc04,
     "74HC08": Hc08,
     "74HC32": Hc32,
@@ -42,6 +50,7 @@ _COMB: dict[str, type[CycleModel]] = {
 
 _SEQ: dict[str, type[CycleModel]] = {
     "REGFILE_574_GPR": Regfile574Gpr,
+    "CPLD_REGFILE": CpldRegfile,
 }
 
 

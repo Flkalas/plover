@@ -38,6 +38,7 @@ KNOWN_PARTS = frozenset(
         "FLG_LATCH",
         "CYCLE_FSM",
         "CPLD_REGFILE",
+        "CPLD_SYSTEM_CTRL_TIER2",
         "ATF1504AS",
         "CPLD_SYSTEM_CTRL",
         "REGFILE_574_GPR",

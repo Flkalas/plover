@@ -1,0 +1,152 @@
+version: 1
+block: sram256_breadboard
+description: "v1.0 64KB — 138×2 + gate ideal comb (MEM_DECODE_BREADBOARD)"
+instances:
+  - ref: U_DECODE
+    part: MEM_DECODE_BREADBOARD
+    pins:
+      RESET_N: net_reset_n
+      MAP_MODE: net_map_mode
+      A0: net_a0
+      A1: net_a1
+      A2: net_a2
+      A3: net_a3
+      A4: net_a4
+      A5: net_a5
+      A6: net_a6
+      A7: net_a7
+      A8: net_a8
+      A9: net_a9
+      A10: net_a10
+      A11: net_a11
+      A12: net_a12
+      A13: net_a13
+      A14: net_a14
+      A15: net_a15
+      MAILBOX_EN: net_mailbox_en
+      RAM1_CS_N: net_ram1_cs_n
+      RAM2_CS_N: net_ram2_cs_n
+      ROM_CS_N: net_rom_cs_n
+      ADDR_FORCE_FFFC: net_addr_force_fffc
+  - ref: U_MB
+    part: MAILBOX_MMIO
+    pins:
+      CS: net_mailbox_en
+      RD: net_mb_rd
+      WE: net_mb_we
+      A0: net_a0
+      A1: net_a1
+      A2: net_a2
+      A3: net_a3
+      A4: net_a4
+      A5: net_a5
+      A6: net_a6
+      A7: net_a7
+      STATUS0: net_status0
+      STATUS1: net_status1
+      STATUS2: net_status2
+      STATUS3: net_status3
+      STATUS4: net_status4
+      STATUS5: net_status5
+      STATUS6: net_status6
+      STATUS7: net_status7
+nets:
+  - name: net_reset_n
+    width: 1
+    probes: [reset_n]
+  - name: net_map_mode
+    width: 1
+    probes: [map_mode]
+  - name: net_mailbox_en
+    width: 1
+    probes: [mailbox_en]
+  - name: net_ram1_cs_n
+    width: 1
+    probes: [ram1_cs_n]
+  - name: net_ram2_cs_n
+    width: 1
+    probes: [ram2_cs_n]
+  - name: net_rom_cs_n
+    width: 1
+    probes: [rom_cs_n]
+  - name: net_addr_force_fffc
+    width: 1
+    probes: [addr_force_fffc]
+  - name: net_mb_rd
+    width: 1
+    probes: [mb_rd]
+  - name: net_mb_we
+    width: 1
+    probes: [mb_we]
+  - name: net_status0
+    width: 1
+    probes: [status0]
+  - name: net_status1
+    width: 1
+    probes: [status1]
+  - name: net_status2
+    width: 1
+    probes: [status2]
+  - name: net_status3
+    width: 1
+    probes: [status3]
+  - name: net_status4
+    width: 1
+    probes: [status4]
+  - name: net_status5
+    width: 1
+    probes: [status5]
+  - name: net_status6
+    width: 1
+    probes: [status6]
+  - name: net_status7
+    width: 1
+    probes: [status7]
+  - name: net_a0
+    width: 1
+    probes: [a0]
+  - name: net_a1
+    width: 1
+    probes: [a1]
+  - name: net_a2
+    width: 1
+    probes: [a2]
+  - name: net_a3
+    width: 1
+    probes: [a3]
+  - name: net_a4
+    width: 1
+    probes: [a4]
+  - name: net_a5
+    width: 1
+    probes: [a5]
+  - name: net_a6
+    width: 1
+    probes: [a6]
+  - name: net_a7
+    width: 1
+    probes: [a7]
+  - name: net_a8
+    width: 1
+    probes: [a8]
+  - name: net_a9
+    width: 1
+    probes: [a9]
+  - name: net_a10
+    width: 1
+    probes: [a10]
+  - name: net_a11
+    width: 1
+    probes: [a11]
+  - name: net_a12
+    width: 1
+    probes: [a12]
+  - name: net_a13
+    width: 1
+    probes: [a13]
+  - name: net_a14
+    width: 1
+    probes: [a14]
+  - name: net_a15
+    width: 1
+    probes: [a15]

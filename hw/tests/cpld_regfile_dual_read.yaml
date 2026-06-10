@@ -1,0 +1,98 @@
+# tier: 2 — CPLD internal GPR dual read / write
+netlist: ../netlist/blocks/cpld_regfile.yaml
+timing: typ
+duration_ns: 1200
+stimulus:
+  - at_ns: 0
+    set:
+      net_clk: 0
+      net_we: 0
+      net_w_sel0: 0
+      net_w_sel1: 0
+      net_r_sel_a0: 0
+      net_r_sel_a1: 0
+      net_r_sel_b0: 1
+      net_r_sel_b1: 0
+      net_d0: 0
+      net_d1: 1
+      net_d2: 0
+      net_d3: 1
+      net_d4: 0
+      net_d5: 1
+      net_d6: 0
+      net_d7: 1
+  - at_ns: 80
+    set:
+      net_we: 1
+  - at_ns: 100
+    set:
+      net_clk: 1
+  - at_ns: 200
+    set:
+      net_clk: 0
+      net_we: 0
+      net_w_sel0: 1
+      net_w_sel1: 0
+      net_d0: 1
+      net_d1: 0
+      net_d2: 1
+      net_d3: 0
+      net_d4: 1
+      net_d5: 0
+      net_d6: 1
+      net_d7: 0
+  - at_ns: 280
+    set:
+      net_we: 1
+  - at_ns: 300
+    set:
+      net_clk: 1
+  - at_ns: 400
+    set:
+      net_clk: 0
+      net_we: 0
+      net_w_sel0: 0
+      net_w_sel1: 0
+      net_r_sel_a0: 0
+      net_r_sel_a1: 0
+      net_r_sel_b0: 1
+      net_r_sel_b1: 0
+expect:
+  - at_ns: 120
+    net_qa0: 0
+    net_qa1: 1
+    net_qa2: 0
+    net_qa3: 1
+    net_qa4: 0
+    net_qa5: 1
+    net_qa6: 0
+    net_qa7: 1
+  - at_ns: 320
+    net_qb0: 1
+    net_qb1: 0
+    net_qb2: 1
+    net_qb3: 0
+    net_qb4: 1
+    net_qb5: 0
+    net_qb6: 1
+    net_qb7: 0
+  - at_ns: 420
+    net_qa0: 0
+    net_qa1: 1
+    net_qa2: 0
+    net_qa3: 1
+    net_qa4: 0
+    net_qa5: 1
+    net_qa6: 0
+    net_qa7: 1
+  - at_ns: 420
+    net_qb0: 1
+    net_qb1: 0
+    net_qb2: 1
+    net_qb3: 0
+    net_qb4: 1
+    net_qb5: 0
+    net_qb6: 1
+    net_qb7: 0
+checks:
+  - type: setup_hold

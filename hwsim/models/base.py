@@ -562,6 +562,113 @@ class CpldSystemCtrl(ChipModel):
             self._drive("REG_SEL1", gpr.reg_sel1, t, "sel")
 
 
+class MemDecodeBreadboard(ChipModel):
+    """v1.0 breadboard — 138×2 + gate ideal comb (truth via decode_ce_breadboard)."""
+
+    part = "MEM_DECODE_BREADBOARD"
+
+    def on_start(self) -> None:
+        self._update(0)
+
+    def on_net_change(self, net: str) -> None:
+        self._update(0)
+
+    def _addr(self) -> int:
+        v = 0
+        for i in range(16):
+            if f"A{i}" in self.pin_nets:
+                v |= self.read_bit(f"A{i}") << i
+        return v
+
+    def _update(self, delay: int) -> None:
+        t = delay if delay else self.t_pd("CPLD_SYSTEM_CTRL", "t_pd", default=0)
+        a = self._addr()
+        rst = self.read_bit("RESET_N") == 0
+        map_mode = self.read_bit("MAP_MODE")
+        mem = cpld_decode.decode_ce_breadboard(a, map_mode, rst)
+        self._drive("MAILBOX_EN", mem.mailbox_en, t, "mailbox")
+        self._drive("RAM1_CS_N", mem.ram1_cs_n, t, "ram1")
+        self._drive("RAM2_CS_N", mem.ram2_cs_n, t, "ram2")
+        self._drive("ROM_CS_N", mem.rom_cs_n, t, "rom")
+        self._drive("ADDR_FORCE_FFFC", mem.addr_force_fffc, t, "reset_vec")
+
+
+class CpldGprCtrl(ChipModel):
+    """v1.0 ATF1504 GPR routing — REG_SEL from latched CW."""
+
+    part = "CPLD_GPR_CTRL"
+
+    def on_start(self) -> None:
+        self._update(0)
+
+    def on_net_change(self, net: str) -> None:
+        self._update(0)
+
+    def _update(self, delay: int) -> None:
+        t = delay if delay else self.t_pd("CPLD_SYSTEM_CTRL", "t_pd", default=0)
+        reg_sel = self.read_bit("REG_SEL0") | (self.read_bit("REG_SEL1") << 1)
+        reg_we = self.read_bit("REG_WE") if "REG_WE" in self.pin_nets else 0
+        gpr = cpld_decode.decode_gpr_from_cw(reg_sel, reg_we)
+        if "W_SEL0" in self.pin_nets:
+            self._drive("W_SEL0", gpr.w_sel & 1, t, "wsel")
+            self._drive("W_SEL1", (gpr.w_sel >> 1) & 1, t, "wsel")
+        if "R_SEL_A0" in self.pin_nets:
+            self._drive("R_SEL_A0", gpr.r_sel_a & 1, t, "rsel_a")
+            self._drive("R_SEL_A1", (gpr.r_sel_a >> 1) & 1, t, "rsel_a")
+        if "R_SEL_B0" in self.pin_nets:
+            self._drive("R_SEL_B0", gpr.r_sel_b & 1, t, "rsel_b")
+            self._drive("R_SEL_B1", (gpr.r_sel_b >> 1) & 1, t, "rsel_b")
+
+
+class CpldSystemCtrlTier2(MemDecodeBreadboard):
+    """Deprecated alias — use MEM_DECODE_BREADBOARD."""
+
+    part = "CPLD_SYSTEM_CTRL_TIER2"
+
+
+class CpldRegfile(ChipModel):
+    """4×8-bit GPR inside ATF1504 — async dual read, sync write on WE∧CLK↑."""
+
+    part = "CPLD_REGFILE"
+
+    def on_start(self) -> None:
+        self._regs = [0, 0, 0, 0]
+        self._prev_clk["CLK"] = self.read_bit("CLK")
+        self._read_out(0)
+
+    def on_net_change(self, net: str) -> None:
+        watched = {self.net_for("CLK"), self.net_for("WE")}
+        for p in ("W_SEL0", "W_SEL1", "R_SEL_A0", "R_SEL_A1", "R_SEL_B0", "R_SEL_B1"):
+            if p in self.pin_nets:
+                watched.add(self.net_for(p))
+        for i in range(8):
+            watched.add(self.net_for(f"D{i}"))
+        if net not in watched:
+            return
+        if self._posedge("CLK") and self.read_bit("WE") == 1:
+            self._write()
+        self._read_out(0)
+
+    def _write(self) -> None:
+        t_su = self.t_pd("CPLD_REGFILE", "t_setup", default=5)
+        for i in range(8):
+            if not self.ctx.check_setup(self.ref, "CLK", f"D{i}", t_su):
+                return
+        w_sel = self.read_bit("W_SEL0") | (self.read_bit("W_SEL1") << 1)
+        d = sum(self.read_bit(f"D{i}") << i for i in range(8))
+        self._regs[w_sel & 3] = d & 0xFF
+
+    def _read_out(self, delay: int) -> None:
+        t = delay or self.t_pd("CPLD_REGFILE", "t_pd", default=10)
+        ra = self.read_bit("R_SEL_A0") | (self.read_bit("R_SEL_A1") << 1)
+        rb = self.read_bit("R_SEL_B0") | (self.read_bit("R_SEL_B1") << 1)
+        qa = self._regs[ra & 3]
+        qb = self._regs[rb & 3]
+        for i in range(8):
+            self._drive(f"QA{i}", (qa >> i) & 1, t, "qa")
+            self._drive(f"QB{i}", (qb >> i) & 1, t, "qb")
+
+
 class Regfile574Gpr(ChipModel):
     """4×8-bit GPR via 574 behavior — LOAD_R* + CLK, dual read ports."""
 
@@ -674,7 +781,11 @@ def create_model(ref: str, part: str, pins: dict[str, str], ctx: SimContext) -> 
         "74HC32": Hc32,
         "74HC86": Hc86,
         "CPLD_SYSTEM_CTRL": CpldSystemCtrl,
-        "ATF1504AS": CpldSystemCtrl,
+        "MEM_DECODE_BREADBOARD": MemDecodeBreadboard,
+        "CPLD_GPR_CTRL": CpldGprCtrl,
+        "CPLD_SYSTEM_CTRL_TIER2": CpldSystemCtrlTier2,
+        "ATF1504AS": CpldGprCtrl,
+        "CPLD_REGFILE": CpldRegfile,
         "REGFILE_574_GPR": Regfile574Gpr,
         "MAILBOX_MMIO": MailboxMmio,
     }

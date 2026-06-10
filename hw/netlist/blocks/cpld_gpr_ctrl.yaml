@@ -1,0 +1,44 @@
+version: 1
+block: cpld_gpr_ctrl
+description: "v1.0 ATF1504 — GPR selects from latched CW REG_SEL"
+instances:
+  - ref: U_CPLD
+    part: CPLD_GPR_CTRL
+    pins:
+      REG_SEL0: net_reg_sel0
+      REG_SEL1: net_reg_sel1
+      REG_WE: net_reg_we
+      W_SEL0: net_w_sel0
+      W_SEL1: net_w_sel1
+      R_SEL_A0: net_r_sel_a0
+      R_SEL_A1: net_r_sel_a1
+      R_SEL_B0: net_r_sel_b0
+      R_SEL_B1: net_r_sel_b1
+nets:
+  - name: net_reg_we
+    width: 1
+    probes: [reg_we]
+  - name: net_reg_sel0
+    width: 1
+    probes: [reg_sel0]
+  - name: net_reg_sel1
+    width: 1
+    probes: [reg_sel1]
+  - name: net_w_sel0
+    width: 1
+    probes: [w_sel0]
+  - name: net_w_sel1
+    width: 1
+    probes: [w_sel1]
+  - name: net_r_sel_a0
+    width: 1
+    probes: [r_sel_a0]
+  - name: net_r_sel_a1
+    width: 1
+    probes: [r_sel_a1]
+  - name: net_r_sel_b0
+    width: 1
+    probes: [r_sel_b0]
+  - name: net_r_sel_b1
+    width: 1
+    probes: [r_sel_b1]

@@ -39,7 +39,7 @@ class CycleContext:
             ctx.models.append(model)
             if is_sequential_part(inst.part):
                 ctx.seq_models.append(model)
-                if inst.part == "REGFILE_574_GPR":
+                if inst.part in ("REGFILE_574_GPR", "CPLD_REGFILE"):
                     ctx.regfile = model
             else:
                 ctx.comb_models.append(model)
@@ -116,6 +116,9 @@ class CycleContext:
         self.comb_fixup()
         self.set_net(clk_net, L)
         self.comb_fixup()
+        for m in self.seq_models:
+            if hasattr(m, "_prev_clk"):
+                m._prev_clk = L
 
     def _find_clk_net(self) -> str | None:
         for nd in self.nl.nets:
