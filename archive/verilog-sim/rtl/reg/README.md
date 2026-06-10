@@ -19,7 +19,7 @@ Models **74HC574×7** as an 8-bit register bank (R0–R6).
 | 5 | R5 | Accumulator |
 | 6 | R6 | Temp |
 
-Encoding in the control word: [docs/microcode-spec.md](../../docs/microcode-spec.md) (`reg_ctl`).
+Encoding in the control word: [docs/hardware/microcode-spec.md](../../docs/hardware/microcode-spec.md) (`reg_ctl`).
 
 ## Behavior
 

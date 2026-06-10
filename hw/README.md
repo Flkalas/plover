@@ -11,14 +11,14 @@ Electrical netlist, timing, and block tests for breadboard bring-up.
 | [tests/](tests/) | Stimulus + timing checks |
 | [viewer/](viewer/index.html) | Static waveform / report viewer |
 | [viewer/schematic.html](viewer/schematic.html) | DIP schematic SVG viewer (zoom) |
-| [kicad/](kicad/plover/) | KiCad schematics (see [docs/hw-schematic.md](../docs/hw-schematic.md)) |
+| [kicad/](kicad/plover/) | KiCad schematics (see [docs/hardware/hw-schematic.md](../docs/hardware/hw-schematic.md)) |
 
 See [netlist/blocks/alu8.md](netlist/blocks/alu8.md) for **Phase B2** ALU (14 IC: `153_B`, `153_L`, `157_YBP`; CMP via SUB; SUB **151 ns**, logic **46 ns** @ max).  
-Breadboard phases: [docs/hw-bringup-b3.md](../docs/hw-bringup-b3.md) · [docs/hw-bringup-b3-opcode.md](../docs/hw-bringup-b3-opcode.md).
+Breadboard phases: [docs/hw-bringup/M1-b3-procedure.md](../docs/hw-bringup/M1-b3-procedure.md) · [docs/hw-bringup/b3-opcode.md](../docs/hw-bringup/b3-opcode.md).
 
-Boot ROM: **`boot_rom.hex`** = JMP product path; **`boot_rom_manual.hex`** = DIP Run recovery — [docs/boot-jmp-handoff.md](../docs/boot-jmp-handoff.md).
+Boot ROM: **`boot_rom.hex`** = JMP product path; **`boot_rom_manual.hex`** = DIP Run recovery — [docs/boot/boot-jmp-handoff.md](../docs/boot/boot-jmp-handoff.md).
 
-Regenerate after ALU edits ([docs/hw-sim.md](../docs/hw-sim.md#alu-netlist-regeneration-phase-a)):
+Regenerate after ALU edits ([docs/simulation/hw-sim.md](../docs/simulation/hw-sim.md#alu-netlist-regeneration-phase-a)):
 
 ```bash
 python tools/gen_alu_decode_netlist.py

@@ -21,4 +21,4 @@ A sample netlist matching `clock.yaml` is in [`export/clock.net`](export/clock.n
 
 ## Naming
 
-See [docs/hw-schematic.md](../../../docs/hw-schematic.md).
+See [docs/hardware/hw-schematic.md](../../../docs/hardware/hw-schematic.md).

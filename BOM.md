@@ -1,9 +1,9 @@
 ﻿# Plover — 구매 목록 (v1.0 breadboard, 1세트)
 
-**Normative:** [docs/system-architecture.md](docs/system-architecture.md) v1.0  
+**Normative:** [docs/hardware/system-architecture.md](docs/hardware/system-architecture.md) v1.0  
 **1세트 부품 명세** · 5 V · 74HC DIP 빵판 · **CPLD GPR ~40 MC + 138×2 + 10b CW**  
 PCB 3.3 V 대응 목록: [BOM-3v3.md](BOM-3v3.md) (**중복 주문 금지**)  
-이력 · 검산 · 발주 기록: [docs/bom-maintenance.md](docs/bom-maintenance.md)
+이력 · 검산 · 발주 기록: [docs/project/bom-maintenance.md](docs/project/bom-maintenance.md)
 
 **구분** · **MPN** · **Qty** · **역할 · 목적** (보드 기능) · **비고** (구매·합산)
 

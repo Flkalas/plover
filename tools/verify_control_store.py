@@ -37,7 +37,7 @@ from tools.pack_control_store import (  # noqa: E402
     sequences,
 )
 
-# Normative bit fields from docs/microcode-spec.md §2
+# Normative bit fields from docs/hardware/microcode-spec.md §2
 SPEC_BIT_MAP = {
     "alu_op": (7, 4),
     "reg_we": (3, 3),
@@ -46,7 +46,7 @@ SPEC_BIT_MAP = {
     "mem_wr": (0, 0),
 }
 
-# Documented CW rows in docs/microcode-spec.md §3 (packed opcodes)
+# Documented CW rows in docs/hardware/microcode-spec.md §3 (packed opcodes)
 SPEC_DOC_ROWS = {
     (OP_ADD, 0): {"alu_op": ALU_ADD, "reg_we": 0, "y_oe": 1, "mem_rd": 0, "mem_wr": 0},
     (OP_ADD, 1): {"alu_op": ALU_ADD, "reg_we": 0, "y_oe": 1, "mem_rd": 0, "mem_wr": 0},

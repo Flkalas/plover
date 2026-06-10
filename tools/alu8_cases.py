@@ -58,7 +58,7 @@ CASES: list[tuple[str, int, int, int, dict[str, int]]] = [
 
 OPCODE_NAMES = {i: name for i, (name, *_rest) in enumerate(CASES)}
 
-# Gigatron 153 C0..C3 (shared across 8 bit-slices); see docs/alu8-phase-b.md
+# Gigatron 153 C0..C3 (shared across 8 bit-slices); see docs/hardware/alu8-phase-b.md
 LOGIC_C: dict[int, tuple[int, int, int, int]] = {
     0: (0, 0, 0, 0),
     3: (0, 0, 0, 1),

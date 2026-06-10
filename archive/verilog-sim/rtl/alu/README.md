@@ -19,7 +19,7 @@
 | 74HC08 / 32 | Inline — `&` and `\|` |
 | 74HC153×4 | **Simplified** — output mux is a Verilog `case (alu_sel)` instead of four 153s |
 
-SUB borrow flag: `cout = ~cout_arith` (see [microcode-spec](../../docs/microcode-spec.md)).
+SUB borrow flag: `cout = ~cout_arith` (see [microcode-spec](../../docs/hardware/microcode-spec.md)).
 
 ## Interface (`alu8`)
 
@@ -38,4 +38,4 @@ Testbench: [sim/tb_alu8.v](../../sim/tb_alu8.v).
 ## See also
 
 - [../README.md](../README.md) — full datapath  
-- [../../docs/microcode-spec.md](../../docs/microcode-spec.md) — `alu_sel` encoding  
+- [../../docs/hardware/microcode-spec.md](../../docs/hardware/microcode-spec.md) — `alu_sel` encoding  

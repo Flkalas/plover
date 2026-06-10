@@ -23,4 +23,4 @@ Models **SST39SF010A×2** (control ROM) and **IS62C256** (SRAM).
 ## See also
 
 - [../../tools/microasm.py](../../tools/microasm.py) — generate ROM hex  
-- [../../docs/microcode-spec.md](../../docs/microcode-spec.md)  
+- [../../docs/hardware/microcode-spec.md](../../docs/hardware/microcode-spec.md)  

@@ -35,4 +35,4 @@ make sim-core
 ## See also
 
 - [../README.md](../README.md)  
-- [../../docs/microcode-spec.md](../../docs/microcode-spec.md)  
+- [../../docs/hardware/microcode-spec.md](../../docs/hardware/microcode-spec.md)  

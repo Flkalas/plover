@@ -9,4 +9,4 @@ Electrical timing simulator for Plover **74HC comb** blocks. **Stdlib only.**
 python -m hwsim run --all
 ```
 
-See [docs/hw-sim.md](../docs/hw-sim.md).
+See [docs/simulation/hw-sim.md](../docs/simulation/hw-sim.md).

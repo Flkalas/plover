@@ -26,4 +26,4 @@ Cross-register moves in **one** cycle are not supported by the 4-bit `reg_ctl` f
 
 ## See also
 
-- [../docs/microcode-spec.md](../docs/microcode-spec.md)  
+- [../docs/hardware/microcode-spec.md](../docs/hardware/microcode-spec.md)  

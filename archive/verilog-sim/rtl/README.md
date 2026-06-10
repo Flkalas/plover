@@ -35,5 +35,5 @@ make test       # both
 ## Conventions
 
 - `` `default_nettype none `` on combinational modules
-- Control word definition: [docs/microcode-spec.md](../docs/microcode-spec.md)
+- Control word definition: [docs/hardware/microcode-spec.md](../docs/hardware/microcode-spec.md)
 - Simulation ROM images: [sim/rom_*.hex](../sim/)

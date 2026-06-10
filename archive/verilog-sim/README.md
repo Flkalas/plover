@@ -44,9 +44,9 @@ The original GitHub Actions workflow is preserved at `.github/workflows/sim.yml`
 | `tools/` | `microasm.py`, `pack_rom.py` |
 | `sim-runner/` | FastAPI → Icarus |
 | `web/` | React simulator UI |
-| `docs/microcode-spec.md` | 16-bit control word spec |
+| `docs/hardware/microcode-spec.md` | 16-bit control word spec |
 
 ## See also
 
-- [../../docs/hw-sim.md](../../docs/hw-sim.md) — current electrical simulator
+- [../../docs/simulation/hw-sim.md](../../docs/simulation/hw-sim.md) — current electrical simulator
 - [../../hwsim/](../../hwsim/) — `python -m hwsim run --all`

@@ -1,4 +1,4 @@
-"""opcode × phase → Reg_Sel[1:0] PLA (v0.1 — see docs/microcode-spec.md)."""
+"""opcode × phase → Reg_Sel[1:0] PLA (v0.1 — see docs/hardware/microcode-spec.md)."""
 
 from __future__ import annotations
 

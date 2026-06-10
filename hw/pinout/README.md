@@ -55,4 +55,4 @@ Power: **VCC** (red, top rail) and **GND** (gray, bottom rail) — all `pwr_vcc`
 
 - Block wiring (nets): `python -m hwsim export-svg hw/netlist/blocks/alu8.yaml`
 - Behavioral pins: [`hw/models/`](../models/)
-- KiCad naming: [docs/hw-schematic.md](../../docs/hw-schematic.md)
+- KiCad naming: [docs/hardware/hw-schematic.md](../../docs/hardware/hw-schematic.md)

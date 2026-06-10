@@ -1,4 +1,4 @@
-"""Generate docs/hw-bringup-b3-opcode.md from shared ALU test vectors."""
+"""Generate docs/hw-bringup/b3-opcode.md from shared ALU test vectors."""
 from __future__ import annotations
 
 import sys
@@ -79,11 +79,11 @@ def main() -> None:
         "| XOR | 0x12 | 0x34 | 0x26 |",
         "| INC | 0x12 | — | 0x13 |",
         "",
-        "See phased bring-up: [hw-bringup-b3.md](hw-bringup-b3.md).",
+        "See phased bring-up: [M1-b3-procedure.md](M1-b3-procedure.md).",
         "",
     ]
 
-    out = ROOT / "docs" / "hw-bringup-b3-opcode.md"
+    out = ROOT / "docs" / "hw-bringup" / "b3-opcode.md"
     out.write_text("\n".join(lines), encoding="utf-8")
     print(f"wrote {out}")
 

@@ -6,7 +6,7 @@ Code and tooling that is **not** part of the current project stage (electrical b
 |------|-------------|
 | [verilog-sim/](verilog-sim/) | Verilog RTL, Icarus testbenches, `microasm`, FastAPI sim-runner, React web UI |
 
-Design notes for the Verilog track: [verilog-sim/docs/microcode-spec.md](verilog-sim/docs/microcode-spec.md).
+Design notes for the Verilog track: [verilog-sim/docs/hardware/microcode-spec.md](verilog-sim/docs/hardware/microcode-spec.md).
 
 Historical Gemini logs and Cursor plans: [../docs/archive/](../docs/archive/).
 

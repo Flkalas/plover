@@ -2,7 +2,7 @@
 
 **1세트 부품 명세** · 단일 **3.3 V** · **PCB SMD**  
 5 V 빵판 목록: [BOM.md](BOM.md) (**중복 주문 금지**)  
-이력 · 검산 · 74HC↔LVC 대응: [docs/bom-maintenance.md](docs/bom-maintenance.md)
+이력 · 검산 · 74HC↔LVC 대응: [docs/project/bom-maintenance.md](docs/project/bom-maintenance.md)
 
 **구분** · **#** = [BOM.md](BOM.md) 동일 라인(있을 때) · **Pkg** · **역할 · 목적** · **비고**
 
@@ -34,7 +34,7 @@
 | 전원 · 프로그래밍 | 25 | *(Prog header / USB-C UART)* | Pin header or module | TH / SMD | 1 | NOR Flash 내용 쓰기 | ↔ #27 Nano **대체** |
 | 전원 · 프로그래밍 | 26 | *(선택)* Pico / CH340 모듈 소켓 | — | — | 0–1 | 개발용 비트뱅 | ↔ #26 케이블 없음 |
 | 전원 · 프로그래밍 | 28 | SN74LVC595APWR | 8-bit serial-in parallel-out shift register | TSSOP-16 | 3 | Flash 프로그래밍 시 주소 비트 확장 | ↔ #28 |
-| 패시브 | 29 | 0.1 µF 50 V X7R | Ceramic capacitor | 0603 | 47 | IC 전원 핀 옆 고주파 디커플 | ↔ #29 · [검산](docs/bom-maintenance.md#bom-33v-pcb-검산) |
+| 패시브 | 29 | 0.1 µF 50 V X7R | Ceramic capacitor | 0603 | 47 | IC 전원 핀 옆 고주파 디커플 | ↔ #29 · [검산](docs/project/bom-maintenance.md#bom-33v-pcb-검산) |
 | 패시브 | 30 | 10 µF 10 V X5R | Ceramic capacitor | 0805 | 12 | IC·모듈 VCC 벌크 안정 | ↔ #30 |
 | 패시브 | 31 | 10 µF ceramic 또는 E-C | Capacitor | 0805 / 1206 | 4 | 전원 리플·리셋 RC | ↔ #31 |
 | 패시브 | 32 | Ferrite bead ~600 Ω @ 100 MHz | Ferrite bead | 0603 | 8 | 전원선 고주파 억제 | ↔ #32 |
