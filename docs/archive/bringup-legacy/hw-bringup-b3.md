@@ -6,9 +6,9 @@
 Breadboard procedure in three steps: **B3a** (comb Y) → **B3b** (manual latch) → **B3c** (2 MHz clock).  
 Electrical behavior is validated in hwsim before wiring.
 
-**Opcode cheat sheet:** [hw-bringup-b3-opcode.md](hw-bringup-b3-opcode.md) — DIP settings for all 12 opcodes.
+**Opcode cheat sheet:** [hw-bringup-b3-opcode.md](hw-bringup/b3-opcode.md) — DIP settings for all 12 opcodes.
 
-**ALU only — step-by-step assembly (14 IC, Phase B2):** [hw-bringup-alu8-assembly-spec.md](hw-bringup-alu8-assembly-spec.md) (Korean build spec).
+**ALU only — step-by-step assembly (14 IC, Phase B2):** [hw-bringup-alu8-assembly-spec.md](hw-bringup/alu8-assembly-spec.md) (Korean build spec).
 
 | Phase | Netlist | hwsim |
 |-------|---------|-------|
@@ -23,7 +23,7 @@ Target clock (B3c): **2 MHz** — 500 ns period, **250 ns** comb budget before p
 ## Common — power and decoupling
 
 - **0.1 µF per IC**, **10 µF** bulk on 5 V rail.
-- Control inputs: use [opcode cheat sheet](hw-bringup-b3-opcode.md); tie unused control nets to GND unless the sheet says VCC.
+- Control inputs: use [opcode cheat sheet](hw-bringup/b3-opcode.md); tie unused control nets to GND unless the sheet says VCC.
 - **INC/DEC:** do not drive `net_b0..7`; use `net_b_const_sel` + `net_b_const_bit1..7` only (bit0 constant is VCC in netlist).
 
 ---
@@ -50,7 +50,7 @@ No 574, no OSC/74.
 
 ### Procedure
 
-1. Look up opcode row in [cheat sheet](hw-bringup-b3-opcode.md).
+1. Look up opcode row in [cheat sheet](hw-bringup/b3-opcode.md).
 2. Set A, B, and control DIP/ties.
 3. Read **Y LEDs** — no clock, no wait beyond comb settling (~µs on breadboard).
 
@@ -187,4 +187,4 @@ Full ALU refs: [`alu8.md`](../hw/netlist/blocks/alu8.md).
 | Q wrong @ 2 MHz | Scope Y vs clk; lower clock or shorten wires |
 | hwsim FAIL | `python -m hwsim run hw/tests/alu_b3_latch.yaml --report`; B3c → scope |
 
-Regenerate (after `alu8` change): `gen_alu_decode_netlist.py` → `gen_alu8_netlist.py` → `gen_alu_b3_netlist.py` → `gen_alu_b3_clock_netlist.py` → `gen_alu8_full_test.py` → `gen_alu8_opcode_timing.py` → `gen_opcode_cheatsheet.py` — full order in [hw-sim.md](hw-sim.md).
+Regenerate (after `alu8` change): `gen_alu_decode_netlist.py` → `gen_alu8_netlist.py` → `gen_alu_b3_netlist.py` → `gen_alu_b3_clock_netlist.py` → `gen_alu8_full_test.py` → `gen_alu8_opcode_timing.py` → `gen_opcode_cheatsheet.py` — full order in [hw-sim.md](../../simulation/hw-sim.md).
