@@ -46,4 +46,4 @@ Columns: **b_cst** = `net_b_const_sel`, **lgc** = `net_lgc3..0` (Gigatron C inpu
 | XOR | 0x12 | 0x34 | 0x26 |
 | INC | 0x12 | — | 0x13 |
 
-See phased bring-up: [hw-bringup-b3.md](hw-bringup-b3.md).
+See phased bring-up: [M1-b3-procedure.md](M1-b3-procedure.md).

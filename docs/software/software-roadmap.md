@@ -1,6 +1,6 @@
 # Software roadmap (VM OS stack)
 
-**Related:** [software-memory-layout.md](software-memory-layout.md) · [implementation-plan-v0.1.md](implementation-plan-v0.1.md) · [hw-sim.md](hw-sim.md)
+**Related:** [software-memory-layout.md](software-memory-layout.md) · [implementation-plan-v0.1.md](../project/implementation-plan-v0.1.md) · [hw-sim.md](../simulation/hw-sim.md)
 
 Plover v0.1 software milestones **S0–S7** on `plover_vm`, then hardware bring-up (M1–M5).
 
@@ -35,8 +35,8 @@ Plover v0.1 software milestones **S0–S7** on `plover_vm`, then hardware bring-
 | Software | Hardware |
 |----------|----------|
 | S2 CALL/RET | M3 control-store pack |
-| S7 vFDD | [mailbox-protocol.md](mailbox-protocol.md), [rp2350-coprocessor.md](rp2350-coprocessor.md) |
-| Boot / PL-DOS | [bootloader.md](bootloader.md) |
+| S7 vFDD | [mailbox-protocol.md](../copro/mailbox-protocol.md), [rp2350-coprocessor.md](../copro/rp2350-coprocessor.md) |
+| Boot / PL-DOS | [bootloader.md](../boot/bootloader.md) |
 
 ## Verification
 

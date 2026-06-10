@@ -5,7 +5,7 @@
 **Audience:** 교육용 FPGA 보드 사용자, 원칙·외부 ROM/RAM·주변 분리 구현자, 향후 RTL 제공·프로젝트 확장 담당자
 
 **Related (TTL 실기):** [system-architecture.md](system-architecture.md) · [BOM.md](../BOM.md) (5 V) · [BOM-3v3.md](../BOM-3v3.md) (3.3 V PCB)  
-**Related (기능 검증):** [plover_vm/](../plover_vm/) · [hw-sim.md](hw-sim.md) · [microcode-spec.md](microcode-spec.md) · [memory-map.md](memory-map.md)
+**Related (기능 검증):** [plover_vm/](../plover_vm/) · [hw-sim.md](../simulation/hw-sim.md) · [microcode-spec.md](microcode-spec.md) · [memory-map.md](memory-map.md)
 
 ---
 
@@ -103,7 +103,7 @@ FPGA 구현의 **정합성 검증 1차 기준**은 `python -m pytest tests/ -q` 
 | 항목 | 내용 |
 |------|------|
 | **CPU 코어** | 모델 B와 동일 |
-| **RP2350** | VDU, HID, vFDD — [mailbox-protocol.md](mailbox-protocol.md) |
+| **RP2350** | VDU, HID, vFDD — [mailbox-protocol.md](../copro/mailbox-protocol.md) |
 | **절감** | 5 V↔3.3 V **LVC245** 다수, vFDD 버퍼 FSM → **~150–400 LUT** (전체의 **~5–15%**) |
 
 Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있다.
@@ -214,8 +214,8 @@ Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있
 | **행위 우선** | 게이트 단위 74HC 복제는 **교육/타이밍 실험**용 옵션; 기본 산출물은 **compact CPU** |
 | **명세 동기** | ISA·phase count — [microcode-spec.md](microcode-spec.md), [plover_vm/macro/isa.py](../plover_vm/macro/isa.py) |
 | **CW** | `tools/pack_control_store.py` / `hw/fixtures/control/cw.hex` **단일 소스** |
-| **Reset** | `$FFFC` 벡터, `MAP_MODE` — [bootloader.md](bootloader.md) |
-| **No IRQ** | 폴링만 — [mailbox-protocol.md](mailbox-protocol.md) |
+| **Reset** | `$FFFC` 벡터, `MAP_MODE` — [bootloader.md](../boot/bootloader.md) |
+| **No IRQ** | 폴링만 — [mailbox-protocol.md](../copro/mailbox-protocol.md) |
 
 ### 7.2 구현 등급 (검증 깊이)
 

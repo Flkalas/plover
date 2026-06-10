@@ -58,6 +58,22 @@ Bitmap layer: **320×200**, RGB565. Coordinates in `MB_BUFFER`.
 | `0x25` | GFX_GETPIX | — | in: x, y → out: c_lo, c_hi | Read pixel |
 | `0x26` | GFX_TILE8 | pal_idx | dst_x, dst_y, tile[32] | Stamp 8×8 tile (4bpp palette indices) |
 
+### 2.2.1 GFX console extensions v0.2 (`0x27–0x2D`)
+
+Layer tilemaps: **40×25** cells (8×8 px). OAM: **32** sprites. See [game-api.md](game-api.md).
+
+| Value | Name | PARAM | AUX / BUFFER | Action |
+|-------|------|-------|--------------|--------|
+| `0x27` | GFX_SET_TILE_PAL | pal_idx 0–15 | entry 0–15 | RGB565 LE [0–1] → `tile_palettes[pal][entry]` |
+| `0x28` | GFX_LAYER_CFG | layer 0–1 | enable | scroll_x, scroll_y in BUFFER[0–1] |
+| `0x29` | GFX_TILEMAP_SET | layer 0–1 | tile_x, tile_y | tile_id in BUFFER[0] (0=empty) |
+| `0x2A` | GFX_OAM_WRITE | sprite_id 0–31 | — | x, y, tile, pal, attr, flags (bit0=visible) |
+| `0x2B` | GFX_OAM_HIDE | sprite_id | — | Clear sprite visible flag |
+| `0x2C` | GFX_FRAME_FLUSH | — | — | Draw layer0→layer1→OAM to bitmap; increment frame |
+| `0x2D` | GFX_SPR_KEY | transparent_nib | — | 4bpp index skipped when stamping sprites |
+
+**GFX_FRAME_FLUSH** draws enabled tile layers (scrolled), then visible OAM entries, using `tile_palettes`. Does not clear text layer.
+
 ### 2.3 System (`0x30–0x31`)
 
 | Value | Name | PARAM | Action |
@@ -96,7 +112,20 @@ See [input-hid.md](input-hid.md). **Silent drop** on vFDD busy / invalid inject 
 **MB_STATUS bit4 `HID_KEY_PENDING`:** keyboard queue non-empty.  
 **MB_STATUS bit5 `HID_MOUSE_PENDING`:** mouse queue non-empty.
 
-**Reserved:** `0x44–0x4F` HID extension · `0x54–0x5F` PCM (v0.2).
+### 2.4.1 APU track extensions v0.2 (`0x54–0x57`)
+
+Timed notes on PSG channels (tracks 0–3). **Silent drop** like §2.4.
+
+| Value | Name | PARAM | BUFFER | Action |
+|-------|------|-------|--------|--------|
+| `0x54` | APU_NOTE_ON | — | ch, period LE, vol, dur_frames LE | Stage square wave; auto-off after dur |
+| `0x55` | APU_NOTE_OFF | channel | — | Immediate channel mute |
+| `0x56` | APU_TRACK_CLEAR | channel | — | Clear pending note timer |
+| `0x57` | APU_SYNC | — | — | Alias of `0x52` APU_CH_SYNC |
+
+Call `APU_SYNC` (`0x52` or `0x57`) after `APU_NOTE_ON` to hear the note. Copro decrements `dur_frames` each `mix_samples` batch.
+
+**Reserved:** `0x44–0x4F` HID extension · `0x58–0x5F` PCM (future).
 
 ---
 
@@ -141,3 +170,4 @@ CPLD asserts `MAILBOX_EN` for `$FF00–$FFFB` only; RAM_2 `/CE` negated in this 
 | 2026-06-08 | MB_AUX; VDU/GFX cmds 0x10–0x31 |
 | 2026-06-08 | APU_READY bit3; PSG cmds 0x50–0x53 |
 | 2026-06-08 | HID_KEY/MOUSE_PENDING bit4/5; HID cmds 0x40–0x43 |
+| 2026-06-08 | GFX v0.2 layer/OAM 0x27–0x2D; APU NOTE_ON 0x54–0x57 |

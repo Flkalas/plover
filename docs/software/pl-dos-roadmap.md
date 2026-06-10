@@ -2,7 +2,7 @@
 
 PL-DOS is the final integration milestone on top of the VM stack (S1–S6): vFDD storage, a flat catalog filesystem, a `.PLR` loader, and a Forth shell.
 
-**Related:** [software-memory-layout.md](software-memory-layout.md) · [mailbox-protocol.md](mailbox-protocol.md) · [rp2350-coprocessor.md](rp2350-coprocessor.md) · [display-console.md](display-console.md)
+**Related:** [software-memory-layout.md](software-memory-layout.md) · [mailbox-protocol.md](../copro/mailbox-protocol.md) · [rp2350-coprocessor.md](../copro/rp2350-coprocessor.md) · [display-console.md](../copro/display-console.md)
 
 ## Milestones
 

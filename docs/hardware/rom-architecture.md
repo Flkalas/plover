@@ -65,7 +65,7 @@ The 2048-byte region is a **sparse physical container**: the v0.1 macro ISA (`0x
 ## 4. Boot segment
 
 - Reset comb forces **`$FFFC`**; vector points to entry in **`$0000–$07FF`**.
-- Bootloader: Mailbox READ → **LDIO + STA16** block-copy to **RAM `$0800+`** ([boot-jmp-handoff.md](boot-jmp-handoff.md)).
+- Bootloader: Mailbox READ → **LDIO + STA16** block-copy to **RAM `$0800+`** ([boot-jmp-handoff.md](../boot/boot-jmp-handoff.md)).
 - Product path: **`JMP $0800`** after SP/RP/GPR pre-init (`boot_rom.hex`).
 - Recovery path: RAM vector @ `$FFFC` + **HALT** (`boot_rom_manual.hex`) → operator Run + RESET.
 

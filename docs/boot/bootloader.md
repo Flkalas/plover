@@ -1,6 +1,6 @@
 ﻿# Bootloader v0.1
 
-**Related:** [rom-architecture.md](rom-architecture.md) · [memory-map.md](memory-map.md) · [boot-jmp-handoff.md](boot-jmp-handoff.md)
+**Related:** [rom-architecture.md](rom-architecture.md) · [memory-map.md](../hardware/memory-map.md) · [boot-jmp-handoff.md](boot-jmp-handoff.md)
 
 ---
 

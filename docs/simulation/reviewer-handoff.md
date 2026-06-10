@@ -2,7 +2,7 @@
 
 **작성일:** 2026-06-01  
 **대상:** 설계·코드·시뮬레이션 검토자  
-**활성 명세:** [system-architecture.md](system-architecture.md)
+**활성 명세:** [system-architecture.md](../hardware/system-architecture.md)
 
 ---
 
@@ -37,7 +37,7 @@ RP2350B                    Mailbox copro (펌웨어 stub만)
 - **Mode B (Run):** 전 영역 RAM, `$FFFC` 벡터 → RAM (운영자 DIP + RESET)  
 - **8-bit CW:** B7–B4 ALU_OP, B3 REG_WE, B2 Y_OE, B1 MEM_RD, B0 MEM_WR  
 
-상세: [memory-map.md](memory-map.md), [microcode-spec.md](microcode-spec.md)
+상세: [memory-map.md](../hardware/memory-map.md), [microcode-spec.md](../hardware/microcode-spec.md)
 
 ---
 
@@ -155,7 +155,7 @@ python -m pytest tests/ -q
 
 ## 6. ISA · macroasm · CW
 
-### 6.1 v0.1 normative ISA ([microcode-spec.md](microcode-spec.md))
+### 6.1 v0.1 normative ISA ([microcode-spec.md](../hardware/microcode-spec.md))
 
 | Op | Mnemonic | 비고 |
 |----|----------|------|
@@ -287,11 +287,11 @@ firmware/rp2350/mailbox_stub/main.c   RP2350 stub (normative doc 참조)
 
 ## 10. 검토 체크리스트 (제안)
 
-1. **명세** — [system-architecture.md](system-architecture.md) vs [BOM.md](../BOM.md) vs [memory-map.md](memory-map.md) 일치  
+1. **명세** — [system-architecture.md](../hardware/system-architecture.md) vs [BOM.md](../BOM.md) vs [memory-map.md](../hardware/memory-map.md) 일치  
 2. **hwsim** — `python -m hwsim run --all` → **17/17 PASS** (74HC comb; no OSC — VM + scope for clock/CPLD timing)  
 3. **VM** — `python -m pytest tests/ -q` → **23/23 PASS**  
 4. **Decode** — `v2_mem_decode` 파형 vs [MapDecoder](../plover_vm/decode.py) truth table  
-5. **CW** — [pack_control_store.py](../tools/pack_control_store.py) 8b map vs [microcode-spec.md](microcode-spec.md)  
+5. **CW** — [pack_control_store.py](../tools/pack_control_store.py) 8b map vs [microcode-spec.md](../hardware/microcode-spec.md)  
 6. **데모** — `run_fib_demo.py`, `run_fib_20000_demo.py` 출력 수치  
 7. **레거시** — `cpld_regfile.yaml` LEGACY 주석, v1 문서 superseded 표기  
 

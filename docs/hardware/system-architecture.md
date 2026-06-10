@@ -3,7 +3,7 @@
 **Version:** 1.0 (pre-release) · **Date:** 2026-06-10  
 **Status:** Active normative specification (breadboard)
 
-Supersedes [v0.2](archive/pre-v1.0/system-architecture-v0.2.md). Design rationale: [hardware-architecture-synthesis.md](hardware-architecture-synthesis.md).
+Supersedes [v0.2](../archive/pre-v1.0/system-architecture-v0.2.md). Design rationale: [hardware-architecture-synthesis.md](hardware-architecture-synthesis.md).
 
 ---
 
@@ -28,7 +28,7 @@ Supersedes [v0.2](archive/pre-v1.0/system-architecture-v0.2.md). Design rational
 - **Deterministic:** no IRQ; operator-visible mode switches.
 - **Passive map:** mailbox/MAP qualifiers in **discrete gates**; CPLD holds GPR only.
 - **ROM as law:** CPU executes; ROM holds boot, control tables, and fixed assets ([rom-architecture.md](rom-architecture.md)).
-- **Logic VM:** [`plover_vm/`](../plover_vm/) — functional simulator ([hw-sim.md](hw-sim.md#plover-logic-vm-plover_vm)).
+- **Logic VM:** [`plover_vm/`](../plover_vm/) — functional simulator ([hw-sim.md](../simulation/hw-sim.md#plover-logic-vm-plover_vm)).
 
 ---
 
@@ -53,7 +53,7 @@ Supersedes [v0.2](archive/pre-v1.0/system-architecture-v0.2.md). Design rational
 3. Bootloader: POST → vFDD load (Mailbox) → copy kernel to **RAM `$0800+`** → **`JMP $0800`** or halt.
 4. Operator DIP → **Run**, **RESET** → fetch `$FFFC` from **RAM**.
 
-Details: [bootloader.md](bootloader.md) · [memory-map.md](memory-map.md).
+Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md).
 
 ---
 
@@ -64,8 +64,8 @@ Details: [bootloader.md](bootloader.md) · [memory-map.md](memory-map.md).
 | [memory-map.md](memory-map.md) | Address map, 138×2 + gate decode |
 | [cpld-system-controller.md](cpld-system-controller.md) | CPLD GPR ports (~40 MC) |
 | [microcode-spec.md](microcode-spec.md) | 10b CW, ISA |
-| [hw-bringup/README.md](hw-bringup/README.md) | M1–M5 breadboard bring-up |
-| [hw-bringup/breadboard-wiring.md](hw-bringup/breadboard-wiring.md) | 138×2, gates, CW latch |
+| [hw-bringup/README.md](../hw-bringup/README.md) | M1–M5 breadboard bring-up |
+| [hw-bringup/breadboard-wiring.md](../hw-bringup/breadboard-wiring.md) | 138×2, gates, CW latch |
 | [hardware-architecture-synthesis.md](hardware-architecture-synthesis.md) | Decisions, parasitics |
 
 ---
@@ -88,5 +88,5 @@ Details: [bootloader.md](bootloader.md) · [memory-map.md](memory-map.md).
 | Date | Note |
 |------|------|
 | 2026-06-01 | v0.1 — archived |
-| 2026-06-10 | v0.2 — archived ([pre-v1.0](archive/pre-v1.0/README.md)) |
+| 2026-06-10 | v0.2 — archived ([pre-v1.0](../archive/pre-v1.0/README.md)) |
 | 2026-06-10 | **v1.0** — single breadboard: CPLD GPR ~40 MC + 138×2 + 10b CW |

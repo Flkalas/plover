@@ -2,9 +2,9 @@
 
 **Device:** ATF1504AS (**100-TQFP**) · **Role:** **GPR only** (R0–R3)  
 **CE tree:** 74HC138×2 + 08/32/04 · **Reg_Sel:** Flash CW B9–B8  
-**GPR timing:** [archive/pre-v0.1/cpld-hybrid-v1.3.md](archive/pre-v0.1/cpld-hybrid-v1.3.md)
+**GPR timing:** [archive/pre-v0.1/cpld-hybrid-v1.3.md](../archive/pre-v0.1/cpld-hybrid-v1.3.md)
 
-**Bring-up:** [hw-bringup/README.md](hw-bringup/README.md) · [breadboard-wiring.md](hw-bringup/breadboard-wiring.md)
+**Bring-up:** [hw-bringup/README.md](../hw-bringup/README.md) · [breadboard-wiring.md](../hw-bringup/breadboard-wiring.md)
 
 **CPLD bitstream:** draft until MC fit report — target **≤40 MC** on **ATF1504** only.
 

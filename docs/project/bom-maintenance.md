@@ -8,7 +8,7 @@
 | [BOM-3v3.md](../BOM-3v3.md) | PCB 3.3 V 쇼핑 목록 |
 | [purchase-devicesmart.md](purchase-devicesmart.md) | 디바이스마트 **1차** 주문 |
 | [purchase-2026-06-01-followup.md](purchase-2026-06-01-followup.md) | 디바이스마트 **2·3차** · AliExpress |
-| [hardware-architecture-synthesis.md](hardware-architecture-synthesis.md) | 아키텍처 종합 — **v1.0 breadboard: CPLD GPR + 138×2 + 10b CW** |
+| [hardware-architecture-synthesis.md](../hardware/hardware-architecture-synthesis.md) | 아키텍처 종합 — **v1.0 breadboard: CPLD GPR + 138×2 + 10b CW** |
 
 ---
 
@@ -78,7 +78,7 @@ Netlist · 타이밍: [alu8.md](../hw/netlist/blocks/alu8.md) · [alu-opcodes-ti
 
 ## 수량 검산 (74HC · 디커플링)
 
-v0.1 [system-architecture.md](system-architecture.md) · [alu8.md](../hw/netlist/blocks/alu8.md) 기준.
+v0.1 [system-architecture.md](../hardware/system-architecture.md) · [alu8.md](../hw/netlist/blocks/alu8.md) 기준.
 
 ### 74HC — [BOM.md](../BOM.md) 표와 일치 ✓
 
@@ -146,7 +146,7 @@ v0.1 [system-architecture.md](system-architecture.md) · [alu8.md](../hw/netlist
 | 138 | **2** total (+1 order from 1차) |
 | GAL / larger CPLD | **Do not buy** |
 
-See [hardware-architecture-synthesis.md](hardware-architecture-synthesis.md) · [hw-bringup/breadboard-wiring.md](hw-bringup/breadboard-wiring.md).
+See [hardware-architecture-synthesis.md](../hardware/hardware-architecture-synthesis.md) · [hw-bringup/breadboard-wiring.md](../hw-bringup/breadboard-wiring.md).
 
 ---
 

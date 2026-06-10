@@ -1,7 +1,7 @@
 ﻿# Microcode Specification v1.0
 
 **Related:** [rom-architecture.md](rom-architecture.md) · [cpld-system-controller.md](cpld-system-controller.md)  
-**Archived:** [microcode-spec-v0.1.md](archive/pre-v0.1/microcode-spec-v0.1.md) · [pre-v1.0](archive/pre-v1.0/README.md)
+**Archived:** [microcode-spec-v0.1.md](../archive/pre-v0.1/microcode-spec-v0.1.md) · [pre-v1.0](../archive/pre-v1.0/README.md)
 
 ---
 
@@ -208,7 +208,7 @@ Packed: ph0 `04`, ph1 `01` (same as STA).
 | 0 | 60 | `$403C` | `04` | 00 | NOP | 0 | 1 | 0 | 0 | R0 → bus |
 | 1 | 61 | `$403D` | `01` | 00 | NOP | 0 | 0 | 0 | 1 | Write bus to **abs16** operand |
 
-3-byte insn: `op, addr_lo, addr_hi`. Used by Boot ROM block-copy ([boot-jmp-handoff.md](boot-jmp-handoff.md)).
+3-byte insn: `op, addr_lo, addr_hi`. Used by Boot ROM block-copy ([boot-jmp-handoff.md](../boot/boot-jmp-handoff.md)).
 
 ---
 

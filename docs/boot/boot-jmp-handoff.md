@@ -1,6 +1,6 @@
 # Boot JMP handoff (software chain load)
 
-**Related:** [bootloader.md](bootloader.md) · [memory-map.md](memory-map.md) · [software-memory-layout.md](software-memory-layout.md)
+**Related:** [bootloader.md](bootloader.md) · [memory-map.md](../hardware/memory-map.md) · [software-memory-layout.md](../software/software-memory-layout.md)
 
 Software-only boot handoff: Boot ROM loads the kernel into RAM and **`JMP`s to `$0800`** without operator DIP/RESET or CPLD changes. This is **방식 1** from the modern-boot comparison notes in [archive/gemini/Plover-부팅과-현대-시스템-비교.md](archive/gemini/Plover-부팅과-현대-시스템-비교.md).
 
@@ -113,7 +113,7 @@ Plover v0.1 **8-bit direct addressing** and **Boot-mode low-page ROM masking** d
 
 | Context | Owner | When | Notes |
 |---------|-------|------|-------|
-| Stack cells (`$0E00` SP, `$0F00` RP) | **Boot ROM** | Before `JMP $0800` | 16-bit LE values — region bases **`$E000`**, **`$F600`** ([software-memory-layout.md](software-memory-layout.md)) |
+| Stack cells (`$0E00` SP, `$0F00` RP) | **Boot ROM** | Before `JMP $0800` | 16-bit LE values — region bases **`$E000`**, **`$F600`** ([software-memory-layout.md](../software/software-memory-layout.md)) |
 | GPR (R0–R3) | **Boot ROM** | Before `JMP $0800` | `LDA` from ROM constants (`$00–$FF` read band) + `MOV`; not `LDA zero` in `$0800+` image |
 | Z/C flags | **RAM kernel** | Before first `BEQ`/branch | **Normative:** at least one **`CMP`** (or equivalent flags-only ALU op) so flags do not depend on Boot ROM leftovers |
 | `HERE`, `HEAP`, `DP` | **RAM kernel** | Before `KERNEL_MAIN` | Linker/placement in **`$0800+`** image or second boot table sector — not single `STA` to `$0E00+` from kernel entry |
@@ -229,7 +229,7 @@ expect:
 | Boot ROM source | Block-copy + pre-init (§5) + **`JMP $0800`** instead of **HALT** |
 | [bootloader.md](bootloader.md) | JMP as product path; §3 manual path as recovery |
 | [tools/gen_boot_fixtures.py](../tools/gen_boot_fixtures.py) | Emit `05 00 08` handoff; document pre-init offsets |
-| `docs/system-architecture.md` §4 | Automatic chain load |
+| `docs/hardware/system-architecture.md` §4 | Automatic chain load |
 | Tests | §7 checklist gates + regression on manual `boot_run.yaml` |
 
 No changes to CPLD, BOM, or [cpld-system-controller.md](cpld-system-controller.md).

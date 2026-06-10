@@ -1,6 +1,6 @@
 ﻿# Memory Map v1.0
 
-**Related:** [cpld-system-controller.md](cpld-system-controller.md) · [mailbox-protocol.md](mailbox-protocol.md)
+**Related:** [cpld-system-controller.md](cpld-system-controller.md) · [mailbox-protocol.md](../copro/mailbox-protocol.md)
 
 ---
 
@@ -33,7 +33,7 @@
 | **74HC138 #1** | CBA = A15,A14,A13 → coarse Y*; E = `!MAILBOX_EN` |
 | **ATF1504** | GPR only — **no** address decode |
 
-Reference: [`decode_ce_breadboard()`](../hw/logic/cpld_decode.py) · [breadboard-wiring.md](hw-bringup/breadboard-wiring.md).
+Reference: [`decode_ce_breadboard()`](../hw/logic/cpld_decode.py) · [breadboard-wiring.md](../hw-bringup/breadboard-wiring.md).
 
 ---
 

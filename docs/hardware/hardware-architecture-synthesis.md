@@ -3,7 +3,7 @@
 **Status:** **v1.0 breadboard (pre-release, 2026-06-10).** Single normative path.  
 **Active normative:** [system-architecture.md](system-architecture.md) v1.0 — **CPLD GPR ~40 MC + 138×2 + 10b CW, no GAL**.
 
-**Related:** [BOM.md](../BOM.md) · [purchase-devicesmart.md](purchase-devicesmart.md) · [purchase-2026-06-01-followup.md](purchase-2026-06-01-followup.md) · [memory-map.md](memory-map.md) · [cpld-system-controller.md](cpld-system-controller.md) · [alu-opcodes-timing.md](alu-opcodes-timing.md) · [tools/estimate_parasitics.py](../tools/estimate_parasitics.py)
+**Related:** [BOM.md](../BOM.md) · [purchase-devicesmart.md](../project/purchase-devicesmart.md) · [purchase-2026-06-01-followup.md](../project/purchase-2026-06-01-followup.md) · [memory-map.md](memory-map.md) · [cpld-system-controller.md](cpld-system-controller.md) · [alu-opcodes-timing.md](alu-opcodes-timing.md) · [tools/estimate_parasitics.py](../tools/estimate_parasitics.py)
 
 ---
 
@@ -24,13 +24,13 @@
 1. **ATF1504 TQFP-100** — GPR + `w_sel`/`r_sel` mux only (~36–40 MC).
 2. **74HC138×2** — two-stage CE; **+1 purchase** (total 2).
 3. **10b CW** — Reg_Sel packed in Flash; bus control direct from CW_L.
-4. **Single bring-up** — M2a CPLD GPR → M2b 138×2 ([breadboard-wiring.md](hw-bringup/breadboard-wiring.md)).
+4. **Single bring-up** — M2a CPLD GPR → M2b 138×2 ([breadboard-wiring.md](../hw-bringup/breadboard-wiring.md)).
 
 ---
 
 ## 2. SUB and ALU — Gemini archive vs implementation
 
-Source: [archive/gemini/TTL로-가장-빠르게-SUB를-구현하는-방법…](archive/gemini/TTL로-가장-빠르게-SUB를-구현하는-방법.-기가트론은-어떻게-하고-있는지와-얼마나-걸리는지도-알려주세요..md)
+Source: [archive/gemini/TTL로-가장-빠르게-SUB를-구현하는-방법…](../archive/gemini/TTL로-가장-빠르게-SUB를-구현하는-방법.-기가트론은-어떻게-하고-있는지와-얼마나-걸리는지도-알려주세요..md)
 
 ### 2.1 What Gemini got right
 
@@ -72,7 +72,7 @@ net_b0 → 04_BINV → 153_B → 283_LO/HI → 157_YBP → net_y0   → 151 ns
 
 ## 3. Purchase inventory vs BOM
 
-Detailed receipts: [purchase-devicesmart.md](purchase-devicesmart.md), [purchase-2026-06-01-followup.md](purchase-2026-06-01-followup.md).
+Detailed receipts: [purchase-devicesmart.md](../project/purchase-devicesmart.md), [purchase-2026-06-01-followup.md](../project/purchase-2026-06-01-followup.md).
 
 ### 3.1 Actually bought (summary)
 
@@ -122,7 +122,7 @@ Detailed receipts: [purchase-devicesmart.md](purchase-devicesmart.md), [purchase
 
 ### 4.3 Archived split (pre-v1.0)
 
-External-GPR and all-in-CPLD iterations are preserved under [archive/pre-v0.1/](archive/pre-v0.1/README.md) and [archive/pre-v1.0/](archive/pre-v1.0/README.md).
+External-GPR and all-in-CPLD iterations are preserved under [archive/pre-v0.1/](../archive/pre-v0.1/README.md) and [archive/pre-v1.0/](../archive/pre-v1.0/README.md).
 
 ---
 
@@ -269,11 +269,11 @@ A[15:0] ──┬──► 08/32/04 ──► MAILBOX_EN, MAP×A11, /CE glue
 
 ## 9. Recommended bring-up sequence
 
-1. **M1** — ALU B3 — [M1-alu.md](hw-bringup/M1-alu.md)
-2. **M2a** — ATF1504 **GPR-only** JED — [M2a-cpld-decode.md](hw-bringup/M2a-cpld-decode.md)
-3. **M2b** — 138×2 + CPLD q_a/q_b ↔ ALU — [breadboard-wiring.md](hw-bringup/breadboard-wiring.md)
-4. **M3a** — 10b CW pack + dual 574 latch + Flash — [M3a-control-store.md](hw-bringup/M3a-control-store.md)
-5. **M3b–M5** — fetch, boot, E2E — [hw-bringup/README.md](hw-bringup/README.md)
+1. **M1** — ALU B3 — [M1-alu.md](../hw-bringup/M1-alu.md)
+2. **M2a** — ATF1504 **GPR-only** JED — [M2a-cpld-decode.md](../hw-bringup/M2a-cpld-decode.md)
+3. **M2b** — 138×2 + CPLD q_a/q_b ↔ ALU — [breadboard-wiring.md](../hw-bringup/breadboard-wiring.md)
+4. **M3a** — 10b CW pack + dual 574 latch + Flash — [M3a-control-store.md](../hw-bringup/M3a-control-store.md)
+5. **M3b–M5** — fetch, boot, E2E — [hw-bringup/README.md](../hw-bringup/README.md)
 
 ---
 
@@ -311,7 +311,7 @@ A[15:0] ──┬──► 08/32/04 ──► MAILBOX_EN, MAP×A11, /CE glue
 | Phase B2 ALU netlist | [alu8-phase-b.md](alu8-phase-b.md) |
 | Shopping | [BOM.md](../BOM.md) |
 | PCB target | [BOM-3v3.md](../BOM-3v3.md) |
-| Gemini SUB chat (archive) | [archive/gemini/TTL…](archive/gemini/TTL로-가장-빠르게-SUB를-구현하는-방법.-기가트론은-어떻게-하고-있는지와-얼마나-걸리는지도-알려주세요..md) |
+| Gemini SUB chat (archive) | [archive/gemini/TTL…](../archive/gemini/TTL로-가장-빠르게-SUB를-구현하는-방법.-기가트론은-어떻게-하고-있는지와-얼마나-걸리는지도-알려주세요..md) |
 
 ---
 

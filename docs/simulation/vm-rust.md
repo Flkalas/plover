@@ -1,7 +1,7 @@
 # Plover VM Rust runtime (v0.1)
 
 **Source:** [archive/gemini/rust_vm_migration_and_virtualization.md](archive/gemini/rust_vm_migration_and_virtualization.md)  
-**Related:** [system-architecture.md](system-architecture.md), [mailbox-protocol.md](mailbox-protocol.md), [display-console.md](display-console.md)
+**Related:** [system-architecture.md](../hardware/system-architecture.md), [mailbox-protocol.md](mailbox-protocol.md), [display-console.md](display-console.md)
 
 Normative **Rust** implementation of the logic VM (`plover_vm`), replacing Python for integrated Presenter + multi-threaded audio. Python `plover_vm/` remains during transition as parity oracle.
 
@@ -76,7 +76,12 @@ cargo run -p plover_vm -- scenario hw/scenarios/vm/add_imm.yaml
 cargo run -p plover_vm -- scenario hw/scenarios/vm/forth_boot.yaml
 cargo run -p plover_vm -- dos-shell
 cargo run -p plover_vm -- vdu-demo
+cargo run -p plover_vm -- play --pls hw/fixtures/sw/media_bench.pls --headless
+cargo run -p plover_vm --features sdl,audio -- play --pls hw/fixtures/sw/media_bench.pls --audio
+cargo run -p plover_vm -- play --basic hw/fixtures/basic/pong.bas --headless
 ```
+
+Demo / workshop I/O programs: [demo-program-spec.md](demo-program-spec.md).
 
 **PL-DOS:** `plover_os` mirrors Python `kern/` + `plover_vm/dos_scenario.py`. Shell commands `dir`/`run`/`type`/`del`/`mon`/`plsrun`/`ccrun`/`ldrun` call Python `plover_asm`/`plover_cc`/`plover_ld` via subprocess (same as Python shell). Fixture `hw/fixtures/plr/hello.plr` is committed so boot does not require assembly at runtime.
 

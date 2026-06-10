@@ -10,7 +10,7 @@ Forth 위에 OS-like word를 추가해, 이후 subset C / 커널 계층에서 �
 
 ## Console
 
-Normative geometry: **40×25** — [display-console.md](display-console.md). VDU mailbox — [mailbox-protocol.md](mailbox-protocol.md) §2.1–2.3.
+Normative geometry: **40×25** — [display-console.md](../copro/display-console.md). VDU mailbox — [mailbox-protocol.md](../copro/mailbox-protocol.md) §2.1–2.3.
 
 - `EMIT (ch -- )` : 출력 (host simulation; with `MemoryBus`, routes to VDU)
 - `KEY ( -- ch)` : 입력 (with `MemoryBus`, HID_KEY_READ; else host `input_bytes`)
@@ -28,7 +28,7 @@ Normative geometry: **40×25** — [display-console.md](display-console.md). VDU
 
 ## Input (when `MemoryBus` attached)
 
-Normative HID — [input-hid.md](input-hid.md) · [mailbox-protocol.md](mailbox-protocol.md) §2.5.
+Normative HID — [input-hid.md](input-hid.md) · [mailbox-protocol.md](../copro/mailbox-protocol.md) §2.5.
 
 | Word | Stack | Mailbox |
 |------|-------|---------|
@@ -37,7 +37,7 @@ Normative HID — [input-hid.md](input-hid.md) · [mailbox-protocol.md](mailbox-
 
 ## Audio (when `MemoryBus` attached)
 
-Normative PSG — [audio-apu.md](audio-apu.md) · [mailbox-protocol.md](mailbox-protocol.md) §2.4.
+Normative PSG — [audio-apu.md](audio-apu.md) · [mailbox-protocol.md](../copro/mailbox-protocol.md) §2.4.
 
 | Word | Stack | Mailbox |
 |------|-------|---------|

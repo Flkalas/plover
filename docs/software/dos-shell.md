@@ -2,7 +2,7 @@
 
 PL-DOS uses a small command shell on top of PLFS + `.PLR` loader.
 
-**Display:** normative **40×25** text — [display-console.md](display-console.md). v0.1 VM uses the host terminal; target hardware uses RP2350 HDMI.
+**Display:** normative **40×25** text — [display-console.md](../copro/display-console.md). v0.1 VM uses the host terminal; target hardware uses RP2350 HDMI.
 
 In v0.1 bring-up the shell is represented by a scripted scenario that exercises:
 
@@ -20,8 +20,11 @@ In v0.1 bring-up the shell is represented by a scripted scenario that exercises:
 ```bash
 cargo test -p plover_os
 cargo run -p plover_vm -- dos-shell
+cargo run -p plover_vm --features sdl -- dos-shell --gui
 cargo run -p plover_vm -- scenario hw/scenarios/vm/dos_boot.yaml
 ```
 
 Interactive shell: prompt `PL-DOS>`, lines truncated to 40 characters (Python parity). `plsrun`/`ccrun`/`ldrun` require Python on `PATH`.
+
+**GUI (`--gui`, SDL):** 640×480 window mirrors VDU text (kernel boot + shell output). **Click the window** and type commands there (`dir`, `help`, `exit`). Terminal echo remains for copy/paste.
 

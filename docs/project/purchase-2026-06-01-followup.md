@@ -1,6 +1,6 @@
 # 디바이스마트 보완 구매 (2026-06-01 ~ 06-02)
 
-Plover **v0.1 BOM 보완** (historical) · **normative v0.2:** [hardware-architecture-synthesis.md](hardware-architecture-synthesis.md)  
+Plover **v0.1 BOM 보완** (historical) · **normative v0.2:** [hardware-architecture-synthesis.md](../hardware/hardware-architecture-synthesis.md)  
 1차 주문: [purchase-devicesmart.md](purchase-devicesmart.md)
 
 | 항목 | 내용 |

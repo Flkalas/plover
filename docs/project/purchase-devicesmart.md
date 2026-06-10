@@ -6,7 +6,7 @@ Plover 프로젝트 **초기 부품 주문** 기록.
 | 항목 | 내용 |
 |------|------|
 | 판매처 | [디바이스마트](https://www.devicesmart.co.kr/) |
-| 대상 | v0.1 **1차** 실구매 · [BOM.md](../BOM.md) (→ **v1.0 breadboard** see [hardware-architecture-synthesis.md](hardware-architecture-synthesis.md)) |
+| 대상 | v0.1 **1차** 실구매 · [BOM.md](../BOM.md) (→ **v1.0 breadboard** see [hardware-architecture-synthesis.md](../hardware/hardware-architecture-synthesis.md)) |
 | 주문 상태 | 상품준비중 (전 품목) |
 
 ### Phase B2 delta (ALU vs 1차 주문 above)

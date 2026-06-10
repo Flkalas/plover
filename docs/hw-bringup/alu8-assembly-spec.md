@@ -13,9 +13,9 @@
 | 문서 | 용도 |
 |------|------|
 | [hw-bringup/M1-b3-procedure.md](hw-bringup/M1-b3-procedure.md) | B3a/b/c 전체 브링업 |
-| [hw-bringup-b3-opcode.md](hw-bringup-b3-opcode.md) | 12 opcode DIP/타이 값 |
-| [hw-bringup-cpld-programming.md](hw-bringup-cpld-programming.md) | CPLD 플래싱 |
-| [hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md) | GPR–ALU 연결 |
+| [hw-bringup-b3-opcode.md](hw-bringup/b3-opcode.md) | 12 opcode DIP/타이 값 |
+| [hw-bringup-cpld-programming.md](archive/bringup-legacy/hw-bringup-cpld-programming.md) | CPLD 플래싱 |
+| [hw-bringup-gpr-alu.md](archive/bringup-legacy/hw-bringup-gpr-alu.md) | GPR–ALU 연결 |
 | [hw/netlist/blocks/alu8.md](../hw/netlist/blocks/alu8.md) | IC 맵 · 제어 넷 |
 | [BOM.md](../BOM.md) | 구매 수량 |
 | [hw/pinout/](../hw/pinout/) | DIP 핀 번호 |
@@ -88,7 +88,7 @@ flowchart LR
 |------|------|------|
 | 피연산자 A | DIP 8bit → `net_a0..7` | 330 Ω~1 kΩ 직렬 권장 |
 | 피연산자 B | DIP 8bit → `net_b0..7` | INC/DEC 단계 전까지 사용 |
-| 제어 | DIP 또는 **고정 타이** | [opcode 치트시트](hw-bringup-b3-opcode.md) |
+| 제어 | DIP 또는 **고정 타이** | [opcode 치트시트](hw-bringup/b3-opcode.md) |
 | 결과 Y | LED ×8 ← `net_y0..7` | MSB=y7, LSB=y0 |
 | 캐리(선택) | LED ← `net_c_hi` | SUB/CMP 디버그용 |
 
@@ -96,7 +96,7 @@ flowchart LR
 
 타이 하지 않은 제어 입력은 **GND**. 예외는 치트시트에 **VCC** 로 적힌 핀만 5 V.
 
-**INC/DEC 주의:** `net_b0..7` 을 INC/DEC용으로 바꾸지 말 것. **`153_B` MUX:** INC=`b_const_sel=1,b_sel=0`; DEC=`b_const_sel=1,b_sel=1` ([opcode 치트시트](hw-bringup-b3-opcode.md)).
+**INC/DEC 주의:** `net_b0..7` 을 INC/DEC용으로 바꾸지 말 것. **`153_B` MUX:** INC=`b_const_sel=1,b_sel=0`; DEC=`b_const_sel=1,b_sel=1` ([opcode 치트시트](hw-bringup/b3-opcode.md)).
 
 ### 2.4 배선 습관
 
@@ -221,7 +221,7 @@ flowchart LR
 
 **검증 — 12 opcode 전체**
 
-[hw-bringup-b3-opcode.md](hw-bringup-b3-opcode.md) 표를 한 줄씩 따라감.
+[hw-bringup-b3-opcode.md](hw-bringup/b3-opcode.md) 표를 한 줄씩 따라감.
 
 **우선 스모크 3개 (반드시)**
 
@@ -255,7 +255,7 @@ python -m hwsim run hw/tests/alu_decode_full.yaml
 
 ### 단계 8 — 시스템 통합 (B3b / B3c)
 
-ALU 단독 Pass 후 [hw-bringup-b3.md](hw-bringup-b3.md) 진행:
+ALU 단독 Pass 후 [hw-bringup-b3.md](archive/bringup-legacy/hw-bringup-b3.md) 진행:
 
 | 단계 | 추가 | 목표 |
 |------|------|------|
@@ -329,7 +329,7 @@ ALU 단독 Pass 후 [hw-bringup-b3.md](hw-bringup-b3.md) 진행:
 - [ ] SUB·캐리 경로 배선 최단화 기록  
 - [ ] `alu8-schematic.html` 에서 넷별 배선 검토 완료  
 
-이후 → [hw-bringup-b3.md](hw-bringup-b3.md) **B3b** 체크리스트로 진행.
+이후 → [hw-bringup-b3.md](archive/bringup-legacy/hw-bringup-b3.md) **B3b** 체크리스트로 진행.
 
 ---
 

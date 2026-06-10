@@ -6,7 +6,7 @@
 12개 `alu_sel[3:0]` (제어 워드 `[15:12]`) 연산의 동작·제어·**조합 전파 지연**을 한 표로 정리합니다.  
 지연 값은 hwsim [`74hc.yaml`](../hw/timing/74hc.yaml) **datasheet typ/max** 합산(배선 지연 0)이며, **2.0 MHz** 시스템의 Execute 반주기 예산 **250 ns** 대비 slack을 함께 기록합니다.
 
-실기 치트시트: [`hw-bringup-b3-opcode.md`](hw-bringup-b3-opcode.md) · 마이크로코드 ISA: [`archive/verilog-sim/docs/microcode-spec.md`](../archive/verilog-sim/docs/microcode-spec.md)
+실기 치트시트: [`b3-opcode.md`](../hw-bringup/b3-opcode.md) · 마이크로코드 ISA: [`archive/verilog-sim/docs/microcode-spec.md`](../archive/verilog-sim/docs/microcode-spec.md)
 
 ---
 
@@ -29,7 +29,7 @@
 | 12–15 | — | *(예약)* | NOP 취급 | — |
 
 - **A** · **B**: `net_a0..7`, `net_b0..7` (CPU: ACC.Q → A 직결, B ← CPLD `q_b` 또는 SRAM).
-- **INC/DEC**: `net_b0..7` 구동 금지 — `153_B` MUX: INC=`b_const_sel=1,b_sel=0`; DEC=`b_const_sel=1,b_sel=1` ([bringup §INC/DEC](hw-bringup-b3-opcode.md)).
+- **INC/DEC**: `net_b0..7` 구동 금지 — `153_B` MUX: INC=`b_const_sel=1,b_sel=0`; DEC=`b_const_sel=1,b_sel=1` ([bringup §INC/DEC](../hw-bringup/b3-opcode.md)).
 
 ---
 

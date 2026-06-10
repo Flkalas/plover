@@ -14,7 +14,7 @@ Host-side microkernel model used for early bring-up on `plover_vm`.
 
 - Kernel model: `kern/kernel.py`
 - Scenario kind: `kind: kernel` in `hw/scenarios/vm/os_boot.yaml`
-- Discovery spec: `docs/device-discovery.md`
+- Discovery spec: `docs/copro/device-discovery.md`
 
 ## Gate
 
