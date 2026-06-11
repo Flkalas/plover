@@ -1,11 +1,14 @@
 use crate::apu::{
-    ApuState, CMD_APU_CH_OFF, CMD_APU_CH_SYNC, CMD_APU_CH_WRITE, CMD_APU_SET_CTRL,
+    ApuState, CMD_APU_CH_OFF, CMD_APU_CH_SYNC, CMD_APU_CH_WRITE, CMD_APU_NOTE_OFF, CMD_APU_NOTE_ON,
+    CMD_APU_SET_CTRL, CMD_APU_SYNC_ALT, CMD_APU_TRACK_CLEAR,
 };
 use crate::hid::{CMD_HID_INJECT, CMD_HID_KEY_READ, CMD_HID_MOUSE_READ, CMD_HID_POLL, HidState};
 use crate::vdu::{
-    CMD_GFX_BLIT, CMD_GFX_CLS, CMD_GFX_FILLRECT, CMD_GFX_GETPIX, CMD_GFX_HLINE, CMD_GFX_PLOT,
-    CMD_GFX_TILE8, CMD_VDU_ATTR, CMD_VDU_CLS, CMD_VDU_CURSORGET, CMD_VDU_GOTO, CMD_VDU_MODE,
-    CMD_VDU_PAL_TEXT, CMD_VDU_PRINT, CMD_VDU_PUTCH, CMD_VDU_SCROLL, CMD_VDU_VSYNC, VduState,
+    CMD_GFX_BLIT, CMD_GFX_CLS, CMD_GFX_FILLRECT, CMD_GFX_FRAME_FLUSH, CMD_GFX_GETPIX, CMD_GFX_HLINE,
+    CMD_GFX_LAYER_CFG, CMD_GFX_OAM_HIDE, CMD_GFX_OAM_WRITE, CMD_GFX_PLOT, CMD_GFX_SET_TILE_PAL,
+    CMD_GFX_SPR_KEY, CMD_GFX_TILE8, CMD_GFX_TILEMAP_SET, CMD_VDU_ATTR, CMD_VDU_CLS,
+    CMD_VDU_CURSORGET, CMD_VDU_GOTO, CMD_VDU_MODE, CMD_VDU_PAL_TEXT, CMD_VDU_PRINT, CMD_VDU_PUTCH,
+    CMD_VDU_SCROLL, CMD_VDU_VSYNC, VduState,
 };
 
 pub const MB_BASE: u16 = 0xFF00;
@@ -42,11 +45,27 @@ const VDU_CMDS: &[u8] = &[
     CMD_GFX_BLIT,
     CMD_GFX_GETPIX,
     CMD_GFX_TILE8,
+    CMD_GFX_SET_TILE_PAL,
+    CMD_GFX_LAYER_CFG,
+    CMD_GFX_TILEMAP_SET,
+    CMD_GFX_OAM_WRITE,
+    CMD_GFX_OAM_HIDE,
+    CMD_GFX_FRAME_FLUSH,
+    CMD_GFX_SPR_KEY,
     CMD_VDU_VSYNC,
     CMD_VDU_MODE,
 ];
 
-const APU_CMDS: &[u8] = &[CMD_APU_SET_CTRL, CMD_APU_CH_WRITE, CMD_APU_CH_SYNC, CMD_APU_CH_OFF];
+const APU_CMDS: &[u8] = &[
+    CMD_APU_SET_CTRL,
+    CMD_APU_CH_WRITE,
+    CMD_APU_CH_SYNC,
+    CMD_APU_CH_OFF,
+    CMD_APU_NOTE_ON,
+    CMD_APU_NOTE_OFF,
+    CMD_APU_TRACK_CLEAR,
+    CMD_APU_SYNC_ALT,
+];
 
 const HID_CMDS: &[u8] = &[CMD_HID_POLL, CMD_HID_KEY_READ, CMD_HID_MOUSE_READ, CMD_HID_INJECT];
 
@@ -58,6 +77,7 @@ pub struct Mailbox {
     aux: u8,
     buffer: [u8; 248],
     sector: [u8; 512],
+    drive_banks: Vec<Vec<u8>>,
     pub vdu: VduState,
     pub apu: ApuState,
     pub hid: HidState,
@@ -75,6 +95,7 @@ impl Default for Mailbox {
             aux: 0,
             buffer: [0; 248],
             sector: [0; 512],
+            drive_banks: Vec::new(),
             vdu: VduState::default(),
             apu: ApuState::default(),
             hid: HidState::default(),
@@ -162,6 +183,43 @@ impl Mailbox {
         self.sector[..n].copy_from_slice(&data[..n]);
     }
 
+    /// Register a drive bank for CMD_READ/WRITE (MB_AUX = drive_id).
+    pub fn register_drive_bank(&mut self, drive_id: u8, data: &[u8]) {
+        let id = drive_id as usize;
+        if id >= self.drive_banks.len() {
+            self.drive_banks.resize(id + 1, Vec::new());
+        }
+        self.drive_banks[id] = data.to_vec();
+        if drive_id == 0 && !data.is_empty() {
+            let n = data.len().min(512);
+            self.sector[..n].copy_from_slice(&data[..n]);
+        }
+    }
+
+    fn sector_view(&self, drive_id: u8, sector: usize) -> Option<&[u8]> {
+        let bank = self.drive_banks.get(drive_id as usize)?;
+        let start = sector * 512;
+        if start >= bank.len() {
+            return None;
+        }
+        let end = (start + 512).min(bank.len());
+        Some(&bank[start..end])
+    }
+
+    fn sector_view_mut(&mut self, drive_id: u8, sector: usize) -> Option<&mut [u8]> {
+        let id = drive_id as usize;
+        if id >= self.drive_banks.len() {
+            return None;
+        }
+        let start = sector * 512;
+        let bank = &mut self.drive_banks[id];
+        if start >= bank.len() {
+            return None;
+        }
+        let end = (start + 512).min(bank.len());
+        Some(&mut bank[start..end])
+    }
+
     fn handle_apu(&mut self, cmd: u8) {
         if self.vfdd_busy || (self.status & ST_BUSY) != 0 {
             return;
@@ -192,23 +250,38 @@ impl Mailbox {
             CMD_READ => {
                 self.vfdd_busy = true;
                 self.status = ST_BUSY;
+                let drive_id = self.aux;
                 let sector = self.param as usize;
-                let start = sector * 512;
-                let end = (start + 248).min(self.sector.len());
-                self.buffer[..(end - start)].copy_from_slice(&self.sector[start..end]);
-                self.vfdd_busy = false;
-                self.status = ST_READY;
+                if let Some(view) = self.sector_view(drive_id, sector) {
+                    let n = view.len().min(248);
+                    let chunk = view[..n].to_vec();
+                    self.buffer[..n].copy_from_slice(&chunk);
+                    self.vfdd_busy = false;
+                    self.status = ST_READY;
+                } else {
+                    self.vfdd_busy = false;
+                    self.status = ST_ERROR;
+                }
                 self.cmd = CMD_NOP;
             }
             CMD_WRITE => {
                 self.vfdd_busy = true;
                 self.status = ST_BUSY;
+                let drive_id = self.aux;
                 let sector = self.param as usize;
-                let start = sector * 512;
-                let n = 248.min(self.sector.len().saturating_sub(start));
-                self.sector[start..start + n].copy_from_slice(&self.buffer[..n]);
-                self.vfdd_busy = false;
-                self.status = ST_READY;
+                let chunk = {
+                    let n = 248.min(self.buffer.len());
+                    self.buffer[..n].to_vec()
+                };
+                if let Some(view) = self.sector_view_mut(drive_id, sector) {
+                    let n = view.len().min(chunk.len());
+                    view[..n].copy_from_slice(&chunk[..n]);
+                    self.vfdd_busy = false;
+                    self.status = ST_READY;
+                } else {
+                    self.vfdd_busy = false;
+                    self.status = ST_ERROR;
+                }
                 self.cmd = CMD_NOP;
             }
             c if HID_CMDS.contains(&c) => {

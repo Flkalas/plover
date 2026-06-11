@@ -6,7 +6,11 @@ from plover_vm.memory.apu import (
     CMD_APU_CH_OFF,
     CMD_APU_CH_SYNC,
     CMD_APU_CH_WRITE,
+    CMD_APU_NOTE_OFF,
+    CMD_APU_NOTE_ON,
     CMD_APU_SET_CTRL,
+    CMD_APU_SYNC_ALT,
+    CMD_APU_TRACK_CLEAR,
     ApuState,
 )
 from plover_vm.memory.hid import (
@@ -20,10 +24,17 @@ from plover_vm.memory.vdu import (
     CMD_GFX_BLIT,
     CMD_GFX_CLS,
     CMD_GFX_FILLRECT,
+    CMD_GFX_FRAME_FLUSH,
     CMD_GFX_GETPIX,
     CMD_GFX_HLINE,
+    CMD_GFX_LAYER_CFG,
+    CMD_GFX_OAM_HIDE,
+    CMD_GFX_OAM_WRITE,
     CMD_GFX_PLOT,
+    CMD_GFX_SET_TILE_PAL,
+    CMD_GFX_SPR_KEY,
     CMD_GFX_TILE8,
+    CMD_GFX_TILEMAP_SET,
     CMD_VDU_ATTR,
     CMD_VDU_CLS,
     CMD_VDU_CURSORGET,
@@ -72,6 +83,13 @@ _VDU_CMDS = frozenset(
         CMD_GFX_BLIT,
         CMD_GFX_GETPIX,
         CMD_GFX_TILE8,
+        CMD_GFX_SET_TILE_PAL,
+        CMD_GFX_LAYER_CFG,
+        CMD_GFX_TILEMAP_SET,
+        CMD_GFX_OAM_WRITE,
+        CMD_GFX_OAM_HIDE,
+        CMD_GFX_FRAME_FLUSH,
+        CMD_GFX_SPR_KEY,
         CMD_VDU_VSYNC,
         CMD_VDU_MODE,
     }
@@ -83,6 +101,10 @@ _APU_CMDS = frozenset(
         CMD_APU_CH_WRITE,
         CMD_APU_CH_SYNC,
         CMD_APU_CH_OFF,
+        CMD_APU_NOTE_ON,
+        CMD_APU_NOTE_OFF,
+        CMD_APU_TRACK_CLEAR,
+        CMD_APU_SYNC_ALT,
     }
 )
 
@@ -104,6 +126,7 @@ class Mailbox:
         self._aux = 0
         self._buffer = bytearray(248)
         self._sector = bytearray(512)
+        self._drive_banks: list[bytearray] = []
         self.vdu = VduState()
         self.apu = ApuState()
         self.hid = HidState()
@@ -165,20 +188,37 @@ class Mailbox:
         if cmd == CMD_READ:
             self._vfdd_busy = True
             self._status = ST_BUSY
+            drive_id = self._aux & 0xFF
             sector = self._param & 0xFF
-            src = self._sector[sector * 512 : (sector + 1) * 512]
-            self._buffer[:248] = src[:248]
-            self._vfdd_busy = False
-            self._status = ST_READY
+            view = self._sector_view(drive_id, sector)
+            if view is not None:
+                n = min(len(view), 248)
+                self._buffer[:n] = view[:n]
+                self._vfdd_busy = False
+                self._status = ST_READY
+            else:
+                self._vfdd_busy = False
+                self._status = ST_ERROR
             self._cmd = CMD_NOP
         elif cmd == CMD_WRITE:
             self._vfdd_busy = True
             self._status = ST_BUSY
+            drive_id = self._aux & 0xFF
             sector = self._param & 0xFF
-            off = sector * 512
-            self._sector[off : off + min(248, len(self._buffer))] = self._buffer[:248]
-            self._vfdd_busy = False
-            self._status = ST_READY
+            if drive_id < len(self._drive_banks):
+                bank = self._drive_banks[drive_id]
+                off = sector * 512
+                if off < len(bank):
+                    n = min(248, len(bank) - off)
+                    bank[off : off + n] = self._buffer[:n]
+                    self._vfdd_busy = False
+                    self._status = ST_READY
+                else:
+                    self._vfdd_busy = False
+                    self._status = ST_ERROR
+            else:
+                self._vfdd_busy = False
+                self._status = ST_ERROR
             self._cmd = CMD_NOP
         elif cmd in _HID_CMDS:
             self._handle_hid(cmd)
@@ -200,6 +240,23 @@ class Mailbox:
 
     def set_sector_stub(self, data: bytes) -> None:
         self._sector[: len(data)] = data[:512]
+
+    def register_drive_bank(self, drive_id: int, data: bytes) -> None:
+        while len(self._drive_banks) <= drive_id:
+            self._drive_banks.append(bytearray())
+        self._drive_banks[drive_id] = bytearray(data)
+        if drive_id == 0 and data:
+            self._sector[: min(len(data), 512)] = data[:512]
+
+    def _sector_view(self, drive_id: int, sector: int) -> memoryview | None:
+        if drive_id >= len(self._drive_banks):
+            return None
+        bank = self._drive_banks[drive_id]
+        start = sector * 512
+        if start >= len(bank):
+            return None
+        end = min(start + 512, len(bank))
+        return memoryview(bank)[start:end]
 
     def issue_vdu(
         self,

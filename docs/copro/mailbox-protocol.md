@@ -14,7 +14,7 @@ Polling only — **no IRQ**.
 | `$FF00` | `MB_STATUS` | R | Bit0 **DataReady** · Bit1 **Busy** · Bit2 **Error** · Bit3 **APU_READY** · Bit4 **HID_KEY_PENDING** · Bit5 **HID_MOUSE_PENDING** |
 | `$FF01` | `MB_CMD` | W | Command to RP2350 |
 | `$FF02` | `MB_PARAM` | W | Parameter (e.g. sector LSB) |
-| `$FF03` | `MB_AUX` | W | VDU/GFX sub-parameter (e.g. cursor row) |
+| `$FF03` | `MB_AUX` | W | vFDD **drive_id** on READ/WRITE; VDU/GFX sub-parameter otherwise |
 | `$FF04–$FFFB` | `MB_BUFFER` | R/W | **248-byte** payload |
 
 512-byte virtual sectors use **multi-transfer** (2×248 + 16 bytes in reserved/param extension — TBD in copro firmware).
@@ -26,8 +26,10 @@ Polling only — **no IRQ**.
 | Value | Name | Action |
 |-------|------|--------|
 | `0x00` | NOP | No operation |
-| `0x01` | READ | Read sector `MB_PARAM` → fill buffer |
-| `0x02` | WRITE | Write buffer → sector `MB_PARAM` |
+| `0x01` | READ | Read sector `MB_PARAM` from drive `MB_AUX` → fill buffer (first 248 B) |
+| `0x02` | WRITE | Write buffer (first 248 B) → sector `MB_PARAM` on drive `MB_AUX` |
+
+Invalid `drive_id` or out-of-range sector sets **Error** (`ST_ERROR`).
 
 ### 2.1 VDU / text (`0x10–0x17`)
 
