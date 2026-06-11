@@ -149,6 +149,9 @@ class Assembler:
                 pseudo = self._advance().value
                 if pseudo == "ORG":
                     val = parse_num(self._advance().value)
+                    while self.pc < val:
+                        self._emit(0)
+                        self.pc += 1
                     self.pc = val
                     self.origin = val
                 elif pseudo == "EQU":

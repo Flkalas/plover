@@ -1,4 +1,4 @@
-use crate::alu::{apply_add, apply_beq_compare, apply_cmp_flags, alu8};
+use crate::alu::{apply_add, apply_cmp_flags, alu8};
 use crate::alu16::{add16, cmp16_u};
 use crate::isa::*;
 use plover_mmu::{mmio_addr, MemoryBus};
@@ -106,9 +106,6 @@ impl MacroFastPath {
             OP_LDA => self.regs[0] = self.read_byte(imm as u16),
             OP_STA | OP_STA16 => self.bus.write_cpu(imm as u16, self.regs[0]),
             OP_BEQ => {
-                let (z, c) = apply_beq_compare(self.regs, imm as u8);
-                self.flag_z = z;
-                self.flag_c = c;
                 if self.flag_z {
                     self.pc = imm;
                 }

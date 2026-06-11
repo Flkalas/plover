@@ -101,7 +101,6 @@ class MacroFastPath:
         elif op == OP_STA16:
             self.bus.write_cpu(imm, self.regs[0])
         elif op == OP_BEQ:
-            self.flag_z, self.flag_c = apply_beq_compare(self.regs, imm)
             if self.flag_z:
                 self.pc = imm & 0xFFFF
         elif op == OP_JMP:

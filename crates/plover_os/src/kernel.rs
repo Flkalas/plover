@@ -94,7 +94,8 @@ impl Kernel {
     pub fn kprint(&mut self, s: &str) {
         self.state.output.push(s.to_string());
         self.serial.write(&(s.to_string() + "\n").into_bytes());
-        let text = s.to_string();
+        let mut text = s.to_string();
+        text.push('\n');
         let bytes = text.as_bytes();
         let len = bytes.len().min(255) as u8;
         use plover_copro::vdu::CMD_VDU_PRINT;
