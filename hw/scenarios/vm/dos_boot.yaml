@@ -8,7 +8,7 @@ expect:
   output_contains:
     - stage1_kernel_ready
     - stage2_shell_ready
-    - PL-DOS>
+    - A>
     - HELLO
     - R0_7
 

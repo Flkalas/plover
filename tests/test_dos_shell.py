@@ -24,7 +24,7 @@ def test_interactive_dos_shell_smoke():
         check=True,
     )
     out = proc.stdout
-    assert "PL-DOS>" in out
+    assert "A>" in out
     assert "HELLO" in out
     assert "R0_7" in out
     # no stale replay lines after exit
@@ -86,7 +86,7 @@ def test_monitor_ram_and_vfdd():
     )
     out = proc.stdout
     assert "RAM_USED_" in out and "RAM_FREE_" in out
-    assert "VFDD_FILES_" in out and "VFDD_USED_SECT_" in out
+    assert "DRV_A" in out and "USED_SECT_" in out
 
 
 def test_monitor_gpio_dev_serial():

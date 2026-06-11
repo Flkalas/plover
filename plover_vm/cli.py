@@ -243,16 +243,18 @@ def cmd_dos_shell(args: argparse.Namespace) -> int:
     rt = _prepare_runtime(root, img_name=args.image_name)
     for line in rt.stage1_boot():
         print(line)
+    prompt = rt.drives.prompt()
     for line in rt.stage2_shell_start():
-        if line != rt.prompt:
+        if line != prompt:
             print(line)
     while True:
         try:
-            line = input(f"{rt.prompt} ")
+            prompt = rt.drives.prompt()
+            line = input(f"{prompt} ")
         except EOFError:
             break
         for item in rt.run_command(line):
-            if item != rt.prompt:
+            if item != rt.drives.prompt():
                 print(item)
         if line.strip().lower() == "exit":
             break

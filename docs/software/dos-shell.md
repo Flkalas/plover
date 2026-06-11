@@ -8,11 +8,14 @@ In v0.1 bring-up the shell is represented by a scripted scenario that exercises:
 
 - `dir` (list directory)
 - `run <file>` (spawn `.PLR`)
+- Multi-drive: `mount` / `unmount` / `drives`, `B:` switch, `copy A:FILE B:FILE`, `dir B:`
 
 ## Gate
 
 - `hw/scenarios/vm/dos_boot.yaml`
+- `hw/scenarios/vm/dos_multidrive.yaml`
 - `tests/test_dos_shell.py`
+- `tests/test_multi_drive.py`
 - `python tools/run_dos_demo.py`
 
 ## Rust (plover_os)
@@ -24,7 +27,7 @@ cargo run -p plover_vm --features sdl -- dos-shell --gui
 cargo run -p plover_vm -- scenario hw/scenarios/vm/dos_boot.yaml
 ```
 
-Interactive shell: prompt `PL-DOS>`, lines truncated to 40 characters (Python parity). `plsrun`/`ccrun`/`ldrun` require Python on `PATH`.
+Interactive shell: prompt `A>` (current drive), lines truncated to 40 characters (Python parity). `plsrun`/`ccrun`/`ldrun` require Python on `PATH`.
 
 **GUI (`--gui`, SDL):** 640×480 window mirrors VDU text (kernel boot + shell output). **Click the window** and type commands there (`dir`, `help`, `exit`). Terminal echo remains for copy/paste.
 

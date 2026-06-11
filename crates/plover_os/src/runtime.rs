@@ -1,10 +1,9 @@
+use crate::drives::DriveMgr;
 use crate::kernel::Kernel;
-use crate::plfs::Plfs;
 use crate::plr::{pack_plr, PlrImage};
 use crate::shell::{DosRuntime, ScenarioAction};
-use crate::vfdd::VfddDriver;
 use plover_core::PloverMachine;
-use plover_copro::vfdd::{VfdConfig, VirtualFdd, SECTOR_SIZE};
+use plover_copro::vfdd::SECTOR_SIZE;
 use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
@@ -20,20 +19,21 @@ pub fn repo_root() -> PathBuf {
 
 pub fn prepare_runtime(root: &Path, img_name: &str) -> Result<DosRuntime, String> {
     let img_path = root.join("hw/fixtures/vfdd").join(img_name);
-    let dev = VirtualFdd::new(VfdConfig {
-        path: img_path,
-        sector_count: 64,
-    })
-    .map_err(|e| e.to_string())?;
-    let mut fs = Plfs::new(VfddDriver::new(dev));
-    fs.format().map_err(|e| format!("{e:?}"))?;
+    let mut drives = DriveMgr::new();
+    drives
+        .mount_formatted('A', img_path)
+        .map_err(|e| format!("{e:?}"))?;
+
+    let fs = drives.current_fs_mut().map_err(|e| format!("{e:?}"))?;
 
     let stage1 = {
         let mut s = b"PLDOS_STAGE1".to_vec();
         s.resize(SECTOR_SIZE, 0);
         s
     };
-    fs.drv.write_sector(0, &stage1).map_err(|e| format!("{e:?}"))?;
+    fs.drv
+        .write_sector(0, &stage1)
+        .map_err(|e| format!("{e:?}"))?;
 
     let hello = std::fs::read(root.join("hw/fixtures/plr/hello.plr"))
         .map_err(|e| format!("hello.plr: {e}"))?;
@@ -53,16 +53,17 @@ pub fn prepare_runtime(root: &Path, img_name: &str) -> Result<DosRuntime, String
     let machine = PloverMachine::new();
     let kernel = Kernel::new(machine.bus.clone());
 
-    Ok(DosRuntime {
-        fs,
+    let mut rt = DosRuntime {
+        drives,
         machine,
         kernel,
         root: root.to_path_buf(),
         output: Vec::new(),
-        prompt: "PL-DOS>".to_string(),
         last_link_map: std::collections::BTreeMap::new(),
         last_link_reloc_count: 0,
-    })
+    };
+    rt.sync_mailbox_drives();
+    Ok(rt)
 }
 
 pub fn run_dos_scenario_yaml(
