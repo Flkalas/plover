@@ -686,6 +686,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "19f132c84eca552bf34cab8ec81f1c1dcc229b811638f9d283dceabe58c5569e"
 
 [[package]]
+name = "plover_basic"
+version = "0.1.0"
+dependencies = [
+ "plover_copro",
+ "plover_mmu",
+ "serde_yaml",
+]
+
+[[package]]
 name = "plover_copro"
 version = "0.1.0"
 
@@ -739,6 +748,7 @@ dependencies = [
 name = "plover_scenario"
 version = "0.1.0"
 dependencies = [
+ "plover_basic",
  "plover_copro",
  "plover_core",
  "plover_forth",
@@ -754,6 +764,7 @@ name = "plover_vm"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "plover_basic",
  "plover_copro",
  "plover_core",
  "plover_mmu",

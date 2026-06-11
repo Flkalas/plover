@@ -1,0 +1,13 @@
+kind: basic
+actions:
+  - type: load_bas
+    path: hw/fixtures/basic/pong.bas
+  - type: run_steps
+    max_steps: 200
+expect:
+  text_contains:
+    - "PLOVER PONG"
+  var:
+    name: X
+    value: 50
+  frame_min: 1

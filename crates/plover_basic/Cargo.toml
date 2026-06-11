@@ -1,0 +1,10 @@
+[package]
+name = "plover_basic"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+plover_copro = { path = "../plover_copro" }
+plover_mmu = { path = "../plover_mmu" }
+serde_yaml = "0.9"

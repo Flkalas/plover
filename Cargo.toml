@@ -6,6 +6,7 @@ members = [
     "crates/plover_core",
     "crates/plover_os",
     "crates/plover_forth",
+    "crates/plover_basic",
     "crates/plover_presenter",
     "crates/plover_scenario",
     "crates/plover_vm",
