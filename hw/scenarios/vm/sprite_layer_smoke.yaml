@@ -1,0 +1,31 @@
+kind: vdu
+actions:
+  - type: set_tile_pal
+    pal: 0
+    entry: 1
+    color: 0xF800
+  - type: layer_cfg
+    layer: 0
+    enable: 1
+    scroll_x: 0
+    scroll_y: 0
+  - type: tilemap_set
+    layer: 0
+    tile_x: 2
+    tile_y: 1
+    tile_id: 1
+  - type: frame_flush
+  - type: oam_write
+    sprite_id: 0
+    x: 40
+    y: 50
+    tile: 2
+    pal: 0
+    flags: 1
+  - type: frame_flush
+expect:
+  frame_min: 2
+  pixel:
+    x: 16
+    y: 8
+    color: 0xF800

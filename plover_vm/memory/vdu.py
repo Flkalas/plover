@@ -22,6 +22,13 @@ CMD_GFX_FILLRECT = 0x23
 CMD_GFX_BLIT = 0x24
 CMD_GFX_GETPIX = 0x25
 CMD_GFX_TILE8 = 0x26
+CMD_GFX_SET_TILE_PAL = 0x27
+CMD_GFX_LAYER_CFG = 0x28
+CMD_GFX_TILEMAP_SET = 0x29
+CMD_GFX_OAM_WRITE = 0x2A
+CMD_GFX_OAM_HIDE = 0x2B
+CMD_GFX_FRAME_FLUSH = 0x2C
+CMD_GFX_SPR_KEY = 0x2D
 
 # System
 CMD_VDU_VSYNC = 0x30
@@ -31,6 +38,11 @@ VDU_COLS = 40
 VDU_ROWS = 25
 GFX_W = 320
 GFX_H = 200
+
+OAM_MAX = 32
+LAYER_TILES_W = 40
+LAYER_TILES_H = 25
+LAYER_COUNT = 2
 
 MODE_TEXT = 0
 MODE_BITMAP = 1
@@ -71,6 +83,14 @@ class VduState:
     mode: int = MODE_BOTH
     frame: int = 0
     last_error: bool = False
+    layers: list[dict] = field(default_factory=lambda: [
+        {"enabled": False, "scroll_x": 0, "scroll_y": 0, "tiles": [[0] * LAYER_TILES_W for _ in range(LAYER_TILES_H)]}
+        for _ in range(LAYER_COUNT)
+    ])
+    oam: list[dict] = field(default_factory=lambda: [
+        {"x": 0, "y": 0, "tile": 0, "pal": 0, "attr": 0, "flags": 0} for _ in range(OAM_MAX)
+    ])
+    sprite_transparent_nib: int = 0
 
     def reset_error(self) -> None:
         self.last_error = False
@@ -136,6 +156,44 @@ class VduState:
             self.chars[r] = [0x20] * VDU_COLS
             self.attrs[r] = [self.current_attr & 0xFF] * VDU_COLS
         self.cursor_row = min(self.cursor_row, VDU_ROWS - 1)
+
+    def _stamp_solid_tile(self, dst_x: int, dst_y: int, tile_id: int, pal_idx: int) -> None:
+        if tile_id == 0:
+            return
+        palette = self.tile_palettes[pal_idx & 0x0F]
+        nib = tile_id & 0x0F
+        if nib == self.sprite_transparent_nib:
+            return
+        color = palette[nib]
+        for ty in range(8):
+            for tx in range(8):
+                self._set_pixel(dst_x + tx, dst_y + ty, color)
+
+    def _draw_layer(self, layer_idx: int) -> None:
+        layer = self.layers[layer_idx]
+        if not layer["enabled"]:
+            return
+        pal = layer_idx & 0x0F
+        sx, sy = layer["scroll_x"], layer["scroll_y"]
+        for ty in range(LAYER_TILES_H):
+            for tx in range(LAYER_TILES_W):
+                tile_id = layer["tiles"][ty][tx]
+                if tile_id == 0:
+                    continue
+                px = tx * 8 - sx
+                py = ty * 8 - sy
+                if px >= GFX_W or py >= GFX_H or px <= -8 or py <= -8:
+                    continue
+                self._stamp_solid_tile(px, py, tile_id, pal)
+
+    def _frame_flush(self) -> None:
+        self.bitmap = [0x0000] * (GFX_W * GFX_H)
+        self._draw_layer(0)
+        self._draw_layer(1)
+        for entry in self.oam:
+            if entry["flags"] & 0x01 and entry["tile"] != 0:
+                self._stamp_solid_tile(entry["x"], entry["y"], entry["tile"], entry["pal"])
+        self.frame += 1
 
     def dispatch(self, cmd: int, param: int, aux: int, buffer: bytearray) -> None:
         """Execute one VDU/GFX command. Sets last_error on invalid args."""
@@ -274,8 +332,70 @@ class VduState:
                 for tx in range(8):
                     byte_idx = ty * 4 + tx // 2
                     nib = (tile[byte_idx] >> (4 if tx & 1 else 0)) & 0x0F
+                    if nib == self.sprite_transparent_nib:
+                        continue
                     color = palette[nib]
                     self._set_pixel(dst_x + tx, dst_y + ty, color)
+            return
+
+        if cmd == CMD_GFX_SET_TILE_PAL:
+            pal_idx = p & 0x0F
+            entry = a & 0x0F
+            self.tile_palettes[pal_idx][entry] = self._rgb565_from_buf(buffer, 0) & 0xFFFF
+            return
+
+        if cmd == CMD_GFX_LAYER_CFG:
+            layer = p & 0x01
+            if layer >= LAYER_COUNT:
+                self.set_error()
+                return
+            self.layers[layer]["enabled"] = a != 0
+            if len(buffer) >= 2:
+                self.layers[layer]["scroll_x"] = buffer[0]
+                self.layers[layer]["scroll_y"] = buffer[1]
+            return
+
+        if cmd == CMD_GFX_TILEMAP_SET:
+            layer = p & 0x01
+            if layer >= LAYER_COUNT or len(buffer) < 2:
+                self.set_error()
+                return
+            tx, ty, tile_id = a, buffer[0], buffer[1]
+            if tx >= LAYER_TILES_W or ty >= LAYER_TILES_H:
+                self.set_error()
+                return
+            self.layers[layer]["tiles"][ty][tx] = tile_id
+            return
+
+        if cmd == CMD_GFX_OAM_WRITE:
+            sid = p & 0x1F
+            if sid >= OAM_MAX or len(buffer) < 6:
+                self.set_error()
+                return
+            self.oam[sid] = {
+                "x": buffer[0],
+                "y": buffer[1],
+                "tile": buffer[2],
+                "pal": buffer[3],
+                "attr": buffer[4],
+                "flags": buffer[5],
+            }
+            return
+
+        if cmd == CMD_GFX_OAM_HIDE:
+            sid = p & 0x1F
+            if sid >= OAM_MAX:
+                self.set_error()
+                return
+            self.oam[sid]["flags"] &= ~0x01
+            return
+
+        if cmd == CMD_GFX_FRAME_FLUSH:
+            self._frame_flush()
+            return
+
+        if cmd == CMD_GFX_SPR_KEY:
+            self.sprite_transparent_nib = p & 0x0F
             return
 
         if cmd == CMD_VDU_VSYNC:
