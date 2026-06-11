@@ -3,7 +3,10 @@ mod generic;
 use plover_core::PloverMachine;
 use plover_copro::apu::{CMD_APU_CH_SYNC, CMD_APU_CH_WRITE, CMD_APU_SET_CTRL, WAVE_SQUARE};
 use plover_copro::hid::{CMD_HID_INJECT, CMD_HID_MOUSE_READ, INJECT_KEY, INJECT_MOUSE};
-use plover_copro::vdu::{CMD_GFX_FILLRECT, CMD_VDU_CLS, CMD_VDU_PRINT, CMD_VDU_VSYNC};
+use plover_copro::vdu::{
+    CMD_GFX_FILLRECT, CMD_GFX_FRAME_FLUSH, CMD_GFX_LAYER_CFG, CMD_GFX_OAM_WRITE,
+    CMD_GFX_SET_TILE_PAL, CMD_GFX_TILEMAP_SET, CMD_VDU_CLS, CMD_VDU_PRINT, CMD_VDU_VSYNC,
+};
 use serde::Deserialize;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -71,6 +74,7 @@ pub fn run_scenario(doc: &ScenarioDoc, root: &Path) -> ScenarioResult {
         "dos" => run_dos(doc, root),
         "kernel" => run_kernel(doc, root),
         "forth" => run_forth(doc),
+        "basic" => run_basic(doc, root),
         other => ScenarioResult {
             ok: false,
             output: vec![],
@@ -203,6 +207,51 @@ fn run_vdu(doc: &ScenarioDoc, root: &Path) -> ScenarioResult {
                 mb.issue_vdu(CMD_VDU_VSYNC, 0, 0, None);
                 Ok(())
             }
+            "set_tile_pal" => {
+                let pal = as_u64(action.get("pal").unwrap_or(&serde_yaml::Value::Number(0.into())), 0) as u8;
+                let entry = as_u64(action.get("entry").unwrap_or(&serde_yaml::Value::Number(0.into())), 0) as u8;
+                let color = as_u64(action.get("color").unwrap_or(&serde_yaml::Value::Number(0.into())), 0) as u16;
+                mb.issue_vdu(
+                    CMD_GFX_SET_TILE_PAL,
+                    pal,
+                    entry,
+                    Some(&[(color & 0xFF) as u8, (color >> 8) as u8]),
+                );
+                Ok(())
+            }
+            "layer_cfg" => {
+                let layer = as_u64(action.get("layer").unwrap_or(&serde_yaml::Value::Number(0.into())), 0) as u8;
+                let enable = as_u64(action.get("enable").unwrap_or(&serde_yaml::Value::Number(1.into())), 1) as u8;
+                let sx = as_u64(action.get("scroll_x").unwrap_or(&serde_yaml::Value::Number(0.into())), 0) as u8;
+                let sy = as_u64(action.get("scroll_y").unwrap_or(&serde_yaml::Value::Number(0.into())), 0) as u8;
+                mb.issue_vdu(CMD_GFX_LAYER_CFG, layer, enable, Some(&[sx, sy]));
+                Ok(())
+            }
+            "tilemap_set" => {
+                let layer = as_u64(action.get("layer").unwrap_or(&serde_yaml::Value::Number(0.into())), 0) as u8;
+                let tx = as_u64(action.get("tile_x").unwrap_or(&serde_yaml::Value::Number(0.into())), 0) as u8;
+                let ty = as_u64(action.get("tile_y").unwrap_or(&serde_yaml::Value::Number(0.into())), 0) as u8;
+                let tile_id = as_u64(action.get("tile_id").unwrap_or(&serde_yaml::Value::Number(0.into())), 0) as u8;
+                mb.issue_vdu(CMD_GFX_TILEMAP_SET, layer, tx, Some(&[ty, tile_id]));
+                Ok(())
+            }
+            "oam_write" => {
+                let sid = as_u64(action.get("sprite_id").unwrap_or(&serde_yaml::Value::Number(0.into())), 0) as u8;
+                let buf = [
+                    as_u64(action.get("x").unwrap_or(&serde_yaml::Value::Number(0.into())), 0) as u8,
+                    as_u64(action.get("y").unwrap_or(&serde_yaml::Value::Number(0.into())), 0) as u8,
+                    as_u64(action.get("tile").unwrap_or(&serde_yaml::Value::Number(0.into())), 0) as u8,
+                    as_u64(action.get("pal").unwrap_or(&serde_yaml::Value::Number(0.into())), 0) as u8,
+                    0u8,
+                    as_u64(action.get("flags").unwrap_or(&serde_yaml::Value::Number(1.into())), 1) as u8,
+                ];
+                mb.issue_vdu(CMD_GFX_OAM_WRITE, sid, 0, Some(&buf));
+                Ok(())
+            }
+            "frame_flush" => {
+                mb.issue_vdu(CMD_GFX_FRAME_FLUSH, 0, 0, None);
+                Ok(())
+            }
             "run_pls" => apply_run_pls(&mut m, action, root),
             _ => Err(format!("unknown vdu action: {typ}")),
         };
@@ -246,6 +295,12 @@ fn run_vdu(doc: &ScenarioDoc, root: &Path) -> ScenarioResult {
             if vdu.frame != f as u32 {
                 ok = false;
                 out.push(format!("frame {} != {f}", vdu.frame));
+            }
+        }
+        if let Some(fmin) = yaml_get(exp, "frame_min").and_then(|v| v.as_u64()) {
+            if u64::from(vdu.frame) < fmin {
+                ok = false;
+                out.push(format!("frame {} < min {fmin}", vdu.frame));
             }
         }
         if let Some(ca) = yaml_get(exp, "char_at").and_then(|v| v.as_mapping()) {
@@ -448,6 +503,15 @@ fn run_forth(doc: &ScenarioDoc) -> ScenarioResult {
     }
 }
 
+fn run_basic(doc: &ScenarioDoc, root: &Path) -> ScenarioResult {
+    let res = plover_basic::run_basic_scenario_yaml(&doc.actions, &doc.expect, root);
+    ScenarioResult {
+        ok: res.ok,
+        output: res.output,
+        error: res.error,
+    }
+}
+
 fn run_dos(doc: &ScenarioDoc, root: &Path) -> ScenarioResult {
     let res = plover_os::run_dos_scenario_yaml(&doc.actions, &doc.expect, root);
     ScenarioResult {
@@ -522,6 +586,27 @@ mod tests {
     #[test]
     fn forth_boot_yaml() {
         let res = run_yaml("forth_boot.yaml");
+        assert!(res.error.is_none(), "{:?}", res.error);
+        assert!(res.ok, "{:?}", res.output);
+    }
+
+    #[test]
+    fn basic_boot_yaml() {
+        let res = run_yaml("basic_boot.yaml");
+        assert!(res.error.is_none(), "{:?}", res.error);
+        assert!(res.ok, "{:?}", res.output);
+    }
+
+    #[test]
+    fn rt_lib_smoke_yaml() {
+        let res = run_yaml("rt_lib_smoke.yaml");
+        assert!(res.error.is_none(), "{:?}", res.error);
+        assert!(res.ok, "{:?}", res.output);
+    }
+
+    #[test]
+    fn sprite_layer_smoke_yaml() {
+        let res = run_yaml("sprite_layer_smoke.yaml");
         assert!(res.error.is_none(), "{:?}", res.error);
         assert!(res.ok, "{:?}", res.output);
     }
