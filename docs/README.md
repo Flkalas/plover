@@ -2,6 +2,16 @@
 
 Design notes and simulators for Plover — **v1.0 breadboard CPU** (CPLD GPR ~40 MC + 138×2 CE + 10b CW).
 
+### Version labels
+
+| Label | Meaning | Examples |
+|-------|---------|----------|
+| **v1.0** | Normative **breadboard hardware** — architecture, BOM, M1–M5 bring-up | [system-architecture.md](hardware/system-architecture.md), [BOM.md](../BOM.md), ALU 14 DIP |
+| **software v0.1** | **S0–S7 / copro protocol / VM** feature track — `*-v0.1.md` filenames kept | [calling-convention-v0.1.md](software/calling-convention-v0.1.md), copro specs |
+| **archive/pre-v0.1** | Historical **external 574 GPR** path — not current breadboard | [archive/pre-v0.1/](archive/pre-v0.1/README.md) |
+
+Hardware prose uses **v1.0**; software and copro API scope stays **software v0.1** unless noted.
+
 ## Quick start
 
 - Project overview: [../README.md](../README.md)
@@ -103,7 +113,7 @@ Design notes and simulators for Plover — **v1.0 breadboard CPU** (CPLD GPR ~40
 
 | Document | Description |
 |----------|-------------|
-| [project/implementation-plan-v0.1.md](project/implementation-plan-v0.1.md) | Milestones M1–M5 |
+| [project/implementation-plan-v1.0.md](project/implementation-plan-v1.0.md) | Milestones M1–M5 |
 | [project/roadmap-next.md](project/roadmap-next.md) | Roadmap |
 | [project/parts-on-hand.md](project/parts-on-hand.md) | **Purchased packages** (v1.0 breadboard) |
 | [project/bom-maintenance.md](project/bom-maintenance.md) | BOM history & checks |
