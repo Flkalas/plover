@@ -1,15 +1,15 @@
 use plover_copro::ApuState;
 use std::sync::{Arc, Mutex};
-use std::thread::JoinHandle;
 
-/// cpal output stream at device sample rate; mixes from shared `ApuState`.
+/// cpal output stream on the creating thread (required on Windows WASAPI).
 pub struct AudioBridge {
-    _thread: JoinHandle<()>,
+    _stream: cpal::Stream,
 }
 
 impl AudioBridge {
     pub fn start(apu: Arc<Mutex<ApuState>>) -> Result<Self, String> {
         use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
+        use cpal::SampleFormat;
 
         let host = cpal::default_host();
         let device = host
@@ -18,38 +18,84 @@ impl AudioBridge {
         let config = device
             .default_output_config()
             .map_err(|e| e.to_string())?;
-        if config.sample_format() != cpal::SampleFormat::U8 {
-            return Err("expected U8 output format".into());
-        }
         let sample_rate = config.sample_rate().0;
         let apu_cb = apu.clone();
-        let stream = device
-            .build_output_stream(
-                &config.into(),
-                move |data: &mut [u8], _| {
-                    if let Ok(mut a) = apu_cb.lock() {
-                        a.sample_rate = sample_rate;
-                        let mixed = a.mix_samples(data.len());
-                        data.copy_from_slice(&mixed);
-                    } else {
-                        data.fill(128);
-                    }
-                },
-                |e| eprintln!("audio stream error: {e}"),
-                None,
-            )
-            .map_err(|e| e.to_string())?;
 
-        let thread = std::thread::spawn(move || {
-            if let Err(e) = stream.play() {
-                eprintln!("audio play failed: {e}");
-                return;
+        let stream = match config.sample_format() {
+            SampleFormat::F32 => {
+                let cfg: cpal::StreamConfig = config.into();
+                device
+                    .build_output_stream(
+                        &cfg,
+                        move |data: &mut [f32], _| write_f32(&apu_cb, sample_rate, data),
+                        |e| eprintln!("audio stream error: {e}"),
+                        None,
+                    )
+                    .map_err(|e| e.to_string())?
             }
-            loop {
-                std::thread::sleep(std::time::Duration::from_secs(3600));
+            SampleFormat::I16 => {
+                let cfg: cpal::StreamConfig = config.into();
+                device
+                    .build_output_stream(
+                        &cfg,
+                        move |data: &mut [i16], _| write_i16(&apu_cb, sample_rate, data),
+                        |e| eprintln!("audio stream error: {e}"),
+                        None,
+                    )
+                    .map_err(|e| e.to_string())?
             }
-        });
+            SampleFormat::U8 => {
+                let cfg: cpal::StreamConfig = config.into();
+                device
+                    .build_output_stream(
+                        &cfg,
+                        move |data: &mut [u8], _| write_u8(&apu_cb, sample_rate, data),
+                        |e| eprintln!("audio stream error: {e}"),
+                        None,
+                    )
+                    .map_err(|e| e.to_string())?
+            }
+            other => {
+                return Err(format!("unsupported cpal sample format: {other:?}"));
+            }
+        };
 
-        Ok(Self { _thread: thread })
+        stream.play().map_err(|e| e.to_string())?;
+        Ok(Self { _stream: stream })
+    }
+}
+
+fn write_u8(apu: &Arc<Mutex<ApuState>>, sample_rate: u32, data: &mut [u8]) {
+    if let Ok(mut a) = apu.lock() {
+        a.sample_rate = sample_rate;
+        let mixed = a.mix_samples(data.len());
+        data.copy_from_slice(&mixed);
+    } else {
+        data.fill(128);
+    }
+}
+
+fn write_f32(apu: &Arc<Mutex<ApuState>>, sample_rate: u32, data: &mut [f32]) {
+    if let Ok(mut a) = apu.lock() {
+        a.sample_rate = sample_rate;
+        let mixed = a.mix_samples(data.len());
+        for (out, sample) in data.iter_mut().zip(mixed.iter()) {
+            *out = (f32::from(*sample) - 128.0) / 128.0;
+        }
+    } else {
+        data.fill(0.0);
+    }
+}
+
+fn write_i16(apu: &Arc<Mutex<ApuState>>, sample_rate: u32, data: &mut [i16]) {
+    if let Ok(mut a) = apu.lock() {
+        a.sample_rate = sample_rate;
+        let mixed = a.mix_samples(data.len());
+        for (out, sample) in data.iter_mut().zip(mixed.iter()) {
+            let norm = (f32::from(*sample) - 128.0) / 128.0;
+            *out = (norm * i16::MAX as f32) as i16;
+        }
+    } else {
+        data.fill(0);
     }
 }

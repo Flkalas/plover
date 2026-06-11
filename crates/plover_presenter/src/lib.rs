@@ -1,4 +1,5 @@
 pub mod compose;
+pub mod font8x8;
 pub mod headless;
 pub mod hid_bridge;
 

@@ -1,3 +1,4 @@
+use crate::font8x8::FONT_8X8_BASIC;
 use plover_copro::vdu::{GFX_H, GFX_W, MODE_BITMAP, MODE_BOTH, MODE_TEXT, VDU_COLS, VDU_ROWS, VduState};
 
 pub const LOGICAL_W: usize = 320;
@@ -41,6 +42,10 @@ pub fn compose_rgb(vdu: &VduState) -> Vec<u8> {
                         let x = col * 8 + px;
                         let y = row * 8 + py;
                         if x >= LOGICAL_W || y >= GFX_H {
+                            continue;
+                        }
+                        // Empty text cells leave the bitmap visible in MODE_BOTH.
+                        if show_bitmap && vdu.mode == MODE_BOTH && ch == b' ' {
                             continue;
                         }
                         let glyph_on = simple_glyph_pixel(ch, px, py);
@@ -106,9 +111,72 @@ fn rgb565_to_rgb(c: u16) -> (u8, u8, u8) {
 }
 
 fn simple_glyph_pixel(ch: u8, px: usize, py: usize) -> bool {
-    if ch == b' ' {
+    let idx = ch as usize;
+    if idx >= FONT_8X8_BASIC.len() {
         return false;
     }
-    // 8x8 block font stub: hash pattern for visibility
-    ((ch as usize).wrapping_add(px).wrapping_mul(7).wrapping_add(py)) & 3 == 0
+    (FONT_8X8_BASIC[idx][py] >> px) & 1 != 0
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use plover_copro::mailbox::Mailbox;
+    use plover_copro::vdu::{CMD_VDU_MODE, CMD_VDU_PUTCH, MODE_BOTH};
+
+    #[test]
+    fn glyph_f_bar_on_left() {
+        let mut mb = Mailbox::default();
+        mb.issue_vdu(CMD_VDU_MODE, MODE_BOTH, 0, None);
+        mb.issue_vdu(CMD_VDU_PUTCH, b'F', 0, None);
+        let logical = compose_rgb(&mb.vdu);
+        let left = fg_x_at(&logical, 0, 0);
+        let right = fg_x_at(&logical, 0, 7);
+        assert!(left < right, "F should not be mirrored (left={left} right={right})");
+    }
+
+    #[test]
+    fn glyph_l_stem_on_left() {
+        let mut mb = Mailbox::default();
+        mb.issue_vdu(CMD_VDU_MODE, MODE_BOTH, 0, None);
+        mb.issue_vdu(CMD_VDU_PUTCH, b'L', 0, None);
+        let logical = compose_rgb(&mb.vdu);
+        let left = fg_x_at(&logical, 0, 0);
+        assert!(left <= 2, "L stem should be on the left (left={left})");
+    }
+
+    fn fg_x_at(logical: &[u8], col: usize, row: usize) -> usize {
+        for px in 0..8 {
+            let x = col * 8 + px;
+            let y = row * 8;
+            let idx = (y * LOGICAL_W + x) * 3;
+            if logical[idx] > 200 {
+                return px;
+            }
+        }
+        8
+    }
+
+    #[test]
+    fn mode_both_shows_bitmap_through_spaces() {
+        use plover_copro::vdu::{CMD_GFX_FILLRECT, CMD_VDU_CLS, CMD_VDU_VSYNC, MODE_BOTH};
+
+        let mut mb = Mailbox::default();
+        mb.issue_vdu(CMD_VDU_MODE, MODE_BOTH, 0, None);
+        mb.issue_vdu(CMD_VDU_CLS, 0x07, 0, None);
+        mb.issue_vdu(
+            CMD_GFX_FILLRECT,
+            0,
+            0,
+            Some(&[10, 10, 8, 8, 0x00, 0xF8]),
+        );
+        mb.issue_vdu(CMD_VDU_VSYNC, 0, 0, None);
+
+        let logical = compose_rgb(&mb.vdu);
+        let idx = (10 * LOGICAL_W + 10) * 3;
+        assert!(
+            logical[idx] > 200 && logical[idx + 1] < 20 && logical[idx + 2] < 20,
+            "red fillrect should show through empty text cells"
+        );
+    }
 }
