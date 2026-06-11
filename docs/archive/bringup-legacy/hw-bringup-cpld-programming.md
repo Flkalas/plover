@@ -1,6 +1,6 @@
 # CPLD 프로그래밍 시방서 (ATF1504AS)
 
-> **Canonical:** [hw-bringup/M2a-cpld-decode.md](hw-bringup/M2a-cpld-decode.md) (상세) · Boot G1–G5 → [M4b-boot-hardware.md](hw-bringup/M4b-boot-hardware.md).
+> **Canonical:** [M2a-cpld-decode.md](../../hw-bringup/M2a-cpld-decode.md) (상세) · Boot G1–G5 → [M4b-boot-hardware.md](../../hw-bringup/M4b-boot-hardware.md).
 
 | 항목 | 내용 |
 |------|------|
@@ -22,7 +22,7 @@
 | **574 GPR 이전** | `LOAD_R0..3` 없으면 레지스터에 쓸 수 없음 |
 | **SRAM/ROM 이전** | `RAM1_CS_N`, `ROM_CS_N`, `MAILBOX_EN` 으로 잘못된 CS 방지 |
 
-권장: **[ALU8 조립 완료](hw-bringup/alu8-assembly-spec.md) (B3a)** → **CPLD 소각·벤치 검증** → **[GPR–ALU 배선](archive/bringup-legacy/hw-bringup-gpr-alu.md)** → SRAM/ROM/클록.
+권장: **[ALU8 조립 완료](../../hw-bringup/alu8-assembly-spec.md) (B3a)** → **CPLD 소각·벤치 검증** → **[GPR datapath (v1.0)](../../hw-bringup/M2b-gpr-datapath.md)** (legacy 574×4: [hw-bringup-gpr-alu.md](hw-bringup-gpr-alu.md)) → SRAM/ROM/클록.
 
 ---
 

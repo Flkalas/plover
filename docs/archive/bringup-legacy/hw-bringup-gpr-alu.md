@@ -1,16 +1,16 @@
 # GPR ↔ ALU 연결 시방서 (archived — external 574×4)
 
-> **v1.0 normative:** CPLD GPR — [M2b-gpr-datapath.md](hw-bringup/M2b-gpr-datapath.md) · [breadboard-wiring.md](hw-bringup/breadboard-wiring.md).  
-> Below documents **legacy external GPR** ([archive/pre-v0.1/](archive/pre-v0.1/README.md)).
+> **v1.0 normative:** CPLD GPR — [M2b-gpr-datapath.md](../../hw-bringup/M2b-gpr-datapath.md) · [breadboard-wiring.md](../../hw-bringup/breadboard-wiring.md).  
+> Below documents **legacy external GPR** ([archive/pre-v0.1/](../pre-v0.1/README.md)).
 
 # GPR(574×4) ↔ ALU 연결 시방서 (legacy)
 
-> **Canonical:** [hw-bringup/M2b-gpr-datapath.md](hw-bringup/M2b-gpr-datapath.md) (G0–G6) · [M2b-memory.md](hw-bringup/M2b-memory.md) · fetch → [M3b-fetch-execute.md](hw-bringup/M3b-fetch-execute.md).
+> **Canonical:** [M2b-gpr-datapath.md](../../hw-bringup/M2b-gpr-datapath.md) (G0–G6) · [M2b-memory.md](../../hw-bringup/M2b-memory.md) · fetch → [M3b-fetch-execute.md](../../hw-bringup/M3b-fetch-execute.md).
 
 | 항목 | 내용 |
 |------|------|
-| **범위** | v0.1 CPU 데이터패스 — **R0–R3 (74HC574×4)** 와 **alu8 (74HC×16, Phase B2)** 연결 |
-| **전제** | ALU 단독 검증 완료 ([hw-bringup-alu8-assembly-spec.md](hw-bringup/alu8-assembly-spec.md) B3a) |
+| **범위** | legacy CPU 데이터패스 — **R0–R3 (74HC574×4)** 와 **alu8 (14 DIP, Phase B2)** 연결 |
+| **전제** | ALU 단독 검증 완료 ([alu8-assembly-spec.md](../../hw-bringup/alu8-assembly-spec.md) B3a) |
 | **CPLD** | `LOAD_R0..3`, `REG_SEL`, `REG_WE` ([hw-bringup-cpld-programming.md](archive/bringup-legacy/hw-bringup-cpld-programming.md)) |
 | **hwsim** | `regfile_574` · `alu8` · (통합 시) `cpld_gpr_decode` |
 
@@ -255,7 +255,7 @@ python -m hwsim run hw/tests/cpld_gpr_decode.yaml
 | A/B 항상 0 | MUX S선, 574 OE, RA/RB DIP |
 | Y는 맞는데 R2 안 바뀜 | `LOAD_R2`, `REG_WE`, CP 게이트, D↔Y 배선 |
 | INC/DEC 이상 | `b_const_sel`, **B DIP 직접 구동 금지** |
-| ADD만 틀림 | ALU 제어 vs GPR — [hw-bringup-alu8-assembly-spec.md](hw-bringup/alu8-assembly-spec.md) |
+| ADD만 틀림 | ALU 제어 vs GPR — [alu8-assembly-spec.md](../../hw-bringup/alu8-assembly-spec.md) |
 | hwsim OK, 실기 NG | `Y_OE`/`MEM_RD` 버스 충돌, setup (CP 전 Y 안정) |
 
 ---
@@ -264,7 +264,7 @@ python -m hwsim run hw/tests/cpld_gpr_decode.yaml
 
 | 문서 | 내용 |
 |------|------|
-| [hw-bringup-alu8-assembly-spec.md](hw-bringup/alu8-assembly-spec.md) | ALU 14 IC 조립 순서 (Phase B2) |
+| [alu8-assembly-spec.md](../../hw-bringup/alu8-assembly-spec.md) | ALU 14 IC 조립 순서 (Phase B2) |
 | [hw-bringup-b3.md](archive/bringup-legacy/hw-bringup-b3.md) | 574 ACC · 2 MHz |
 | [hw-bringup-b3-opcode.md](hw-bringup/b3-opcode.md) | ALU opcode DIP |
 | [cpld-system-controller.md](../../hardware/cpld-system-controller.md) | CPLD 포트 |

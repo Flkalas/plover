@@ -1,14 +1,14 @@
 # B3 — ALU + 574 accumulator bring-up (phased)
 
-> **Canonical:** [hw-bringup/M1-b3-procedure.md](hw-bringup/M1-b3-procedure.md) (상세 절차) · [hw-bringup/M1-alu.md](hw-bringup/M1-alu.md) (sign-off).  
-> 이 파일은 레거시 복사본 — 신규 편집은 `hw-bringup/` 쪽을 우선합니다.
+> **Canonical (v1.0):** [M1-b3-procedure.md](../../hw-bringup/M1-b3-procedure.md) · [M1-alu.md](../../hw-bringup/M1-alu.md) · [alu8-assembly-spec.md](../../hw-bringup/alu8-assembly-spec.md).  
+> 이 파일은 레거시 복사본 — 신규 편집은 `docs/hw-bringup/` 쪽을 우선합니다.
 
 Breadboard procedure in three steps: **B3a** (comb Y) → **B3b** (manual latch) → **B3c** (2 MHz clock).  
 Electrical behavior is validated in hwsim before wiring.
 
-**Opcode cheat sheet:** [hw-bringup-b3-opcode.md](hw-bringup/b3-opcode.md) — DIP settings for all 12 opcodes.
+**Opcode cheat sheet:** [b3-opcode.md](../../hw-bringup/b3-opcode.md) — DIP settings for all 12 opcodes.
 
-**ALU only — step-by-step assembly (14 IC, Phase B2):** [hw-bringup-alu8-assembly-spec.md](hw-bringup/alu8-assembly-spec.md) (Korean build spec).
+**ALU only — step-by-step assembly (14 IC, Phase B2):** [alu8-assembly-spec.md](../../hw-bringup/alu8-assembly-spec.md) (Korean build spec).
 
 | Phase | Netlist | hwsim |
 |-------|---------|-------|
