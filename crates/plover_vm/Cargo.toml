@@ -19,5 +19,10 @@ plover_copro = { path = "../plover_copro" }
 plover_presenter = { path = "../plover_presenter" }
 plover_scenario = { path = "../plover_scenario" }
 plover_os = { path = "../plover_os" }
+plover_basic = { path = "../plover_basic" }
 clap = { version = "4", features = ["derive"] }
 serde_json = "1"
+
+[dev-dependencies]
+plover_core = { path = "../plover_core" }
+plover_scenario = { path = "../plover_scenario" }

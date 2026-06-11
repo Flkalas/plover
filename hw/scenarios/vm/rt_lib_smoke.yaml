@@ -1,0 +1,8 @@
+kind: vdu
+actions:
+  - type: run_pls
+    path: hw/fixtures/sw/rt_smoke.pls
+    origin: 0x00E0
+    max_steps: 100
+expect:
+  frame_min: 1
