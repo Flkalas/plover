@@ -33,7 +33,7 @@ CW_H (REG_SEL) ──► CPLD GPR ──► q_a / q_b ──► ALU A/B
 |-----|------|------|
 | `U_GPR_R0`…`R3` | 74HC574 | 4 |
 | `U_GPR_MUX_A/B` | 74HC157 | 4~8 (포트당 157×2) |
-| `U_ALU_*` | alu8 | [M1 조립](../hw-bringup/alu8-assembly-spec.md) |
+| `U_ALU_*` | alu8 | [M1 조립](alu8-assembly-spec.md) |
 | `U_CPLD` | ATF1504AS | 1 |
 
 핀 번호: `python -m hwsim pinout 74HC574`
@@ -129,7 +129,7 @@ CP_Rn = net_clk2 AND net_reg_we AND net_load_rn
 
 1. MUX A→`net_a*`, MUX B→`net_b*` (또는 B는 DIP).
 2. R0=`0x12`, R1=`0x34` 래치.
-3. ALU 제어는 **DIP/치트시트** ([opcode](../hw-bringup/b3-opcode.md)).
+3. ALU 제어는 **DIP/치트시트** ([opcode](b3-opcode.md)).
 
 **Pass:** SUB smoke — Y LED = `0xDE`.
 

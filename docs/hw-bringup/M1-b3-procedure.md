@@ -5,8 +5,8 @@
 | **마일스톤** | M1 |
 | **선행** | 없음 (첫 하드웨어 단계) |
 | **완료 체크** | [M1-alu.md](M1-alu.md) § sign-off |
-| **조립 상세** | [ALU8 단계별 조립](../hw-bringup/alu8-assembly-spec.md) (14 IC, 한국어) |
-| **Opcode DIP** | [hw-bringup-b3-opcode.md](../hw-bringup/b3-opcode.md) |
+| **조립 상세** | [ALU8 단계별 조립](alu8-assembly-spec.md) (14 IC, 한국어) |
+| **Opcode DIP** | [b3-opcode.md](b3-opcode.md) |
 
 빵판 절차 3단계: **B3a** (조합 Y) → **B3b** (수동 래치) → **B3c** (2 MHz 클록).  
 배선 전 **hwsim**으로 동작을 확인합니다.
@@ -33,8 +33,8 @@ python -m hwsim export-schematic hw/netlist/blocks/alu8.yaml -o build/alu8-schem
 ## 공통 — 전원·디커플링
 
 - **0.1 µF / IC 1개**, 5 V 레일에 **10 µF** 벌크.
-- 제어 입력: [opcode 치트시트](../hw-bringup/b3-opcode.md). 시트에 없는 제어 넷은 **GND** (VCC 예외만 시트 참조).
-- **INC/DEC:** `net_b0..7` 을 피연산자로 쓰지 말 것. `net_b_const_sel` + `net_b_const_bit1..7` 만 사용 (bit0 상수는 netlist에서 VCC).
+- 제어 입력: [opcode 치트시트](b3-opcode.md). 시트에 없는 제어 넷은 **GND** (VCC 예외만 시트 참조).
+- **INC/DEC (B3a):** `net_b0..7` 을 피연산자로 쓰지 말 것. `153_B` INC/DEC 상수는 **하드와이어** — **`b_const_sel` + `b_sel`만** 설정. 치트시트 `b_const_bit1..7` 열은 hwsim parity (선택 `alu_decode` 단계에서만 물리 DIP).
 
 ---
 
@@ -44,11 +44,15 @@ python -m hwsim export-schematic hw/netlist/blocks/alu8.yaml -o build/alu8-schem
 
 ### 부품
 
-| 블록 | IC 수 |
-|------|-------|
-| ALU 코어 | **14~24** — [alu8.md](../../hw/netlist/blocks/alu8.md) · [조립 시방](../hw-bringup/alu8-assembly-spec.md) |
+| Phase | 추가 IC | 누적 (ALU+ACC+clk) |
+|-------|---------|---------------------|
+| **B3a** | ALU 코어 **14** | 14 |
+| **B3b** | +574×1 | 15 |
+| **B3c** | +4 MHz OSC, +74HC74 (÷2) | 17+ |
 
-574, OSC, 74HC74 **없음**.
+참조: [alu8.md](../../hw/netlist/blocks/alu8.md) · [조립 시방](alu8-assembly-spec.md)
+
+B3a: 574, OSC, 74HC74 **없음**.
 
 ### 배선 (순서대로)
 
@@ -57,13 +61,13 @@ python -m hwsim export-schematic hw/netlist/blocks/alu8.yaml -o build/alu8-schem
    283 → 04 BINV → **153_B** → 283 → **153_L** → **157_YBP** (sum vs logic → Y).  
    CMP 플래그는 SUB 경로 (`net_y`, `net_c_hi`).
 3. **피연산자** — DIP ×16: `net_a0..7`, `net_b0..7` (INC/DEC 시 B 무시).
-4. **제어** — 치트시트대로 DIP/타이: `cin`, `153_s0/s1`, `b_sel`, `b_const_sel`, `b_const_bit1..7`, `net_lgc0..3`.  
-   SUB/CMP: `b_sel=1`, `cin=1`.
+4. **제어** — 치트시트대로 DIP/타이: `cin`, `153_s0/s1`, `b_sel`, `b_const_sel`, `net_lgc0..3`.  
+   SUB/CMP: `b_sel=1`, `cin=1`. (B3a: `b_const_bit*` 넷 없음 — INC/DEC는 `b_const_sel`+`b_sel`만)
 5. **출력** — `net_y0..7` → LED ×8 (330 Ω~1 kΩ). 선택: `net_c_hi` LED.
 
 ### 작업 절차
 
-1. [치트시트](../hw-bringup/b3-opcode.md)에서 opcode 행을 찾는다.
+1. [치트시트](b3-opcode.md)에서 opcode 행을 찾는다.
 2. A, B, 제어 DIP/타이를 설정한다.
 3. **Y LED**를 읽는다 — 클록 없음, 조합 안정 후 ~µs 이내.
 

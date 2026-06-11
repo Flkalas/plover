@@ -3,7 +3,7 @@
 > **Normative v1.0:** CPLD GPR + 138×2 + 10b CW — [system-architecture.md](../hardware/system-architecture.md).  
 > **실구매 패키지:** [parts-on-hand.md](../project/parts-on-hand.md) · Wiring: [breadboard-wiring.md](breadboard-wiring.md).
 
-**마일스톤 계획:** [implementation-plan-v0.1.md](../project/implementation-plan-v0.1.md)  
+**마일스톤 계획:** [implementation-plan-v1.0.md](../project/implementation-plan-v1.0.md)  
 **아키텍처:** [system-architecture.md](../hardware/system-architecture.md) v1.0
 
 초보 작업자도 **문서만 따라** 빵판 CPU를 올릴 수 있도록 단계별 시방서입니다.
@@ -42,7 +42,9 @@ flowchart LR
 | 문서 | 내용 |
 |------|------|
 | [M1-alu.md](M1-alu.md) | 마일스톤 개요 |
+| [alu8-assembly-spec.md](alu8-assembly-spec.md) | ALU 14 IC 단계별 조립 (한국어) |
 | [M1-b3-procedure.md](M1-b3-procedure.md) | B3a/b/c 상세 |
+| [b3-opcode.md](b3-opcode.md) | 12 opcode DIP 치트시트 |
 
 ### M2 — CPU gate
 
