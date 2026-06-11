@@ -2,6 +2,10 @@ pub const CMD_APU_SET_CTRL: u8 = 0x50;
 pub const CMD_APU_CH_WRITE: u8 = 0x51;
 pub const CMD_APU_CH_SYNC: u8 = 0x52;
 pub const CMD_APU_CH_OFF: u8 = 0x53;
+pub const CMD_APU_NOTE_ON: u8 = 0x54;
+pub const CMD_APU_NOTE_OFF: u8 = 0x55;
+pub const CMD_APU_TRACK_CLEAR: u8 = 0x56;
+pub const CMD_APU_SYNC_ALT: u8 = 0x57;
 
 pub const APU_CHANNELS: usize = 4;
 pub const NOISE_CHANNEL: usize = 3;
@@ -27,6 +31,7 @@ pub struct ApuState {
     pub master_vol: u8,
     pub mute: bool,
     pub beep_ticks: u16,
+    pub note_frames: [u16; APU_CHANNELS],
     pub clk_hz: u32,
     pub sample_rate: u32,
     phase: [u32; APU_CHANNELS],
@@ -41,6 +46,7 @@ impl Default for ApuState {
             master_vol: 15,
             mute: false,
             beep_ticks: 0,
+            note_frames: [0; APU_CHANNELS],
             clk_hz: CLK_HZ,
             sample_rate: SAMPLE_RATE,
             phase: [0; APU_CHANNELS],
@@ -98,20 +104,64 @@ impl ApuState {
         self.channels[ch] = off;
         self.pending[ch] = off;
         self.phase[ch] = 0;
+        self.note_frames[ch] = 0;
         true
+    }
+
+    pub fn note_on(&mut self, buffer: &[u8]) -> bool {
+        if buffer.len() < 6 {
+            return false;
+        }
+        let ch = (buffer[0] & 0x03) as usize;
+        let period = u16::from(buffer[1]) | (u16::from(buffer[2]) << 8);
+        let vol = buffer[3] & 0x0F;
+        let dur = u16::from(buffer[4]) | (u16::from(buffer[5]) << 8);
+        self.pending[ch] = Channel {
+            period,
+            volume: vol,
+            wave: WAVE_SQUARE,
+        };
+        self.note_frames[ch] = dur;
+        true
+    }
+
+    pub fn tick_notes(&mut self, frames: u16) {
+        for ch in 0..APU_CHANNELS {
+            if self.note_frames[ch] == 0 {
+                continue;
+            }
+            if self.note_frames[ch] <= frames {
+                self.note_frames[ch] = 0;
+                let off = Channel::default();
+                self.channels[ch] = off;
+                self.pending[ch] = off;
+            } else {
+                self.note_frames[ch] -= frames;
+            }
+        }
     }
 
     pub fn dispatch(&mut self, cmd: u8, param: u8, buffer: &mut [u8; 248]) -> bool {
         match cmd {
             CMD_APU_SET_CTRL => self.set_ctrl(buffer),
             CMD_APU_CH_WRITE => self.stage_ch_write(buffer),
-            CMD_APU_CH_SYNC => self.sync(),
-            CMD_APU_CH_OFF => self.ch_off((param & 0x03) as usize),
+            CMD_APU_CH_SYNC | CMD_APU_SYNC_ALT => self.sync(),
+            CMD_APU_CH_OFF | CMD_APU_NOTE_OFF => self.ch_off((param & 0x03) as usize),
+            CMD_APU_NOTE_ON => self.note_on(buffer),
+            CMD_APU_TRACK_CLEAR => {
+                let ch = (param & 0x03) as usize;
+                if ch >= APU_CHANNELS {
+                    return false;
+                }
+                self.note_frames[ch] = 0;
+                self.ch_off(ch)
+            }
             _ => false,
         }
     }
 
     pub fn mix_samples(&mut self, n: usize) -> Vec<u8> {
+        self.tick_notes(1);
         let mut out = vec![128u8; n];
         if self.mute {
             return out;

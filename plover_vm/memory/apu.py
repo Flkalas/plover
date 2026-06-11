@@ -8,6 +8,10 @@ CMD_APU_SET_CTRL = 0x50
 CMD_APU_CH_WRITE = 0x51
 CMD_APU_CH_SYNC = 0x52
 CMD_APU_CH_OFF = 0x53
+CMD_APU_NOTE_ON = 0x54
+CMD_APU_NOTE_OFF = 0x55
+CMD_APU_TRACK_CLEAR = 0x56
+CMD_APU_SYNC_ALT = 0x57
 
 APU_CHANNELS = 4
 NOISE_CHANNEL = 3
@@ -39,6 +43,7 @@ class ApuState:
     master_vol: int = 15
     mute: bool = False
     beep_ticks: int = 0
+    note_frames: list[int] = field(default_factory=lambda: [0] * APU_CHANNELS)
     clk_hz: int = CLK_HZ
     sample_rate: int = SAMPLE_RATE
     _phase: list[int] = field(default_factory=lambda: [0] * APU_CHANNELS)
@@ -79,7 +84,31 @@ class ApuState:
         self.channels[ch] = off.copy()
         self.pending[ch] = off.copy()
         self._phase[ch] = 0
+        self.note_frames[ch] = 0
         return True
+
+    def note_on(self, buffer: bytearray | bytes) -> bool:
+        if len(buffer) < 6:
+            return False
+        ch = buffer[0] & 0x03
+        period = buffer[1] | (buffer[2] << 8)
+        vol = buffer[3] & 0x0F
+        dur = buffer[4] | (buffer[5] << 8)
+        self.pending[ch] = Channel(period=period & 0xFFFF, volume=vol, wave=WAVE_SQUARE)
+        self.note_frames[ch] = dur
+        return True
+
+    def tick_notes(self, frames: int = 1) -> None:
+        for ch in range(APU_CHANNELS):
+            if self.note_frames[ch] == 0:
+                continue
+            if self.note_frames[ch] <= frames:
+                self.note_frames[ch] = 0
+                off = Channel()
+                self.channels[ch] = off.copy()
+                self.pending[ch] = off.copy()
+            else:
+                self.note_frames[ch] -= frames
 
     def dispatch(self, cmd: int, param: int, buffer: bytearray) -> bool:
         """Return True if command accepted, False if silent drop."""
@@ -87,10 +116,16 @@ class ApuState:
             return self.set_ctrl(buffer)
         if cmd == CMD_APU_CH_WRITE:
             return self.stage_ch_write(buffer)
-        if cmd == CMD_APU_CH_SYNC:
+        if cmd in (CMD_APU_CH_SYNC, CMD_APU_SYNC_ALT):
             return self.sync()
-        if cmd == CMD_APU_CH_OFF:
+        if cmd in (CMD_APU_CH_OFF, CMD_APU_NOTE_OFF):
             return self.ch_off(param & 0x03)
+        if cmd == CMD_APU_NOTE_ON:
+            return self.note_on(buffer)
+        if cmd == CMD_APU_TRACK_CLEAR:
+            ch = param & 0x03
+            self.note_frames[ch] = 0
+            return self.ch_off(ch)
         return False
 
     def freq_hz(self, ch: int) -> float:
@@ -101,6 +136,7 @@ class ApuState:
 
     def mix_samples(self, n: int) -> bytes:
         """Generate n mono 8-bit samples (center 128) for VM tests."""
+        self.tick_notes(1)
         out = bytearray(n)
         if self.mute:
             return bytes([128] * n)
