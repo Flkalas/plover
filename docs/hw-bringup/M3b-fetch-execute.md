@@ -18,7 +18,7 @@
 | **CW addr mux** | 157/153 | Flash A0..5 | `{opcode,phase}` |
 | **PC+1** | 283 (low) | — | sequential fetch |
 
-> v0.1 breadboard: PC high byte는 DIP 프리셋 또는 2번째 574로 단순화 가능. **F0–F2는 low-page `$00xx` 만** 사용.
+> v1.0 breadboard: PC high byte는 DIP 프리셋 또는 2번째 574로 단순화 가능. **F0–F2는 low-page `$00xx` 만** 사용.
 
 ---
 

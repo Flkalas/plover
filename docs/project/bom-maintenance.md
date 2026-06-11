@@ -79,7 +79,7 @@ Netlist · 타이밍: [alu8.md](../hw/netlist/blocks/alu8.md) · [alu-opcodes-ti
 
 ## 수량 검산 (74HC · 디커플링)
 
-v0.1 [system-architecture.md](../hardware/system-architecture.md) · [alu8.md](../hw/netlist/blocks/alu8.md) 기준.
+v1.0 [system-architecture.md](../hardware/system-architecture.md) · [alu8.md](../hw/netlist/blocks/alu8.md) 기준.
 
 ### 74HC — [BOM.md](../BOM.md) 표와 일치 ✓
 
@@ -116,7 +116,7 @@ v0.1 [system-architecture.md](../hardware/system-architecture.md) · [alu8.md](.
 
 | 항목 | 비고 |
 |------|------|
-| **74HC7485 / 74HC85** | v0.1 ALU 미포함 |
+| **74HC7485 / 74HC85** | v1.0 ALU 미포함 |
 | **RP2350B** | [BOM-3v3.md](../BOM-3v3.md) 또는 부록 |
 | **alu8_decode PLA** | 시뮬 전용 |
 

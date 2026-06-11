@@ -155,7 +155,7 @@ python -m pytest tests/ -q
 
 ## 6. ISA · macroasm · CW
 
-### 6.1 v0.1 normative ISA ([microcode-spec.md](../hardware/microcode-spec.md))
+### 6.1 v1.0 hardware / ISA ([microcode-spec.md](../hardware/microcode-spec.md))
 
 | Op | Mnemonic | 비고 |
 |----|----------|------|
@@ -265,7 +265,7 @@ firmware/rp2350/mailbox_stub/main.c   RP2350 stub (normative doc 참조)
 
 ### 9.1 완료 (검토 가능)
 
-- [x] v0.1 normative 문서 8종 + BOM/README 갱신  
+- [x] v1.0 normative 문서 + BOM/README 갱신  
 - [x] hwsim: system CPLD decode, 574 GPR, mem decode, mailbox, boot handoff  
 - [x] plover_vm: NOR/RAM/Mailbox, micro/macro/fast, CLI, pytest  
 - [x] `pack_control_store.py`, boot fixtures, RP2350 mailbox stub  

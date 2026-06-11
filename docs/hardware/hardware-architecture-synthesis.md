@@ -45,7 +45,7 @@ Source: [archive/gemini/TTL로-가장-빠르게-SUB를-구현하는-방법…](.
 |-------------------|---------------|
 | 74**LVC**, ~30 ns total delay | **74HC** @ 5 V, hwsim **151 ns** SUB max |
 | HCT ~111 ns (153-only ~B path) | **151 ns** — extra **04_BINV** hop + **157_YBP** + HC datasheet max |
-| GPR in CPLD (late conversation) | v0.1 normative: **574×4 external**; v1.3 CPLD GPR **superseded** then archived |
+| GPR in CPLD (late conversation) | **v1.0 normative:** ATF1504 GPR; **archive/pre-v0.1:** 574×4 external |
 | Flash ×2, 16-bit control bus | **1× SST39**, **10-bit CW** (2 B/slot) @ `$4000` |
 | Programmable CE glue | **74HC138×2** + **08/32/04** discrete gates |
 
@@ -78,7 +78,7 @@ Detailed receipts: [purchase-devicesmart.md](../project/purchase-devicesmart.md)
 
 - **74HC DIP** ALU/CPU/clocks — **not 74LVC** datapath.
 - **Phase B2 ALU:** 283×2, **153×8** (1차 4 + 주문 C 4), 157×8 total, 04×3, etc.
-- **574×7**, **161×4**, **SST39×2**, **IS62×2**, **ATF1504×1**, **LVC245×3** (level shift only).
+- **574×5**, **161×3**, **SST39×1**, **IS62×2**, **ATF1504×1**, **LVC245×3** (level shift only).
 - **74HC138×1** (on hand) — **order +1** for v1.0 **×2** split; **74HC86/08/32×2** each — **08/32** used for CE/map glue and BEQ; **86 not used in B2 ALU**.
 - **Flash** `SST39SF010A-70-4C-PHE` **PDIP-32** — 빵판 직결 ([parts-on-hand.md](../project/parts-on-hand.md)).
 
@@ -87,7 +87,7 @@ Detailed receipts: [purchase-devicesmart.md](../project/purchase-devicesmart.md)
 | Part | 1st order | Current BOM | Notes |
 |------|-----------|-------------|-------|
 | 74HC153 | 4 | **8** | +4 in order C |
-| 74HC574 | 7 | 7 | v0.1 GPR + sequencer headroom |
+| 74HC574 | 5 | 5 | v1.0 PC/MBR/CW_L/CW_H/FLG |
 | ATF1504 | 0 → +1 | 1 | 2nd/3rd order |
 | 7485 | — | **0** | CMP from SUB — not in ALU BOM |
 

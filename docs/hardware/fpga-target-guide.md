@@ -1,4 +1,4 @@
-# Plover v0.1 — FPGA 타깃 가이드 (기준 문서)
+# Plover v1.0 — FPGA 타깃 가이드 (기준 문서)
 
 **Version:** 0.1 · **Date:** 2026-06-02  
 **Status:** Planning — normative for **future FPGA / Verilog** work; **not** the active breadboard/PCB build path  
@@ -15,7 +15,7 @@
 
 | 항목 | 내용 |
 |------|------|
-| **정리** | v0.1 CPU를 **5 V 빵판 / 3.3 V PCB가 아닌 FPGA**에 올릴 때의 리소스·메모리·속도·비용 고찰 |
+| **정리** | v1.0 CPU를 **5 V 빵판 / 3.3 V PCB가 아닌 FPGA**에 올릴 때의 리소스·메모리·속도·비용 고찰 |
 | **기준** | 이후 공개할 **Verilog (또는 SystemVerilog) RTL** 의 아키텍처·검증·메모리 맵 **단일 참조** |
 | **분기** | **원칩 FPGA**, **FPGA + 외부 ROM/RAM**, **FPGA + 외부 주변(RP2350 등)** 구성을 명시적으로 구분 |
 
@@ -31,17 +31,17 @@
 |------|------|
 | **`plover_vm/`** | NOR/RAM/Mailbox·ISA·8b CW **기능 모델** — 프로그램·부트·Mailbox 프로토콜 bring-up |
 | **hwsim** | 74HC netlist **ns 타이밍** — ALU·CPLD decode·GPR latch |
-| **FPGA RTL (예정)** | v0.1 **행위적 CPU** 우선; 필요 시 hwsim과 **타이밍 정합**은 별도 게이트 |
+| **FPGA RTL (예정)** | v1.0 **행위적 CPU** 우선; 필요 시 hwsim과 **타이밍 정합**은 별도 게이트 |
 
 FPGA 구현의 **정합성 검증 1차 기준**은 `python -m pytest tests/ -q` 및 `hw/fixtures/` / `tools/pack_control_store.py` 산출물(`cw.hex`)이다.
 
 ### 1.4 레거시 Verilog
 
-[archive/verilog-sim/rtl/](../archive/verilog-sim/rtl/) 는 **구세대**(16b CW·Flash×2 등) 이다. v0.1 FPGA RTL은 **이 가이드 + v0.1 명세**를 따르며, 아카이브는 참고용으로만 사용한다.
+[archive/verilog-sim/rtl/](../archive/verilog-sim/rtl/) 는 **구세대**(16b CW·Flash×2 등) 이다. v1.0 FPGA RTL은 **이 가이드 + v1.0 명세**를 따르며, 아카이브는 참고용으로만 사용한다.
 
 ---
 
-## 2. v0.1 하드웨어 요약 (FPGA에 매핑할 블록)
+## 2. v1.0 하드웨어 요약 (FPGA에 매핑할 블록)
 
 ```
                     ┌── system decode (CPLD → RTL comb) ──┐
@@ -54,7 +54,7 @@ FPGA 구현의 **정합성 검증 1차 기준**은 `python -m pytest tests/ -q` 
                         └──────┴──────┴── PC/MBR/phase FSM
 ```
 
-| 블록 | TTL v0.1 | FPGA 권장 매핑 |
+| 블록 | TTL v1.0 | FPGA 권장 매핑 |
 |------|----------|----------------|
 | **alu8** | 74HC **24** IC (TTL) | 단일 **8b ALU** 모듈 (12 opcode + 병렬 CMP, [alu-opcodes-timing.md](alu-opcodes-timing.md)) |
 | **GPR** | 574×4 | 레지스터 파일 **32 bit** + MBR/PCH/flags |
@@ -82,7 +82,7 @@ FPGA 구현의 **정합성 검증 1차 기준**은 `python -m pytest tests/ -q` 
 
 **한계:** 소형 FPGA(iCE40 UP5K, MachXO2 2K 등)는 **온칩 RAM 용량**으로 **모델 A 불가**.
 
-### 3.2 모델 B — FPGA + 외부 ROM & RAM (v0.1 BOM과 개념 동일)
+### 3.2 모델 B — FPGA + 외부 ROM & RAM (v1.0 BOM과 개념 동일)
 
 | FPGA에 남는 것 | 외부로 분리 |
 |----------------|-------------|
@@ -157,7 +157,7 @@ Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있
 
 ### 5.2 TTL/BOM과 다른 점
 
-| TTL v0.1 | EP4CE6 보드 |
+| TTL v1.0 | EP4CE6 보드 |
 |----------|-------------|
 | 병렬 SST39 + IS62 | **SDRAM + EPCS** |
 | 2 MHz 시스템 | **50 MHz** 오실레이터 (내부 분주 가능) |
@@ -180,7 +180,7 @@ Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있
 
 ## 6. 속도 (MIPS) — 클록과 구현 방식
 
-**MIPS** = 초당 **매크로 명령**(opcode 1개) 수. v0.1 TTL 목표: [roadmap-next.md](roadmap-next.md).
+**MIPS** = 초당 **매크로 명령**(opcode 1개) 수. v1.0 TTL 목표: [roadmap-next.md](../project/roadmap-next.md).
 
 | 프로파일 @ **2 MHz** | MIPS |
 |----------------------|------|
@@ -230,7 +230,7 @@ Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있
 ### 7.3 디렉터리 (계획)
 
 ```
-hw/rtl/v0.1/          # 신규 (미작성) — 이 문서가 normative
+hw/rtl/v1.0/          # 신규 (미작성) — 이 문서가 normative
   alu8.sv
   regfile.sv
   sys_decode.sv
@@ -239,7 +239,7 @@ hw/rtl/v0.1/          # 신규 (미작성) — 이 문서가 normative
   plover_top.sv
 ```
 
-레거시: [archive/verilog-sim/rtl/](../archive/verilog-sim/rtl/) — **이식 시 v0.1 8b CW로 재작성**.
+레거시: [archive/verilog-sim/rtl/](../archive/verilog-sim/rtl/) — **이식 시 v1.0 10b CW로 재작성**.
 
 ### 7.4 메모리 인터페이스 추상화
 
@@ -274,14 +274,14 @@ RTL 상단에서 **백엔드**만 교체할 수 있게 한다.
 | # | 산출물 | 의존 |
 |---|--------|------|
 | F0 | **이 문서** | — |
-| F1 | `hw/rtl/v0.1/alu8` + bench | hwsim alu8 tests |
+| F1 | `hw/rtl/v1.0/alu8` + bench | hwsim alu8 tests |
 | F2 | micro sequencer + BRAM CW | `cw.hex`, micro tests |
 | F3 | Macro engine + BRAM RAM | `test_add_imm`, boot handoff |
 | F4 | `plover_top` + SDRAM (EP4CE6) | Quartus project template |
 | F5 | Mailbox + RP2350 GPIO | [rp2350-coprocessor.md](rp2350-coprocessor.md) |
 | F6 | (선택) Parallel NOR/SRAM wrapper | [BOM-3v3.md](../BOM-3v3.md) |
 
-TTL 실기 마일스톤: [implementation-plan-v0.1.md](implementation-plan-v0.1.md) — **병렬 진행 가능**, 문서만 교차 링크.
+TTL 실기 마일스톤: [implementation-plan-v1.0.md](../project/implementation-plan-v1.0.md) — **병렬 진행 가능**, 문서만 교차 링크.
 
 ---
 

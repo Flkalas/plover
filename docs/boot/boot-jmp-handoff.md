@@ -15,11 +15,11 @@ Software-only boot handoff: Boot ROM loads the kernel into RAM and **`JMP`s to `
 | Continuous execution | ROM → RAM, no halt | ROM → halt → reset → RAM |
 | Warm reset into kernel | No (see §6) | Yes, after Run + RESET |
 
-Use JMP handoff when the product path is **power-on → OS/shell** with v0.1 hardware. Keep manual handoff as a **bring-up and recovery** option.
+Use JMP handoff when the product path is **power-on → OS/shell** with v1.0 hardware. Keep manual handoff as a **bring-up and recovery** option.
 
 ---
 
-## 2. Why it works on v0.1 hardware
+## 2. Why it works on v1.0 hardware
 
 `MAP_MODE` only affects how **`$0000–$07FF`** and **`$FFFC–$FFFF`** decode. The kernel region is always RAM:
 
@@ -107,7 +107,7 @@ Pair with a RAM program at `$0800` (e.g. `HALT` or kernel stub). Host/sim may pr
 
 ## 5. Init contract and JMP handoff rules
 
-Plover v0.1 **8-bit direct addressing** and **Boot-mode low-page ROM masking** define a **hardware–software split**. RAM (`$0800+`) constants are not loadable with `LDA`; **16-bit RAM writes** are Boot ROM's job via a block-copy primitive.
+Plover v1.0 **8-bit direct addressing** and **Boot-mode low-page ROM masking** define a **hardware–software split**. RAM (`$0800+`) constants are not loadable with `LDA`; **16-bit RAM writes** are Boot ROM's job via a block-copy primitive.
 
 ### 5.1 Responsibility table
 
@@ -160,7 +160,7 @@ Boot ROM, vFDD/kernel image, and linker layout **must ship together**. A version
 | `$FFFC` fetch source | ROM (ignored while PC ∈ `$0800+`) | RAM vector |
 | Press RESET while running | Boots back into **Boot ROM** | Jumps to **`$0800`** if RAM vector intact |
 | MAP_MODE | Stays **Boot** until DIP change | **Run** |
-| Dynamic IRQ vectors | **Not applicable** in v0.1 (no IRQ) — becomes a **roadmap** issue when IRQ is added | RAM vector under Run map |
+| Dynamic IRQ vectors | **Not applicable** in v1.0 (no IRQ) — becomes a **roadmap** issue when IRQ is added | RAM vector under Run map |
 
 If warm reset into the kernel, full low-page RAM, or runtime vector tables are required, use manual handoff ([bootloader.md](bootloader.md) §3) or a future **SYS_CTRL soft-reset** path (hardware v0.2+).
 
@@ -216,7 +216,7 @@ expect:
 
 | File | Role |
 |------|------|
-| `hw/fixtures/boot/boot_rom.hex` | v0.1 image (may gain JMP tail via `tools/gen_boot_fixtures.py`) |
+| `hw/fixtures/boot/boot_rom.hex` | v1.0 boot image (may gain JMP tail via `tools/gen_boot_fixtures.py`) |
 | `hw/fixtures/boot/ram_kernel.hex` | Expected RAM after load |
 | `hw/fixtures/boot/boot_rom_jmp.hex` | *(optional)* JMP-handoff variant for gates |
 
@@ -239,7 +239,7 @@ No changes to CPLD, BOM, or [cpld-system-controller.md](cpld-system-controller.m
 ## 9. Comparison summary
 
 ```
-Manual (v0.1 default)     JMP handoff (this doc)     Soft reset (future v0.2)
+Manual (v1.0 default)     JMP handoff (this doc)     Soft reset (future v0.2)
 ─────────────────────     ──────────────────────     ─────────────────────────
 ROM load → HALT           ROM load → pre-init → JMP   ROM load → SYS_CTRL → RESET
 DIP + RESET               (none)                      (none)
@@ -249,7 +249,7 @@ CPLD: comb only           CPLD: comb only             CPLD: FSM + MMIO
 
 ### Current state vs roadmap
 
-JMP chain loading is the **stable current-state** bootstrap for v0.1: no CPLD macrocell spend, no board spin. Delegating **16-bit pointer and GPR pre-init** to Boot ROM is the correct split under the 8-bit ISA, but it **raises coupling** between boot ROM, disk image, and linker output.
+JMP chain loading is the **stable current-state** bootstrap for v1.0: no CPLD macrocell spend, no board spin. Delegating **16-bit pointer and GPR pre-init** to Boot ROM is the correct split under the 8-bit ISA, but it **raises coupling** between boot ROM, disk image, and linker output.
 
 Fixed **`MAP_MODE=0`** masks the low **2 KB** as non-RAM — a **static map capacity** limit, not an execution bandwidth problem. When **async IRQ** enters the roadmap, static **`$FFFC`** binding and Boot-mode vectors become a structural constraint; plan **v0.2** MMIO map control and soft-reset sequences at that milestone.
 
@@ -259,6 +259,6 @@ Fixed **`MAP_MODE=0`** masks the low **2 KB** as non-RAM — a **static map capa
 
 | Date | Note |
 |------|------|
-| 2026-06-08 | Initial normative doc — software JMP chain load on v0.1 |
+| 2026-06-08 | Initial normative doc — software JMP chain load on v1.0 breadboard |
 | 2026-06-08 | §5 init contract, §5.2 block-copy, §7 verification checklist |
 | 2026-06-08 | Implementation: boot_rom.hex, LDIO/STIO/MOV/STA16, VM gates |
