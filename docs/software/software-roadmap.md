@@ -1,6 +1,6 @@
 # Software roadmap (VM OS stack)
 
-**Related:** [software-memory-layout.md](software-memory-layout.md) · [implementation-plan-v0.1.md](../project/implementation-plan-v0.1.md) · [hw-sim.md](../simulation/hw-sim.md)
+**Related:** [software-memory-layout.md](software-memory-layout.md) · [implementation-plan-v1.0.md](../project/implementation-plan-v1.0.md) · [hw-sim.md](../simulation/hw-sim.md)
 
 Plover v0.1 software milestones **S0–S7** on `plover_vm`, then hardware bring-up (M1–M5).
 

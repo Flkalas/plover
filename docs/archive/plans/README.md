@@ -2,7 +2,7 @@
 
 Frozen snapshots — **do not link from active docs** except via this index.
 
-Active work: [../../plans/README.md](../../plans/README.md) · [../../implementation-plan-v0.1.md](../../implementation-plan-v0.1.md)
+Active work: [../../plans/README.md](../../plans/README.md) · [../../implementation-plan-v1.0.md](../../project/implementation-plan-v1.0.md)
 
 ## Root
 
