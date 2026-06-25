@@ -1,9 +1,9 @@
 # Microcode Specification v1.1b
 
-**Status:** Archived reference ??**merged into** [microcode-spec.md](../../hardware/microcode-spec.md).  
-**Active normative:** v1.1b ??[system-architecture.md](../../hardware/system-architecture.md)  
+**Status:** Archived reference — **merged into** [microcode-spec.md](../../hardware/microcode-spec.md).  
+**Active normative:** v1.0 — [system-architecture.md](../../hardware/system-architecture.md)  
 **Design authority:** [cpu-4axis-arch-search-report.md](../../hardware/cpu-4axis-arch-search-report.md)  
-**Search:** [`build/cpu_arch_pareto.json`](../../../build/cpu_arch_pareto.json)  
+**Search:** `python tools/cpu_arch_search.py --pareto` → `build/cpu_arch_pareto.json` (local, gitignored)  
 **Related (archived):** [opcode-expanded-control.md](opcode-expanded-control.md) · [cpld-system-controller-v1.1b.md](cpld-system-controller-v1.1b.md)
 
 ---
@@ -12,13 +12,13 @@
 
 | Axis | Choice | Rationale |
 |------|--------|-----------|
-| Opcode | **`op_legacy`** (`0x01??x0F`) | Minimal Flash migration; interpreter unchanged |
+| Opcode | **`op_legacy`** (`0x01–0x0F`) | Minimal Flash migration; interpreter unchanged |
 | Index | **`idx4`** `(opcode[3:0]<<2)\|phase` | No CW MUX widen on bench |
 | Decode | **`dec_cpld_seq`** | Phase FSM in CPLD; no `alu8_decode` |
-| CPLD | **`cpld_3fixed`** | R0?�A, R1?�B, R2=result; ~26 MC |
+| CPLD | **`cpld_3fixed`** | R0→A, R1→B, R2=result; ~26 MC |
 | CW/Flash | **`cw_hybrid`** | **~25 param rows** vs ~23 per-phase v1.0 |
 
-**Metrics vs v1.0 baseline:** DIP **31??0** (??1), delay **151??36 ns** (??5), Flash **23??5** rows, MC **40??6**.
+**Metrics vs v1.0 baseline:** DIP **31→20** (−11), delay **151→136 ns** (−15), Flash **23→25** rows, MC **40→26**.
 
 **Forward paths:**
 
@@ -36,8 +36,8 @@
 | Source | Content |
 |--------|---------|
 | **CPLD phase FSM** | Fixed templates: ADD (3 ph), LDA/STA (2 ph), LDIO/STIO, CMP |
-| **Flash param row** | Per-opcode **8??6 b** exception: `REG_WSEL`, `branch_arm`, macro length override |
-| **Flash full rows** | JMP, BEQ, CALL, RET, HALT, MOV, STA16 ??macro boundary / branch glue |
+| **Flash param row** | Per-opcode **8–16 b** exception: `REG_WSEL`, `branch_arm`, macro length override |
+| **Flash full rows** | JMP, BEQ, CALL, RET, HALT, MOV, STA16 — macro boundary / branch glue |
 
 ### 2.2 Indexing (recommended `idx4`)
 
@@ -63,13 +63,13 @@ Verify: `python tools/verify_control_store.py` (extend for v1.1b fixtures).
 
 ## 3. 16-bit control word (`cw16_direct`, H2)
 
-Physical slot: **2 bytes** @ `$4000 + 2×index`. All 16 bits used ??**no `ALU_OP` nibble**.
+Physical slot: **2 bytes** @ `$4000 + 2×index`. All 16 bits used — **no `ALU_OP` nibble**.
 
 | Bit(s) | Field | Drives |
 |--------|-------|--------|
-| 15??4 | `REG_WSEL[1:0]` | CPLD write target (R0?�R2) |
+| 15–14 | `REG_WSEL[1:0]` | CPLD write target (R0–R2) |
 | 13 | `y_mux_sel` | 157 arithmetic vs logic Y |
-| 12?? | `lgc3:0` | 153_L logic |
+| 12–9 | `lgc3:0` | 153_L logic |
 | 8 | `cin` | 283 C0 |
 | 7 | `b_sel` | 153_B mux |
 | 6 | `b_const_sel` | INC/DEC constant |
@@ -80,14 +80,14 @@ Physical slot: **2 bytes** @ `$4000 + 2×index`. All 16 bits used ??**no `ALU_OP
 | 1 | `MEM_WR` | Memory write |
 | 0 | reserved | 0 |
 
-**Timing:** hwsim spot tests `hw/tests/cpu_cw_direct_sub.yaml`, `cpu_cw_direct_add.yaml` ??path ??**250 ns** @ 2 MHz Execute.
+**Timing:** hwsim spot tests `hw/tests/cpu_cw_direct_sub.yaml`, `cpu_cw_direct_add.yaml` — path ≤ **250 ns** @ 2 MHz Execute.
 
 ---
 
 ## 4. Macro ISA
 
-v1.0 mnemonics **`0x01??x0F`** retained. Operand byte follows opcode.  
-`MOV` (`0x0C`) deprecated in H1/H2 ??use fixed-reg copy opcodes per [opcode-expanded-control.md](opcode-expanded-control.md) §4.
+v1.0 mnemonics **`0x01–0x0F`** retained. Operand byte follows opcode.  
+`MOV` (`0x0C`) deprecated in H1/H2 — use fixed-reg copy opcodes per [opcode-expanded-control.md](opcode-expanded-control.md) §4.
 
 Phase counts for CPLD FSM (same as v1.0):
 
@@ -96,7 +96,7 @@ Phase counts for CPLD FSM (same as v1.0):
 | ADD | 3 | CPLD template |
 | LDA, STA, LDIO, STIO, STA16 | 2 | CPLD template |
 | CMP | 3 | CPLD template |
-| BEQ, JMP, CALL, RET, HALT, MOV | 1?? | Flash rows + branch sample @ macro end |
+| BEQ, JMP, CALL, RET, HALT, MOV | 1–2 | Flash rows + branch sample @ macro end |
 
 ---
 
@@ -109,7 +109,7 @@ Phase counts for CPLD FSM (same as v1.0):
 | P3 | Optional H2: widen CW index to 10b, `pack_cw16` full store |
 | P4 | Optional H1: `op_class` namespace + class param rows |
 
-**Do not migrate** CE/mailbox into CPLD ??**138×2 + glue** stays off-chip.
+**Do not migrate** CE/mailbox into CPLD — **138×2 + glue** stays off-chip.
 
 ---
 

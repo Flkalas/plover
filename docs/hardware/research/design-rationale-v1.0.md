@@ -1,8 +1,8 @@
 # v1.0 design rationale
 
 **Date:** 2026-06-24  
-**Status:** Research ¡ª design decisions and trade-offs (not normative)  
-**Normative:** [system-architecture.md](../system-architecture.md) ¡¤ [microcode-spec.md](../microcode-spec.md) ¡¤ [cpld-system-controller.md](../cpld-system-controller.md)
+**Status:** Research â€” design decisions and trade-offs (not normative)  
+**Normative:** [system-architecture.md](../system-architecture.md) Â· [microcode-spec.md](../microcode-spec.md) Â· [cpld-system-controller.md](../cpld-system-controller.md)
 
 ---
 
@@ -10,11 +10,11 @@
 
 | Topic | v1.0 choice |
 |-------|----------------|
-| **Control** | **FSM-only** in ATF1504 ¡ª no Flash control store @ `$4000` |
-| **Decode index** | **idx5** ¡ª `(opcode[4:0]<<2)\|phase`, 128 logical CPLD slots |
-| **ISA** | Opcode `[4:0]`; Extended `0x10¨C0x1F` (TFR `0x10¨C0x15`); `0x0C` reserved |
-| **Operands** | Fetch path only ¡ª **MBR** / addr MUX; no Flash param rows |
-| **ALU control** | From CPLD FSM ¡ª **no `alu8_decode`** TTL block (~9 DIP removed) |
+| **Control** | **FSM-only** in ATF1504 â€” no Flash control store @ `$4000` |
+| **Decode index** | **idx5** â€” `(opcode[4:0]<<2)\|phase`, 128 logical CPLD slots |
+| **ISA** | Opcode `[4:0]`; Extended `0x10â€“0x1F` (TFR `0x10â€“0x15`); `0x0C` reserved |
+| **Operands** | Fetch path only â€” **MBR** / addr MUX; no Flash param rows |
+| **ALU control** | From CPLD FSM â€” **no `alu8_decode`** TTL block (~9 DIP removed) |
 | **Metrics** | ~**20** DIP control path; **136 ns** critical delay; **~38** CPLD MC |
 
 ---
@@ -31,16 +31,16 @@ Normative v1.0 moves **repeated phase patterns** (ADD 3-phase, LDA 2-phase, etc.
 
 | Macro | Operand source |
 |-------|----------------|
-| LDA, STA, CMP, LDIO, STIO | imm8 @ PC+1 ¡ú **MBR**; effective address from MBR at execute |
-| BEQ, JMP, CALL, STA16 | abs16 from fetch ¡ú MBR / operand latch |
-| ADD | imm8 ¡ú R1 via internal `w_sel` |
-| TFR `0x10¨C0x15` | none ¡ª 1-byte implied |
+| LDA, STA, CMP, LDIO, STIO | imm8 @ PC+1 â†’ **MBR**; effective address from MBR at execute |
+| BEQ, JMP, CALL, STA16 | abs16 from fetch â†’ MBR / operand latch |
+| ADD | imm8 â†’ R1 via internal `w_sel` |
+| TFR `0x10â€“0x15` | none â€” 1-byte implied |
 
-CPLD asserts `MEM_RD`/`MEM_WR` using **already latched** MBR ¡ª not a second Flash fetch for parameters.
+CPLD asserts `MEM_RD`/`MEM_WR` using **already latched** MBR â€” not a second Flash fetch for parameters.
 
 ### 2.3 Branch and flags
 
-- CMP / ADD / BEQ ph0: ALU sets **Z/C** ¡ú **574 FLG**
+- CMP / ADD / BEQ ph0: ALU sets **Z/C** â†’ **574 FLG**
 - BEQ macro end: `PC_LOAD_EN <= FLG_Z`
 - JMP macro end: `PC_LOAD_EN <= 1`
 
@@ -55,25 +55,25 @@ fsm_index[6:0] = (opcode[4:0] << 2) | phase[1:0]
 | Item | Specification |
 |------|---------------|
 | Logical slots | **128** (7-bit key inside CPLD only) |
-| CPLD input | **`OPC[4:0]`** ¡ª **IR[4]** added vs 4-bit opcode decode |
-| Flash A0¨CA6 | **Not wired** ¡ª no burn of 128 Flash rows |
-| Extended opcodes | `0x10¨C0x1F` ¡ª TFR `0x10¨C0x15`; `0x16¨C0x1F` reserved |
+| CPLD input | **`OPC[4:0]`** â€” **IR[4]** added vs 4-bit opcode decode |
+| Flash A0â€“A6 | **Not wired** â€” no burn of 128 Flash rows |
+| Extended opcodes | `0x10â€“0x1F` â€” TFR `0x10â€“0x15`; `0x16â€“0x1F` reserved |
 
 **CPLD MC:** ~**38** macrocells (GPR 3fixed + idx5 K-map + TFR templates).
 
 ---
 
-## 4. Exploration history (idx4 ¡ú idx5)
+## 4. Exploration history (idx4 â†’ idx5)
 
-A **4-axis Cartesian Pareto search** (opcode ¡Á decode ¡Á CPLD ¡Á CW/Flash) identified a feasible winner:
+A **4-axis Cartesian Pareto search** (opcode Ã— decode Ã— CPLD Ã— CW/Flash) identified a feasible winner:
 
 `op_legacy` + **idx4** + CPLD phase FSM + 3fixed GPR + **hybrid Flash CW** (param rows @ `$4000`).
 
 **Post-search refinement** adopted the same DIP/delay wins but **dropped hybrid Flash**:
 
-- **idx5** instead of idx4 ¡ª supports TFR `0x10+` without Flash index extension
-- **FSM-only** ¡ª Flash `$4000` unused; operands via MBR only
-- **MC +4~6** vs idx4 estimate ¡ª acceptable within ATF1504 budget
+- **idx5** instead of idx4 â€” supports TFR `0x10+` without Flash index extension
+- **FSM-only** â€” Flash `$4000` unused; operands via MBR only
+- **MC +4~6** vs idx4 estimate â€” acceptable within ATF1504 budget
 
 Full methodology, H1/H2 corners, and gap checklist: [cpu-4axis-arch-search-report.md](../cpu-4axis-arch-search-report.md).
 
@@ -83,13 +83,13 @@ Full methodology, H1/H2 corners, and gap checklist: [cpu-4axis-arch-search-repor
 
 | Benefit | Cost |
 |---------|------|
-| **?11 DIP** vs prototype Flash-CW control path (`alu8_decode` removed) | **IR[4] ¡ú CPLD** (+1 control net) |
-| **?15 ns** critical path vs decode-in-series prototype | CPLD MC **~38** (+4~6 vs simpler idx4 map) |
-| **0 Flash CW rows** ¡ª simpler ROM programming | idx5 K-map complexity |
-| Extended ISA `0x10¨C0x1F` in CPLD | ¡ª |
-| BEQ glue simplified (`PC_LOAD_EN` in CPLD) | ¡ª |
+| **âˆ’11 DIP** vs prototype Flash-CW control path (`alu8_decode` removed) | **IR[4] â†’ CPLD** (+1 control net) |
+| **âˆ’15 ns** critical path vs decode-in-series prototype | CPLD MC **~38** (+4~6 vs simpler idx4 map) |
+| **0 Flash CW rows** â€” simpler ROM programming | idx5 K-map complexity |
+| Extended ISA `0x10â€“0x1F` in CPLD | â€” |
+| BEQ glue simplified (`PC_LOAD_EN` in CPLD) | â€” |
 
-**Unchanged from search baseline:** 138¡Á2 CE, mailbox glue, flat 64 KiB, no MMU, no IRQ.
+**Unchanged from search baseline:** 138Ã—2 CE, mailbox glue, flat 64 KiB, no MMU, no IRQ.
 
 ---
 
@@ -108,4 +108,4 @@ Full methodology, H1/H2 corners, and gap checklist: [cpu-4axis-arch-search-repor
 
 | Date | Note |
 |------|------|
-| 2026-06-24 | Initial rationale ¡ª extracted from normative docs for research tier |
+| 2026-06-24 | Initial rationale â€” extracted from normative docs for research tier |
