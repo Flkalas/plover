@@ -9,7 +9,7 @@
 - [system-architecture.md](../../hardware/system-architecture.md)
 
 **Design rationale:** [research/design-rationale-v1.0.md](../../hardware/research/design-rationale-v1.0.md)  
-**Search record:** [cpu-4axis-arch-search-report.md](../../hardware/cpu-4axis-arch-search-report.md)  
+**Search record:** [cpu-4axis-arch-search-report.md](../../hardware/research/cpu-4axis-arch-search-report.md)  
 **Superseded prototype:** [prototype-flash-cw/](../prototype-flash-cw/README.md)
 
 ## Historical Pareto winner (pre-refinement)

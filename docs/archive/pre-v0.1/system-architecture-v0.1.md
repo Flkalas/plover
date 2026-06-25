@@ -75,7 +75,7 @@ Details: [bootloader.md](../../boot/bootloader.md) · [boot-jmp-handoff.md](boot
 | [rp2350-coprocessor.md](rp2350-coprocessor.md) | Copro board, firmware contract |
 | [bootloader.md](../../boot/bootloader.md) | ROM image, handoff |
 | [alu-opcodes-timing.md](alu-opcodes-timing.md) | ALU comb delay (unchanged) |
-| [hardware-architecture-synthesis.md](../../hardware/hardware-architecture-synthesis.md) | **Breadboard target decided** — CPLD GPR, 138×2, no GAL; Tier 0–3, parasitics |
+| [hardware-architecture-synthesis.md](../../hardware/research/hardware-architecture-synthesis.md) | **Breadboard target decided** — CPLD GPR, 138×2, no GAL; Tier 0–3, parasitics |
 
 ---
 

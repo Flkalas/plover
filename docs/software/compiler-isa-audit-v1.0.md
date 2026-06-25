@@ -60,7 +60,7 @@
 
 | 평가 범주 | 시스템 구현자 대상 질문 | 컴파일러 구현 시 요구 근거 | v1.0 답변 | 근거·비고 |
 |-----------|-------------------------|---------------------------|-----------|-----------|
-| 제어 | **Zero, Carry, Sign, Overflow** 개별 플래그 조건 분기가 완전히 지원됩니까? | `if`/`while`/`for` 등을 조건부 점프로 번역 | **부분** | **하드웨어 플래그:** **Z, C** 만 — **574 FLG** 래치 ([hardware-architecture-synthesis.md](../hardware/hardware-architecture-synthesis.md)). **Sign(N)·Overflow(V) 없음.** **조건 분기:** **`BEQ`** (Z) — 마이크로코드 패킹됨. **`BCS`** (C, unsigned ≥) — opcode·VM fast path만, **마이크로코드 미패킹**. **`BNE`/`BLT`/`BGT` 등 없음** — `CMP`+`BEQ`/`JMP` 조합으로 일부 대체. 부호 있는 비교는 **추가 런타임 루틴** 필요. |
+| 제어 | **Zero, Carry, Sign, Overflow** 개별 플래그 조건 분기가 완전히 지원됩니까? | `if`/`while`/`for` 등을 조건부 점프로 번역 | **부분** | **하드웨어 플래그:** **Z, C** 만 — **574 FLG** 래치 ([hardware-architecture-synthesis.md](../hardware/research/hardware-architecture-synthesis.md)). **Sign(N)·Overflow(V) 없음.** **조건 분기:** **`BEQ`** (Z) — 마이크로코드 패킹됨. **`BCS`** (C, unsigned ≥) — opcode·VM fast path만, **마이크로코드 미패킹**. **`BNE`/`BLT`/`BGT` 등 없음** — `CMP`+`BEQ`/`JMP` 조합으로 일부 대체. 부호 있는 비교는 **추가 런타임 루틴** 필요. |
 
 ---
 

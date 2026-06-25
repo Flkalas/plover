@@ -75,7 +75,7 @@ A **4-axis Cartesian Pareto search** (opcode × decode × CPLD × CW/Flash) iden
 - **FSM-only** — Flash `$4000` unused; operands via MBR only
 - **MC +4~6** vs idx4 estimate — acceptable within ATF1504 budget
 
-Full methodology, H1/H2 corners, and gap checklist: [cpu-4axis-arch-search-report.md](../cpu-4axis-arch-search-report.md).
+Full methodology, H1/H2 corners, and gap checklist: [cpu-4axis-arch-search-report.md](cpu-4axis-arch-search-report.md).
 
 ---
 
@@ -97,8 +97,8 @@ Full methodology, H1/H2 corners, and gap checklist: [cpu-4axis-arch-search-repor
 
 | Topic | Document |
 |-------|----------|
-| Pareto search & axes | [cpu-4axis-arch-search-report.md](../cpu-4axis-arch-search-report.md) |
-| ALU timing, purchases, parasitics | [hardware-architecture-synthesis.md](../hardware-architecture-synthesis.md) |
+| Pareto search & axes | [cpu-4axis-arch-search-report.md](cpu-4axis-arch-search-report.md) |
+| ALU timing, purchases, parasitics | [hardware-architecture-synthesis.md](hardware-architecture-synthesis.md) |
 | Decode removal study | [alu-decode-architecture-study.md](../../archive/pre-v1.1b/alu-decode-architecture-study.md) |
 | Superseded prototype | [prototype-flash-cw/](../../archive/prototype-flash-cw/README.md) |
 

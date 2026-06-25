@@ -9,7 +9,7 @@
 | [BOM-3v3.md](../BOM-3v3.md) | PCB 3.3 V 쇼핑 목록 |
 | [purchase-devicesmart.md](purchase-devicesmart.md) | 디바이스마트 **1차** 주문 |
 | [purchase-2026-06-01-followup.md](purchase-2026-06-01-followup.md) | 디바이스마트 **2·3차** · AliExpress |
-| [hardware-architecture-synthesis.md](../hardware/hardware-architecture-synthesis.md) | 아키텍처 종합 — **v1.0 breadboard: CPLD GPR + 138×2 + 10b CW** |
+| [hardware-architecture-synthesis.md](../hardware/research/hardware-architecture-synthesis.md) | 아키텍처 종합 — **v1.0 breadboard: CPLD GPR + 138×2 + 10b CW** |
 
 ---
 
@@ -148,7 +148,7 @@ v1.0 [system-architecture.md](../hardware/system-architecture.md) · [alu8.md](.
 | CW | **10b** — 574 **CW_L + CW_H** (+ PC/MBR/FLG → **5×574** seq) |
 | 138 | **2** total (+1 order from 1차) |
 
-See [parts-on-hand.md](parts-on-hand.md) · [hardware-architecture-synthesis.md](../hardware/hardware-architecture-synthesis.md) · [hw-bringup/breadboard-wiring.md](../hw-bringup/breadboard-wiring.md).
+See [parts-on-hand.md](parts-on-hand.md) · [hardware-architecture-synthesis.md](../hardware/research/hardware-architecture-synthesis.md) · [hw-bringup/breadboard-wiring.md](../hw-bringup/breadboard-wiring.md).
 
 ---
 

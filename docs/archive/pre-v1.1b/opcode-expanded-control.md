@@ -16,7 +16,7 @@
 | **BEQ glue** | `FLG.Z` ∧ BEQ active → PC load enable | **shared** with CE 08/32 (#11b) | Branch split across CMP micro + glue |
 | **CE / mailbox** | A15, MAP, `$FF00` window | **138×2 + 08/32/04** | **Not removable** via opcode (needs address pins) |
 
-v1.0 already stores **micro-sequences in Flash** (`$4000+`), but **ALU datapath controls are still compressed into `ALU_OP`** and expanded by `alu_decode` on the breadboard ([hardware-architecture-synthesis.md](hardware-architecture-synthesis.md) §4.1).
+v1.0 already stores **micro-sequences in Flash** (`$4000+`), but **ALU datapath controls are still compressed into `ALU_OP`** and expanded by `alu_decode` on the breadboard ([hardware-architecture-synthesis.md](../../hardware/research/hardware-architecture-synthesis.md) §4.1).
 
 **Insight:** Flash has **4096 B** CW region and **sparse** slot use; comb decode exists to save CW bits, not because Flash is full.
 

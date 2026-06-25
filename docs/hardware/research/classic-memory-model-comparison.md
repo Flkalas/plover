@@ -1,7 +1,7 @@
 # Classic memory model comparison — Plover v1.0
 
 **Status:** Reference synthesis (2026-06-13)  
-**Related:** [memory-map.md](memory-map.md) · [system-architecture.md](system-architecture.md) · [boot-jmp-handoff.md](../boot/boot-jmp-handoff.md) · [bootloader.md](../boot/bootloader.md) · [software-memory-layout.md](../software/software-memory-layout.md) · [vm-rust.md](../simulation/vm-rust.md) · [archive/gemini/Plover-부팅과-현대-시스템-비교.md](../archive/gemini/Plover-부팅과-현대-시스템-비교.md)
+**Related:** [memory-map.md](../memory-map.md) · [system-architecture.md](../system-architecture.md) · [boot-jmp-handoff.md](../../boot/boot-jmp-handoff.md) · [bootloader.md](../../boot/bootloader.md) · [software-memory-layout.md](../../software/software-memory-layout.md) · [vm-rust.md](../../simulation/vm-rust.md) · [archive/gemini/Plover-부팅과-현대-시스템-비교.md](../../../archive/gemini/Plover-부팅과-현대-시스템-비교.md)
 
 This document summarizes how Plover v1.0 compares to **8086 Real Mode**, **Commodore 64 bank switching**, and **Z80 I/O mapping**, including the distinction between **JMP handoff** (implemented) and **SYS_CTRL soft-reset** (planned v0.2).
 
@@ -35,7 +35,7 @@ Three different “MMU” meanings appear in project docs:
 | **`plover_mmu` (Rust crate)** | Simulator: 64 KiB map decode, NOR/RAM, Mailbox MMIO bridge ([vm-rust.md](../simulation/vm-rust.md)) |
 | **MAP_MODE / A15 decode** | Physical chip-select and ROM overlay — **not** an MMU; combinatorial glue + operator DIP |
 
-Archive notes ([8비트-컴퓨터-설계-고려사항.md](../archive/gemini/8비트-컴퓨터-설계-고려사항.md)) explicitly describe the OS model as **no MMU — fixed task control blocks; no preemption** (consistent with v1.0 no-IRQ policy).
+Archive notes ([8비트-컴퓨터-설계-고려사항.md](../../archive/gemini/8비트-컴퓨터-설계-고려사항.md)) explicitly describe the OS model as **no MMU — fixed task control blocks; no preemption** (consistent with v1.0 no-IRQ policy).
 
 ---
 
@@ -87,7 +87,7 @@ CPLD: comb only         CPLD: comb only              CPLD: FSM + MMIO @ $FF08
 |------|--------|-----|
 | **JMP handoff** | **Implemented** — `boot_rom.hex` ends `JMP $0800` | Power-on → OS without operator DIP/RESET |
 | **Manual handoff** | Implemented — Boot ROM **HALT**, operator DIP → Run + RESET | Bring-up, recovery, warm boot with RAM vector |
-| **SYS_CTRL soft-reset** | **Not implemented** — `$FF08` MAP bit + SOFT_RESET bit | Proposed in [Plover-부팅과-현대-시스템-비교.md](../archive/gemini/Plover-부팅과-현대-시스템-비교.md); needs CPLD sequential logic (v0.2) |
+| **SYS_CTRL soft-reset** | **Not implemented** — `$FF08` MAP bit + SOFT_RESET bit | Proposed in [Plover-부팅과-현대-시스템-비교.md](../../archive/gemini/Plover-부팅과-현대-시스템-비교.md); needs CPLD sequential logic (v0.2) |
 
 ### Why JMP handoff works without MAP switch
 
@@ -214,7 +214,7 @@ Reference implementation: [plover_mmu/src/decode.rs](../../crates/plover_mmu/src
 
 | Feature | Effect |
 |---------|--------|
-| ~~**v1.1 discrete MMU**~~ | **Archived, not adopted** — [pre-v1.1-mmu/](../archive/pre-v1.1-mmu/README.md). Plover stays **C64/Apple II-class flat 64 KiB** for single-thread Forth. |
+| ~~**v1.1 discrete MMU**~~ | **Archived, not adopted** — [pre-v1.1-mmu/](../../archive/pre-v1.1-mmu/README.md). Plover stays **C64/Apple II-class flat 64 KiB** for single-thread Forth. |
 | **`SYS_CTRL` @ `$FF08`** (v0.2) | Software MAP_MODE + soft-reset — closer to C64 port / 8086 firmware map control |
 | **IRQ** | RAM vectors under Run map become mandatory; JMP-only Boot map more constraining ([boot-jmp-handoff.md](../boot/boot-jmp-handoff.md) §6) |
 | **v1.0 CPU control** | CPLD idx5 FSM-only — [system-architecture.md](system-architecture.md) (normative); ISA `op_legacy` + TFR `0x10–0x15` |
@@ -233,7 +233,7 @@ Until v0.2, comparisons to “software-controlled reset/map” systems should tr
 | [bootloader.md](../boot/bootloader.md) | Boot ROM steps; manual recovery |
 | [software-memory-layout.md](../software/software-memory-layout.md) | RAM regions |
 | [vm-rust.md](../simulation/vm-rust.md) | `plover_mmu` crate role |
-| [archive/gemini/Plover-부팅과-현대-시스템-비교.md](../archive/gemini/Plover-부팅과-현대-시스템-비교.md) | Modern boot comparison; SYS_CTRL proposal |
+| [archive/gemini/Plover-부팅과-현대-시스템-비교.md](../../archive/gemini/Plover-부팅과-현대-시스템-비교.md) | Modern boot comparison; SYS_CTRL proposal |
 | [M4a-boot-sim.md](../hw-bringup/M4a-boot-sim.md) | JMP handoff simulation gates |
 
 ---

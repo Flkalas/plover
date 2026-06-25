@@ -2,7 +2,7 @@
 
 **Status:** Archived reference — **merged into** [microcode-spec.md](../../hardware/microcode-spec.md).  
 **Active normative:** v1.0 — [system-architecture.md](../../hardware/system-architecture.md)  
-**Design authority:** [cpu-4axis-arch-search-report.md](../../hardware/cpu-4axis-arch-search-report.md)  
+**Design authority:** [cpu-4axis-arch-search-report.md](../../hardware/research/cpu-4axis-arch-search-report.md)  
 **Search:** `python tools/cpu_arch_search.py --pareto` → `build/cpu_arch_pareto.json` (local, gitignored)  
 **Related (archived):** [opcode-expanded-control.md](opcode-expanded-control.md) · [cpld-system-controller-v1.1b.md](cpld-system-controller-v1.1b.md)
 
