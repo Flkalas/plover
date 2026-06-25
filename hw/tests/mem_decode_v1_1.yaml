@@ -1,0 +1,44 @@
+# mem_decode_v1_1 ??spot checks (logic VM / pytest)
+
+# Normative exhaustive tests: tests/test_mem_decode_v1_1.py
+# Timing budget: tests/test_mmu_timing_v1_1.py
+
+cases:
+  - name: identity_va_0800
+    va: 0x0800
+    map_mode: 1
+    cpu_wr: false
+    expect_phys: 0x0800
+    expect_fault: false
+
+  - name: remap_page4_to_7
+    va: 0x4000
+    pte:
+      index: 4
+      pa_hi: 7
+      valid: true
+      we: true
+    expect_phys: 0x7000
+    expect_fault: false
+
+  - name: invalid_pte_nmi
+    va: 0x2000
+    pte:
+      index: 2
+      pa_hi: 2
+      valid: false
+      we: true
+    expect_fault: true
+    expect_nmi: true
+
+  - name: rom_boot_bypass
+    va: 0x0100
+    map_mode: 0
+    expect_bypass: true
+    expect_fault: false
+
+  - name: mailbox_bypass
+    va: 0xFF04
+    map_mode: 1
+    expect_bypass: true
+    expect_fault: false
