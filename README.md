@@ -2,7 +2,9 @@
 
 **Plover**는 74HC 디스크리트 로직 8-bit CPU 프로젝트입니다.
 
-**활성 설계:** [v1.0 system architecture](docs/hardware/system-architecture.md) — CPLD GPR + 138×2 + 10b CW
+**활성 설계:** [v1.0 system architecture](docs/normative/hardware/system-architecture.md) — CPLD GPR + 138×2 + FSM-only idx5
+
+**외부 문서:** [docs/normative/README.md](docs/normative/README.md) · **개발자:** [docs/developer/README.md](docs/developer/README.md)
 
 ---
 
