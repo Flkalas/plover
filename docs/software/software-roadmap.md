@@ -23,8 +23,8 @@ Plover v0.1 software milestones **S0–S7** on `plover_vm`, then hardware bring-
 | S3 | Forth core | [forth-system.md](forth-system.md) | `test_forth_*.py`, `forth_boot.yaml` |
 | S3c | Normative asm Forth | forth-system §normative | `--engine micro` |
 | S4 | Forth OS services | [forth-os-services.md](forth-os-services.md) | `test_forth_blocks.py` |
-| S5 | `plover_cc` | [subset-c.md](subset-c.md) | `test_plover_cc.py` |
-| S6 | C kernel | [os-kernel.md](os-kernel.md) | `test_kernel_boot.py`, `os_boot.yaml` |
+| S5 | `plover_cc` | **Static-allocation Subset C** — [subset-c.md](subset-c.md) | `test_plover_cc.py` |
+| S6 | C kernel | **Cooperative / polling microkernel** — [os-kernel.md](os-kernel.md) | `test_kernel_boot.py`, `os_boot.yaml` |
 | S7a | vFDD driver | [virtual-fdd.md](virtual-fdd.md) | `test_vfdd_io.py` |
 | S7b | PLFS | [plover-fat.md](plover-fat.md) | `test_fat_fs.py` |
 | S7c | `.PLR` loader | [program-loader.md](program-loader.md) | `test_plr_exec.py` |
@@ -41,3 +41,11 @@ Plover v0.1 software milestones **S0–S7** on `plover_vm`, then hardware bring-
 ## Verification
 
 Each milestone: add tests → cumulative `pytest tests/` PASS → git commit. See [tests/README.md](../tests/README.md).
+
+### S5 — Subset C philosophy
+
+v1.0 hardware has **no stack-pointer register** and **no frame-pointer datapath**. **S5 Subset C** targets a restricted dialect: **no unbounded recursion**, and all locals/parameters are **statically allocated** in fixed RAM cells ([subset-c.md](subset-c.md), [plover-whitepaper.md](../project/plover-whitepaper.md) §2.3.1).
+
+### S6 — Microkernel philosophy
+
+**S6** adopts a **cooperative** scheduling model and **polling-only I/O** — no preemptive multitasking and no IRQ drivers on the normative breadboard ([os-kernel.md](os-kernel.md), [plover-whitepaper.md](../project/plover-whitepaper.md) §9.1).

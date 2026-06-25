@@ -2,6 +2,10 @@
 
 Host-side microkernel model used for early bring-up on `plover_vm`.
 
+## Cooperative / polling model
+
+Normative v1.0 hardware has **no IRQ**. **S6** uses **polling I/O** (Mailbox status polls) and **cooperative** tasking — no preemptive scheduler. See [plover-whitepaper.md](../project/plover-whitepaper.md) §9.1.
+
 ## Responsibilities
 
 - Boot flow and shell entry point
