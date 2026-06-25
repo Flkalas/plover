@@ -1,0 +1,69 @@
+﻿# Memory Map v1.0
+
+**Related:** [cpld-system-controller.md](cpld-system-controller.md) · [mailbox-protocol.md](../copro/mailbox-protocol.md)
+
+---
+
+## 1. CPU address space (16-bit)
+
+| Range | Mode A (Boot) | Mode B (Run) | Notes |
+|-------|---------------|--------------|-------|
+| `$0000–$07FF` | **Boot ROM** (2 KB) | RAM | SST39 low window |
+| `$0800–$FEFF` | RAM | RAM | Kernel, data, stack |
+| `$FF00–$FFFB` | **Mailbox** (252 B) | Mailbox | Full A15–A0 decode |
+| `$FFFC–$FFFF` | **ROM vector** | **RAM vector** | Never Mailbox |
+
+**Decode priority:** `MAILBOX_EN` wins for `$FF00–$FFFB` only. `$FFFC–$FFFF` is excluded from mailbox.
+
+---
+
+## 2. Physical RAM — 2× IS62C256AL
+
+| Chip | `/CE` condition | CPU range |
+|------|---------------|-----------|
+| **RAM_1** | `A15=0` | `$0000–$7FFF` |
+| **RAM_2** | `A15=1` ∧ ¬`MAILBOX_EN` | `$8000–$FFFF` (except mailbox window) |
+
+### 2.1 Breadboard — 74HC138×2 + discrete glue
+
+| Block | Role |
+|-------|------|
+| **08/32/04** | `MAILBOX_EN`, MAP×A11 boot ROM, final `/CE` combine |
+| **74HC138 #2** | Half-select: low 32 KiB vs high 32 KiB (A15, MAP-gated) |
+| **74HC138 #1** | CBA = A15,A14,A13 → coarse Y*; E = `!MAILBOX_EN` |
+| **ATF1504** | GPR only — **no** address decode |
+
+Reference: [`decode_ce_breadboard()`](../hw/logic/cpld_decode.py) · [breadboard-wiring.md](../hw-bringup/breadboard-wiring.md).
+
+---
+
+## 3. MAP_MODE (operator manual)
+
+| MAP_MODE | Switch | `$0000–$07FF` | `$FFFC–$FFFF` |
+|----------|--------|---------------|---------------|
+| 0 | **Boot** | ROM | ROM |
+| 1 | **Run** | RAM | RAM |
+
+No automatic map switch from software — operator toggles DIP, then **RESET**.
+
+---
+
+## 4. Flash (SST39) vs CPU map
+
+| Access | Address source |
+|--------|----------------|
+| Instruction fetch (Mode A boot) | PC → decode glue |
+| Control store | **Unused** — Flash `$4000` not wired; CPLD idx5 FSM ([microcode-spec.md](microcode-spec.md)) |
+| Utility read | PC or boot copy loops |
+
+Superseded Flash CW prototype: [prototype-flash-cw](../archive/prototype-flash-cw/README.md).
+
+---
+
+## Change log
+
+| Date | Note |
+|------|------|
+| 2026-06-01 | 64 KB A15 bank; mailbox window |
+| 2026-06-10 | **v1.0** — 138×2 + gates; CPLD GPR only |
+| 2026-06-24 | **v1.0 FSM-only** — Flash `$4000` CW region unused |
