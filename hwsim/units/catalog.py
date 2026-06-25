@@ -8,7 +8,22 @@ from pathlib import Path
 from hwsim import yaml_util
 from hwsim.netlist import Netlist
 
-UNIT_KINDS = frozenset({"not_gate", "mux4_b", "mux4_l", "adder4", "mux2_y"})
+UNIT_KINDS = frozenset(
+    {
+        "not_gate",
+        "mux4_b",
+        "mux4_l",
+        "adder4",
+        "mux2_y",
+        "and_gate",
+        "or_gate",
+        "counter4",
+        "latch8",
+        "decoder3x8",
+        "mux2_addr",
+        "rom16",
+    }
+)
 
 CATEGORY_LABELS = {
     "not_gate": "NOT (~B)",
@@ -16,6 +31,13 @@ CATEGORY_LABELS = {
     "mux4_l": "MUX Logic",
     "adder4": "4-bit Adder",
     "mux2_y": "Y bypass",
+    "and_gate": "AND",
+    "or_gate": "OR",
+    "counter4": "Counter",
+    "latch8": "Latch 8",
+    "decoder3x8": "Decoder 3:8",
+    "mux2_addr": "Addr MUX",
+    "rom16": "Flash CW",
 }
 
 
@@ -123,13 +145,17 @@ def catalog_to_yaml(units: list[ViewUnit]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def load_catalog(path: Path) -> list[ViewUnit]:
+    data = yaml_util.load_file(str(path))
+    raw_units = data.get("units", [])
+    return [_unit_from_dict(u) for u in raw_units]
+
+
 def load_alu8_catalog(path: Path | None = None) -> list[ViewUnit]:
     if path is None:
         path = Path(__file__).resolve().parents[2] / "hw" / "units" / "alu8.yaml"
     if path.is_file():
-        data = yaml_util.load_file(str(path))
-        raw_units = data.get("units", [])
-        return [_unit_from_dict(u) for u in raw_units]
+        return load_catalog(path)
     return _build_alu8_units()
 
 
@@ -145,6 +171,6 @@ def validate_catalog(nl: Netlist, units: list[ViewUnit]) -> list[str]:
             errors.append(f"{unit.id}: unknown kind {unit.kind}")
         if unit.package_ref not in refs:
             errors.append(f"{unit.id}: missing package_ref {unit.package_ref}")
-        if unit.kind in ("mux4_b", "mux2_y") and not unit.slot:
+        if unit.kind in ("mux4_b", "mux2_y", "mux2_addr") and not unit.slot:
             errors.append(f"{unit.id}: slot required for {unit.kind}")
     return errors

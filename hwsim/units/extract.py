@@ -193,6 +193,17 @@ def extract_unit(nl: Netlist, unit: ViewUnit) -> UnitExtract:
     elif unit.kind == "mux2_y":
         bit_local = int(unit.slot.replace("bit", ""))
         pkg, pins = _slice_157_bit(inst, bit_local)
+    elif unit.kind in (
+        "and_gate",
+        "or_gate",
+        "not_gate",
+        "counter4",
+        "latch8",
+        "decoder3x8",
+        "rom16",
+        "mux2_addr",
+    ):
+        pkg, pins = _package_whole(inst)
     else:
         raise ValueError(f"unsupported unit kind: {unit.kind}")
 

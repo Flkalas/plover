@@ -4,26 +4,50 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Callable
 
+from hwsim.export_control_gate_graph import (
+    export_control_gate_graph_html,
+    export_control_gate_graph_svg,
+)
 from hwsim.export_gate_graph import export_gate_graph_html, export_gate_graph_svg
 from hwsim.export_gate_schematic import export_gate_schematic_html, export_gate_schematic_svg
-from hwsim.netlist import load_netlist
-from hwsim.units.catalog import CATEGORY_LABELS, ViewUnit, load_alu8_catalog, validate_catalog
+from hwsim.netlist import Netlist, load_netlist
+from hwsim.units.catalog import CATEGORY_LABELS, ViewUnit, load_alu8_catalog, load_catalog, validate_catalog
 from hwsim.units.scope import scope_to_manifest_entry, unit_scope
 
 _UNITS_VIEWER_MARKER = "/* EMBED_MANIFEST */"
+
+
+def _default_graph_svg(nl: Netlist, units: list[ViewUnit]) -> str:
+    if nl.block.startswith("cpld_ctrl"):
+        return export_control_gate_graph_svg(nl, units)
+    return export_gate_graph_svg(nl, units)
+
+
+def _default_graph_html(nl: Netlist, units: list[ViewUnit]) -> str:
+    if nl.block.startswith("cpld_ctrl"):
+        return export_control_gate_graph_html(nl, units)
+    return export_gate_graph_html(nl)
 
 
 def export_units(
     netlist_path: Path,
     *,
     output_dir: Path,
+    catalog_path: Path | None = None,
     html: bool = False,
     unit_id: str | None = None,
     embed_manifest: bool = False,
+    title: str | None = None,
+    graph_svg_fn: Callable[[Netlist, list[ViewUnit]], str] | None = None,
+    graph_html_fn: Callable[[Netlist, list[ViewUnit]], str] | None = None,
 ) -> dict:
     nl = load_netlist(netlist_path)
-    all_units = load_alu8_catalog()
+    if catalog_path is not None:
+        all_units = load_catalog(catalog_path)
+    else:
+        all_units = load_alu8_catalog()
     errors = validate_catalog(nl, all_units)
     if errors:
         raise ValueError("catalog validation failed:\n" + "\n".join(errors))
@@ -36,13 +60,17 @@ def export_units(
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    graph_svg = export_gate_graph_svg(nl, all_units)
-    graph_svg_path = output_dir / "alu8-gates.svg"
+    svg_fn = graph_svg_fn or _default_graph_svg
+    html_fn = graph_html_fn or _default_graph_html
+
+    graph_svg = svg_fn(nl, all_units)
+    graph_base = f"{nl.block}-gates"
+    graph_svg_path = output_dir / f"{graph_base}.svg"
     graph_svg_path.write_text(graph_svg, encoding="utf-8")
 
-    graph_html_name = "alu8-gates.html"
+    graph_html_name = f"{graph_base}.html"
     if html:
-        (output_dir / graph_html_name).write_text(export_gate_graph_html(nl), encoding="utf-8")
+        (output_dir / graph_html_name).write_text(html_fn(nl, all_units), encoding="utf-8")
 
     entries: list[dict] = []
     for unit in all_units:
@@ -65,15 +93,16 @@ def export_units(
                 entry["html"] = html_path.name
         entries.append(entry)
 
+    used_kinds = sorted({u.kind for u in all_units})
     manifest = {
         "block": nl.block,
+        "title": title or nl.block,
         "source": str(netlist_path).replace("\\", "/"),
         "view": "gate",
         "graph_svg": graph_svg_path.name,
         "graph_html": graph_html_name if html else None,
         "categories": [
-            {"kind": kind, "label": label}
-            for kind, label in CATEGORY_LABELS.items()
+            {"kind": kind, "label": CATEGORY_LABELS.get(kind, kind)} for kind in used_kinds
         ],
         "units": entries,
     }
@@ -95,6 +124,8 @@ def export_units(
         payload = f"window.__UNITS_MANIFEST__ = {json.dumps(manifest)};"
         if _UNITS_VIEWER_MARKER in text:
             text = text.replace(_UNITS_VIEWER_MARKER, payload)
+        if title:
+            text = text.replace("<h1>ALU8 gates</h1>", f"<h1>{title}</h1>")
         embedded = output_dir / "index.html"
         embedded.write_text(
             text.replace(

@@ -32,6 +32,13 @@ def _gate_title(unit: ViewUnit) -> str:
         "mux4_l": "MUX 4:1",
         "adder4": "ADD 4-bit",
         "mux2_y": "MUX 2:1",
+        "and_gate": "AND",
+        "or_gate": "OR",
+        "counter4": "CNT 4-bit",
+        "latch8": "LATCH 8",
+        "decoder3x8": "DEC 3:8",
+        "mux2_addr": "MUX addr",
+        "rom16": "ROM 16",
     }
     return titles.get(unit.kind, unit.kind)
 
@@ -59,12 +66,48 @@ def _gate_body_svg(kind: str, cx: float, cy: float) -> list[str]:
             f'<text x="{cx:.1f}" y="{cy - 8:.1f}" text-anchor="middle" class="gate-label">+</text>',
             f'<text x="{cx:.1f}" y="{cy + 12:.1f}" text-anchor="middle" class="gate-sub">4-bit</text>',
         ]
-    if kind == "mux2_y":
+    if kind == "mux2_y" or kind == "mux2_addr":
         return [
             f'<path d="M{cx - 28:.1f},{cy - 24:.1f} L{cx + 20:.1f},{cy - 12:.1f} '
             f'L{cx + 20:.1f},{cy + 12:.1f} L{cx - 28:.1f},{cy + 24:.1f} Z" '
             f'fill="#21262d" stroke="#d29922" stroke-width="2"/>',
             f'<text x="{cx - 4:.1f}" y="{cy + 4:.1f}" text-anchor="middle" class="gate-label">2:1</text>',
+        ]
+    if kind == "and_gate":
+        return [
+            f'<path d="M{cx - 24:.1f},{cy - 20:.1f} L{cx + 8:.1f},{cy:.1f} L{cx - 24:.1f},{cy + 20:.1f} Z" '
+            f'fill="#21262d" stroke="#58a6ff" stroke-width="2"/>',
+            f'<text x="{cx - 8:.1f}" y="{cy + 4:.1f}" class="gate-label">&</text>',
+        ]
+    if kind == "or_gate":
+        return [
+            f'<path d="M{cx - 22:.1f},{cy - 22:.1f} Q{cx - 8:.1f},{cy:.1f} {cx - 22:.1f},{cy + 22:.1f} '
+            f'L{cx + 6:.1f},{cy:.1f} Z" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>',
+            f'<text x="{cx - 10:.1f}" y="{cy + 4:.1f}" class="gate-label">≥1</text>',
+        ]
+    if kind == "counter4":
+        return [
+            f'<rect x="{cx - 34:.1f}" y="{cy - 28:.1f}" width="68" height="56" rx="4" '
+            f'fill="#21262d" stroke="#3fb950" stroke-width="2"/>',
+            f'<text x="{cx:.1f}" y="{cy + 4:.1f}" text-anchor="middle" class="gate-label">161</text>',
+        ]
+    if kind == "latch8":
+        return [
+            f'<rect x="{cx - 34:.1f}" y="{cy - 28:.1f}" width="68" height="56" rx="4" '
+            f'fill="#21262d" stroke="#a371f7" stroke-width="2"/>',
+            f'<text x="{cx:.1f}" y="{cy + 4:.1f}" text-anchor="middle" class="gate-label">574</text>',
+        ]
+    if kind == "decoder3x8":
+        return [
+            f'<rect x="{cx - 34:.1f}" y="{cy - 28:.1f}" width="68" height="56" rx="4" '
+            f'fill="#21262d" stroke="#d29922" stroke-width="2"/>',
+            f'<text x="{cx:.1f}" y="{cy + 4:.1f}" text-anchor="middle" class="gate-label">138</text>',
+        ]
+    if kind == "rom16":
+        return [
+            f'<rect x="{cx - 38:.1f}" y="{cy - 32:.1f}" width="76" height="64" rx="4" '
+            f'fill="#21262d" stroke="#f85149" stroke-width="2"/>',
+            f'<text x="{cx:.1f}" y="{cy + 4:.1f}" text-anchor="middle" class="gate-label">CW</text>',
         ]
     return [
         f'<rect x="{cx - 30:.1f}" y="{cy - 20:.1f}" width="60" height="40" rx="4" '

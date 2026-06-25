@@ -14,6 +14,7 @@ from hwsim.pinout import format_pinout_table, list_parts, load_pinout
 from hwsim.netlist import load_netlist, validate_netlist
 from hwsim.report import write_report
 from hwsim.simulator import run_test
+from hwsim.units.export import export_units, format_unit_list
 from hwsim import yaml_util
 
 # OSC / recurring clock netlists — not simulated (VM + scope on real hardware).
@@ -189,6 +190,43 @@ def cmd_pinout(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_export_units(args: argparse.Namespace) -> int:
+    root = repo_root()
+    path = Path(args.netlist)
+    if not path.is_absolute():
+        path = root / path
+    out = Path(args.output)
+    if not out.is_absolute():
+        out = root / out
+    catalog = None
+    if args.catalog:
+        catalog = Path(args.catalog)
+        if not catalog.is_absolute():
+            catalog = root / catalog
+    try:
+        manifest = export_units(
+            path,
+            output_dir=out,
+            catalog_path=catalog,
+            html=args.html,
+            unit_id=args.unit or None,
+            embed_manifest=args.embed_manifest,
+            title=args.title or None,
+        )
+    except (ValueError, FileNotFoundError) as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        return 1
+    print(f"Exported {len(manifest['units'])} units to {out}")
+    print(f"  manifest: {out / 'manifest.json'}")
+    print(f"  graph: {out / manifest['graph_svg']}")
+    if args.list:
+        from hwsim.units.catalog import load_alu8_catalog, load_catalog
+
+        units = load_catalog(catalog) if catalog else load_alu8_catalog()
+        print(format_unit_list(units))
+    return 0
+
+
 def cmd_diff_kicad(args: argparse.Namespace) -> int:
     root = repo_root()
     kicad = Path(args.kicad_net)
@@ -252,6 +290,24 @@ def build_parser() -> argparse.ArgumentParser:
     po.add_argument("part", nargs="?", help="e.g. 74HC283")
     po.add_argument("--list", dest="list_parts", action="store_true", help="List indexed parts")
     po.set_defaults(func=cmd_pinout)
+
+    eu = sub.add_parser(
+        "export-units",
+        help="Export gate-level unit schematics + connectivity graph",
+    )
+    eu.add_argument("netlist")
+    eu.add_argument("-o", "--output", required=True, help="Output directory")
+    eu.add_argument("--catalog", default="", help="View-unit catalog YAML (default: alu8)")
+    eu.add_argument("--unit", default="", help="Export single unit id only")
+    eu.add_argument("--html", action="store_true", help="Also write per-unit and graph HTML")
+    eu.add_argument(
+        "--embed-manifest",
+        action="store_true",
+        help="Write index.html with embedded manifest",
+    )
+    eu.add_argument("--title", default="", help="Viewer title (embed-manifest only)")
+    eu.add_argument("--list", action="store_true", help="Print unit catalog after export")
+    eu.set_defaults(func=cmd_export_units)
 
     return p
 
