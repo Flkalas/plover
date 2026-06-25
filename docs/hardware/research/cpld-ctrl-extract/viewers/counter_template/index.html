@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ALU8 gate connectivity</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    body { display: grid; grid-template-columns: 240px 1fr; gap: 0; min-height: 100vh; margin: 0; }
+    #sidebar { background: #161b22; border-right: 1px solid #30363d; padding: 12px; overflow: auto; }
+    #sidebar h1 { font-size: 16px; margin: 0 0 8px; color: #e6edf3; }
+    #sidebar p { font-size: 12px; color: #8b949e; margin: 0 0 12px; }
+    .cat { margin-bottom: 12px; }
+    .cat-title { font-size: 11px; font-weight: 600; color: #8b949e; text-transform: uppercase; margin-bottom: 4px; }
+    .unit-btn {
+      display: block; width: 100%; text-align: left; margin: 2px 0; padding: 6px 8px;
+      background: #21262d; color: #c9d1d9; border: 1px solid #30363d; border-radius: 4px;
+      cursor: pointer; font: 12px system-ui;
+    }
+    .unit-btn:hover { border-color: #58a6ff; }
+    .unit-btn.active { background: #1f3a5f; border-color: #58a6ff; color: #e6edf3; }
+    .unit-btn.all-view { margin-bottom: 10px; font-weight: 600; }
+    #main { display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
+    #toolbar {
+      padding: 8px 12px; background: #0d1117; border-bottom: 1px solid #30363d;
+      font: 12px system-ui; color: #8b949e; flex-shrink: 0;
+    }
+    #toolbar strong { color: #e6edf3; }
+    #schematic-host {
+      flex: 1; overflow: auto; background: #0d1117;
+      -webkit-user-select: none; user-select: none;
+    }
+    #schematic-host iframe { width: 100%; height: 100%; min-height: 560px; border: 0; background: #0d1117; }
+    #load-hint { padding: 24px; color: #8b949e; font: 13px system-ui; }
+    #manifest-file { margin-top: 8px; font-size: 11px; display: block; }
+    .scope-tags { font-size: 11px; color: #8b949e; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <aside id="sidebar">
+    <h1>CPLD control - counter + template decode</h1>
+    <p>Full gate connectivity + single-gate drill-down</p>
+    <button type="button" class="unit-btn all-view" id="btn-all">All gates (full graph)</button>
+    <label id="manifest-file">manifest.json
+      <input type="file" id="file-manifest" accept=".json"/>
+    </label>
+    <div id="unit-list"></div>
+  </aside>
+  <main id="main">
+    <div id="toolbar">
+      <span id="unit-title">All gates</span>
+      <div id="scope-tags" class="scope-tags"></div>
+    </div>
+    <div id="schematic-host">
+      <div id="load-hint">
+        Run <code>python -m hwsim export-units hw/netlist/blocks/alu8.yaml -o build/units --html --embed-manifest</code>
+        then open <code>build/units/index.html</code>.
+      </div>
+    </div>
+  </main>
+  
+  
+  <script>
+    window.__UNITS_MANIFEST__ = {"block": "cpld_ctrl_counter", "title": "CPLD control - counter + template decode", "source": "D:/Github/plover/hw/netlist/research/cpld_ctrl_counter.yaml", "view": "gate", "graph_svg": "cpld_ctrl_counter-gates.svg", "graph_html": "cpld_ctrl_counter-gates.html", "categories": [{"kind": "and_gate", "label": "AND"}, {"kind": "counter4", "label": "Counter"}, {"kind": "decoder3x8", "label": "Decoder 3:8"}, {"kind": "latch8", "label": "Latch 8"}, {"kind": "mux4_l", "label": "MUX Logic"}, {"kind": "or_gate", "label": "OR"}], "units": [{"id": "phase_161", "kind": "counter4", "category": "Counter", "label": "phase 161", "stage": 1, "nets": ["net_clk", "net_macro_end", "net_phase0", "net_phase1"], "gate_pins": [], "instance_refs": ["U_PH_161"], "svg": "phase_161.svg", "html": "phase_161.html"}, {"id": "opc_138", "kind": "decoder3x8", "category": "Decoder 3:8", "label": "opcode class 138", "stage": 2, "nets": ["net_opc0", "net_opc1", "net_opc2", "net_opc_cls0", "net_opc_cls1", "net_opc_cls2", "net_opc_cls3", "net_opc_cls4", "net_opc_cls5", "net_opc_cls6", "net_opc_cls7"], "gate_pins": [], "instance_refs": ["U_OPC_138"], "svg": "opc_138.svg", "html": "opc_138.html"}, {"id": "u_cpld_ctrl_counter_08_1", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_1", "stage": 2, "nets": ["net_a_35", "net_nopc1_31", "net_opc0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_1"], "svg": "u_cpld_ctrl_counter_08_1.svg", "html": "u_cpld_ctrl_counter_08_1.html"}, {"id": "u_cpld_ctrl_counter_08_2", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_2", "stage": 2, "nets": ["net_a_35", "net_a_36", "net_nopc2_32"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_2"], "svg": "u_cpld_ctrl_counter_08_2.svg", "html": "u_cpld_ctrl_counter_08_2.html"}, {"id": "u_cpld_ctrl_counter_08_3", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_3", "stage": 2, "nets": ["net_a_36", "net_a_37", "net_nopc3_33"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_3"], "svg": "u_cpld_ctrl_counter_08_3.svg", "html": "u_cpld_ctrl_counter_08_3.html"}, {"id": "u_cpld_ctrl_counter_08_4", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_4", "stage": 2, "nets": ["net_a_37", "net_a_38", "net_nopc4_34"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_4"], "svg": "u_cpld_ctrl_counter_08_4.svg", "html": "u_cpld_ctrl_counter_08_4.html"}, {"id": "u_cpld_ctrl_counter_08_5", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_5", "stage": 2, "nets": ["net_a_41", "net_nopc1_39", "net_opc0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_5"], "svg": "u_cpld_ctrl_counter_08_5.svg", "html": "u_cpld_ctrl_counter_08_5.html"}, {"id": "u_cpld_ctrl_counter_08_6", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_6", "stage": 2, "nets": ["net_a_41", "net_a_42", "net_opc2"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_6"], "svg": "u_cpld_ctrl_counter_08_6.svg", "html": "u_cpld_ctrl_counter_08_6.html"}, {"id": "u_cpld_ctrl_counter_08_7", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_7", "stage": 2, "nets": ["net_a_42", "net_a_43", "net_opc3"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_7"], "svg": "u_cpld_ctrl_counter_08_7.svg", "html": "u_cpld_ctrl_counter_08_7.html"}, {"id": "u_cpld_ctrl_counter_08_8", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_8", "stage": 2, "nets": ["net_a_43", "net_a_44", "net_nopc4_40"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_8"], "svg": "u_cpld_ctrl_counter_08_8.svg", "html": "u_cpld_ctrl_counter_08_8.html"}, {"id": "u_cpld_ctrl_counter_32_1", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_1", "stage": 2, "nets": ["net_a_38", "net_a_44", "net_o_45"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_1"], "svg": "u_cpld_ctrl_counter_32_1.svg", "html": "u_cpld_ctrl_counter_32_1.html"}, {"id": "u_cpld_ctrl_counter_08_10", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_10", "stage": 2, "nets": ["net_a_50", "net_nopc0_46", "net_opc1"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_10"], "svg": "u_cpld_ctrl_counter_08_10.svg", "html": "u_cpld_ctrl_counter_08_10.html"}, {"id": "u_cpld_ctrl_counter_08_11", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_11", "stage": 2, "nets": ["net_a_50", "net_a_51", "net_nopc2_47"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_11"], "svg": "u_cpld_ctrl_counter_08_11.svg", "html": "u_cpld_ctrl_counter_08_11.html"}, {"id": "u_cpld_ctrl_counter_08_12", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_12", "stage": 2, "nets": ["net_a_51", "net_a_52", "net_nopc3_48"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_12"], "svg": "u_cpld_ctrl_counter_08_12.svg", "html": "u_cpld_ctrl_counter_08_12.html"}, {"id": "u_cpld_ctrl_counter_08_13", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_13", "stage": 2, "nets": ["net_a_52", "net_a_53", "net_nopc4_49"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_13"], "svg": "u_cpld_ctrl_counter_08_13.svg", "html": "u_cpld_ctrl_counter_08_13.html"}, {"id": "u_cpld_ctrl_counter_08_14", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_14", "stage": 2, "nets": ["net_a_58", "net_nopc0_54", "net_nopc1_55"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_14"], "svg": "u_cpld_ctrl_counter_08_14.svg", "html": "u_cpld_ctrl_counter_08_14.html"}, {"id": "u_cpld_ctrl_counter_08_15", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_15", "stage": 2, "nets": ["net_a_58", "net_a_59", "net_nopc2_56"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_15"], "svg": "u_cpld_ctrl_counter_08_15.svg", "html": "u_cpld_ctrl_counter_08_15.html"}, {"id": "u_cpld_ctrl_counter_08_16", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_16", "stage": 2, "nets": ["net_a_59", "net_a_60", "net_opc3"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_16"], "svg": "u_cpld_ctrl_counter_08_16.svg", "html": "u_cpld_ctrl_counter_08_16.html"}, {"id": "u_cpld_ctrl_counter_08_17", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_17", "stage": 2, "nets": ["net_a_60", "net_a_61", "net_nopc4_57"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_17"], "svg": "u_cpld_ctrl_counter_08_17.svg", "html": "u_cpld_ctrl_counter_08_17.html"}, {"id": "u_cpld_ctrl_counter_32_2", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_2", "stage": 2, "nets": ["net_a_53", "net_a_61", "net_o_62"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_2"], "svg": "u_cpld_ctrl_counter_32_2.svg", "html": "u_cpld_ctrl_counter_32_2.html"}, {"id": "u_cpld_ctrl_counter_08_19", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_19", "stage": 2, "nets": ["net_a_66", "net_opc0", "net_opc1"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_19"], "svg": "u_cpld_ctrl_counter_08_19.svg", "html": "u_cpld_ctrl_counter_08_19.html"}, {"id": "u_cpld_ctrl_counter_08_20", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_20", "stage": 2, "nets": ["net_a_66", "net_a_67", "net_nopc2_63"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_20"], "svg": "u_cpld_ctrl_counter_08_20.svg", "html": "u_cpld_ctrl_counter_08_20.html"}, {"id": "u_cpld_ctrl_counter_08_21", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_21", "stage": 2, "nets": ["net_a_67", "net_a_68", "net_nopc3_64"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_21"], "svg": "u_cpld_ctrl_counter_08_21.svg", "html": "u_cpld_ctrl_counter_08_21.html"}, {"id": "u_cpld_ctrl_counter_08_22", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_22", "stage": 2, "nets": ["net_a_68", "net_a_69", "net_nopc4_65"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_22"], "svg": "u_cpld_ctrl_counter_08_22.svg", "html": "u_cpld_ctrl_counter_08_22.html"}, {"id": "u_cpld_ctrl_counter_08_23", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_23", "stage": 2, "nets": ["net_a_73", "net_nopc1_70", "net_opc0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_23"], "svg": "u_cpld_ctrl_counter_08_23.svg", "html": "u_cpld_ctrl_counter_08_23.html"}, {"id": "u_cpld_ctrl_counter_08_24", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_24", "stage": 2, "nets": ["net_a_73", "net_a_74", "net_nopc2_71"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_24"], "svg": "u_cpld_ctrl_counter_08_24.svg", "html": "u_cpld_ctrl_counter_08_24.html"}, {"id": "u_cpld_ctrl_counter_08_25", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_25", "stage": 2, "nets": ["net_a_74", "net_a_75", "net_opc3"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_25"], "svg": "u_cpld_ctrl_counter_08_25.svg", "html": "u_cpld_ctrl_counter_08_25.html"}, {"id": "u_cpld_ctrl_counter_08_26", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_26", "stage": 2, "nets": ["net_a_75", "net_a_76", "net_nopc4_72"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_26"], "svg": "u_cpld_ctrl_counter_08_26.svg", "html": "u_cpld_ctrl_counter_08_26.html"}, {"id": "u_cpld_ctrl_counter_08_27", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_27", "stage": 2, "nets": ["net_a_78", "net_opc0", "net_opc1"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_27"], "svg": "u_cpld_ctrl_counter_08_27.svg", "html": "u_cpld_ctrl_counter_08_27.html"}, {"id": "u_cpld_ctrl_counter_08_28", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_28", "stage": 2, "nets": ["net_a_78", "net_a_79", "net_opc2"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_28"], "svg": "u_cpld_ctrl_counter_08_28.svg", "html": "u_cpld_ctrl_counter_08_28.html"}, {"id": "u_cpld_ctrl_counter_08_29", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_29", "stage": 2, "nets": ["net_a_79", "net_a_80", "net_opc3"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_29"], "svg": "u_cpld_ctrl_counter_08_29.svg", "html": "u_cpld_ctrl_counter_08_29.html"}, {"id": "u_cpld_ctrl_counter_08_30", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_30", "stage": 2, "nets": ["net_a_80", "net_a_81", "net_nopc4_77"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_30"], "svg": "u_cpld_ctrl_counter_08_30.svg", "html": "u_cpld_ctrl_counter_08_30.html"}, {"id": "u_cpld_ctrl_counter_32_3", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_3", "stage": 2, "nets": ["net_a_69", "net_a_76", "net_o_82"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_3"], "svg": "u_cpld_ctrl_counter_32_3.svg", "html": "u_cpld_ctrl_counter_32_3.html"}, {"id": "u_cpld_ctrl_counter_32_4", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_4", "stage": 2, "nets": ["net_a_81", "net_o_82", "net_o_83"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_4"], "svg": "u_cpld_ctrl_counter_32_4.svg", "html": "u_cpld_ctrl_counter_32_4.html"}, {"id": "u_cpld_ctrl_counter_08_32", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_32", "stage": 2, "nets": ["net_a_88", "net_nopc0_84", "net_nopc1_85"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_32"], "svg": "u_cpld_ctrl_counter_08_32.svg", "html": "u_cpld_ctrl_counter_08_32.html"}, {"id": "u_cpld_ctrl_counter_08_33", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_33", "stage": 2, "nets": ["net_a_88", "net_a_89", "net_nopc2_86"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_33"], "svg": "u_cpld_ctrl_counter_08_33.svg", "html": "u_cpld_ctrl_counter_08_33.html"}, {"id": "u_cpld_ctrl_counter_08_34", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_34", "stage": 2, "nets": ["net_a_89", "net_a_90", "net_nopc3_87"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_34"], "svg": "u_cpld_ctrl_counter_08_34.svg", "html": "u_cpld_ctrl_counter_08_34.html"}, {"id": "u_cpld_ctrl_counter_08_35", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_35", "stage": 2, "nets": ["net_a_90", "net_a_91", "net_opc4"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_35"], "svg": "u_cpld_ctrl_counter_08_35.svg", "html": "u_cpld_ctrl_counter_08_35.html"}, {"id": "u_cpld_ctrl_counter_08_36", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_36", "stage": 2, "nets": ["net_a_95", "net_nopc1_92", "net_opc0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_36"], "svg": "u_cpld_ctrl_counter_08_36.svg", "html": "u_cpld_ctrl_counter_08_36.html"}, {"id": "u_cpld_ctrl_counter_08_37", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_37", "stage": 2, "nets": ["net_a_95", "net_a_96", "net_nopc2_93"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_37"], "svg": "u_cpld_ctrl_counter_08_37.svg", "html": "u_cpld_ctrl_counter_08_37.html"}, {"id": "u_cpld_ctrl_counter_08_38", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_38", "stage": 2, "nets": ["net_a_96", "net_a_97", "net_nopc3_94"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_38"], "svg": "u_cpld_ctrl_counter_08_38.svg", "html": "u_cpld_ctrl_counter_08_38.html"}, {"id": "u_cpld_ctrl_counter_08_39", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_39", "stage": 2, "nets": ["net_a_97", "net_a_98", "net_opc4"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_39"], "svg": "u_cpld_ctrl_counter_08_39.svg", "html": "u_cpld_ctrl_counter_08_39.html"}, {"id": "u_cpld_ctrl_counter_08_40", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_40", "stage": 2, "nets": ["net_a_102", "net_nopc0_99", "net_opc1"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_40"], "svg": "u_cpld_ctrl_counter_08_40.svg", "html": "u_cpld_ctrl_counter_08_40.html"}, {"id": "u_cpld_ctrl_counter_08_41", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_41", "stage": 2, "nets": ["net_a_102", "net_a_103", "net_nopc2_100"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_41"], "svg": "u_cpld_ctrl_counter_08_41.svg", "html": "u_cpld_ctrl_counter_08_41.html"}, {"id": "u_cpld_ctrl_counter_08_42", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_42", "stage": 2, "nets": ["net_a_103", "net_a_104", "net_nopc3_101"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_42"], "svg": "u_cpld_ctrl_counter_08_42.svg", "html": "u_cpld_ctrl_counter_08_42.html"}, {"id": "u_cpld_ctrl_counter_08_43", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_43", "stage": 2, "nets": ["net_a_104", "net_a_105", "net_opc4"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_43"], "svg": "u_cpld_ctrl_counter_08_43.svg", "html": "u_cpld_ctrl_counter_08_43.html"}, {"id": "u_cpld_ctrl_counter_08_44", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_44", "stage": 2, "nets": ["net_a_108", "net_opc0", "net_opc1"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_44"], "svg": "u_cpld_ctrl_counter_08_44.svg", "html": "u_cpld_ctrl_counter_08_44.html"}, {"id": "u_cpld_ctrl_counter_08_45", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_45", "stage": 2, "nets": ["net_a_108", "net_a_109", "net_nopc2_106"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_45"], "svg": "u_cpld_ctrl_counter_08_45.svg", "html": "u_cpld_ctrl_counter_08_45.html"}, {"id": "u_cpld_ctrl_counter_08_46", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_46", "stage": 2, "nets": ["net_a_109", "net_a_110", "net_nopc3_107"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_46"], "svg": "u_cpld_ctrl_counter_08_46.svg", "html": "u_cpld_ctrl_counter_08_46.html"}, {"id": "u_cpld_ctrl_counter_08_47", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_47", "stage": 2, "nets": ["net_a_110", "net_a_111", "net_opc4"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_47"], "svg": "u_cpld_ctrl_counter_08_47.svg", "html": "u_cpld_ctrl_counter_08_47.html"}, {"id": "u_cpld_ctrl_counter_08_48", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_48", "stage": 2, "nets": ["net_a_115", "net_nopc0_112", "net_nopc1_113"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_48"], "svg": "u_cpld_ctrl_counter_08_48.svg", "html": "u_cpld_ctrl_counter_08_48.html"}, {"id": "u_cpld_ctrl_counter_08_49", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_49", "stage": 2, "nets": ["net_a_115", "net_a_116", "net_opc2"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_49"], "svg": "u_cpld_ctrl_counter_08_49.svg", "html": "u_cpld_ctrl_counter_08_49.html"}, {"id": "u_cpld_ctrl_counter_08_50", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_50", "stage": 2, "nets": ["net_a_116", "net_a_117", "net_nopc3_114"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_50"], "svg": "u_cpld_ctrl_counter_08_50.svg", "html": "u_cpld_ctrl_counter_08_50.html"}, {"id": "u_cpld_ctrl_counter_08_51", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_51", "stage": 2, "nets": ["net_a_117", "net_a_118", "net_opc4"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_51"], "svg": "u_cpld_ctrl_counter_08_51.svg", "html": "u_cpld_ctrl_counter_08_51.html"}, {"id": "u_cpld_ctrl_counter_08_52", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_52", "stage": 2, "nets": ["net_a_121", "net_nopc1_119", "net_opc0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_52"], "svg": "u_cpld_ctrl_counter_08_52.svg", "html": "u_cpld_ctrl_counter_08_52.html"}, {"id": "u_cpld_ctrl_counter_08_53", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_53", "stage": 2, "nets": ["net_a_121", "net_a_122", "net_opc2"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_53"], "svg": "u_cpld_ctrl_counter_08_53.svg", "html": "u_cpld_ctrl_counter_08_53.html"}, {"id": "u_cpld_ctrl_counter_08_54", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_54", "stage": 2, "nets": ["net_a_122", "net_a_123", "net_nopc3_120"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_54"], "svg": "u_cpld_ctrl_counter_08_54.svg", "html": "u_cpld_ctrl_counter_08_54.html"}, {"id": "u_cpld_ctrl_counter_08_55", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_55", "stage": 2, "nets": ["net_a_123", "net_a_124", "net_opc4"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_55"], "svg": "u_cpld_ctrl_counter_08_55.svg", "html": "u_cpld_ctrl_counter_08_55.html"}, {"id": "u_cpld_ctrl_counter_32_5", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_5", "stage": 2, "nets": ["net_a_91", "net_a_98", "net_o_125"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_5"], "svg": "u_cpld_ctrl_counter_32_5.svg", "html": "u_cpld_ctrl_counter_32_5.html"}, {"id": "u_cpld_ctrl_counter_32_6", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_6", "stage": 2, "nets": ["net_a_105", "net_o_125", "net_o_126"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_6"], "svg": "u_cpld_ctrl_counter_32_6.svg", "html": "u_cpld_ctrl_counter_32_6.html"}, {"id": "u_cpld_ctrl_counter_32_7", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_7", "stage": 2, "nets": ["net_a_111", "net_o_126", "net_o_127"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_7"], "svg": "u_cpld_ctrl_counter_32_7.svg", "html": "u_cpld_ctrl_counter_32_7.html"}, {"id": "u_cpld_ctrl_counter_32_8", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_8", "stage": 2, "nets": ["net_a_118", "net_o_127", "net_o_128"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_8"], "svg": "u_cpld_ctrl_counter_32_8.svg", "html": "u_cpld_ctrl_counter_32_8.html"}, {"id": "u_cpld_ctrl_counter_32_9", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_9", "stage": 2, "nets": ["net_a_124", "net_o_128", "net_o_129"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_9"], "svg": "u_cpld_ctrl_counter_32_9.svg", "html": "u_cpld_ctrl_counter_32_9.html"}, {"id": "u_cpld_ctrl_counter_08_57", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_57", "stage": 2, "nets": ["net_a_134", "net_nopc0_130", "net_nopc1_131"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_57"], "svg": "u_cpld_ctrl_counter_08_57.svg", "html": "u_cpld_ctrl_counter_08_57.html"}, {"id": "u_cpld_ctrl_counter_08_58", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_58", "stage": 2, "nets": ["net_a_134", "net_a_135", "net_opc2"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_58"], "svg": "u_cpld_ctrl_counter_08_58.svg", "html": "u_cpld_ctrl_counter_08_58.html"}, {"id": "u_cpld_ctrl_counter_08_59", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_59", "stage": 2, "nets": ["net_a_135", "net_a_136", "net_nopc3_132"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_59"], "svg": "u_cpld_ctrl_counter_08_59.svg", "html": "u_cpld_ctrl_counter_08_59.html"}, {"id": "u_cpld_ctrl_counter_08_60", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_60", "stage": 2, "nets": ["net_a_136", "net_a_137", "net_nopc4_133"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_60"], "svg": "u_cpld_ctrl_counter_08_60.svg", "html": "u_cpld_ctrl_counter_08_60.html"}, {"id": "u_cpld_ctrl_counter_08_62", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_62", "stage": 2, "nets": ["net_a_141", "net_nopc1_138", "net_opc0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_62"], "svg": "u_cpld_ctrl_counter_08_62.svg", "html": "u_cpld_ctrl_counter_08_62.html"}, {"id": "u_cpld_ctrl_counter_08_63", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_63", "stage": 2, "nets": ["net_a_141", "net_a_142", "net_opc2"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_63"], "svg": "u_cpld_ctrl_counter_08_63.svg", "html": "u_cpld_ctrl_counter_08_63.html"}, {"id": "u_cpld_ctrl_counter_08_64", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_64", "stage": 2, "nets": ["net_a_142", "net_a_143", "net_nopc3_139"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_64"], "svg": "u_cpld_ctrl_counter_08_64.svg", "html": "u_cpld_ctrl_counter_08_64.html"}, {"id": "u_cpld_ctrl_counter_08_65", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_65", "stage": 2, "nets": ["net_a_143", "net_a_144", "net_nopc4_140"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_65"], "svg": "u_cpld_ctrl_counter_08_65.svg", "html": "u_cpld_ctrl_counter_08_65.html"}, {"id": "u_cpld_ctrl_counter_08_67", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_67", "stage": 2, "nets": ["net_a_148", "net_nopc0_145", "net_opc1"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_67"], "svg": "u_cpld_ctrl_counter_08_67.svg", "html": "u_cpld_ctrl_counter_08_67.html"}, {"id": "u_cpld_ctrl_counter_08_68", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_68", "stage": 2, "nets": ["net_a_148", "net_a_149", "net_nopc2_146"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_68"], "svg": "u_cpld_ctrl_counter_08_68.svg", "html": "u_cpld_ctrl_counter_08_68.html"}, {"id": "u_cpld_ctrl_counter_08_69", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_69", "stage": 2, "nets": ["net_a_149", "net_a_150", "net_opc3"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_69"], "svg": "u_cpld_ctrl_counter_08_69.svg", "html": "u_cpld_ctrl_counter_08_69.html"}, {"id": "u_cpld_ctrl_counter_08_70", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_70", "stage": 2, "nets": ["net_a_150", "net_a_151", "net_nopc4_147"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_70"], "svg": "u_cpld_ctrl_counter_08_70.svg", "html": "u_cpld_ctrl_counter_08_70.html"}, {"id": "u_cpld_ctrl_counter_08_72", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_72", "stage": 2, "nets": ["net_a_154", "net_ph0n_152", "net_ph1n_153"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_72"], "svg": "u_cpld_ctrl_counter_08_72.svg", "html": "u_cpld_ctrl_counter_08_72.html"}, {"id": "u_cpld_ctrl_counter_08_73", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_73", "stage": 2, "nets": ["net_a_154", "net_a_155", "net_tpl0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_73"], "svg": "u_cpld_ctrl_counter_08_73.svg", "html": "u_cpld_ctrl_counter_08_73.html"}, {"id": "u_cpld_ctrl_counter_08_74", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_74", "stage": 2, "nets": ["net_a_157", "net_ph1n_156", "net_phase0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_74"], "svg": "u_cpld_ctrl_counter_08_74.svg", "html": "u_cpld_ctrl_counter_08_74.html"}, {"id": "u_cpld_ctrl_counter_08_75", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_75", "stage": 2, "nets": ["net_a_157", "net_a_158", "net_tpl0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_75"], "svg": "u_cpld_ctrl_counter_08_75.svg", "html": "u_cpld_ctrl_counter_08_75.html"}, {"id": "u_cpld_ctrl_counter_08_76", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_76", "stage": 2, "nets": ["net_a_160", "net_ph0n_159", "net_phase1"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_76"], "svg": "u_cpld_ctrl_counter_08_76.svg", "html": "u_cpld_ctrl_counter_08_76.html"}, {"id": "u_cpld_ctrl_counter_08_77", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_77", "stage": 2, "nets": ["net_a_160", "net_a_161", "net_tpl0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_77"], "svg": "u_cpld_ctrl_counter_08_77.svg", "html": "u_cpld_ctrl_counter_08_77.html"}, {"id": "u_cpld_ctrl_counter_08_78", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_78", "stage": 2, "nets": ["net_a_164", "net_ph0n_162", "net_ph1n_163"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_78"], "svg": "u_cpld_ctrl_counter_08_78.svg", "html": "u_cpld_ctrl_counter_08_78.html"}, {"id": "u_cpld_ctrl_counter_08_79", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_79", "stage": 2, "nets": ["net_a_164", "net_a_165", "net_tpl1"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_79"], "svg": "u_cpld_ctrl_counter_08_79.svg", "html": "u_cpld_ctrl_counter_08_79.html"}, {"id": "u_cpld_ctrl_counter_08_80", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_80", "stage": 2, "nets": ["net_a_167", "net_ph1n_166", "net_phase0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_80"], "svg": "u_cpld_ctrl_counter_08_80.svg", "html": "u_cpld_ctrl_counter_08_80.html"}, {"id": "u_cpld_ctrl_counter_08_81", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_81", "stage": 2, "nets": ["net_a_167", "net_a_168", "net_tpl1"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_81"], "svg": "u_cpld_ctrl_counter_08_81.svg", "html": "u_cpld_ctrl_counter_08_81.html"}, {"id": "u_cpld_ctrl_counter_08_82", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_82", "stage": 2, "nets": ["net_a_171", "net_ph0n_169", "net_ph1n_170"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_82"], "svg": "u_cpld_ctrl_counter_08_82.svg", "html": "u_cpld_ctrl_counter_08_82.html"}, {"id": "u_cpld_ctrl_counter_08_83", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_83", "stage": 2, "nets": ["net_a_171", "net_a_172", "net_tpl2"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_83"], "svg": "u_cpld_ctrl_counter_08_83.svg", "html": "u_cpld_ctrl_counter_08_83.html"}, {"id": "u_cpld_ctrl_counter_08_84", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_84", "stage": 2, "nets": ["net_a_174", "net_ph1n_173", "net_phase0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_84"], "svg": "u_cpld_ctrl_counter_08_84.svg", "html": "u_cpld_ctrl_counter_08_84.html"}, {"id": "u_cpld_ctrl_counter_08_85", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_85", "stage": 2, "nets": ["net_a_174", "net_a_175", "net_tpl2"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_85"], "svg": "u_cpld_ctrl_counter_08_85.svg", "html": "u_cpld_ctrl_counter_08_85.html"}, {"id": "u_cpld_ctrl_counter_08_86", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_86", "stage": 2, "nets": ["net_a_178", "net_ph0n_176", "net_ph1n_177"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_86"], "svg": "u_cpld_ctrl_counter_08_86.svg", "html": "u_cpld_ctrl_counter_08_86.html"}, {"id": "u_cpld_ctrl_counter_08_87", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_87", "stage": 2, "nets": ["net_a_178", "net_a_179", "net_tpl4"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_87"], "svg": "u_cpld_ctrl_counter_08_87.svg", "html": "u_cpld_ctrl_counter_08_87.html"}, {"id": "u_cpld_ctrl_counter_08_88", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_88", "stage": 2, "nets": ["net_a_181", "net_ph1n_180", "net_phase0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_88"], "svg": "u_cpld_ctrl_counter_08_88.svg", "html": "u_cpld_ctrl_counter_08_88.html"}, {"id": "u_cpld_ctrl_counter_08_89", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_89", "stage": 2, "nets": ["net_a_181", "net_a_182", "net_tpl4"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_89"], "svg": "u_cpld_ctrl_counter_08_89.svg", "html": "u_cpld_ctrl_counter_08_89.html"}, {"id": "u_cpld_ctrl_counter_08_90", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_90", "stage": 2, "nets": ["net_a_185", "net_ph0n_183", "net_ph1n_184"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_90"], "svg": "u_cpld_ctrl_counter_08_90.svg", "html": "u_cpld_ctrl_counter_08_90.html"}, {"id": "u_cpld_ctrl_counter_08_91", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_91", "stage": 2, "nets": ["net_a_185", "net_a_186", "net_tpl5"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_91"], "svg": "u_cpld_ctrl_counter_08_91.svg", "html": "u_cpld_ctrl_counter_08_91.html"}, {"id": "u_cpld_ctrl_counter_08_92", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_92", "stage": 2, "nets": ["net_a_189", "net_ph0n_187", "net_ph1n_188"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_92"], "svg": "u_cpld_ctrl_counter_08_92.svg", "html": "u_cpld_ctrl_counter_08_92.html"}, {"id": "u_cpld_ctrl_counter_08_93", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_93", "stage": 2, "nets": ["net_a_189", "net_a_190", "net_tpl1"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_93"], "svg": "u_cpld_ctrl_counter_08_93.svg", "html": "u_cpld_ctrl_counter_08_93.html"}, {"id": "u_cpld_ctrl_counter_08_94", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_94", "stage": 2, "nets": ["net_a_192", "net_ph1n_191", "net_phase0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_94"], "svg": "u_cpld_ctrl_counter_08_94.svg", "html": "u_cpld_ctrl_counter_08_94.html"}, {"id": "u_cpld_ctrl_counter_08_95", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_95", "stage": 2, "nets": ["net_a_192", "net_a_193", "net_tpl1"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_95"], "svg": "u_cpld_ctrl_counter_08_95.svg", "html": "u_cpld_ctrl_counter_08_95.html"}, {"id": "u_cpld_ctrl_counter_08_96", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_96", "stage": 2, "nets": ["net_a_196", "net_ph0n_194", "net_ph1n_195"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_96"], "svg": "u_cpld_ctrl_counter_08_96.svg", "html": "u_cpld_ctrl_counter_08_96.html"}, {"id": "u_cpld_ctrl_counter_08_97", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_97", "stage": 2, "nets": ["net_a_196", "net_a_197", "net_tpl2"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_97"], "svg": "u_cpld_ctrl_counter_08_97.svg", "html": "u_cpld_ctrl_counter_08_97.html"}, {"id": "u_cpld_ctrl_counter_08_98", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_98", "stage": 2, "nets": ["net_a_199", "net_ph1n_198", "net_phase0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_98"], "svg": "u_cpld_ctrl_counter_08_98.svg", "html": "u_cpld_ctrl_counter_08_98.html"}, {"id": "u_cpld_ctrl_counter_08_99", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_99", "stage": 2, "nets": ["net_a_199", "net_a_200", "net_tpl2"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_99"], "svg": "u_cpld_ctrl_counter_08_99.svg", "html": "u_cpld_ctrl_counter_08_99.html"}, {"id": "u_cpld_ctrl_counter_08_100", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_100", "stage": 2, "nets": ["net_a_203", "net_ph0n_201", "net_ph1n_202"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_100"], "svg": "u_cpld_ctrl_counter_08_100.svg", "html": "u_cpld_ctrl_counter_08_100.html"}, {"id": "u_cpld_ctrl_counter_08_101", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_101", "stage": 2, "nets": ["net_a_203", "net_a_204", "net_tpl6"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_101"], "svg": "u_cpld_ctrl_counter_08_101.svg", "html": "u_cpld_ctrl_counter_08_101.html"}, {"id": "u_cpld_ctrl_counter_08_102", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_102", "stage": 2, "nets": ["net_a_207", "net_ph0n_205", "net_ph1n_206"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_102"], "svg": "u_cpld_ctrl_counter_08_102.svg", "html": "u_cpld_ctrl_counter_08_102.html"}, {"id": "u_cpld_ctrl_counter_08_103", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_103", "stage": 2, "nets": ["net_a_207", "net_a_208", "net_tpl0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_103"], "svg": "u_cpld_ctrl_counter_08_103.svg", "html": "u_cpld_ctrl_counter_08_103.html"}, {"id": "u_cpld_ctrl_counter_08_104", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_104", "stage": 2, "nets": ["net_a_210", "net_ph1n_209", "net_phase0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_104"], "svg": "u_cpld_ctrl_counter_08_104.svg", "html": "u_cpld_ctrl_counter_08_104.html"}, {"id": "u_cpld_ctrl_counter_08_105", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_105", "stage": 2, "nets": ["net_a_210", "net_a_211", "net_tpl0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_105"], "svg": "u_cpld_ctrl_counter_08_105.svg", "html": "u_cpld_ctrl_counter_08_105.html"}, {"id": "u_cpld_ctrl_counter_08_106", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_106", "stage": 2, "nets": ["net_a_213", "net_ph0n_212", "net_phase1"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_106"], "svg": "u_cpld_ctrl_counter_08_106.svg", "html": "u_cpld_ctrl_counter_08_106.html"}, {"id": "u_cpld_ctrl_counter_08_107", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_107", "stage": 2, "nets": ["net_a_213", "net_a_214", "net_tpl0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_107"], "svg": "u_cpld_ctrl_counter_08_107.svg", "html": "u_cpld_ctrl_counter_08_107.html"}, {"id": "u_cpld_ctrl_counter_08_108", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_108", "stage": 2, "nets": ["net_a_217", "net_ph0n_215", "net_ph1n_216"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_108"], "svg": "u_cpld_ctrl_counter_08_108.svg", "html": "u_cpld_ctrl_counter_08_108.html"}, {"id": "u_cpld_ctrl_counter_08_109", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_109", "stage": 2, "nets": ["net_a_217", "net_a_218", "net_tpl2"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_109"], "svg": "u_cpld_ctrl_counter_08_109.svg", "html": "u_cpld_ctrl_counter_08_109.html"}, {"id": "u_cpld_ctrl_counter_08_110", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_110", "stage": 2, "nets": ["net_a_220", "net_ph1n_219", "net_phase0"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_110"], "svg": "u_cpld_ctrl_counter_08_110.svg", "html": "u_cpld_ctrl_counter_08_110.html"}, {"id": "u_cpld_ctrl_counter_08_111", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_111", "stage": 2, "nets": ["net_a_220", "net_a_221", "net_tpl2"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_111"], "svg": "u_cpld_ctrl_counter_08_111.svg", "html": "u_cpld_ctrl_counter_08_111.html"}, {"id": "u_cpld_ctrl_counter_08_112", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_112", "stage": 2, "nets": ["net_a_224", "net_ph0n_222", "net_ph1n_223"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_112"], "svg": "u_cpld_ctrl_counter_08_112.svg", "html": "u_cpld_ctrl_counter_08_112.html"}, {"id": "u_cpld_ctrl_counter_08_113", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_113", "stage": 2, "nets": ["net_a_224", "net_a_225", "net_tpl3"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_113"], "svg": "u_cpld_ctrl_counter_08_113.svg", "html": "u_cpld_ctrl_counter_08_113.html"}, {"id": "u_cpld_ctrl_counter_08_114", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_114", "stage": 2, "nets": ["net_a_228", "net_ph0n_226", "net_ph1n_227"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_114"], "svg": "u_cpld_ctrl_counter_08_114.svg", "html": "u_cpld_ctrl_counter_08_114.html"}, {"id": "u_cpld_ctrl_counter_08_115", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_115", "stage": 2, "nets": ["net_a_228", "net_a_229", "net_tpl3"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_115"], "svg": "u_cpld_ctrl_counter_08_115.svg", "html": "u_cpld_ctrl_counter_08_115.html"}, {"id": "u_cpld_ctrl_counter_08_116", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_116", "stage": 2, "nets": ["net_a_232", "net_ph0n_230", "net_ph1n_231"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_116"], "svg": "u_cpld_ctrl_counter_08_116.svg", "html": "u_cpld_ctrl_counter_08_116.html"}, {"id": "u_cpld_ctrl_counter_08_117", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_117", "stage": 2, "nets": ["net_a_232", "net_a_233", "net_tpl3"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_117"], "svg": "u_cpld_ctrl_counter_08_117.svg", "html": "u_cpld_ctrl_counter_08_117.html"}, {"id": "u_cpld_ctrl_counter_08_118", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_118", "stage": 2, "nets": ["net_a_236", "net_ph0n_234", "net_ph1n_235"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_118"], "svg": "u_cpld_ctrl_counter_08_118.svg", "html": "u_cpld_ctrl_counter_08_118.html"}, {"id": "u_cpld_ctrl_counter_08_119", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_119", "stage": 2, "nets": ["net_a_236", "net_a_237", "net_tpl3"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_119"], "svg": "u_cpld_ctrl_counter_08_119.svg", "html": "u_cpld_ctrl_counter_08_119.html"}, {"id": "u_cpld_ctrl_counter_08_120", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_120", "stage": 2, "nets": ["net_a_240", "net_ph0n_238", "net_ph1n_239"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_120"], "svg": "u_cpld_ctrl_counter_08_120.svg", "html": "u_cpld_ctrl_counter_08_120.html"}, {"id": "u_cpld_ctrl_counter_08_121", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_121", "stage": 2, "nets": ["net_a_240", "net_a_241", "net_tpl3"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_121"], "svg": "u_cpld_ctrl_counter_08_121.svg", "html": "u_cpld_ctrl_counter_08_121.html"}, {"id": "u_cpld_ctrl_counter_08_122", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_122", "stage": 2, "nets": ["net_a_244", "net_ph0n_242", "net_ph1n_243"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_122"], "svg": "u_cpld_ctrl_counter_08_122.svg", "html": "u_cpld_ctrl_counter_08_122.html"}, {"id": "u_cpld_ctrl_counter_08_123", "kind": "and_gate", "category": "AND", "label": "U_CPLD_CTRL_COUNTER_08_123", "stage": 2, "nets": ["net_a_244", "net_a_245", "net_tpl3"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_08_123"], "svg": "u_cpld_ctrl_counter_08_123.svg", "html": "u_cpld_ctrl_counter_08_123.html"}, {"id": "u_cpld_ctrl_counter_32_10", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_10", "stage": 2, "nets": ["net_a_161", "net_a_168", "net_o_246"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_10"], "svg": "u_cpld_ctrl_counter_32_10.svg", "html": "u_cpld_ctrl_counter_32_10.html"}, {"id": "u_cpld_ctrl_counter_32_11", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_11", "stage": 2, "nets": ["net_a_193", "net_o_246", "net_o_247"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_11"], "svg": "u_cpld_ctrl_counter_32_11.svg", "html": "u_cpld_ctrl_counter_32_11.html"}, {"id": "u_cpld_ctrl_counter_32_12", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_12", "stage": 2, "nets": ["net_a_225", "net_o_247", "net_o_248"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_12"], "svg": "u_cpld_ctrl_counter_32_12.svg", "html": "u_cpld_ctrl_counter_32_12.html"}, {"id": "u_cpld_ctrl_counter_32_13", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_13", "stage": 2, "nets": ["net_a_229", "net_o_248", "net_o_249"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_13"], "svg": "u_cpld_ctrl_counter_32_13.svg", "html": "u_cpld_ctrl_counter_32_13.html"}, {"id": "u_cpld_ctrl_counter_32_14", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_14", "stage": 2, "nets": ["net_a_233", "net_o_249", "net_o_250"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_14"], "svg": "u_cpld_ctrl_counter_32_14.svg", "html": "u_cpld_ctrl_counter_32_14.html"}, {"id": "u_cpld_ctrl_counter_32_15", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_15", "stage": 2, "nets": ["net_a_237", "net_o_250", "net_o_251"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_15"], "svg": "u_cpld_ctrl_counter_32_15.svg", "html": "u_cpld_ctrl_counter_32_15.html"}, {"id": "u_cpld_ctrl_counter_32_16", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_16", "stage": 2, "nets": ["net_a_241", "net_o_251", "net_o_252"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_16"], "svg": "u_cpld_ctrl_counter_32_16.svg", "html": "u_cpld_ctrl_counter_32_16.html"}, {"id": "u_cpld_ctrl_counter_32_17", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_17", "stage": 2, "nets": ["net_a_245", "net_o_252", "net_o_253"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_17"], "svg": "u_cpld_ctrl_counter_32_17.svg", "html": "u_cpld_ctrl_counter_32_17.html"}, {"id": "u_cpld_ctrl_counter_32_18", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_18", "stage": 2, "nets": ["net_a_165", "net_a_190", "net_o_254"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_18"], "svg": "u_cpld_ctrl_counter_32_18.svg", "html": "u_cpld_ctrl_counter_32_18.html"}, {"id": "u_cpld_ctrl_counter_32_19", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_19", "stage": 2, "nets": ["net_a_175", "net_a_200", "net_o_255"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_19"], "svg": "u_cpld_ctrl_counter_32_19.svg", "html": "u_cpld_ctrl_counter_32_19.html"}, {"id": "u_cpld_ctrl_counter_32_20", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_20", "stage": 2, "nets": ["net_a_221", "net_o_255", "net_o_256"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_20"], "svg": "u_cpld_ctrl_counter_32_20.svg", "html": "u_cpld_ctrl_counter_32_20.html"}, {"id": "u_cpld_ctrl_counter_32_21", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_21", "stage": 2, "nets": ["net_a_155", "net_a_158", "net_o_257"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_21"], "svg": "u_cpld_ctrl_counter_32_21.svg", "html": "u_cpld_ctrl_counter_32_21.html"}, {"id": "u_cpld_ctrl_counter_32_22", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_22", "stage": 2, "nets": ["net_a_161", "net_o_257", "net_o_258"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_22"], "svg": "u_cpld_ctrl_counter_32_22.svg", "html": "u_cpld_ctrl_counter_32_22.html"}, {"id": "u_cpld_ctrl_counter_32_23", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_23", "stage": 2, "nets": ["net_a_172", "net_o_258", "net_o_259"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_23"], "svg": "u_cpld_ctrl_counter_32_23.svg", "html": "u_cpld_ctrl_counter_32_23.html"}, {"id": "u_cpld_ctrl_counter_32_24", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_24", "stage": 2, "nets": ["net_a_197", "net_o_259", "net_o_260"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_24"], "svg": "u_cpld_ctrl_counter_32_24.svg", "html": "u_cpld_ctrl_counter_32_24.html"}, {"id": "u_cpld_ctrl_counter_32_25", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_25", "stage": 2, "nets": ["net_a_218", "net_o_260", "net_o_261"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_25"], "svg": "u_cpld_ctrl_counter_32_25.svg", "html": "u_cpld_ctrl_counter_32_25.html"}, {"id": "u_cpld_ctrl_counter_32_26", "kind": "or_gate", "category": "OR", "label": "U_CPLD_CTRL_COUNTER_32_26", "stage": 2, "nets": ["net_a_182", "net_a_186", "net_o_262"], "gate_pins": [], "instance_refs": ["U_CPLD_CTRL_COUNTER_32_26"], "svg": "u_cpld_ctrl_counter_32_26.svg", "html": "u_cpld_ctrl_counter_32_26.html"}, {"id": "wsel_153", "kind": "mux4_l", "category": "MUX Logic", "label": "w_sel 153", "stage": 3, "nets": ["net_opc0", "net_opc1", "net_wsel0", "net_wsel1"], "gate_pins": [{"pkg": "U_ALU_153_L_76", "dip": 1, "logical": "1G"}, {"pkg": "U_ALU_153_L_76", "dip": 2, "logical": "B"}, {"pkg": "U_ALU_153_L_76", "dip": 3, "logical": "1C3"}, {"pkg": "U_ALU_153_L_76", "dip": 4, "logical": "1C2"}, {"pkg": "U_ALU_153_L_76", "dip": 5, "logical": "1C1"}, {"pkg": "U_ALU_153_L_76", "dip": 6, "logical": "1C0"}, {"pkg": "U_ALU_153_L_76", "dip": 7, "logical": "1Y"}, {"pkg": "U_ALU_153_L_76", "dip": 8, "logical": "GND"}, {"pkg": "U_ALU_153_L_76", "dip": 9, "logical": "2Y"}, {"pkg": "U_ALU_153_L_76", "dip": 10, "logical": "2C0"}, {"pkg": "U_ALU_153_L_76", "dip": 11, "logical": "2C1"}, {"pkg": "U_ALU_153_L_76", "dip": 12, "logical": "2C2"}, {"pkg": "U_ALU_153_L_76", "dip": 13, "logical": "2C3"}, {"pkg": "U_ALU_153_L_76", "dip": 14, "logical": "A"}, {"pkg": "U_ALU_153_L_76", "dip": 15, "logical": "2G"}, {"pkg": "U_ALU_153_L_76", "dip": 16, "logical": "VCC"}], "instance_refs": ["U_WSEL_153"], "svg": "wsel_153.svg", "html": "wsel_153.html"}, {"id": "ctrl_574", "kind": "latch8", "category": "Latch 8", "label": "ctrl 574", "stage": 4, "nets": ["net_clk", "net_mem_rd", "net_mem_rd_lat", "net_mem_wr", "net_mem_wr_lat", "net_pc_load_en", "net_pc_load_en_lat", "net_reg_we", "net_reg_we_lat", "net_rsv_lat", "net_wsel0", "net_wsel0_lat", "net_wsel1", "net_wsel1_lat", "net_y_oe", "net_y_oe_lat"], "gate_pins": [], "instance_refs": ["U_CTRL_574"], "svg": "ctrl_574.svg", "html": "ctrl_574.html"}, {"id": "beq_and", "kind": "and_gate", "category": "AND", "label": "BEQ PC_LOAD\u2227Z", "stage": 5, "nets": ["net_flg_z", "net_pc_load", "net_pc_load_en_lat"], "gate_pins": [], "instance_refs": ["U_BEQ_AND"], "svg": "beq_and.svg", "html": "beq_and.html"}]};
+    const listEl = document.getElementById('unit-list');
+    const host = document.getElementById('schematic-host');
+    const titleEl = document.getElementById('unit-title');
+    const scopeEl = document.getElementById('scope-tags');
+    let manifest = window.__UNITS_MANIFEST__ || null;
+    let activeId = null;
+    let baseUrl = '';
+    let graphLoaded = false;
+
+    function renderSidebar() {
+      listEl.innerHTML = '';
+      if (!manifest || !manifest.units) return;
+      const byKind = {};
+      manifest.units.forEach((u) => {
+        const key = u.category || u.kind;
+        (byKind[key] = byKind[key] || []).push(u);
+      });
+      Object.keys(byKind).sort().forEach((cat) => {
+        const section = document.createElement('div');
+        section.className = 'cat';
+        section.innerHTML = '<div class="cat-title">' + cat + '</div>';
+        byKind[cat].forEach((u) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'unit-btn' + (u.id === activeId ? ' active' : '');
+          btn.textContent = u.label;
+          btn.title = u.id;
+          btn.onclick = () => selectUnit(u);
+          section.appendChild(btn);
+        });
+        listEl.appendChild(section);
+      });
+      document.getElementById('btn-all').classList.toggle('active', activeId === null);
+    }
+
+    function loadGraph(done) {
+      const path = manifest.graph_html || manifest.graph_svg;
+      if (!path) {
+        host.innerHTML = '<div id="load-hint">manifest missing graph_html / graph_svg</div>';
+        return;
+      }
+      if (manifest.graph_html) {
+        host.innerHTML = '<iframe id="graph-frame" src="' + baseUrl + manifest.graph_html + '"></iframe>';
+        document.getElementById('load-hint')?.remove();
+        graphLoaded = true;
+        const frame = document.getElementById('graph-frame');
+        frame.onload = () => { if (done) done(frame); };
+        if (frame.contentDocument) { if (done) done(frame); }
+        return;
+      }
+      fetch(baseUrl + path)
+        .then((r) => r.text())
+        .then((text) => {
+          host.innerHTML = text;
+          document.getElementById('load-hint')?.remove();
+          graphLoaded = true;
+          if (window.initSchematicInteractive) initSchematicInteractive(host);
+          if (done) done(null);
+        });
+    }
+
+    function graphSvg(frame) {
+      if (frame && frame.contentDocument) {
+        return frame.contentDocument.querySelector('svg');
+      }
+      return host.querySelector('svg');
+    }
+
+    function clearHighlight() {
+      const svg = graphSvg(document.getElementById('graph-frame'));
+      if (!svg) return;
+      svg.querySelectorAll('.gate-node, .wire-seg, .io-net, .port').forEach((el) => {
+        el.style.opacity = '';
+      });
+      svg.querySelectorAll('.wire-seg').forEach((w) => w.setAttribute('stroke-width', '1.3'));
+    }
+
+    function showAll() {
+      activeId = null;
+      renderSidebar();
+      titleEl.textContent = 'All gates';
+      scopeEl.textContent = (manifest.units || []).length + ' gates · full connectivity';
+      const run = () => clearHighlight();
+      if (!graphLoaded) loadGraph(run);
+      else run();
+    }
+
+    function selectUnit(u) {
+      activeId = u.id;
+      renderSidebar();
+      titleEl.innerHTML = '<strong>' + u.label + '</strong> · ' + u.kind;
+      scopeEl.textContent = (u.nets || []).length + ' nets · highlight on full graph';
+
+      const apply = (frame) => {
+        const svg = graphSvg(frame);
+        if (svg && window.applyGateHighlight) applyGateHighlight(svg, u);
+      };
+
+      if (!graphLoaded) loadGraph(apply);
+      else apply(document.getElementById('graph-frame'));
+    }
+
+    function applyManifest(data, base) {
+      manifest = data;
+      baseUrl = base || '';
+      renderSidebar();
+      showAll();
+    }
+
+    document.getElementById('btn-all').onclick = showAll;
+    document.getElementById('file-manifest').addEventListener('change', (e) => {
+      const f = e.target.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = () => { graphLoaded = false; applyManifest(JSON.parse(r.result), ''); };
+      r.readAsText(f);
+    });
+
+    if (manifest) applyManifest(manifest, '');
+    else fetch('manifest.json')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data) applyManifest(data, ''); })
+      .catch(() => {});
+  </script>
+<script>
+/**
+ * Highlight one gate unit on the full gate connectivity graph.
+ */
+(function () {
+  'use strict';
+
+  const DIM = '0.1';
+  const WIRE_DIM = '0.08';
+
+  function applyGateHighlight(svg, unit) {
+    if (!svg || !unit) return;
+    const nets = new Set(unit.nets || []);
+    const relatedUnits = new Set([unit.id]);
+
+    svg.querySelectorAll('.gate-node, .wire-seg, .wire-trunk, .io-net, .port, .net-hub, .net-junction, .port-fixed').forEach((el) => {
+      el.style.opacity = '';
+    });
+
+    // Expand to gates that share a highlighted net
+    svg.querySelectorAll('.port').forEach((p) => {
+      const net = p.getAttribute('data-net') || '';
+      const uid = p.getAttribute('data-unit') || '';
+      if (nets.has(net)) relatedUnits.add(uid);
+    });
+
+    svg.querySelectorAll('.gate-node').forEach((g) => {
+      const id = g.getAttribute('data-unit-id') || '';
+      const on = relatedUnits.has(id);
+      g.style.opacity = on ? '1' : DIM;
+    });
+
+    svg.querySelectorAll('.wire-seg, .wire-trunk').forEach((w) => {
+      const net = w.getAttribute('data-net') || '';
+      w.style.opacity = nets.has(net) ? '0.9' : WIRE_DIM;
+      w.setAttribute('stroke-width', nets.has(net) ? '2.2' : w.getAttribute('data-base-sw') || '1.3');
+    });
+
+    svg.querySelectorAll('.net-hub, .net-junction').forEach((j) => {
+      const net = j.getAttribute('data-net') || '';
+      j.style.opacity = nets.has(net) ? '1' : WIRE_DIM;
+    });
+
+    svg.querySelectorAll('.io-net').forEach((io) => {
+      const net = io.getAttribute('data-net') || '';
+      io.style.opacity = nets.has(net) ? '1' : WIRE_DIM;
+    });
+
+    svg.querySelectorAll('.port').forEach((p) => {
+      const net = p.getAttribute('data-net') || '';
+      const uid = p.getAttribute('data-unit') || '';
+      const on = nets.has(net) || uid === unit.id;
+      p.style.opacity = on ? '1' : DIM;
+    });
+  }
+
+  window.applyGateHighlight = applyGateHighlight;
+})();
+
+</script>
+<script>
+/**
+ * Plover schematic SVG: drag chips, net hubs, individual wire bends.
+ */
+(function () {
+  'use strict';
+
+  const DIM_OPACITY = '0.1';
+  const HI_OPACITY = '1';
+  const HI_WIDTH = '2.4';
+  const PWR = new Set(['pwr_vcc', 'pwr_gnd']);
+  const ROUTE_STUB = 32;
+
+  function svgRoot(host) {
+    return host.querySelector('svg') || host;
+  }
+
+  function parsePoints(pts) {
+    return pts
+      .trim()
+      .split(/\s+/)
+      .map((p) => {
+        const [x, y] = p.split(',');
+        return { x: parseFloat(x), y: parseFloat(y) };
+      });
+  }
+
+  function formatPoints(arr) {
+    return arr.map((p) => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+  }
+
+  function pinSide(pin) {
+    return pin && pin.getAttribute('data-side') === 'right' ? 'right' : 'left';
+  }
+
+  /** Left pins exit left; right pins exit right (avoid routing through chip). */
+  function routeOrtho(x1, y1, x2, y2, side) {
+    const ex = side === 'left' ? x1 - ROUTE_STUB : x1 + ROUTE_STUB;
+    return [
+      { x: x1, y: y1 },
+      { x: ex, y: y1 },
+      { x: ex, y: y2 },
+      { x: x2, y: y2 },
+    ];
+  }
+
+  function routeToRail(px, py, railY, side) {
+    const ex = side === 'left' ? px - ROUTE_STUB : px + ROUTE_STUB;
+    return [
+      { x: px, y: py },
+      { x: ex, y: py },
+      { x: ex, y: railY },
+    ];
+  }
+
+  function pinCenter(svg, pinEl) {
+    const pt = svg.createSVGPoint();
+    const ctm = pinEl.getScreenCTM();
+    const root = svg.getScreenCTM();
+    if (!ctm || !root) {
+      return { x: parseFloat(pinEl.getAttribute('cx')), y: parseFloat(pinEl.getAttribute('cy')) };
+    }
+    pt.x = parseFloat(pinEl.getAttribute('cx'));
+    pt.y = parseFloat(pinEl.getAttribute('cy'));
+    const s = pt.matrixTransform(ctm);
+    const local = svg.createSVGPoint();
+    local.x = s.x;
+    local.y = s.y;
+    return local.matrixTransform(root.inverse());
+  }
+
+  function clientToSvg(svg, e) {
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+  }
+
+  function allPins(svg) {
+    return [...svg.querySelectorAll('circle.pin[data-net]')];
+  }
+
+  function wireSeg(svg, net, pkg) {
+    return svg.querySelector(
+      '.wire-seg[data-net="' + net + '"][data-pkg="' + pkg + '"]'
+    );
+  }
+
+  function wiresForNet(svg, net) {
+    return [...svg.querySelectorAll('.wire-seg[data-net="' + net + '"]')];
+  }
+
+  function setWirePoints(svg, net, pkg, pointsStr) {
+    const seg = wireSeg(svg, net, pkg);
+    const hit = svg.querySelector(
+      '.wire-hit[data-net="' + net + '"][data-pkg="' + pkg + '"]'
+    );
+    if (seg) seg.setAttribute('points', pointsStr);
+    if (hit) hit.setAttribute('points', pointsStr);
+    syncHandlesForWire(svg, net, pkg);
+  }
+
+  function handleLayer(svg) {
+    let g = svg.querySelector('#wire-handles');
+    if (!g) {
+      g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('id', 'wire-handles');
+      svg.appendChild(g);
+    }
+    return g;
+  }
+
+  function syncHandlesForWire(svg, net, pkg) {
+    const layer = handleLayer(svg);
+    layer.querySelectorAll(
+      '.wire-handle[data-net="' + net + '"][data-pkg="' + pkg + '"]'
+    ).forEach((h) => h.remove());
+
+    const seg = wireSeg(svg, net, pkg);
+    if (!seg) return;
+
+    const pts = parsePoints(seg.getAttribute('points') || '');
+    const indices = [];
+    for (let i = 1; i < pts.length - 1; i++) indices.push(i);
+    if (pts.length <= 3 && PWR.has(net) && indices.length === 0) indices.push(1);
+
+    indices.forEach((i) => {
+      const p =
+        pts.length === 2 && PWR.has(net)
+          ? { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 }
+          : pts[i];
+      const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('class', 'wire-handle');
+      c.setAttribute('data-net', net);
+      c.setAttribute('data-pkg', pkg);
+      c.setAttribute('data-idx', String(i));
+      c.setAttribute('cx', p.x.toFixed(1));
+      c.setAttribute('cy', p.y.toFixed(1));
+      c.setAttribute('r', '5');
+      layer.appendChild(c);
+    });
+  }
+
+  function rebuildAllHandles(svg) {
+    const layer = handleLayer(svg);
+    layer.innerHTML = '';
+    svg.querySelectorAll('.wire-seg').forEach((seg) => {
+      syncHandlesForWire(
+        svg,
+        seg.getAttribute('data-net'),
+        seg.getAttribute('data-pkg')
+      );
+    });
+  }
+
+  function setHandlesVisible(svg, net, pkg, on) {
+    const sel =
+      pkg != null
+        ? '.wire-handle[data-net="' + net + '"][data-pkg="' + pkg + '"]'
+        : '.wire-handle[data-net="' + net + '"]';
+    svg.querySelectorAll(sel).forEach((h) => {
+      if (on) h.classList.add('on');
+      else h.classList.remove('on');
+    });
+  }
+
+  function hideAllHandles(svg) {
+    svg.querySelectorAll('.wire-handle').forEach((h) => h.classList.remove('on'));
+  }
+
+  function resetWireRoute(svg, net, pkg) {
+    const seg = wireSeg(svg, net, pkg);
+    if (seg) seg.removeAttribute('data-custom');
+  }
+
+  function disableTextSelection(svg) {
+    svg.querySelectorAll('text').forEach((t) => {
+      t.setAttribute('pointer-events', 'none');
+    });
+    svg.addEventListener('selectstart', (e) => e.preventDefault());
+    svg.addEventListener('dragstart', (e) => e.preventDefault());
+    const root = svg.parentElement;
+    if (root) {
+      root.style.userSelect = 'none';
+      root.style.webkitUserSelect = 'none';
+    }
+  }
+
+  function hubForNet(svg, net) {
+    return svg.querySelector('.net-hub[data-net="' + net + '"]');
+  }
+
+  function labelForNet(svg, net) {
+    return svg.querySelector('.net-label[data-net="' + net + '"]');
+  }
+
+  function netsForChip(svg, chipId) {
+    const nets = new Set();
+    svg.querySelectorAll('.chip[data-id="' + chipId + '"] circle.pin[data-net]').forEach((p) => {
+      nets.add(p.getAttribute('data-net'));
+    });
+    return nets;
+  }
+
+  function hubCentroid(svg, net) {
+    const pins = allPins(svg).filter((p) => p.getAttribute('data-net') === net);
+    if (!pins.length) return null;
+    let sx = 0;
+    let sy = 0;
+    pins.forEach((p) => {
+      const c = pinCenter(svg, p);
+      sx += c.x;
+      sy += c.y;
+    });
+    return { x: sx / pins.length, y: sy / pins.length };
+  }
+
+  function hubCoords(svg, net, repositionAuto) {
+    const hubEl = hubForNet(svg, net);
+    if (!hubEl) return null;
+    if (hubEl.getAttribute('data-manual') === '1' && !repositionAuto) {
+      return {
+        x: parseFloat(hubEl.getAttribute('cx')),
+        y: parseFloat(hubEl.getAttribute('cy')),
+      };
+    }
+    const pos = hubCentroid(svg, net);
+    if (!pos) return null;
+    hubEl.setAttribute('cx', pos.x.toFixed(1));
+    hubEl.setAttribute('cy', pos.y.toFixed(1));
+    return pos;
+  }
+
+  function pinForWire(svg, net, pkg) {
+    return svg.querySelector(
+      '.chip[data-id="' + pkg + '"] circle.pin[data-net="' + net + '"]'
+    );
+  }
+
+  function routeOneWire(svg, net, pkg, hub) {
+    const pin = pinForWire(svg, net, pkg);
+    if (!pin) return;
+    const c = pinCenter(svg, pin);
+    const side = pinSide(pin);
+    const seg = wireSeg(svg, net, pkg);
+    if (!seg) return;
+
+    let pts;
+    if (seg.getAttribute('data-custom') === '1') {
+      pts = parsePoints(seg.getAttribute('points'));
+      if (pts.length < 2) pts = routeOrtho(c.x, c.y, hub.x, hub.y, side);
+      else {
+        pts[0] = c;
+        pts[pts.length - 1] = hub;
+      }
+    } else {
+      pts = routeOrtho(c.x, c.y, hub.x, hub.y, side);
+    }
+    setWirePoints(svg, net, pkg, formatPoints(pts));
+  }
+
+  function routeOnePowerWire(svg, net, pkg, railY) {
+    const pin = pinForWire(svg, net, pkg);
+    if (!pin) return;
+    const c = pinCenter(svg, pin);
+    const side = pinSide(pin);
+    const seg = wireSeg(svg, net, pkg);
+    if (!seg) return;
+
+    let pts;
+    if (seg.getAttribute('data-custom') === '1') {
+      pts = parsePoints(seg.getAttribute('points'));
+      if (pts.length < 2) pts = routeToRail(c.x, c.y, railY, side);
+      else {
+        pts[0] = c;
+        pts[pts.length - 1] = { x: pts[pts.length - 1].x, y: railY };
+      }
+    } else {
+      pts = routeToRail(c.x, c.y, railY, side);
+    }
+    setWirePoints(svg, net, pkg, formatPoints(pts));
+  }
+
+  function routeWiresToHub(svg, net, hub) {
+    const lbl = labelForNet(svg, net);
+    if (lbl) {
+      lbl.setAttribute('x', hub.x.toFixed(1));
+      lbl.setAttribute('y', (hub.y - 6).toFixed(1));
+    }
+    wiresForNet(svg, net).forEach((w) => {
+      routeOneWire(svg, net, w.getAttribute('data-pkg'), hub);
+    });
+  }
+
+  function refreshNet(svg, net) {
+    if (PWR.has(net)) {
+      const railY = parseFloat(svg.getAttribute('data-rail-vcc-y') || '14');
+      const railGnd = parseFloat(svg.getAttribute('data-rail-gnd-y') || '0');
+      const y = net === 'pwr_vcc' ? railY : railGnd;
+      wiresForNet(svg, net).forEach((w) => {
+        routeOnePowerWire(svg, net, w.getAttribute('data-pkg'), y);
+      });
+      return;
+    }
+
+    const hub = hubCoords(svg, net, false);
+    if (!hub) return;
+    routeWiresToHub(svg, net, hub);
+  }
+
+  function clearHighlight(svg) {
+    svg.querySelectorAll('.wire-seg').forEach((w) => {
+      w.classList.remove('highlight');
+      w.style.opacity = '';
+      w.style.strokeWidth = '';
+    });
+    svg.querySelectorAll('.net-hub').forEach((h) => {
+      h.classList.remove('highlight');
+      h.style.opacity = '';
+    });
+    svg.querySelectorAll('.net-label').forEach((l) => {
+      l.style.opacity = '';
+      l.style.fontWeight = '';
+    });
+    svg.querySelectorAll('.chip').forEach((c) => c.classList.remove('highlight'));
+  }
+
+  function dimOthers(svg, activeNets, activeChip) {
+    svg.querySelectorAll('.wire-seg').forEach((w) => {
+      const n = w.getAttribute('data-net');
+      const pkg = w.getAttribute('data-pkg');
+      const on = activeNets.has(n) || (activeChip && pkg === activeChip);
+      if (!on) {
+        w.style.opacity = DIM_OPACITY;
+      } else {
+        w.style.opacity = HI_OPACITY;
+        w.style.strokeWidth = HI_WIDTH;
+        w.classList.add('highlight');
+      }
+    });
+    svg.querySelectorAll('.net-hub').forEach((h) => {
+      const n = h.getAttribute('data-net');
+      h.style.opacity = activeNets.has(n) ? HI_OPACITY : DIM_OPACITY;
+      if (activeNets.has(n)) h.classList.add('highlight');
+    });
+    svg.querySelectorAll('.net-label').forEach((l) => {
+      const n = l.getAttribute('data-net');
+      if (activeNets.has(n)) {
+        l.style.opacity = '1';
+        l.style.fontWeight = '600';
+      } else {
+        l.style.opacity = DIM_OPACITY;
+      }
+    });
+  }
+
+  const CLICK_THRESH = 6;
+
+  function pickTarget(svg, el) {
+    if (!el || !el.closest) return null;
+    const handle = el.closest('.wire-handle');
+    if (handle) {
+      return {
+        type: 'handle',
+        el: handle,
+        net: handle.getAttribute('data-net'),
+        pkg: handle.getAttribute('data-pkg'),
+        idx: parseInt(handle.getAttribute('data-idx'), 10),
+      };
+    }
+    const chip = el.closest('.chip');
+    if (chip) {
+      return { type: 'chip', el: chip, id: chip.getAttribute('data-id') };
+    }
+    const hub = el.closest('.net-hub');
+    if (hub) {
+      return { type: 'hub', el: hub, net: hub.getAttribute('data-net') };
+    }
+    const wire = el.closest('.wire-hit') || el.closest('.wire-seg');
+    if (wire) {
+      return {
+        type: 'wire',
+        el: wire,
+        net: wire.getAttribute('data-net'),
+        pkg: wire.getAttribute('data-pkg'),
+      };
+    }
+    if (el === svg || (el.tagName === 'rect' && el.getAttribute('fill') === '#0d1117')) {
+      return { type: 'background', el: svg };
+    }
+    return null;
+  }
+
+  function targetsMatch(a, b) {
+    if (!a || !b || a.type !== b.type) return false;
+    if (a.type === 'chip') return a.id === b.id;
+    if (a.type === 'hub') return a.net === b.net;
+    if (a.type === 'wire') return a.net === b.net && a.pkg === b.pkg;
+    if (a.type === 'handle') {
+      return a.net === b.net && a.pkg === b.pkg && a.idx === b.idx;
+    }
+    return false;
+  }
+
+  function setupSelection(svg) {
+    let selection = null;
+
+    function clearSelectionVisual() {
+      svg.querySelectorAll('.selected').forEach((n) => n.classList.remove('selected'));
+      hideAllHandles(svg);
+    }
+
+    function applySelectionVisual(sel) {
+      clearSelectionVisual();
+      if (!sel || sel.type === 'background') return;
+      if (sel.type === 'chip') {
+        sel.el.classList.add('selected');
+        netsForChip(svg, sel.id).forEach((n) => setHandlesVisible(svg, n, null, true));
+      } else if (sel.type === 'hub') {
+        sel.el.classList.add('selected');
+        setHandlesVisible(svg, sel.net, null, true);
+      } else if (sel.type === 'wire') {
+        const seg = wireSeg(svg, sel.net, sel.pkg) || sel.el;
+        seg.classList.add('selected');
+        setHandlesVisible(svg, sel.net, sel.pkg, true);
+      } else if (sel.type === 'handle') {
+        sel.el.classList.add('selected');
+        const seg = wireSeg(svg, sel.net, sel.pkg);
+        if (seg) seg.classList.add('selected');
+        setHandlesVisible(svg, sel.net, sel.pkg, true);
+      }
+    }
+
+    function updateStatus(sel) {
+      const status = document.getElementById('sel-status');
+      if (!status) return;
+      if (!sel || sel.type === 'background') {
+        status.textContent = '(nothing selected) — click chip, hub, wire, or bend';
+        return;
+      }
+      if (sel.type === 'chip') {
+        status.textContent = 'Selected: chip ' + sel.id + ' — drag to move';
+      } else if (sel.type === 'hub') {
+        status.textContent = 'Selected: net hub ' + sel.net + ' — drag to move';
+      } else if (sel.type === 'wire') {
+        status.textContent =
+          'Selected: wire ' + sel.net + ' @ ' + sel.pkg + ' — drag wire to move';
+      } else if (sel.type === 'handle') {
+        status.textContent =
+          'Selected: bend on ' + sel.net + ' @ ' + sel.pkg + ' — drag to move';
+      }
+    }
+
+    function setSelection(sel) {
+      selection = sel && sel.type !== 'background' ? sel : null;
+      applySelectionVisual(selection);
+      updateStatus(selection);
+    }
+
+    function getSelection() {
+      return selection;
+    }
+
+    function isSelected(sel) {
+      return selection && sel && targetsMatch(selection, sel);
+    }
+
+    return { setSelection, getSelection, isSelected, clearSelectionVisual };
+  }
+
+  function setupInteraction(svg, selApi) {
+    let dragChip = null;
+    let dragHub = null;
+    let dragHandle = null;
+    let dragWireBody = false;
+    let dragNet = null;
+    let dragPkg = null;
+    let dragIdx = -1;
+    let dragStart = null;
+    let wireBodyBase = null;
+    let baseTransform = { x: 0, y: 0 };
+    let pointer = null;
+    let dragActive = false;
+    let requireMatch = false;
+
+    function parseTranslate(g) {
+      const t = g.getAttribute('transform') || '';
+      const m = t.match(/translate\(\s*([-\d.]+)(?:[\s,]+([-\d.]+))?\s*\)/);
+      if (!m) return { x: 0, y: 0 };
+      return { x: parseFloat(m[1]), y: parseFloat(m[2] || 0) };
+    }
+
+    function beginDrag(target) {
+      dragActive = true;
+      if (target.type === 'chip') {
+        dragChip = target.el;
+        dragChip.style.cursor = 'grabbing';
+        baseTransform = parseTranslate(dragChip);
+      } else if (target.type === 'hub') {
+        dragHub = target.el;
+        dragNet = target.net;
+        dragHub.setAttribute('data-manual', '1');
+      } else if (target.type === 'wireBody') {
+        dragWireBody = true;
+        dragNet = target.net;
+        dragPkg = target.pkg;
+        const seg = wireSeg(svg, dragNet, dragPkg);
+        if (seg) {
+          seg.setAttribute('data-custom', '1');
+          wireBodyBase = parsePoints(seg.getAttribute('points') || '');
+        }
+      } else if (target.type === 'handle') {
+        dragHandle = target.el;
+        dragNet = target.net;
+        dragPkg = target.pkg;
+        dragIdx = target.idx;
+        const seg = wireSeg(svg, dragNet, dragPkg);
+        if (seg) seg.setAttribute('data-custom', '1');
+      }
+    }
+
+    function dragTargetForWire(target, svgPt) {
+      syncHandlesForWire(svg, target.net, target.pkg);
+      const seg = wireSeg(svg, target.net, target.pkg);
+      if (!seg) return { type: 'wireBody', net: target.net, pkg: target.pkg };
+      const pts = parsePoints(seg.getAttribute('points') || '');
+      if (pts.length > 2 && svgPt) {
+        let best = 1;
+        let bd = Infinity;
+        for (let i = 1; i < pts.length - 1; i++) {
+          const d = (pts[i].x - svgPt.x) ** 2 + (pts[i].y - svgPt.y) ** 2;
+          if (d < bd) {
+            bd = d;
+            best = i;
+          }
+        }
+        if (bd < 28 * 28) {
+          const el = svg.querySelector(
+            '.wire-handle[data-net="' +
+              target.net +
+              '"][data-pkg="' +
+              target.pkg +
+              '"][data-idx="' +
+              best +
+              '"]'
+          );
+          if (el) {
+            return {
+              type: 'handle',
+              el: el,
+              net: target.net,
+              pkg: target.pkg,
+              idx: best,
+            };
+          }
+        }
+      }
+      return { type: 'wireBody', net: target.net, pkg: target.pkg };
+    }
+
+    function endDrag() {
+      if (dragChip) dragChip.style.cursor = 'grab';
+      dragChip = null;
+      dragHub = null;
+      dragHandle = null;
+      dragWireBody = false;
+      dragNet = null;
+      dragPkg = null;
+      dragIdx = -1;
+      dragStart = null;
+      wireBodyBase = null;
+      dragActive = false;
+      requireMatch = false;
+    }
+
+    function onPointerDown(e) {
+      if (e.button !== 0) return;
+      const target = pickTarget(svg, e.target);
+      if (!target) return;
+
+      if (target.type === 'background') {
+        e.preventDefault();
+        pointer = {
+          target,
+          clientX: e.clientX,
+          clientY: e.clientY,
+          didDrag: false,
+        };
+        return;
+      }
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const sel = selApi.getSelection();
+      requireMatch = !!(
+        sel &&
+        sel.type === 'chip' &&
+        target.type === 'chip' &&
+        !targetsMatch(sel, target)
+      );
+
+      pointer = {
+        target,
+        clientX: e.clientX,
+        clientY: e.clientY,
+        didDrag: false,
+      };
+      dragStart = clientToSvg(svg, e);
+
+      if (target.type === 'wire') {
+        beginDrag(dragTargetForWire(target, dragStart));
+      } else if (target.type === 'handle') {
+        beginDrag(target);
+      } else if (target.type === 'hub' || target.type === 'chip') {
+        if (!sel || targetsMatch(sel, target)) beginDrag(target);
+      }
+    }
+
+    function pointerDist(e) {
+      if (!pointer) return 0;
+      const dx = e.clientX - pointer.clientX;
+      const dy = e.clientY - pointer.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function onPointerMove(e) {
+      if (!pointer) return;
+
+      if (!dragActive && pointerDist(e) >= CLICK_THRESH) {
+        pointer.didDrag = true;
+        const sel = selApi.getSelection();
+        if (requireMatch && sel && !targetsMatch(sel, pointer.target)) {
+          return;
+        }
+        if (!sel || !targetsMatch(sel, pointer.target)) {
+          selApi.setSelection(pointer.target);
+        }
+        const t = pointer.target;
+        if (t.type === 'wire') {
+          beginDrag(dragTargetForWire(t, clientToSvg(svg, e)));
+        } else {
+          beginDrag(t);
+        }
+      }
+
+      if (!dragActive || !dragStart) return;
+      const cur = clientToSvg(svg, e);
+
+      if (dragChip) {
+        const dx = cur.x - dragStart.x;
+        const dy = cur.y - dragStart.y;
+        dragChip.setAttribute(
+          'transform',
+          'translate(' +
+            (baseTransform.x + dx).toFixed(1) +
+            ',' +
+            (baseTransform.y + dy).toFixed(1) +
+            ')'
+        );
+        netsForChip(svg, dragChip.getAttribute('data-id')).forEach((n) =>
+          refreshNet(svg, n)
+        );
+        return;
+      }
+
+      if (dragHub && dragNet) {
+        dragHub.setAttribute('cx', cur.x.toFixed(1));
+        dragHub.setAttribute('cy', cur.y.toFixed(1));
+        routeWiresToHub(svg, dragNet, { x: cur.x, y: cur.y });
+        return;
+      }
+
+      if (dragWireBody && dragNet && dragPkg && wireBodyBase) {
+        const dx = cur.x - dragStart.x;
+        const dy = cur.y - dragStart.y;
+        const pts = wireBodyBase.map((p) => ({ x: p.x + dx, y: p.y + dy }));
+        setWirePoints(svg, dragNet, dragPkg, formatPoints(pts));
+        return;
+      }
+
+      if (dragHandle && dragNet && dragPkg && dragIdx >= 0) {
+        const seg = wireSeg(svg, dragNet, dragPkg);
+        if (!seg) return;
+        let pts = parsePoints(seg.getAttribute('points'));
+        if (pts.length === 2 && PWR.has(dragNet) && dragIdx === 1) {
+          pts = [
+            pts[0],
+            { x: cur.x, y: pts[0].y },
+            { x: cur.x, y: pts[1].y },
+            pts[1],
+          ];
+        } else if (dragIdx >= 1 && dragIdx < pts.length - 1) {
+          pts[dragIdx] = { x: cur.x, y: cur.y };
+        } else {
+          return;
+        }
+        const s = formatPoints(pts);
+        seg.setAttribute('points', s);
+        seg.setAttribute('data-custom', '1');
+        const hit = svg.querySelector(
+          '.wire-hit[data-net="' + dragNet + '"][data-pkg="' + dragPkg + '"]'
+        );
+        if (hit) hit.setAttribute('points', s);
+        syncHandlesForWire(svg, dragNet, dragPkg);
+        const nh = svg.querySelector(
+          '.wire-handle[data-net="' +
+            dragNet +
+            '"][data-pkg="' +
+            dragPkg +
+            '"][data-idx="' +
+            dragIdx +
+            '"]'
+        );
+        if (nh) {
+          dragHandle = nh;
+          selApi.setSelection({
+            type: 'handle',
+            el: nh,
+            net: dragNet,
+            pkg: dragPkg,
+            idx: dragIdx,
+          });
+          dragHandle.setAttribute('cx', cur.x.toFixed(1));
+          dragHandle.setAttribute('cy', cur.y.toFixed(1));
+        }
+      }
+    }
+
+    function onPointerUp() {
+      if (!pointer) return;
+      if (!pointer.didDrag && !dragActive) {
+        if (pointer.target.type === 'background') {
+          selApi.setSelection(null);
+        } else {
+          selApi.setSelection(pointer.target);
+        }
+      } else if (dragActive && pointer.target) {
+        selApi.setSelection(pointer.target);
+      }
+      endDrag();
+      pointer = null;
+    }
+
+    svg.querySelectorAll('.chip').forEach((c) => {
+      c.style.cursor = 'grab';
+    });
+    svg.querySelectorAll('.net-hub').forEach((hub) => {
+      hub.style.cursor = 'move';
+      const r = parseFloat(hub.getAttribute('r') || '3');
+      if (r < 6) hub.setAttribute('r', '6');
+      hub.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const net = hub.getAttribute('data-net');
+        hub.removeAttribute('data-manual');
+        wiresForNet(svg, net).forEach((w) =>
+          resetWireRoute(svg, net, w.getAttribute('data-pkg'))
+        );
+        refreshNet(svg, net);
+      });
+    });
+
+    handleLayer(svg).addEventListener('dblclick', (e) => {
+      const t = e.target;
+      if (!t.classList.contains('wire-handle')) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const net = t.getAttribute('data-net');
+      const pkg = t.getAttribute('data-pkg');
+      resetWireRoute(svg, net, pkg);
+      if (PWR.has(net)) {
+        const railY =
+          net === 'pwr_vcc'
+            ? parseFloat(svg.getAttribute('data-rail-vcc-y') || '14')
+            : parseFloat(svg.getAttribute('data-rail-gnd-y') || '0');
+        routeOnePowerWire(svg, net, pkg, railY);
+      } else {
+        const hub = hubCoords(svg, net, false);
+        if (hub) routeOneWire(svg, net, pkg, hub);
+      }
+    });
+
+    svg.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('mouseup', onPointerUp);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        selApi.setSelection(null);
+        endDrag();
+        pointer = null;
+      }
+    });
+  }
+
+  function setupHover(svg, selApi) {
+    svg.querySelectorAll('.chip').forEach((chip) => {
+      chip.addEventListener('mouseenter', () => {
+        clearHighlight(svg);
+        chip.classList.add('highlight');
+        const nets = netsForChip(svg, chip.getAttribute('data-id'));
+        dimOthers(svg, nets, chip.getAttribute('data-id'));
+        nets.forEach((n) => setHandlesVisible(svg, n, null, true));
+      });
+      chip.addEventListener('mouseleave', () => {
+        clearHighlight(svg);
+        const sel = selApi.getSelection();
+        if (!sel || sel.type !== 'chip' || sel.id !== chip.getAttribute('data-id')) {
+          hideAllHandles(svg);
+          if (sel) selApi.setSelection(sel);
+        }
+      });
+    });
+
+    function wireHover(wire, net, pkg) {
+      wire.addEventListener('mouseenter', () => {
+        clearHighlight(svg);
+        dimOthers(svg, new Set([net]), null);
+        setHandlesVisible(svg, net, pkg, true);
+      });
+      wire.addEventListener('mouseleave', () => {
+        clearHighlight(svg);
+        const sel = selApi.getSelection();
+        const keep =
+          sel &&
+          ((sel.type === 'wire' && sel.net === net && sel.pkg === pkg) ||
+            (sel.type === 'handle' && sel.net === net && sel.pkg === pkg) ||
+            (sel.type === 'hub' && sel.net === net));
+        if (!keep) setHandlesVisible(svg, net, pkg, false);
+      });
+    }
+
+    svg.querySelectorAll('.wire-hit').forEach((wire) => {
+      wire.style.cursor = 'move';
+      wireHover(wire, wire.getAttribute('data-net'), wire.getAttribute('data-pkg'));
+    });
+
+    svg.querySelectorAll('.wire-seg').forEach((wire) => {
+      if (!svg.querySelector('.wire-hit[data-net="' + wire.getAttribute('data-net') + '"]')) {
+        wireHover(wire, wire.getAttribute('data-net'), wire.getAttribute('data-pkg'));
+      }
+    });
+
+    svg.querySelectorAll('.net-hub').forEach((hub) => {
+      hub.addEventListener('mouseenter', () => {
+        clearHighlight(svg);
+        const net = hub.getAttribute('data-net');
+        dimOthers(svg, new Set([net]), null);
+        setHandlesVisible(svg, net, null, true);
+      });
+      hub.addEventListener('mouseleave', () => {
+        clearHighlight(svg);
+        const sel = selApi.getSelection();
+        if (!sel || (sel.type === 'hub' && sel.net !== net)) {
+          if (!sel || sel.type !== 'chip') hideAllHandles(svg);
+        }
+        if (sel) selApi.setSelection(sel);
+      });
+    });
+  }
+
+  window.initSchematicInteractive = function (host) {
+    const svg = svgRoot(host);
+    if (!svg || svg.getAttribute('data-interactive') === '1') return;
+    svg.setAttribute('data-interactive', '1');
+    disableTextSelection(svg);
+    rebuildAllHandles(svg);
+    const selApi = setupSelection(svg);
+    setupInteraction(svg, selApi);
+    setupHover(svg, selApi);
+    selApi.setSelection(null);
+  };
+})();
+
+</script>
+</body>
+</html>

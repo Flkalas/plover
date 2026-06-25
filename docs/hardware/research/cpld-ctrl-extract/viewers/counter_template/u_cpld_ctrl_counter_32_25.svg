@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="144" viewBox="0 0 440 144" data-unit-id="u_cpld_ctrl_counter_32_25" data-gate-view="1">
+<style>
+    text{font-family:system-ui,sans-serif;user-select:none}
+    .title{font-size:13px;font-weight:600;fill:#e6edf3}
+    .subtitle{font-size:10px;fill:#8b949e}
+    .gate-label{font-size:14px;font-weight:700;fill:#e6edf3}
+    .gate-sub{font-size:9px;fill:#8b949e}
+    .port-label{font-size:11px;fill:#c9d1d9}
+    .pin-label{font-size:9px;fill:#8b949e}
+    .col-hdr{font-size:9px;fill:#6e7681;text-transform:uppercase}
+    </style>
+<text x="40.0" y="28.0" class="title">U_CPLD_CTRL_COUNTER_32_25</text>
+<text x="40.0" y="40.0" class="subtitle">OR · u_cpld_ctrl_counter_32_25</text>
+<text x="24.0" y="48.0" class="col-hdr">in</text>
+<text x="360.0" y="48.0" class="col-hdr">out</text>
+<g id="gate">
+<path d="M178.0,39.0 Q192.0,61.0 178.0,83.0 L206.0,61.0 Z" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+<text x="190.0" y="65.0" class="gate-label">≥1</text>
+</g>
+<g id="wires">
+<polyline class="wire-seg" data-net="net_a_218" points="74.0,50.0 168.0,50.0 168.0,61.0" fill="none" stroke="#9380e4" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_o_260" points="74.0,72.0 168.0,72.0 168.0,61.0" fill="none" stroke="#549eeb" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_o_261" points="224.0,61.0 224.0,61.0 350.0,61.0" fill="none" stroke="#86eaf2" stroke-width="1.5" opacity="0.8"/>
+</g>
+<g id="ports">
+<g class="port in" data-net="net_a_218"><circle cx="74.0" cy="50.0" r="3.5" fill="#9380e4"/><text x="24.0" y="54.0" class="port-label">a_218</text><text x="82.0" y="54.0" class="pin-label">B</text></g>
+<g class="port in" data-net="net_o_260"><circle cx="74.0" cy="72.0" r="3.5" fill="#549eeb"/><text x="24.0" y="76.0" class="port-label">o_260</text><text x="82.0" y="76.0" class="pin-label">A</text></g>
+<g class="port out" data-net="net_o_261"><circle cx="350.0" cy="61.0" r="3.5" fill="#86eaf2"/><text x="360.0" y="65.0" class="port-label">o_261</text><text x="342.0" y="65.0" text-anchor="end" class="pin-label">Y</text></g>
+</g>
+</svg>

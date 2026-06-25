@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="452" viewBox="0 0 440 452" data-unit-id="ctrl_574" data-gate-view="1">
+<style>
+    text{font-family:system-ui,sans-serif;user-select:none}
+    .title{font-size:13px;font-weight:600;fill:#e6edf3}
+    .subtitle{font-size:10px;fill:#8b949e}
+    .gate-label{font-size:14px;font-weight:700;fill:#e6edf3}
+    .gate-sub{font-size:9px;fill:#8b949e}
+    .port-label{font-size:11px;fill:#c9d1d9}
+    .pin-label{font-size:9px;fill:#8b949e}
+    .col-hdr{font-size:9px;fill:#6e7681;text-transform:uppercase}
+    </style>
+<text x="40.0" y="28.0" class="title">ctrl 574</text>
+<text x="40.0" y="40.0" class="subtitle">LATCH 8 · ctrl_574</text>
+<text x="24.0" y="48.0" class="col-hdr">in</text>
+<text x="360.0" y="48.0" class="col-hdr">out</text>
+<g id="gate">
+<rect x="166.0" y="187.0" width="68" height="56" rx="4" fill="#21262d" stroke="#a371f7" stroke-width="2"/>
+<text x="200.0" y="219.0" text-anchor="middle" class="gate-label">574</text>
+</g>
+<g id="wires">
+<polyline class="wire-seg" data-net="net_clk" points="74.0,50.0 168.0,50.0 168.0,215.0" fill="none" stroke="#906c93" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_mem_rd" points="74.0,72.0 168.0,72.0 168.0,215.0" fill="none" stroke="#b4b9a5" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_mem_rd_lat" points="74.0,94.0 168.0,94.0 168.0,215.0" fill="none" stroke="#5fa27c" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_mem_wr" points="74.0,116.0 168.0,116.0 168.0,215.0" fill="none" stroke="#8fea83" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_mem_wr_lat" points="74.0,138.0 168.0,138.0 168.0,215.0" fill="none" stroke="#9ed787" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_pc_load_en" points="74.0,160.0 168.0,160.0 168.0,215.0" fill="none" stroke="#d47bd4" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_pc_load_en_lat" points="74.0,182.0 168.0,182.0 168.0,215.0" fill="none" stroke="#54b6be" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_reg_we" points="74.0,204.0 168.0,204.0 168.0,215.0" fill="none" stroke="#80fe94" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_reg_we_lat" points="74.0,226.0 168.0,226.0 168.0,215.0" fill="none" stroke="#6068eb" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_rsv_lat" points="74.0,248.0 168.0,248.0 168.0,215.0" fill="none" stroke="#f4e1d1" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_wsel0" points="74.0,270.0 168.0,270.0 168.0,215.0" fill="none" stroke="#e18de9" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_wsel0_lat" points="74.0,292.0 168.0,292.0 168.0,215.0" fill="none" stroke="#fdf8c8" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_wsel1" points="74.0,314.0 168.0,314.0 168.0,215.0" fill="none" stroke="#7ed6eb" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_wsel1_lat" points="74.0,336.0 168.0,336.0 168.0,215.0" fill="none" stroke="#9afdbd" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_y_oe" points="74.0,358.0 168.0,358.0 168.0,215.0" fill="none" stroke="#f3d9f7" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_y_oe_lat" points="74.0,380.0 168.0,380.0 168.0,215.0" fill="none" stroke="#9fd791" stroke-width="1.5" opacity="0.8"/>
+</g>
+<g id="ports">
+<g class="port in" data-net="net_clk"><circle cx="74.0" cy="50.0" r="3.5" fill="#906c93"/><text x="24.0" y="54.0" class="port-label">clk</text><text x="82.0" y="54.0" class="pin-label">CLK</text></g>
+<g class="port in" data-net="net_mem_rd"><circle cx="74.0" cy="72.0" r="3.5" fill="#b4b9a5"/><text x="24.0" y="76.0" class="port-label">mem_rd</text><text x="82.0" y="76.0" class="pin-label">D1</text></g>
+<g class="port in" data-net="net_mem_rd_lat"><circle cx="74.0" cy="94.0" r="3.5" fill="#5fa27c"/><text x="24.0" y="98.0" class="port-label">mem_rd_lat</text><text x="82.0" y="98.0" class="pin-label">Q1</text></g>
+<g class="port in" data-net="net_mem_wr"><circle cx="74.0" cy="116.0" r="3.5" fill="#8fea83"/><text x="24.0" y="120.0" class="port-label">mem_wr</text><text x="82.0" y="120.0" class="pin-label">D2</text></g>
+<g class="port in" data-net="net_mem_wr_lat"><circle cx="74.0" cy="138.0" r="3.5" fill="#9ed787"/><text x="24.0" y="142.0" class="port-label">mem_wr_lat</text><text x="82.0" y="142.0" class="pin-label">Q2</text></g>
+<g class="port in" data-net="net_pc_load_en"><circle cx="74.0" cy="160.0" r="3.5" fill="#d47bd4"/><text x="24.0" y="164.0" class="port-label">pc_load_en</text><text x="82.0" y="164.0" class="pin-label">D6</text></g>
+<g class="port in" data-net="net_pc_load_en_lat"><circle cx="74.0" cy="182.0" r="3.5" fill="#54b6be"/><text x="24.0" y="186.0" class="port-label">pc_load_en_lat</text><text x="82.0" y="186.0" class="pin-label">Q6</text></g>
+<g class="port in" data-net="net_reg_we"><circle cx="74.0" cy="204.0" r="3.5" fill="#80fe94"/><text x="24.0" y="208.0" class="port-label">reg_we</text><text x="82.0" y="208.0" class="pin-label">D0</text></g>
+<g class="port in" data-net="net_reg_we_lat"><circle cx="74.0" cy="226.0" r="3.5" fill="#6068eb"/><text x="24.0" y="230.0" class="port-label">reg_we_lat</text><text x="82.0" y="230.0" class="pin-label">Q0</text></g>
+<g class="port in" data-net="net_rsv_lat"><circle cx="74.0" cy="248.0" r="3.5" fill="#f4e1d1"/><text x="24.0" y="252.0" class="port-label">rsv_lat</text><text x="82.0" y="252.0" class="pin-label">Q7</text></g>
+<g class="port in" data-net="net_wsel0"><circle cx="74.0" cy="270.0" r="3.5" fill="#e18de9"/><text x="24.0" y="274.0" class="port-label">wsel0</text><text x="82.0" y="274.0" class="pin-label">D4</text></g>
+<g class="port in" data-net="net_wsel0_lat"><circle cx="74.0" cy="292.0" r="3.5" fill="#fdf8c8"/><text x="24.0" y="296.0" class="port-label">wsel0_lat</text><text x="82.0" y="296.0" class="pin-label">Q4</text></g>
+<g class="port in" data-net="net_wsel1"><circle cx="74.0" cy="314.0" r="3.5" fill="#7ed6eb"/><text x="24.0" y="318.0" class="port-label">wsel1</text><text x="82.0" y="318.0" class="pin-label">D5</text></g>
+<g class="port in" data-net="net_wsel1_lat"><circle cx="74.0" cy="336.0" r="3.5" fill="#9afdbd"/><text x="24.0" y="340.0" class="port-label">wsel1_lat</text><text x="82.0" y="340.0" class="pin-label">Q5</text></g>
+<g class="port in" data-net="net_y_oe"><circle cx="74.0" cy="358.0" r="3.5" fill="#f3d9f7"/><text x="24.0" y="362.0" class="port-label">y_oe</text><text x="82.0" y="362.0" class="pin-label">D3</text></g>
+<g class="port in" data-net="net_y_oe_lat"><circle cx="74.0" cy="380.0" r="3.5" fill="#9fd791"/><text x="24.0" y="384.0" class="port-label">y_oe_lat</text><text x="82.0" y="384.0" class="pin-label">Q3</text></g>
+</g>
+</svg>

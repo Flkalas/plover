@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="232" viewBox="0 0 440 232" data-unit-id="addr_157" data-gate-view="1">
+<style>
+    text{font-family:system-ui,sans-serif;user-select:none}
+    .title{font-size:13px;font-weight:600;fill:#e6edf3}
+    .subtitle{font-size:10px;fill:#8b949e}
+    .gate-label{font-size:14px;font-weight:700;fill:#e6edf3}
+    .gate-sub{font-size:9px;fill:#8b949e}
+    .port-label{font-size:11px;fill:#c9d1d9}
+    .pin-label{font-size:9px;fill:#8b949e}
+    .col-hdr{font-size:9px;fill:#6e7681;text-transform:uppercase}
+    </style>
+<text x="40.0" y="28.0" class="title">CW addr 157</text>
+<text x="40.0" y="40.0" class="subtitle">MUX addr · addr_157</text>
+<text x="24.0" y="48.0" class="col-hdr">in</text>
+<text x="360.0" y="48.0" class="col-hdr">out</text>
+<g id="gate">
+<path d="M172.0,81.0 L220.0,93.0 L220.0,117.0 L172.0,129.0 Z" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+<text x="196.0" y="109.0" text-anchor="middle" class="gate-label">2:1</text>
+</g>
+<g id="wires">
+<polyline class="wire-seg" data-net="net_opc0" points="74.0,50.0 168.0,50.0 168.0,105.0" fill="none" stroke="#5bebaa" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_opc1" points="74.0,72.0 168.0,72.0 168.0,105.0" fill="none" stroke="#d4947b" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_opc2" points="74.0,94.0 168.0,94.0 168.0,105.0" fill="none" stroke="#82b0a7" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_opc3" points="74.0,116.0 168.0,116.0 168.0,105.0" fill="none" stroke="#d379a1" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_phase0" points="74.0,138.0 168.0,138.0 168.0,105.0" fill="none" stroke="#8273d6" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_phase1" points="74.0,160.0 168.0,160.0 168.0,105.0" fill="none" stroke="#6271d0" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_cw_addr0" points="224.0,105.0 224.0,72.0 350.0,72.0" fill="none" stroke="#cec88c" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_cw_addr1" points="224.0,105.0 224.0,94.0 350.0,94.0" fill="none" stroke="#7768aa" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_cw_addr2" points="224.0,105.0 224.0,116.0 350.0,116.0" fill="none" stroke="#f070d3" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_cw_addr3" points="224.0,105.0 224.0,138.0 350.0,138.0" fill="none" stroke="#65dc96" stroke-width="1.5" opacity="0.8"/>
+</g>
+<g id="ports">
+<g class="port in" data-net="net_opc0"><circle cx="74.0" cy="50.0" r="3.5" fill="#5bebaa"/><text x="24.0" y="54.0" class="port-label">opc0</text><text x="82.0" y="54.0" class="pin-label">1A</text></g>
+<g class="port in" data-net="net_opc1"><circle cx="74.0" cy="72.0" r="3.5" fill="#d4947b"/><text x="24.0" y="76.0" class="port-label">opc1</text><text x="82.0" y="76.0" class="pin-label">2A</text></g>
+<g class="port in" data-net="net_opc2"><circle cx="74.0" cy="94.0" r="3.5" fill="#82b0a7"/><text x="24.0" y="98.0" class="port-label">opc2</text><text x="82.0" y="98.0" class="pin-label">3A</text></g>
+<g class="port in" data-net="net_opc3"><circle cx="74.0" cy="116.0" r="3.5" fill="#d379a1"/><text x="24.0" y="120.0" class="port-label">opc3</text><text x="82.0" y="120.0" class="pin-label">4A</text></g>
+<g class="port in" data-net="net_phase0"><circle cx="74.0" cy="138.0" r="3.5" fill="#8273d6"/><text x="24.0" y="142.0" class="port-label">phase0</text><text x="82.0" y="142.0" class="pin-label">1B</text></g>
+<g class="port in" data-net="net_phase1"><circle cx="74.0" cy="160.0" r="3.5" fill="#6271d0"/><text x="24.0" y="164.0" class="port-label">phase1</text><text x="82.0" y="164.0" class="pin-label">2B</text></g>
+<g class="port out" data-net="net_cw_addr0"><circle cx="350.0" cy="72.0" r="3.5" fill="#cec88c"/><text x="360.0" y="76.0" class="port-label">cw_addr0</text><text x="342.0" y="76.0" text-anchor="end" class="pin-label">1Y</text></g>
+<g class="port out" data-net="net_cw_addr1"><circle cx="350.0" cy="94.0" r="3.5" fill="#7768aa"/><text x="360.0" y="98.0" class="port-label">cw_addr1</text><text x="342.0" y="98.0" text-anchor="end" class="pin-label">2Y</text></g>
+<g class="port out" data-net="net_cw_addr2"><circle cx="350.0" cy="116.0" r="3.5" fill="#f070d3"/><text x="360.0" y="120.0" class="port-label">cw_addr2</text><text x="342.0" y="120.0" text-anchor="end" class="pin-label">3Y</text></g>
+<g class="port out" data-net="net_cw_addr3"><circle cx="350.0" cy="138.0" r="3.5" fill="#65dc96"/><text x="360.0" y="142.0" class="port-label">cw_addr3</text><text x="342.0" y="142.0" text-anchor="end" class="pin-label">4Y</text></g>
+</g>
+</svg>

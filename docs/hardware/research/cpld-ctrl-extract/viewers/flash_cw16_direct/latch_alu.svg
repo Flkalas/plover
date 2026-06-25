@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="474" viewBox="0 0 440 474" data-unit-id="latch_alu" data-gate-view="1">
+<style>
+    text{font-family:system-ui,sans-serif;user-select:none}
+    .title{font-size:13px;font-weight:600;fill:#e6edf3}
+    .subtitle{font-size:10px;fill:#8b949e}
+    .gate-label{font-size:14px;font-weight:700;fill:#e6edf3}
+    .gate-sub{font-size:9px;fill:#8b949e}
+    .port-label{font-size:11px;fill:#c9d1d9}
+    .pin-label{font-size:9px;fill:#8b949e}
+    .col-hdr{font-size:9px;fill:#6e7681;text-transform:uppercase}
+    </style>
+<text x="40.0" y="28.0" class="title">ALU cw 574</text>
+<text x="40.0" y="40.0" class="subtitle">LATCH 8 · latch_alu</text>
+<text x="24.0" y="48.0" class="col-hdr">in</text>
+<text x="360.0" y="48.0" class="col-hdr">out</text>
+<g id="gate">
+<rect x="166.0" y="198.0" width="68" height="56" rx="4" fill="#21262d" stroke="#a371f7" stroke-width="2"/>
+<text x="200.0" y="230.0" text-anchor="middle" class="gate-label">574</text>
+</g>
+<g id="wires">
+<polyline class="wire-seg" data-net="net_b_const_sel" points="74.0,50.0 168.0,50.0 168.0,226.0" fill="none" stroke="#d29922" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_b_sel" points="74.0,72.0 168.0,72.0 168.0,226.0" fill="none" stroke="#d29922" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_cin" points="74.0,94.0 168.0,94.0 168.0,226.0" fill="none" stroke="#d29922" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_clk" points="74.0,116.0 168.0,116.0 168.0,226.0" fill="none" stroke="#906c93" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_cw_hi0" points="74.0,138.0 168.0,138.0 168.0,226.0" fill="none" stroke="#9beaf0" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_cw_hi1" points="74.0,160.0 168.0,160.0 168.0,226.0" fill="none" stroke="#59ebe7" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_cw_hi2" points="74.0,182.0 168.0,182.0 168.0,226.0" fill="none" stroke="#6e6f9d" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_cw_hi3" points="74.0,204.0 168.0,204.0 168.0,226.0" fill="none" stroke="#6af7db" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_cw_hi4" points="74.0,226.0 168.0,226.0 168.0,226.0" fill="none" stroke="#d9ded0" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_cw_hi5" points="74.0,248.0 168.0,248.0 168.0,226.0" fill="none" stroke="#f6c18f" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_cw_hi6" points="74.0,270.0 168.0,270.0 168.0,226.0" fill="none" stroke="#93c6a7" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_cw_hi7" points="74.0,292.0 168.0,292.0 168.0,226.0" fill="none" stroke="#98a6be" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_lgc0" points="74.0,314.0 168.0,314.0 168.0,226.0" fill="none" stroke="#d29922" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_lgc1" points="74.0,336.0 168.0,336.0 168.0,226.0" fill="none" stroke="#d29922" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_lgc2" points="74.0,358.0 168.0,358.0 168.0,226.0" fill="none" stroke="#d29922" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_lgc3" points="74.0,380.0 168.0,380.0 168.0,226.0" fill="none" stroke="#d29922" stroke-width="1.5" opacity="0.8"/>
+<polyline class="wire-seg" data-net="net_y_mux_sel" points="74.0,402.0 168.0,402.0 168.0,226.0" fill="none" stroke="#d29922" stroke-width="1.5" opacity="0.8"/>
+</g>
+<g id="ports">
+<g class="port in" data-net="net_b_const_sel"><circle cx="74.0" cy="50.0" r="3.5" fill="#d29922"/><text x="24.0" y="54.0" class="port-label">b_const_sel</text><text x="82.0" y="54.0" class="pin-label">Q2</text></g>
+<g class="port in" data-net="net_b_sel"><circle cx="74.0" cy="72.0" r="3.5" fill="#d29922"/><text x="24.0" y="76.0" class="port-label">b_sel</text><text x="82.0" y="76.0" class="pin-label">Q1</text></g>
+<g class="port in" data-net="net_cin"><circle cx="74.0" cy="94.0" r="3.5" fill="#d29922"/><text x="24.0" y="98.0" class="port-label">cin</text><text x="82.0" y="98.0" class="pin-label">Q0</text></g>
+<g class="port in" data-net="net_clk"><circle cx="74.0" cy="116.0" r="3.5" fill="#906c93"/><text x="24.0" y="120.0" class="port-label">clk</text><text x="82.0" y="120.0" class="pin-label">CLK</text></g>
+<g class="port in" data-net="net_cw_hi0"><circle cx="74.0" cy="138.0" r="3.5" fill="#9beaf0"/><text x="24.0" y="142.0" class="port-label">cw_hi0</text><text x="82.0" y="142.0" class="pin-label">D0</text></g>
+<g class="port in" data-net="net_cw_hi1"><circle cx="74.0" cy="160.0" r="3.5" fill="#59ebe7"/><text x="24.0" y="164.0" class="port-label">cw_hi1</text><text x="82.0" y="164.0" class="pin-label">D1</text></g>
+<g class="port in" data-net="net_cw_hi2"><circle cx="74.0" cy="182.0" r="3.5" fill="#6e6f9d"/><text x="24.0" y="186.0" class="port-label">cw_hi2</text><text x="82.0" y="186.0" class="pin-label">D2</text></g>
+<g class="port in" data-net="net_cw_hi3"><circle cx="74.0" cy="204.0" r="3.5" fill="#6af7db"/><text x="24.0" y="208.0" class="port-label">cw_hi3</text><text x="82.0" y="208.0" class="pin-label">D3</text></g>
+<g class="port in" data-net="net_cw_hi4"><circle cx="74.0" cy="226.0" r="3.5" fill="#d9ded0"/><text x="24.0" y="230.0" class="port-label">cw_hi4</text><text x="82.0" y="230.0" class="pin-label">D4</text></g>
+<g class="port in" data-net="net_cw_hi5"><circle cx="74.0" cy="248.0" r="3.5" fill="#f6c18f"/><text x="24.0" y="252.0" class="port-label">cw_hi5</text><text x="82.0" y="252.0" class="pin-label">D5</text></g>
+<g class="port in" data-net="net_cw_hi6"><circle cx="74.0" cy="270.0" r="3.5" fill="#93c6a7"/><text x="24.0" y="274.0" class="port-label">cw_hi6</text><text x="82.0" y="274.0" class="pin-label">D6</text></g>
+<g class="port in" data-net="net_cw_hi7"><circle cx="74.0" cy="292.0" r="3.5" fill="#98a6be"/><text x="24.0" y="296.0" class="port-label">cw_hi7</text><text x="82.0" y="296.0" class="pin-label">D7</text></g>
+<g class="port in" data-net="net_lgc0"><circle cx="74.0" cy="314.0" r="3.5" fill="#d29922"/><text x="24.0" y="318.0" class="port-label">lgc0</text><text x="82.0" y="318.0" class="pin-label">Q4</text></g>
+<g class="port in" data-net="net_lgc1"><circle cx="74.0" cy="336.0" r="3.5" fill="#d29922"/><text x="24.0" y="340.0" class="port-label">lgc1</text><text x="82.0" y="340.0" class="pin-label">Q5</text></g>
+<g class="port in" data-net="net_lgc2"><circle cx="74.0" cy="358.0" r="3.5" fill="#d29922"/><text x="24.0" y="362.0" class="port-label">lgc2</text><text x="82.0" y="362.0" class="pin-label">Q6</text></g>
+<g class="port in" data-net="net_lgc3"><circle cx="74.0" cy="380.0" r="3.5" fill="#d29922"/><text x="24.0" y="384.0" class="port-label">lgc3</text><text x="82.0" y="384.0" class="pin-label">Q7</text></g>
+<g class="port in" data-net="net_y_mux_sel"><circle cx="74.0" cy="402.0" r="3.5" fill="#d29922"/><text x="24.0" y="406.0" class="port-label">y_mux_sel</text><text x="82.0" y="406.0" class="pin-label">Q3</text></g>
+</g>
+</svg>
