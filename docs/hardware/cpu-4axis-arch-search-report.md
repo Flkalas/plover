@@ -2,7 +2,7 @@
 
 **날짜:** 2026-06-24  
 **범위:** opcode · 제어로직 · CPLD · CW/Flash 네 축 Cartesian Pareto 검색  
-**도구:** `python tools/cpu_arch_search.py --pareto` → [`build/cpu_arch_pareto.json`](../../build/cpu_arch_pareto.json)  
+**도구:** `python tools/cpu_arch_search.py --pareto` → `build/cpu_arch_pareto.json` (로컬 생성, gitignored)  
 **Research (archived):** [pre-v1.1b/](../archive/pre-v1.1b/README.md) · **Normative:** [system-architecture.md](system-architecture.md) · [research/design-rationale-v1.0.md](research/design-rationale-v1.0.md)
 
 ---
@@ -17,6 +17,8 @@
 | **Superseded prototype** | [prototype-flash-cw/](../archive/prototype-flash-cw/README.md) |
 | **Internal codename** | **v1.1b** — pre-release iteration name in archive changelog only |
 | **MMU v1.1** | Not adopted |
+
+> **Reader guide:** **Normative breadboard = v1.0 §4.0 only** ([system-architecture.md](system-architecture.md) FSM-only idx5). **§3 and §4.1–4.6** document the **historical Pareto record** (idx4 + cw_hybrid). Internal codename **v1.1b** is archive-only, not the active spec label.
 
 ---
 
@@ -91,13 +93,13 @@ flowchart TB
 
 ---
 
-## 3. 현재(v1.0) vs 목표(v1.1b) — 차이 분석
+## 3. baseline (prototype-flash-cw) vs Pareto record (pre-refinement)
 
 ### 3.1 아키텍처 비교
 
 ```mermaid
 flowchart LR
-  subgraph v10 [v1.0 today]
+  subgraph baseline [prototype_flash_cw]
     F10[Flash 10b CW]
     L10[574 CW_L/H]
     D10[alu8_decode 9 DIP]
@@ -107,7 +109,7 @@ flowchart LR
     C10 --> A10
   end
 
-  subgraph v11b [v1.1b target winner]
+  subgraph pareto [Pareto_record_hybrid]
     F11[Flash hybrid param + branch rows]
     S11[CPLD 3fixed + phase FSM]
     A11[alu8 no decode]
@@ -116,8 +118,8 @@ flowchart LR
   end
 ```
 
-| 항목 | v1.0 (현재 빵판) | v1.1b (Pareto 승자) | 차이의 이유 |
-|------|------------------|---------------------|-------------|
+| 항목 | prototype / pre-refinement baseline | Pareto record (idx4+hybrid) | 차이의 이유 |
+|------|-------------------------------------|-----------------------------|-------------|
 | **Opcode** | `0x01–0x0F` + operand | **동일** (`op_legacy`) | 인터프리터·어셈블러 변경 최소화 |
 | **CW 인덱스** | `(opcode[3:0]<<2)\|phase` (64슬롯) | **동일** (`idx4`) | CW 주소 MUX 추가 칩 불필요 |
 | **제어 디코드** | `ALU_OP[3:0]` → `alu8_decode` (~9 DIP) | **CPLD phase FSM** (`dec_cpld_seq`) | comb decode를 시퀀서+직접 제어로 대체 |
@@ -279,25 +281,26 @@ decode 제거 시 제어→ALU 경로가 짧아져 **~15 ns slack** 확보. `cpl
 |--------|------|
 | `tools/cpu_arch_model.py` | 완료 |
 | `tools/cpu_arch_search.py` | 완료 |
-| `build/cpu_arch_pareto.json` | 완료 |
+| `build/cpu_arch_pareto.json` | 완료 (로컬 `build/`, gitignored) |
 | `tools/estimate_parasitics.py` H1/H2 variant | 완료 |
 | `tests/test_cpu_arch_search.py` | 완료 |
 | hwsim 스팟 3종 | 완료 |
-| `docs/hardware/microcode-spec-v1.1b.md` | 완료 |
-| `docs/hardware/cpld-system-controller-v1.1b.md` | 완료 |
+| [`archive/pre-v1.1b/microcode-spec-v1.1b.md`](../archive/pre-v1.1b/microcode-spec-v1.1b.md) | 완료 (archived) |
+| [`archive/pre-v1.1b/cpld-system-controller-v1.1b.md`](../archive/pre-v1.1b/cpld-system-controller-v1.1b.md) | 완료 (archived) |
 | `tools/pack_control_store.py` — `pack_cw16`, `pack_hybrid_store` | 완료 |
 
-### 6.2 미완 (실제 빵판 v1.1b)
+### 6.2 Bring-up gap vs normative v1.0 (2026-06-24)
 
-| 항목 | v1.0 | 목표 | 갭 |
-|------|------|------|-----|
-| `alu8_decode` netlist | SoC에 포함 (~9 DIP) | **제거** | 하드웨어 미적용 |
-| CPLD bitstream | GPR-only ~40 MC | **3fixed + FSM ~32 MC** | M2a fit·JED 미작성 |
-| Flash CW 이미지 | 10b per-phase | **hybrid param + branch** | `pack_hybrid` fixture 미생산 |
-| `plover_vm/micro/cw.py` | 10b `ALU_OP` | 16b / hybrid lookup | VM 미동기 |
-| `verify_control_store.py` | v1.0 10b | v1.1b 게이트 | 확장 필요 |
-| `hw/micro/reg_sel.py` | opcode×phase 테이블 | CPLD 고정 read로 **축소/삭제** | 코드 정리 필요 |
-| BEQ glue | 08/32 분기 glue | macro_end `PC_LOAD_EN` | 빵판 미배선 |
+| 항목 | Historical Pareto (hybrid) | Normative v1.0 | Status |
+|------|---------------------------|----------------|--------|
+| Flash hybrid param @ `$4000` | 목표였음 | **미사용 (FSM-only)** | **superseded** — not normative |
+| 10b CW per-phase | prototype | **미사용** | **superseded** — [prototype-flash-cw](../archive/prototype-flash-cw/README.md) |
+| `verify_control_store.py --v1.0` | — | FSM idx5 + TFR | **완료** |
+| TFR `0x10–0x15` | — | implied 1-byte | **완료** (spec + VM) |
+| idx5 `opcode[4:0]` | idx4 in Pareto record | CPLD FSM key | **완료** (spec) |
+| `alu8_decode` on SoC | 제거 목표 | **없음** (normative) | spec 완료; **M2a JED TBD** |
+| CPLD bitstream | 3fixed + FSM | ~38 MC idx5 FSM | **M2a bring-up TBD** |
+| BEQ `PC_LOAD_EN` in CPLD | macro_end | FSM @ macro_end | spec 완료; **빵판 배선 TBD** |
 
 ---
 
