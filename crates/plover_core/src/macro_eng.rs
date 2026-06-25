@@ -1,5 +1,6 @@
 use crate::isa::{
-    is_wide_abs16, phase_count, OP_BEQ, OP_CALL, OP_HALT, OP_JMP, OP_MOV, OP_RET, OP_STA16,
+    is_tfr, is_wide_abs16, phase_count, tfr_regs, OP_BEQ, OP_CALL, OP_HALT, OP_JMP, OP_MOV,
+    OP_RET, OP_STA16,
 };
 use crate::micro::MicroEngine;
 use plover_mmu::MemoryBus;
@@ -46,13 +47,11 @@ impl MacroEngine {
             let lo = u16::from(self.bus.read_cpu(fa.wrapping_add(1)));
             let hi = u16::from(self.bus.read_cpu(fa.wrapping_add(2)));
             (lo | (hi << 8), 3u16)
+        } else if is_tfr(op) {
+            (0, 1u16)
         } else {
             let imm = u16::from(self.bus.read_cpu(fa.wrapping_add(1)));
-            let len = if matches!(op, OP_RET | OP_HALT) {
-                1
-            } else {
-                2
-            };
+            let len = if matches!(op, OP_RET | OP_HALT) { 1 } else { 2 };
             (imm, len)
         };
         self.current_op = op;
@@ -94,6 +93,11 @@ impl MacroEngine {
                 let dst = ((imm >> 4) & 3) as usize;
                 let src = (imm & 3) as usize;
                 self.micro.state.regs[dst] = self.micro.state.regs[src];
+            }
+            _ if is_tfr(op) => {
+                if let Some((dst, src)) = tfr_regs(op) {
+                    self.micro.state.regs[dst] = self.micro.state.regs[src];
+                }
             }
             _ => {}
         }

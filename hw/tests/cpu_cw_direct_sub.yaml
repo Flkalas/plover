@@ -1,0 +1,65 @@
+# Spot test: cw_direct execute path (no alu8_decode)
+#
+# v1.1b dec_cw_direct / dec_cpld_seq: Flash/CPLD drive net_cin, net_b_sel,
+# net_lgc* directly ??same datapath as alu_b3_sub_critical (151 ns typ SUB).
+# Budget: 250 ns half-period @ 2 MHz; decode bypass saves ~15 ns vs v1.0.
+netlist: ../netlist/blocks/alu_b3.yaml
+timing: max
+duration_ns: 500
+stimulus:
+  - at_ns: 0
+    set:
+      net_a0: 0
+      net_a1: 1
+      net_a2: 0
+      net_a3: 0
+      net_a4: 1
+      net_a5: 0
+      net_a6: 0
+      net_a7: 0
+      net_b0: 0
+      net_b1: 0
+      net_b2: 1
+      net_b3: 0
+      net_b4: 1
+      net_b5: 1
+      net_b6: 0
+      net_b7: 0
+      net_cin: 1
+      net_153_s0: 0
+      net_153_s1: 0
+      net_b_sel: 1
+      net_b_const_sel: 0
+      net_lgc0: 0
+      net_lgc1: 0
+      net_lgc2: 0
+      net_lgc3: 0
+      net_b_const_bit1: 0
+      net_b_const_bit2: 0
+      net_b_const_bit3: 0
+      net_b_const_bit4: 0
+      net_b_const_bit5: 0
+      net_b_const_bit6: 0
+      net_b_const_bit7: 0
+      net_clk: 0
+expect:
+  - at_ns: 400
+    net_y0: 0
+    net_y1: 1
+    net_y2: 1
+    net_y3: 1
+    net_y4: 1
+    net_y5: 0
+    net_y6: 1
+    net_y7: 1
+checks:
+  - type: path_delay
+    from_net: net_b_sel
+    to_net: net_y0
+    after_ns: 0
+    max_delay_ns: 250
+  - type: path_delay
+    from_net: net_cin
+    to_net: net_y7
+    after_ns: 0
+    max_delay_ns: 250

@@ -10,6 +10,8 @@ from plover_vm.macro.isa import (
     OP_MOV,
     OP_RET,
     OP_STA16,
+    TFR_OPS,
+    TFR_REG_MAP,
     WIDE_ABS16_OPS,
     phase_count,
 )
@@ -37,9 +39,12 @@ class MacroEngine:
             hi = self.bus.read_cpu((fa + 2) & 0xFFFF)
             operand = lo | (hi << 8)
             insn_len = 3
+        elif op in TFR_OPS:
+            operand = 0
+            insn_len = 1
         else:
             operand = self.bus.read_cpu((fa + 1) & 0xFFFF)
-            insn_len = 2 if op != OP_RET and op != OP_HALT else 1
+            insn_len = 2 if op not in (OP_RET, OP_HALT) else 1
         self._current_op = op
         self._current_operand = operand
         op16 = operand if op in WIDE_ABS16_OPS else 0
@@ -68,6 +73,9 @@ class MacroEngine:
                 self.pc = self._ret_stack.pop() & 0xFFFF
         elif op == OP_MOV:
             dst, src = (imm >> 4) & 3, imm & 3
+            self.micro.state.regs[dst] = self.micro.state.regs[src] & 0xFF
+        elif op in TFR_OPS:
+            dst, src = TFR_REG_MAP[op]
             self.micro.state.regs[dst] = self.micro.state.regs[src] & 0xFF
 
     def step(self) -> None:

@@ -24,9 +24,9 @@ OPCODES = {
     "MOV": 0x0C,
     "CMP": 0x0D,
     "BCS": 0x0E,
-    "WADD_RR": 0x10,
-    "WMOV": 0x11,
-    "WCMP16": 0x12,
+    "WADD_RR": 0x20,
+    "WMOV": 0x21,
+    "WCMP16": 0x22,
 }
 
 WIDE_IMM16 = frozenset({"WCMP16"})

@@ -21,9 +21,17 @@ from plover_vm.macro.isa import (
     OP_STA,
     OP_STA16,
     OP_STIO,
+    OP_TFR01,
+    OP_TFR02,
+    OP_TFR10,
+    OP_TFR12,
+    OP_TFR20,
+    OP_TFR21,
     OP_WADD_RR,
     OP_WCMP16,
     OP_WMOV,
+    TFR_OPS,
+    TFR_REG_MAP,
     WIDE_ABS16_OPS,
     WIDE_IMM16_OPS,
 )
@@ -58,7 +66,7 @@ class MacroFastPath:
         elif op in WIDE_ABS16_OPS:
             imm = self._read_byte(fa + 1) | (self._read_byte(fa + 2) << 8)
             self.pc = (fa + 3) & 0xFFFF
-        elif op in (OP_RET, OP_HALT, OP_ADD_RR):
+        elif op in TFR_OPS or op in (OP_RET, OP_HALT, OP_ADD_RR):
             imm = 0
             self.pc = (fa + 1) & 0xFFFF
         else:
@@ -74,6 +82,9 @@ class MacroFastPath:
             self.regs[2] = r.y
             self.flag_z = r.zero
             self.flag_c = r.cout
+        elif op in TFR_OPS:
+            dst, src = TFR_REG_MAP[op]
+            self.regs[dst] = self.regs[src] & 0xFF
         elif op == OP_MOV:
             dst, src = (imm >> 4) & 3, imm & 3
             self.regs[dst] = self.regs[src] & 0xFF

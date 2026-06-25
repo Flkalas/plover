@@ -49,6 +49,9 @@ impl MacroFastPath {
                 | (u16::from(self.read_byte(fa.wrapping_add(2))) << 8);
             self.pc = fa.wrapping_add(3);
             (v, false)
+        } else if is_tfr(op) {
+            self.pc = fa.wrapping_add(1);
+            (0, false)
         } else if matches!(op, OP_RET | OP_HALT | OP_ADD_RR) {
             self.pc = fa.wrapping_add(1);
             (0, false)
@@ -76,6 +79,11 @@ impl MacroFastPath {
                 let dst = ((imm >> 4) & 3) as usize;
                 let src = (imm & 3) as usize;
                 self.regs[dst] = self.regs[src];
+            }
+            _ if is_tfr(op) => {
+                if let Some((dst, src)) = tfr_regs(op) {
+                    self.regs[dst] = self.regs[src];
+                }
             }
             OP_CMP => {
                 let (z, c) = apply_cmp_flags(self.regs, imm as u8);

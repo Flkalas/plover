@@ -3,7 +3,9 @@
 
 from __future__ import annotations
 
+import argparse
 import sys
+import warnings
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,11 +30,18 @@ from tools.pack_control_store import (  # noqa: E402
     OP_STA,
     OP_STA16,
     OP_STIO,
-    OP_MOV,
+    OP_TFR01,
+    OP_TFR02,
+    OP_TFR10,
+    OP_TFR12,
+    OP_TFR20,
+    OP_TFR21,
     build_all,
     cs_index,
+    cs_index5,
     cw_hi,
     cw_lo,
+    fsm_opcode_table,
     pack_cw,
     sequences,
 )
@@ -66,13 +75,41 @@ SPEC_DOC_ROWS = {
     (OP_LDIO, 1): {"alu_op": ALU_NOP, "reg_we": 1, "y_oe": 0, "mem_rd": 0, "mem_wr": 0},
     (OP_STIO, 0): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 1, "mem_rd": 0, "mem_wr": 0},
     (OP_STIO, 1): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 1},
-    (OP_MOV, 0): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 0},
     (OP_STA16, 0): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 1, "mem_rd": 0, "mem_wr": 0},
     (OP_STA16, 1): {"alu_op": ALU_NOP, "reg_we": 0, "y_oe": 0, "mem_rd": 0, "mem_wr": 1},
 }
 
 # §3 draft rows — documented as TBD, intentionally absent from packer
 SPEC_TBD_OPCODES = {0x06, 0x07}
+
+# Expected per-template phase counts (microcode-spec.md §2.3)
+FSM_PHASE_COUNTS: dict[int, int] = {
+    OP_ADD: 3,
+    OP_LDA: 2,
+    OP_STA: 2,
+    OP_BEQ: 2,
+    OP_JMP: 1,
+    OP_CMP: 3,
+    OP_HALT: 1,
+    OP_LDIO: 2,
+    OP_STIO: 2,
+    OP_STA16: 2,
+    OP_TFR01: 1,
+    OP_TFR02: 1,
+    OP_TFR10: 1,
+    OP_TFR12: 1,
+    OP_TFR20: 1,
+    OP_TFR21: 1,
+}
+
+TFR_PAIRS: dict[int, tuple[int, int]] = {
+    OP_TFR01: (1, 0),
+    OP_TFR02: (2, 0),
+    OP_TFR10: (0, 1),
+    OP_TFR12: (2, 1),
+    OP_TFR20: (0, 2),
+    OP_TFR21: (1, 2),
+}
 
 
 def decode_cw(word: int) -> dict[str, int]:
@@ -98,7 +135,61 @@ def pack_from_fields(op: int, ph: int, fields: dict[str, int]) -> int:
     )
 
 
-def main() -> int:
+def verify_v10_fsm() -> int:
+    """Normative v1.0: FSM-only opcode table + idx5 slot coverage."""
+    errors: list[str] = []
+    table = fsm_opcode_table()
+
+    if len(table) != 16:
+        errors.append(f"FSM_OPCODE_TABLE has {len(table)} entries, expected 16")
+
+    for op, meta in table.items():
+        want_ph = FSM_PHASE_COUNTS.get(op)
+        if want_ph is None:
+            errors.append(f"unexpected FSM opcode 0x{op:02X}")
+            continue
+        if meta.get("phases") != want_ph:
+            errors.append(f"0x{op:02X}: phases {meta.get('phases')} != {want_ph}")
+        if meta.get("template") == "XFER":
+            src, dst = meta.get("src"), meta.get("dst")
+            if TFR_PAIRS.get(op) != (src, dst):
+                errors.append(f"TFR 0x{op:02X}: src/dst {src},{dst} != {TFR_PAIRS[op]}")
+
+    for op, ph_count in FSM_PHASE_COUNTS.items():
+        for ph in range(ph_count):
+            idx = cs_index5(op, ph)
+            if idx >= 128:
+                errors.append(f"idx5 slot {idx} >= 128 for op=0x{op:02X} ph={ph}")
+
+    # idx5 keys must be unique per (op, phase) pair in table
+    seen: set[int] = set()
+    for op, ph_count in FSM_PHASE_COUNTS.items():
+        for ph in range(ph_count):
+            idx = cs_index5(op, ph)
+            if idx in seen:
+                errors.append(f"duplicate idx5 slot {idx}")
+            seen.add(idx)
+
+    print("Control Store v1.0 verification (FSM-only, idx5)")
+    print("=" * 60)
+    print(f"FSM opcodes: {len(table)}  idx5 slots used: {len(seen)}")
+    print(f"Flash $4000: unused (FSM-only)")
+    print()
+    for op in sorted(table):
+        meta = table[op]
+        print(f"  0x{op:02X} {meta['template']:8s} phases={meta['phases']}")
+
+    print()
+    if errors:
+        print(f"FAILED ({len(errors)} errors):")
+        for e in errors:
+            print(f"  - {e}")
+        return 1
+    print("PASS: FSM opcode table, idx5 slots, TFR routing")
+    return 0
+
+
+def verify_v10_flash_archive() -> int:
     errors: list[str] = []
     warnings: list[str] = []
 
@@ -223,6 +314,38 @@ def main() -> int:
     if warnings:
         print(f"({len(warnings)} coverage gaps - see warnings)")
     return 0
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="Verify control store / FSM opcode table")
+    ap.add_argument(
+        "--v1.0",
+        dest="v10",
+        action="store_true",
+        help="Normative v1.0 FSM-only idx5 opcode table",
+    )
+    ap.add_argument(
+        "--v1.1b",
+        dest="v11b",
+        action="store_true",
+        help="Deprecated alias for --v1.0",
+    )
+    ap.add_argument(
+        "--archive-flash-cw",
+        dest="archive_flash_cw",
+        action="store_true",
+        help="Verify prototype 10b Flash CW packer (prototype-flash-cw)",
+    )
+    args = ap.parse_args()
+
+    if args.v11b:
+        warnings.warn("--v1.1b is deprecated; use --v1.0", DeprecationWarning, stacklevel=2)
+        return verify_v10_fsm()
+    if args.v10:
+        return verify_v10_fsm()
+    if args.archive_flash_cw:
+        return verify_v10_flash_archive()
+    return verify_v10_flash_archive()
 
 
 if __name__ == "__main__":
