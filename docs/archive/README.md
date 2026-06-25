@@ -16,3 +16,5 @@ Material kept for reference but not part of the active **hwsim** electrical-simu
 Active plans: [../plans/README.md](../plans/README.md)
 
 Active docs: [../README.md](../README.md), [../simulation/hw-sim.md](../simulation/hw-sim.md), [../project/roadmap-next.md](../project/roadmap-next.md).
+
+| [prototype-flash-cw/](prototype-flash-cw/README.md) | Superseded 10b Flash CW + idx4 prototype |
