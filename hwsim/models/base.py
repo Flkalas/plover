@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from hw.logic import cpld_decode, gates
@@ -242,27 +243,36 @@ class Hc283(ChipModel):
 class Hc574(ChipModel):
     part = "74HC574"
 
+    def _cp_pin(self) -> str:
+        if "CP" in self.pin_nets:
+            return "CP"
+        if "CLK" in self.pin_nets:
+            return "CLK"
+        return "CP"
+
     def on_start(self) -> None:
-        self._prev_clk["CP"] = self.read_bit("CP")
+        self._prev_clk[self._cp_pin()] = self.read_bit(self._cp_pin())
         oe = self.read_bit("OE")
         if oe == 1:
             for i in range(8):
                 self._drive(f"Q{i}", 3, 0, "high-z")  # Z
 
     def on_net_change(self, net: str) -> None:
-        cp_net = self.net_for("CP")
+        cp = self._cp_pin()
+        cp_net = self.net_for(cp)
         if net == cp_net or any(net == self.net_for(f"D{i}") for i in range(8)):
-            if self._posedge("CP"):
+            if self._posedge(cp):
                 self._latch()
         if net == self.net_for("OE"):
             self._output_enable()
 
     def _latch(self) -> None:
+        cp = self._cp_pin()
         t = self.t_pd("74HC574", "t_pd_q", default=15)
         t_su = self.t_pd("74HC574", "t_setup", default=5)
         ok = True
         for i in range(8):
-            if not self.ctx.check_setup(self.ref, "CP", f"D{i}", t_su):
+            if not self.ctx.check_setup(self.ref, cp, f"D{i}", t_su):
                 ok = False
                 break
         if not ok:
@@ -760,6 +770,76 @@ class MailboxMmio(ChipModel):
                 self._drive(f"STATUS{i}", (self._status >> i) & 1, t, "st")
 
 
+class RomCtrlFlash(ChipModel):
+    """SST39 / control-store Flash — addr → D after ROM_CTRL.t_pd (70 ns max)."""
+
+    part = "ROM_CTRL"
+    _words_cache: dict[int, int] | None = None
+
+    @classmethod
+    def _rom_words(cls) -> dict[int, int]:
+        if cls._words_cache is not None:
+            return cls._words_cache
+        path = Path(__file__).resolve().parents[2] / "hw" / "fixtures" / "control" / "cw.hex"
+        words: dict[int, int] = {}
+        if path.is_file():
+            raw = [
+                int(line.strip(), 16)
+                for line in path.read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+            for idx in range(len(raw) // 2):
+                words[idx] = raw[2 * idx] | (raw[2 * idx + 1] << 8)
+        cls._words_cache = words
+        return words
+
+    def on_start(self) -> None:
+        self._update(0)
+
+    def on_net_change(self, net: str) -> None:
+        watched = {self.net_for("OE")}
+        for i in range(16):
+            pin = f"A{i}"
+            if pin in self.pin_nets:
+                watched.add(self.net_for(pin))
+        if net in watched:
+            self._update(self.t_pd("ROM_CTRL", "t_pd", default=70))
+
+    def _addr(self) -> int:
+        v = 0
+        for i in range(16):
+            pin = f"A{i}"
+            if pin in self.pin_nets:
+                v |= self.read_bit(pin) << i
+        return v
+
+    def _update(self, delay: int) -> None:
+        oe = self.read_bit("OE")
+        if oe == 1:
+            t = delay if delay else self.t_pd("ROM_CTRL", "t_pd", default=70)
+            for i in range(16):
+                pin = f"D{i}"
+                if pin in self.pin_nets:
+                    self._drive(pin, 3, t, "rom-z")
+            return
+        addr = self._addr()
+        word = self._rom_words().get(addr, 0)
+        lo = word & 0xFF
+        hi = (word >> 8) & 0xFF
+        t = delay if delay else self.t_pd("ROM_CTRL", "t_pd", default=70)
+        for b in range(8):
+            pin_lo = f"D{b}"
+            if pin_lo in self.pin_nets:
+                self._drive(pin_lo, (lo >> b) & 1, t, "rom")
+            pin_hi = f"D{b + 8}"
+            if pin_hi in self.pin_nets:
+                self._drive(pin_hi, (hi >> b) & 1, t, "rom")
+
+
+class FlashCw16(RomCtrlFlash):
+    part = "FLASH_CW16"
+
+
 def create_model(ref: str, part: str, pins: dict[str, str], ctx: SimContext) -> ChipModel:
     table: dict[str, type[ChipModel]] = {
         "OSC_4M": Osc4M,
@@ -780,6 +860,9 @@ def create_model(ref: str, part: str, pins: dict[str, str], ctx: SimContext) -> 
         "74HC08": Hc08,
         "74HC32": Hc32,
         "74HC86": Hc86,
+        "ROM_CTRL": RomCtrlFlash,
+        "FLASH_CW16": FlashCw16,
+        "SST39SF010A": RomCtrlFlash,
         "CPLD_SYSTEM_CTRL": CpldSystemCtrl,
         "MEM_DECODE_BREADBOARD": MemDecodeBreadboard,
         "CPLD_GPR_CTRL": CpldGprCtrl,

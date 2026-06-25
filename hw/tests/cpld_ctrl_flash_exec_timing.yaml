@@ -1,0 +1,27 @@
+# Flash CW fetch timing @ 2 MHz — mux + SST39 t_ACC (pipelined half-cycle).
+#
+# Execute window (574 Q → ALU) is covered by cpu_cw_direct_sub.yaml + tools/flash_cw_timing.py.
+netlist: ../netlist/research/cpld_ctrl_cw16_exec.yaml
+timing: max
+duration_ns: 400
+stimulus:
+  - at_ns: 0
+    set:
+      net_opc0: 0
+      net_opc1: 0
+      net_opc2: 0
+      net_opc3: 0
+      net_opc4: 0
+      net_phase0: 0
+      net_phase1: 0
+      net_clk: 0
+      net_flg_z: 0
+  - at_ns: 1
+    set:
+      net_opc0: 1
+checks:
+  - type: path_delay
+    from_net: net_opc0
+    to_net: net_cw_lo0
+    after_ns: 0
+    max_delay_ns: 242

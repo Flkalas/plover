@@ -276,7 +276,9 @@ def _run_check(chk: dict[str, Any], ctx: SimContext, duration: int, errors: list
             errors.append(f"path_delay {from_net}->{to_net}: could not measure")
             return {"type": ctype, "passed": False}
         ok = measured <= max_delay
-        if not ok:
+        if chk.get("expect_fail"):
+            ok = not ok
+        if not ok and not chk.get("expect_fail"):
             errors.append(f"path_delay {from_net}->{to_net}: {measured}ns > {max_delay}ns")
         return {
             "type": ctype,
@@ -352,6 +354,8 @@ def _is_path_output(part: str, pin: str) -> bool:
         return True
     if part == "ROM16" and pin.startswith("D"):
         return True
+    if part in ("ROM_CTRL", "FLASH_CW16", "SST39SF010A") and pin.startswith("D"):
+        return True
     return False
 
 
@@ -390,6 +394,8 @@ def _hop_delay(ctx: SimContext, part: str, pin: str) -> int:
         return delay_ns(ctx.timing, "ALU_CMP_SUB", "t_pd", default=151)
     if part == "ROM16":
         return delay_ns(ctx.timing, "ROM16", "t_pd", default=40)
+    if part in ("ROM_CTRL", "FLASH_CW16", "SST39SF010A"):
+        return delay_ns(ctx.timing, "ROM_CTRL", "t_pd", default=70)
     if part == "PC8_AUTO":
         return delay_ns(ctx.timing, "PC8_AUTO", "t_clk_to_q", default=15)
     return 10
