@@ -83,6 +83,17 @@ def test_flash_cw16_fewer_dip_than_cw10():
     assert c16.dip_74hc < c10.dip_74hc
 
 
+def test_flash_cw16_e2e_timing_fields():
+    c = score_control_arch(ARCH_FLASH_CW16, IndexWidth.IDX4)
+    assert c.delay_alu_ns == 136
+    assert c.delay_fetch_ns == 96
+    assert c.delay_execute_ns == 159
+    assert c.delay_max_ns == c.delay_execute_ns
+    assert c.timing_feasible
+    assert c.feasible
+    assert any("pipelined" in n.lower() or "serial" in n.lower() for n in c.notes)
+
+
 def test_sop_idx5_positive_dip():
     c = score_control_arch(ARCH_SOP_IDX5, IndexWidth.IDX4)
     assert c.dip_74hc > 0

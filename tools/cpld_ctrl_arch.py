@@ -21,6 +21,7 @@ from cpld_ctrl_model import (
     build_v10_ctrl_table,
     strobe_truth_table,
 )
+from flash_cw_timing import EXEC_HALF_NS, budget_for_arch
 
 DELAY_SUB_WITH_DECODE = 151
 DELAY_DECODE_SAVED = 15
@@ -82,6 +83,10 @@ class CtrlArchCost:
     feasible: bool = True
     pure_74hc: bool = False
     notes: list[str] = field(default_factory=list)
+    delay_alu_ns: int = 0
+    delay_fetch_ns: int = 0
+    delay_execute_ns: int = 0
+    timing_feasible: bool = True
 
     @property
     def key(self) -> str:
@@ -97,6 +102,10 @@ class CtrlArchCost:
             "index_width": self.index_width.value,
             "dip_74hc": self.dip_74hc,
             "delay_max_ns": self.delay_max_ns,
+            "delay_alu_ns": self.delay_alu_ns,
+            "delay_fetch_ns": self.delay_fetch_ns,
+            "delay_execute_ns": self.delay_execute_ns,
+            "timing_feasible": self.timing_feasible,
             "flash_rows": self.flash_rows,
             "cpld_mc": self.cpld_mc,
             "wire_hops": self.wire_hops,
@@ -259,6 +268,55 @@ def _counter_template_parts() -> dict[str, int]:
     }
 
 
+_E2E_TIMING_ARCHS = frozenset(
+    {ARCH_BASELINE_FSM, ARCH_FLASH_CW10, ARCH_FLASH_CW16}
+)
+
+
+def _timing_bundle(arch: str, fallback_alu_ns: int) -> dict:
+    """Return delay_* fields and timing notes for CtrlArchCost."""
+    if arch in _E2E_TIMING_ARCHS:
+        b = budget_for_arch(arch)
+        notes: list[str] = []
+        if arch in (ARCH_FLASH_CW10, ARCH_FLASH_CW16) and not b.serial_ok:
+            notes.append(
+                f"serial same-half {b.serial_total_ns} ns > {EXEC_HALF_NS}; pipelined CW fetch required"
+            )
+        return {
+            "delay_alu_ns": b.delay_alu_ns,
+            "delay_fetch_ns": b.delay_fetch_ns,
+            "delay_execute_ns": b.delay_execute_ns,
+            "delay_max_ns": b.delay_execute_ns,
+            "timing_feasible": b.pipelined_ok,
+            "timing_notes": notes,
+        }
+    if arch == ARCH_HC154_LAYERED:
+        execute = DELAY_SUB_WITH_DECODE
+    elif arch == ARCH_SPLIT_ALU_SEQ:
+        execute = DELAY_SUB_WITH_DECODE
+    elif arch in PURE_74HC_ARCHITECTURES:
+        execute = fallback_alu_ns + DELAY_EXT_CTRL_PENALTY
+    else:
+        execute = fallback_alu_ns
+    return {
+        "delay_alu_ns": fallback_alu_ns,
+        "delay_fetch_ns": 0,
+        "delay_execute_ns": execute,
+        "delay_max_ns": execute,
+        "timing_feasible": execute <= EXEC_HALF_NS,
+        "timing_notes": [],
+    }
+
+
+def _merge_notes(*parts: list[str]) -> list[str]:
+    out: list[str] = []
+    for p in parts:
+        for n in p:
+            if n not in out:
+                out.append(n)
+    return out
+
+
 def score_control_arch(arch: str, index_width: IndexWidth) -> CtrlArchCost:
     rows = build_v10_ctrl_table()
     idx_key = index_width.value
@@ -267,58 +325,80 @@ def score_control_arch(arch: str, index_width: IndexWidth) -> CtrlArchCost:
     flash_rows = FLASH_ROWS_IDX5 if index_width == IndexWidth.IDX5 else FLASH_ROWS_IDX4
 
     if arch == ARCH_BASELINE_FSM:
+        timing = _timing_bundle(arch, DELAY_CW16_DIRECT)
+        mc_ok = BASELINE_MC <= ATF1504_MC_LIMIT
         return CtrlArchCost(
             arch=arch,
             index_width=index_width,
             dip_74hc=0,
-            delay_max_ns=DELAY_CW16_DIRECT + 5,
             flash_rows=0,
             cpld_mc=BASELINE_MC,
             wire_hops=WIRE_HOPS_BASELINE,
             gates=0,
             advanced_blocks=1,
             parts={"ATF1504": 1},
-            feasible=BASELINE_MC <= ATF1504_MC_LIMIT,
+            feasible=mc_ok and timing["timing_feasible"],
             pure_74hc=False,
-            notes=["normative v1.0: GPR + idx5 FSM in CPLD"],
+            notes=_merge_notes(["normative v1.0: GPR + idx5 FSM in CPLD"], timing["timing_notes"]),
+            delay_alu_ns=timing["delay_alu_ns"],
+            delay_fetch_ns=timing["delay_fetch_ns"],
+            delay_execute_ns=timing["delay_execute_ns"],
+            delay_max_ns=timing["delay_max_ns"],
+            timing_feasible=timing["timing_feasible"],
         )
 
     if arch == ARCH_FLASH_CW10:
         dip = 1 + DECODE_SOP_DIP + 2
+        timing = _timing_bundle(arch, DELAY_SUB_WITH_DECODE)
         return CtrlArchCost(
             arch=arch,
             index_width=index_width,
             dip_74hc=dip,
-            delay_max_ns=DELAY_SUB_WITH_DECODE,
             flash_rows=flash_rows,
             cpld_mc=GPR_ONLY_MC,
             wire_hops=WIRE_HOPS_FLASH_CW,
             gates=0,
             advanced_blocks=0,
             parts={"74HC574": 1},
-            feasible=True,
+            feasible=timing["timing_feasible"],
             pure_74hc=False,
-            notes=["Flash $4000 + 574 CW latch + alu8_decode SOP"],
+            notes=_merge_notes(
+                ["Flash $4000 + 574 CW latch + alu8_decode SOP"],
+                timing["timing_notes"],
+            ),
+            delay_alu_ns=timing["delay_alu_ns"],
+            delay_fetch_ns=timing["delay_fetch_ns"],
+            delay_execute_ns=timing["delay_execute_ns"],
+            delay_max_ns=timing["delay_max_ns"],
+            timing_feasible=timing["timing_feasible"],
         )
 
     if arch == ARCH_FLASH_CW16:
         dip = 3
         if index_width == IndexWidth.IDX5:
             dip += 1
+        timing = _timing_bundle(arch, DELAY_CW16_DIRECT)
         return CtrlArchCost(
             arch=arch,
             index_width=index_width,
             dip_74hc=dip,
-            delay_max_ns=DELAY_CW16_DIRECT,
             flash_rows=flash_rows,
             cpld_mc=GPR_ONLY_MC,
             wire_hops=WIRE_HOPS_FLASH_CW,
             gates=0,
             advanced_blocks=0,
             parts={"74HC574": 2},
-            feasible=True,
+            feasible=timing["timing_feasible"],
             pure_74hc=False,
-            notes=["16b CW direct to ALU/bus; no alu8_decode"],
+            notes=_merge_notes(
+                ["16b CW direct to ALU/bus; no alu8_decode"],
+                timing["timing_notes"],
+            ),
+            delay_alu_ns=timing["delay_alu_ns"],
+            delay_fetch_ns=timing["delay_fetch_ns"],
+            delay_execute_ns=timing["delay_execute_ns"],
+            delay_max_ns=timing["delay_max_ns"],
+            timing_feasible=timing["timing_feasible"],
         )
 
     strobe_tbl = strobe_truth_table(idx_key=idx_key)
@@ -345,20 +425,25 @@ def score_control_arch(arch: str, index_width: IndexWidth) -> CtrlArchCost:
         ]
         if not feasible:
             notes.append("SOP gate/DIP explosion — research only")
+        timing = _timing_bundle(arch, DELAY_CW16_DIRECT)
         return CtrlArchCost(
             arch=arch,
             index_width=index_width,
             dip_74hc=dip,
-            delay_max_ns=DELAY_CW16_DIRECT + DELAY_EXT_CTRL_PENALTY,
             flash_rows=0,
             cpld_mc=GPR_ONLY_MC,
             wire_hops=WIRE_HOPS_EXT_CTRL,
             gates=gates,
             advanced_blocks=0,
             parts=parts,
-            feasible=feasible,
+            feasible=feasible and timing["timing_feasible"],
             pure_74hc=True,
-            notes=notes,
+            notes=_merge_notes(notes, timing["timing_notes"]),
+            delay_alu_ns=timing["delay_alu_ns"],
+            delay_fetch_ns=timing["delay_fetch_ns"],
+            delay_execute_ns=timing["delay_execute_ns"],
+            delay_max_ns=timing["delay_max_ns"],
+            timing_feasible=timing["timing_feasible"],
         )
 
     if arch == ARCH_HC154_LAYERED:
@@ -369,62 +454,85 @@ def score_control_arch(arch: str, index_width: IndexWidth) -> CtrlArchCost:
         for k, v in alu_dec.parts.items():
             parts[k] = parts.get(k, 0) + v
         dip = pack_dips(parts) + 2 + _branch_glue_dip()
+        timing = _timing_bundle(arch, DELAY_SUB_WITH_DECODE)
         return CtrlArchCost(
             arch=arch,
             index_width=index_width,
             dip_74hc=dip,
-            delay_max_ns=DELAY_SUB_WITH_DECODE,
             flash_rows=0,
             cpld_mc=GPR_ONLY_MC,
             wire_hops=WIRE_HOPS_EXT_CTRL,
             gates=gates + alu_dec.gates,
             advanced_blocks=alu_dec.advanced_blocks,
             parts=parts,
-            feasible=True,
+            feasible=timing["timing_feasible"],
             pure_74hc=True,
-            notes=["strobes: idx SOP; ALU: 74HC154+00 from 4b alu_op field"]
-            + alu_dec.notes[:2],
+            notes=_merge_notes(
+                ["strobes: idx SOP; ALU: 74HC154+00 from 4b alu_op field"] + alu_dec.notes[:2],
+                timing["timing_notes"],
+            ),
+            delay_alu_ns=timing["delay_alu_ns"],
+            delay_fetch_ns=timing["delay_fetch_ns"],
+            delay_execute_ns=timing["delay_execute_ns"],
+            delay_max_ns=timing["delay_max_ns"],
+            timing_feasible=timing["timing_feasible"],
         )
 
     if arch == ARCH_COUNTER_TEMPLATE:
         parts = _counter_template_parts()
         dip = pack_dips(parts) + _branch_glue_dip()
+        timing = _timing_bundle(arch, DELAY_CW16_DIRECT)
         return CtrlArchCost(
             arch=arch,
             index_width=index_width,
             dip_74hc=dip,
-            delay_max_ns=DELAY_CW16_DIRECT + DELAY_EXT_CTRL_PENALTY,
             flash_rows=0,
             cpld_mc=GPR_ONLY_MC,
             wire_hops=WIRE_HOPS_EXT_CTRL - 4,
             gates=strobe_cost.total // 3,
             advanced_blocks=0,
             parts=parts,
-            feasible=True,
+            feasible=timing["timing_feasible"],
             pure_74hc=True,
-            notes=[
-                "161 phase counter + opcode→template glue + 153 w_sel",
-                f"template strobes est. {strobe_cost.total} gates if fully SOP",
-            ],
+            notes=_merge_notes(
+                [
+                    "161 phase counter + opcode→template glue + 153 w_sel",
+                    f"template strobes est. {strobe_cost.total} gates if fully SOP",
+                ],
+                timing["timing_notes"],
+            ),
+            delay_alu_ns=timing["delay_alu_ns"],
+            delay_fetch_ns=timing["delay_fetch_ns"],
+            delay_execute_ns=timing["delay_execute_ns"],
+            delay_max_ns=timing["delay_max_ns"],
+            timing_feasible=timing["timing_feasible"],
         )
 
     if arch == ARCH_SPLIT_ALU_SEQ:
         gates, parts, dip_seq = _sum_decode_costs(strobe_cost)
         dip = dip_seq + DECODE_SOP_DIP + 2 + _branch_glue_dip()
+        timing = _timing_bundle(arch, DELAY_SUB_WITH_DECODE)
         return CtrlArchCost(
             arch=arch,
             index_width=index_width,
             dip_74hc=dip,
-            delay_max_ns=DELAY_SUB_WITH_DECODE,
             flash_rows=0,
             cpld_mc=GPR_ONLY_MC,
             wire_hops=WIRE_HOPS_EXT_CTRL,
             gates=gates,
             advanced_blocks=0,
             parts=parts,
-            feasible=True,
+            feasible=timing["timing_feasible"],
             pure_74hc=True,
-            notes=["idx SOP sequencer + separate alu8_decode SOP block"],
+            notes=_merge_notes(
+                ["idx SOP sequencer + separate alu8_decode SOP block"],
+                timing["timing_notes"],
+            ),
+            delay_alu_ns=timing["delay_alu_ns"],
+            delay_fetch_ns=timing["delay_fetch_ns"],
+            delay_execute_ns=timing["delay_execute_ns"],
+            delay_max_ns=timing["delay_max_ns"],
+            timing_feasible=timing["timing_feasible"],
         )
 
     raise ValueError(f"unknown arch: {arch}")
