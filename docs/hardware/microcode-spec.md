@@ -1,8 +1,7 @@
 # Microcode Specification v1.0
 
-**Normative:** v1.0 breadboard (Pareto winner + FSM-only + idx5 refinement)  
+**Normative:** v1.0 breadboard (FSM-only idx5)  
 **Related:** [rom-architecture.md](rom-architecture.md) · [cpld-system-controller.md](cpld-system-controller.md)  
-**Design rationale:** [research/design-rationale-v1.0.md](research/design-rationale-v1.0.md) · [cpu-4axis-arch-search-report.md](cpu-4axis-arch-search-report.md) (research)  
 **Superseded prototype:** [prototype-flash-cw](../archive/prototype-flash-cw/README.md)
 
 ---

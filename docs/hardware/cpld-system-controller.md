@@ -215,9 +215,7 @@ Unchanged — [memory-map.md](memory-map.md).
 | idx5 FSM + XFER internal read + ALU ctrl + branch | ~12 |
 | **Total** | **~38** |
 
-제어 로직만 74HC로 분리하는 탐색: [cpld-ctrl-extract-search-report.md](cpld-ctrl-extract-search-report.md) (research).
-
-Pareto idx4 estimate was ~34 MC; **+4 MC** for 5-bit opcode decode (TFR `0x10+`).
+idx5 (5-bit opcode decode, TFR `0x10+`) adds **~4 MC** vs archived idx4 (~34 MC).
 
 ---
 

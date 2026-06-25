@@ -1,7 +1,6 @@
 # Plover hardware bring-up index
 
 > **Normative v1.0:** CPLD FSM idx5 + 138×2 — [system-architecture.md](../hardware/system-architecture.md).  
-> **Design rationale:** [research/design-rationale-v1.0.md](../hardware/research/design-rationale-v1.0.md)  
 > **실구매 패키지:** [parts-on-hand.md](../project/parts-on-hand.md) · Wiring: [breadboard-wiring.md](breadboard-wiring.md).
 
 **마일스톤 계획:** [implementation-plan-v1.0.md](../project/implementation-plan-v1.0.md) (v1.0 content)  

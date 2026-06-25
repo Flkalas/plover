@@ -6,7 +6,7 @@
 **Design rationale:** [research/design-rationale-v1.0.md](research/design-rationale-v1.0.md)  
 **Superseded prototype:** [prototype-flash-cw](../archive/prototype-flash-cw/README.md)
 
-**Winner:** `op_legacy` + `dec_cpld_seq` + `cpld_3fixed` + **`cw_fsm_only`** + **`idx5`** (+ TFR `0x10–0x15`)
+**v1.0:** FSM-only **idx5** control, 3×GPR in CPLD, Extended TFR `0x10–0x15`, Flash `$4000` unused.
 
 ---
 
@@ -42,7 +42,7 @@
 - **Passive map:** mailbox/MAP in **discrete gates**; CPLD holds GPR + sequencer only.
 - **Thin decode:** ALU controls from CPLD FSM, not comb `alu8_decode` block.
 - **ROM as law:** boot + program only; Flash **`$4000` unused** ([rom-architecture.md](rom-architecture.md)).
-- **Flat memory:** 64 KiB linear map; **no MMU** ([classic-memory-model-comparison.md](classic-memory-model-comparison.md)).
+- **Flat memory:** 64 KiB linear map; **no MMU**.
 
 ---
 
@@ -87,8 +87,8 @@ CPLD `ATF1504AS-10JU44` + PLCC→DIP (#15); Flash `SST39SF010A-70-4C-PHE` PDIP �
 | [microcode-spec.md](microcode-spec.md) | FSM-only ISA, idx5 |
 | [hw-bringup/README.md](../hw-bringup/README.md) | M1–M5 breadboard bring-up |
 | [hw-bringup/breadboard-wiring.md](../hw-bringup/breadboard-wiring.md) | SoC wiring (no decode block) |
-| [research/design-rationale-v1.0.md](research/design-rationale-v1.0.md) | Design decisions (research) |
-| [cpu-4axis-arch-search-report.md](cpu-4axis-arch-search-report.md) | Exploration record (research) |
+
+Design rationale and exploration history: [research/README.md](research/README.md) (research, not normative).
 
 ---
 
@@ -99,16 +99,6 @@ CPLD `ATF1504AS-10JU44` + PLCC→DIP (#15); Flash `SST39SF010A-70-4C-PHE` PDIP �
 | Breadboard | M1–M5 bring-up checklists ([hw-bringup/README.md](../hw-bringup/README.md)) |
 | FSM table | `python tools/verify_control_store.py --v1.0` |
 | Scope | CPLD `REG_WE`, `MEM_RD`, `PC_LOAD_EN` vs FLG |
-
----
-
-## 8. Forward work (not normative)
-
-| Track | Status |
-|-------|--------|
-| **H1** `op_class` + `cpld_3seq` | Optional — [hardware/research/](research/README.md) |
-| **H2** `cw16_direct` + `idx8` | P1 bypass path — microcode-spec appendix A |
-| **MMU v1.1** | **Not adopted** — [archive/pre-v1.1-mmu/](../archive/pre-v1.1-mmu/README.md) |
 
 ---
 
