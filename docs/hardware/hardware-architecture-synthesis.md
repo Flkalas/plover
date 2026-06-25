@@ -1,7 +1,7 @@
 # Hardware architecture synthesis (2026-06)
 
-**Status:** **v1.0 breadboard (pre-release, 2026-06-10).** Single normative path.  
-**Active normative:** [system-architecture.md](system-architecture.md) v1.0 — **CPLD GPR ~40 MC + 138×2 + 10b CW**.
+**Status:** **Research** — decisions, parasitics, purchases (not normative).  
+**Active normative:** [system-architecture.md](system-architecture.md) v1.0 — **CPLD FSM idx5 ~38 MC, no Flash CW**.
 
 **Related:** [BOM.md](../BOM.md) · [parts-on-hand.md](../project/parts-on-hand.md) · [purchase-devicesmart.md](../project/purchase-devicesmart.md) · [purchase-2026-06-01-followup.md](../project/purchase-2026-06-01-followup.md) · [memory-map.md](memory-map.md) · [cpld-system-controller.md](cpld-system-controller.md) · [alu-opcodes-timing.md](alu-opcodes-timing.md) · [tools/estimate_parasitics.py](../tools/estimate_parasitics.py)
 
