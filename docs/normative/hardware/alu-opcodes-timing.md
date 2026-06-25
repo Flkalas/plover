@@ -4,7 +4,7 @@
 **블록:** [`hw/netlist/blocks/alu8.yaml`](../hw/netlist/blocks/alu8.yaml) · **디코더:** [`alu8_decode.yaml`](../hw/netlist/blocks/alu8_decode.yaml)
 
 12개 `alu_sel[3:0]` (제어 워드 `[15:12]`) 연산의 동작·제어·**조합 전파 지연**을 한 표로 정리합니다.  
-지연 값은 hwsim [`74hc.yaml`](../hw/timing/74hc.yaml) **datasheet typ/max** 합산(배선 지연 0)이며, **2.0 MHz** 시스템의 Execute 반주기 예산 **250 ns** 대비 slack을 함께 기록합니다.
+지연 값은 pre-flight sim [`74hc.yaml`](../hw/timing/74hc.yaml) **datasheet typ/max** 합산(배선 지연 0)이며, **2.0 MHz** 시스템의 Execute 반주기 예산 **250 ns** 대비 slack을 함께 기록합니다.
 
 실기 치트시트: [`b3-opcode.md`](../hw-bringup/b3-opcode.md) · 마이크로코드 ISA: [`archive/verilog-sim/docs/microcode-spec.md`](../archive/verilog-sim/docs/microcode-spec.md)
 
@@ -75,7 +75,7 @@
 | 10 | DEC | adder | **151** | **99** | `153_B` → `0xFF` (~B path) |
 | 11 | CMP | **critical** | **151** | **99** | Y = SUB; flags §3.5 |
 
-측정: [`alu8_opcode_timing`](../hw/tests/alu8_opcode_timing.yaml) · `build/hwsim/alu8_opcode_timing/timing_report.json` (@ **max**).
+측정: [`alu8_opcode_timing`](../hw/tests/alu8_opcode_timing.yaml) · `build/pre-flight sim/alu8_opcode_timing/timing_report.json` (@ **max**).
 
 **worst-case (Y):** **SUB / CMP / DEC** — **151 ns** (slack **99 ns** @ 250 ns Execute half-period).  
 **fastest:** logic opcodes — **46 ns**.
@@ -103,7 +103,7 @@ B3c 브링업 경로 — ALU 출력이 **다음 posedge** 전에 setup 만족해
 ### 3.5 CMP 플래그 (SUB 유도, no 7485)
 
 `ALU_CMP_SUB`: CMP/SUB 시 (`b_sel=1`, `cin=1`) **Z** = all `net_y==0`, **C_GE** = `net_c_hi`.  
-hwsim [`alu8_cmp_sub`](../hw/tests/alu8_cmp_sub.yaml) — 플래그는 Y 경로와 **동일 오더**:
+pre-flight sim [`alu8_cmp_sub`](../hw/tests/alu8_cmp_sub.yaml) — 플래그는 Y 경로와 **동일 오더**:
 
 | 구간 | typ (ns) | max (ns) | 비고 |
 |------|----------|----------|------|
@@ -127,7 +127,7 @@ v1.0 CPU는 **10-bit CW** (B9–B8 `REG_SEL` in Flash hi byte; B7–B0 bus/ALU i
 
 ---
 
-## 4. hwsim 검증 · 파형 측정
+## 4. pre-flight sim 검증 · 파형 측정
 
 | 테스트 | 검증 opcode / 구간 | 리포트 delay (max) |
 |--------|-------------------|-------------------|
@@ -143,12 +143,9 @@ v1.0 CPU는 **10-bit CW** (B9–B8 `REG_SEL` in Flash hi byte; B7–B0 bus/ALU i
 
 ```bash
 python tools/gen_alu8_opcode_timing.py
-python -m hwsim run hw/tests/alu8_full.yaml
-python -m hwsim run hw/tests/alu8_opcode_timing.yaml
-python -m hwsim run hw/tests/alu_b3_sub_critical.yaml
 ```
 
-아티팩트: `build/hwsim/<test>/timing_report.json`
+아티팩트: `build/pre-flight sim/<test>/timing_report.json`
 
 ---
 
@@ -185,4 +182,4 @@ CPU E2E (Flash 70 ns + CPLD read 10–15 ns + ALU)는 별도 `cpu_v1_*` / `cpld_
 | 2026-06-02 | Phase B2: Gigatron `153_L`, **16** IC, opcode timing matrix, logic **46 ns** |
 | 2026-06-02 | Phase B1: SUB **151 ns** max (`157_B2` 제거, `157_YBP` sum bypass) |
 | 2026-06-02 | Phase A: SUB 179 ns max, `7485` CMP flags §3.5, 제어표 `sub` 제거 |
-| 2026-06-01 | 12 opcode · 제어 · typ/max 지연 · hwsim 교차표 초판 |
+| 2026-06-01 | 12 opcode · 제어 · typ/max 지연 · pre-flight sim 교차표 초판 |

@@ -36,5 +36,5 @@ This tree contains **v1.0 confirmed facts** only — hardware specs, bring-up, s
 | Tier | Path |
 |------|------|
 | Developer (sim, VM, CI) | [../developer/README.md](../developer/README.md) |
-| Research | [../hardware/research/README.md](../hardware/research/README.md) |
+| Research | [developer research index](developer research index) |
 | Archive | [../archive/README.md](../archive/README.md) |

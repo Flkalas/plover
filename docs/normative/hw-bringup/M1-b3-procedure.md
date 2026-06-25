@@ -9,9 +9,9 @@
 | **Opcode DIP** | [b3-opcode.md](b3-opcode.md) |
 
 빵판 절차 3단계: **B3a** (조합 Y) → **B3b** (수동 래치) → **B3c** (2 MHz 클록).  
-배선 전 **hwsim**으로 동작을 확인합니다.
+배선 전 **pre-flight sim**으로 동작을 확인합니다.
 
-| Phase | Netlist | hwsim |
+| Phase | Netlist | pre-flight sim |
 |-------|---------|-------|
 | **B3a** | [`alu8.yaml`](../../hw/netlist/blocks/alu8.yaml) | `alu8_full.yaml` |
 | **B3b** | [`alu_b3.yaml`](../../hw/netlist/blocks/alu_b3.yaml) | `alu_b3_latch.yaml` |
@@ -21,11 +21,6 @@
 
 **배선 전 필수:**
 
-```bash
-python -m hwsim run hw/tests/alu8_full.yaml
-python -m hwsim export-schematic hw/netlist/blocks/alu8.yaml -o build/alu8-schematic.svg --html
-```
-
 `build/alu8-schematic.html` — IC 14개 배선도. 제어 넷은 주황색.
 
 ---
@@ -34,7 +29,7 @@ python -m hwsim export-schematic hw/netlist/blocks/alu8.yaml -o build/alu8-schem
 
 - **0.1 µF / IC 1개**, 5 V 레일에 **10 µF** 벌크.
 - 제어 입력: [opcode 치트시트](b3-opcode.md). 시트에 없는 제어 넷은 **GND** (VCC 예외만 시트 참조).
-- **INC/DEC (B3a):** `net_b0..7` 을 피연산자로 쓰지 말 것. `153_B` INC/DEC 상수는 **하드와이어** — **`b_const_sel` + `b_sel`만** 설정. 치트시트 `b_const_bit1..7` 열은 hwsim parity (선택 `alu_decode` 단계에서만 물리 DIP).
+- **INC/DEC (B3a):** `net_b0..7` 을 피연산자로 쓰지 말 것. `153_B` INC/DEC 상수는 **하드와이어** — **`b_const_sel` + `b_sel`만** 설정. 치트시트 `b_const_bit1..7` 열은 pre-flight sim parity (선택 `alu_decode` 단계에서만 물리 DIP).
 
 ---
 
@@ -87,10 +82,6 @@ B3a: 574, OSC, 74HC74 **없음**.
 
 ### Gate
 
-```bash
-python -m hwsim run hw/tests/alu8_full.yaml
-```
-
 ---
 
 ## B3b — +574 ACC, 수동 CP
@@ -120,10 +111,6 @@ python -m hwsim run hw/tests/alu8_full.yaml
 4. **Q LED = Y**.
 
 ### Gate
-
-```bash
-python -m hwsim run hw/tests/alu_b3_latch.yaml
-```
 
 ### 완료 기준 (B3b)
 
@@ -159,12 +146,7 @@ B1 클록 보드 재사용 가능. **`net_clk2` → `574 CP`** (푸시버튼 제
 | 574 setup | `net_d0` | `net_clk2` | D가 ↑ 전 ≥5 ns 안정 |
 | MSB 마진 | `net_y7` | clk | SUB 벡터, MSB 안정 |
 
-B3c 타이밍은 **hwsim OSC 없음** — 스코프 필수. 사전 마진:
-
-```bash
-python -m hwsim run hw/tests/alu_b3_latch.yaml
-python -m hwsim run hw/tests/alu_b3_sub_critical.yaml
-```
+B3c 타이밍은 **pre-flight sim OSC 없음** — 스코프 필수. 사전 마진:
 
 ### 완료 기준 (B3c)
 
@@ -182,13 +164,13 @@ python -m hwsim run hw/tests/alu_b3_sub_critical.yaml
 | | CP | `net_clk` (B3b) / `net_clk2` (B3c) |
 | | OE | GND |
 
-핀 번호: `python -m hwsim pinout 74HC574`
+핀 번호: developer verification gate
 
 ---
 
-## hwsim ↔ 빵판
+## pre-flight sim ↔ 빵판
 
-| hwsim | 빵판 |
+| pre-flight sim | 빵판 |
 |-------|------|
 | `net_a*` 자극 | DIP |
 | 제어 넷 | DIP / 치트시트 타이 |
@@ -206,9 +188,9 @@ python -m hwsim run hw/tests/alu_b3_sub_critical.yaml
 | Y 틀림 (B3a) | 치트시트 재확인; INC/DEC는 **153_B** (`b_const_sel`); 산술은 **157_YBP** |
 | CP 후 Q≠Y | Setup 위반 — CP 에지 느리게 또는 Y 안정 후 펄스 |
 | 2 MHz에서 Q 틀림 | 스코프 Y vs clk; 배선 단축 또는 클록 하향 |
-| hwsim FAIL | `--report` 옵션; B3c는 스코프 |
+| pre-flight sim FAIL | `--report` 옵션; B3c는 스코프 |
 
-netlist 변경 후 regen: [hw-sim.md](../simulation/hw-sim.md) § ALU regen chain.
+netlist 변경 후 regen: [verification-gates.md](../../developer/verification-gates.md) § ALU regen chain.
 
 ---
 

@@ -1,6 +1,6 @@
 # OS kernel (S6)
 
-Host-side microkernel model used for early bring-up on `plover_vm`.
+Host-side microkernel model used for early bring-up on logic VM (developer).
 
 ## Cooperative / polling model
 
@@ -23,5 +23,4 @@ Normative v1.0 hardware has **no IRQ**. **S6** uses **polling I/O** (Mailbox sta
 ## Gate
 
 - `tests/test_kernel_boot.py`
-- `python -m plover_vm scenario hw/scenarios/vm/os_boot.yaml`
-
+- `

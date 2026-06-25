@@ -62,7 +62,7 @@ See [mailbox-protocol.md](mailbox-protocol.md) §2.5.
 
 | Layer | v0.1 |
 |-------|------|
-| `plover_vm` | [`HidState`](../plover_vm/memory/hid.py) — FIFO queues |
+| logic VM (developer) | [`HidState`](../logic VM/memory/hid.py) — FIFO queues |
 | Host USB | **Deferred** — `HID_INJECT` for tests |
 | Forth | `KEY ( -- ch )`, `MOUSE? ( -- buttons dx dy )` |
 | Discovery | `SIG_HID = 0x48` |

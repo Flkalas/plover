@@ -1,8 +1,8 @@
 # Software roadmap (VM OS stack)
 
-**Related:** [software-memory-layout.md](software-memory-layout.md) · [implementation-plan-v1.0.md](../project/implementation-plan-v1.0.md) · [hw-sim.md](../simulation/hw-sim.md)
+**Related:** [software-memory-layout.md](software-memory-layout.md) · [implementation-plan-v1.0.md](../../developer/project/implementation-plan-v1.0.md) · [verification-gates.md](../../developer/verification-gates.md)
 
-Plover v0.1 software milestones **S0–S7** on `plover_vm`, then hardware bring-up (M1–M5).
+Plover v0.1 software milestones **S0–S7** on logic VM (developer), then hardware bring-up (M1–M5).
 
 ## Phase overview
 
@@ -17,17 +17,17 @@ Plover v0.1 software milestones **S0–S7** on `plover_vm`, then hardware bring-
 
 | ID | Deliverable | Doc | Test gate |
 |----|-------------|-----|-----------|
-| S0 | Roadmap, layout, regression script | this file | baseline pytest |
-| S1 | `plover_asm` | [plover-asm.md](plover-asm.md) | `test_plover_asm.py` |
-| S2 | CALL/RET ISA + CW | [calling-convention-v0.1.md](calling-convention-v0.1.md) | `test_call_ret.py` |
-| S3 | Forth core | [forth-system.md](forth-system.md) | `test_forth_*.py`, `forth_boot.yaml` |
-| S3c | Normative asm Forth | forth-system §normative | `--engine micro` |
-| S4 | Forth OS services | [forth-os-services.md](forth-os-services.md) | `test_forth_blocks.py` |
-| S5 | `plover_cc` | **Static-allocation Subset C** — [subset-c.md](subset-c.md) | `test_plover_cc.py` |
-| S6 | C kernel | **Cooperative / polling microkernel** — [os-kernel.md](os-kernel.md) | `test_kernel_boot.py`, `os_boot.yaml` |
-| S7a | vFDD driver | [virtual-fdd.md](virtual-fdd.md) | `test_vfdd_io.py` |
-| S7b | PLFS | [plover-fat.md](plover-fat.md) | `test_fat_fs.py` |
-| S7c | `.PLR` loader | [program-loader.md](program-loader.md) | `test_plr_exec.py` |
+| S0 | Roadmap, layout, regression script | this file | baseline regression |
+| S1 | `plover_asm` | [plover-asm.md](plover-asm.md) | milestone checklist |
+| S2 | CALL/RET ISA + CW | [calling-convention-v0.1.md](calling-convention-v0.1.md) | S2 bring-up checklist |
+| S3 | Forth core | [forth-system.md](forth-system.md) | milestone checklist, `forth_boot.yaml` |
+| S3c | Normative asm Forth | forth-system §normative | `breadboard ISA` |
+| S4 | Forth OS services | [forth-os-services.md](forth-os-services.md) | milestone checklist |
+| S5 | `plover_cc` | **Static-allocation Subset C** — [subset-c.md](subset-c.md) | milestone checklist |
+| S6 | C kernel | **Cooperative / polling microkernel** — [os-kernel.md](os-kernel.md) | milestone checklist, `os_boot.yaml` |
+| S7a | vFDD driver | [virtual-fdd.md](virtual-fdd.md) | milestone checklist |
+| S7b | PLFS | [plover-fat.md](plover-fat.md) | milestone checklist |
+| S7c | `.PLR` loader | [program-loader.md](program-loader.md) | milestone checklist |
 | S7d | PL-DOS shell | [dos-shell.md](dos-shell.md), [pl-dos-roadmap.md](pl-dos-roadmap.md) | `dos_boot.yaml` |
 
 ## Hardware cross-links
@@ -40,7 +40,7 @@ Plover v0.1 software milestones **S0–S7** on `plover_vm`, then hardware bring-
 
 ## Verification
 
-Each milestone: add tests → cumulative `pytest tests/` PASS → git commit. See [tests/README.md](../tests/README.md).
+Each milestone: add tests → cumulative `regression tests/` PASS → git commit. See [tests/README.md](../tests/README.md).
 
 ### S5 — Subset C philosophy
 

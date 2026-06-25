@@ -55,10 +55,6 @@
 | `$8100` | 1 | RAM_2 |
 | `$FF04` | 1 | **Mailbox** (SRAM CS 비활성) |
 
-```bash
-python -m hwsim run hw/tests/mem_decode.yaml
-```
-
 ---
 
 ## 3. SST39SF010A (NOR)
@@ -109,7 +105,7 @@ DIP `MAP_MODE` → CPLD. 기본 **Boot (0)**.
 - [ ] `$FF04`: SRAM CS **비**활성 (mailbox 영역)
 - [ ] MAP_MODE 토글: low-page ROM↔RAM CS 전환
 - [ ] NOR `/OE` 해제 시 버스 플로팅 없음 (풀업/풀다운 또는 245 Z)
-- [ ] `mem_decode` hwsim PASS
+- [ ] `mem_decode` pre-flight sim PASS
 
 ---
 

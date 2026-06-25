@@ -4,7 +4,7 @@ Breadboard **DIP / tie** settings for 12 `alu_op[3:0]` operations (v0.2 CW `[15:
 
 Regenerate: `python tools/gen_opcode_cheatsheet.py`
 
-**Netlist has no `alu_sel` bus** — in Phase1 hwsim use [`alu_decode.yaml`](../hw/netlist/blocks/alu_decode.yaml) or set each control net manually (or hardwire per row).
+**Netlist has no `alu_sel` bus** — in Phase1 pre-flight sim use [`alu_decode.yaml`](../hw/netlist/blocks/alu_decode.yaml) or set each control net manually (or hardwire per row).
 
 INC/DEC: do **not** drive `net_b0..7`; use `153_B` sel (`b_const_sel`, `b_sel`) — see [alu8.md](../hw/netlist/blocks/alu8.md).
 

@@ -4,8 +4,9 @@
 **Status:** Planning — normative for **future FPGA / Verilog** work; **not** the active breadboard/PCB build path  
 **Audience:** 교육용 FPGA 보드 사용자, 원칙·외부 ROM/RAM·주변 분리 구현자, 향후 RTL 제공·프로젝트 확장 담당자
 
-**Related (TTL 실기):** [system-architecture.md](system-architecture.md) · [BOM.md](../BOM.md) (5 V) · [BOM-3v3.md](../BOM-3v3.md) (3.3 V PCB)  
-**Related (기능 검증):** [plover_vm/](../plover_vm/) · [hw-sim.md](../simulation/hw-sim.md) · [microcode-spec.md](microcode-spec.md) · [memory-map.md](memory-map.md)
+**Related (TTL 실기):** [system-architecture.md](system-architecture.md) · [BOM.md](../../../BOM.md) (5 V) · [BOM-3v3.md](../../../BOM-3v3.md) (3.3 V PCB)  
+**Related (명세):** [microcode-spec.md](microcode-spec.md) · [memory-map.md](memory-map.md)  
+**개발자 검증:** [developer/verification-gates.md](../../developer/verification-gates.md)
 
 ---
 
@@ -25,15 +26,7 @@
 - TTL BOM과 **핀·전기 1:1** 대응 보장 (3.3 V FPGA 구현은 [BOM-3v3.md](../BOM-3v3.md) 정합이지 [BOM.md](../BOM.md) 5 V 버스와 동일하지 않음)
 - **합성 완료 RTL** — 저장소에 **아직 없음** (§8 로드맵)
 
-### 1.3 `plover_vm` 과의 관계
-
-| 계층 | 역할 |
-|------|------|
-| **`plover_vm/`** | NOR/RAM/Mailbox·ISA·8b CW **기능 모델** — 프로그램·부트·Mailbox 프로토콜 bring-up |
-| **hwsim** | 74HC netlist **ns 타이밍** — ALU·CPLD decode·GPR latch |
-| **FPGA RTL (예정)** | v1.0 **행위적 CPU** 우선; 필요 시 hwsim과 **타이밍 정합**은 별도 게이트 |
-
-FPGA 구현의 **정합성 검증 1차 기준**은 `python -m pytest tests/ -q` 및 `hw/fixtures/` / `tools/pack_control_store.py` 산출물(`cw.hex`)이다.
+FPGA RTL 정합성은 [microcode-spec.md](microcode-spec.md) · `hw/fixtures/` · breadboard bring-up 체크리스트를 기준으로 한다. 사전 시뮬·회귀는 [developer/verification-gates.md](../../developer/verification-gates.md).
 
 ### 1.4 레거시 Verilog
 
@@ -161,7 +154,7 @@ Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있
 |----------|-------------|
 | 병렬 SST39 + IS62 | **SDRAM + EPCS** |
 | 2 MHz 시스템 | **50 MHz** 오실레이터 (내부 분주 가능) |
-| 5 V ([BOM.md](../BOM.md)) | **3.3 V** ([BOM-3v3.md](../BOM-3v3.md) 정합) |
+| 5 V ([BOM.md](../../../BOM.md)) | **3.3 V** ([BOM-3v3.md](../../../BOM-3v3.md) 정합) |
 
 ### 5.3 권장 FPGA 메모리 맵 (SDRAM 보드용 초안)
 
@@ -180,7 +173,7 @@ Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있
 
 ## 6. 속도 (MIPS) — 클록과 구현 방식
 
-**MIPS** = 초당 **매크로 명령**(opcode 1개) 수. v1.0 TTL 목표: [roadmap-next.md](../project/roadmap-next.md).
+**MIPS** = 초당 **매크로 명령**(opcode 1개) 수. v1.0 TTL 목표: [developer/project/roadmap-next.md](../../developer/project/roadmap-next.md).
 
 | 프로파일 @ **2 MHz** | MIPS |
 |----------------------|------|
@@ -191,9 +184,9 @@ Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있
 
 | 방식 | `clk_sys` | 기대 MIPS | 비고 |
 |------|-----------|-----------|------|
-| **Cycle-accurate micro** (TTL 동일) | **2 MHz** | **~0.3 – 1.0** | 명세·hwsim 타이밍 스토리와 동일 |
+| **Cycle-accurate micro** (TTL 동일) | **2 MHz** | **~0.3 – 1.0** | 명세 타이밍 스토리와 동일 |
 | **Faithful micro + SDRAM** | 50 MHz | **~2 – 8** | random read wait state 지배 |
-| **Macro-fast** (`plover_vm` fast 유사) | 50 MHz | **~5 – 20+** | micro phase 생략; bring-up용 |
+| **Macro-fast** (micro phase 생략) | 50 MHz | **~5 – 20+** | bring-up·데모용 |
 
 **병목:** EP4CE6 **LE가 아니라 메모리**(SDRAM 첫 read, PC 순차성)와 **MMIO 폴링**.
 
@@ -212,7 +205,7 @@ Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있
 | 원칙 | 설명 |
 |------|------|
 | **행위 우선** | 게이트 단위 74HC 복제는 **교육/타이밍 실험**용 옵션; 기본 산출물은 **compact CPU** |
-| **명세 동기** | ISA·phase count — [microcode-spec.md](microcode-spec.md), [plover_vm/macro/isa.py](../plover_vm/macro/isa.py) |
+| **명세 동기** | ISA·phase count — [microcode-spec.md](microcode-spec.md) |
 | **CW** | `tools/pack_control_store.py` / `hw/fixtures/control/cw.hex` **단일 소스** |
 | **Reset** | `$FFFC` 벡터, `MAP_MODE` — [bootloader.md](../boot/bootloader.md) |
 | **No IRQ** | 폴링만 — [mailbox-protocol.md](../copro/mailbox-protocol.md) |
@@ -221,9 +214,9 @@ Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있
 
 | 등급 | 설명 | 검증 |
 |------|------|------|
-| **L0** | ALU8 단독 | hwsim opcode 표 · cocotb/iverilog |
-| **L1** | MicroEngine 1 phase = 1 clk | `plover_vm` micro vs [cyclesim](../cyclesim/) netlist vs RTL |
-| **L2** | Macro + fetch + [memory-map.md](memory-map.md) | `pytest` + hex 프로그램 |
+| **L0** | ALU8 단독 | cocotb/iverilog + [alu-opcodes-timing.md](alu-opcodes-timing.md) |
+| **L1** | MicroEngine 1 phase = 1 clk | RTL vs 명세 phase table |
+| **L2** | Macro + fetch + [memory-map.md](memory-map.md) | hex 프로그램 on-board |
 | **L3** | SDRAM/QSPI 메모리 래퍼 | 보드 특화; timing constraints |
 | **L4** | Mailbox + RP2350 | 시스템 통합 |
 
@@ -257,15 +250,16 @@ RTL 상단에서 **백엔드**만 교체할 수 있게 한다.
 
 ## 8. 검증 계획
 
-| 단계 | 명령 / 산출물 |
-|------|----------------|
-| CW 패킹 | `python tools/verify_control_store.py` |
-| 기능 VM | `python -m pytest tests/ -q` |
-| Gate 타이밍 | `python -m hwsim run --all` (ALU·decode; CPU 통합 netlist는 진행 중) |
+| 단계 | 산출물 |
+|------|--------|
+| FSM table | M3a bring-up checklist |
+| CW / fixtures | `hw/fixtures/` · breadboard gate |
 | RTL sim | (예정) Verilator/Icarus + `hw/fixtures/sram/*.hex` |
 | FPGA on-board | (예정) SignalTap / LED — Fib 데모·단일 명령 스텝 |
 
-**Parity 목표:** normative ISA에서 **PC·GPR·Z/C·halt** 가 `hwsim/cyclesim` datapath 와 `plover_vm` micro/macro/fast 일치. Execute 슬라이스: `python -m cyclesim run --all` + `pytest tests/test_cyclesim_parity.py tests/test_alu_netlist_parity.py`.
+사전 시뮬·회귀 명령: [developer/verification-gates.md](../../developer/verification-gates.md).
+
+**Parity 목표:** normative ISA에서 **PC·GPR·Z/C·halt** 가 breadboard 관측과 RTL 행위가 일치.
 
 ---
 
@@ -274,14 +268,14 @@ RTL 상단에서 **백엔드**만 교체할 수 있게 한다.
 | # | 산출물 | 의존 |
 |---|--------|------|
 | F0 | **이 문서** | — |
-| F1 | `hw/rtl/v1.0/alu8` + bench | hwsim alu8 tests |
+| F1 | `hw/rtl/v1.0/alu8` + bench | [alu-opcodes-timing.md](alu-opcodes-timing.md) |
 | F2 | micro sequencer + BRAM CW | `cw.hex`, micro tests |
-| F3 | Macro engine + BRAM RAM | `test_add_imm`, boot handoff |
+| F3 | Macro engine + BRAM RAM | boot handoff on breadboard |
 | F4 | `plover_top` + SDRAM (EP4CE6) | Quartus project template |
 | F5 | Mailbox + RP2350 GPIO | [rp2350-coprocessor.md](rp2350-coprocessor.md) |
 | F6 | (선택) Parallel NOR/SRAM wrapper | [BOM-3v3.md](../BOM-3v3.md) |
 
-TTL 실기 마일스톤: [implementation-plan-v1.0.md](../project/implementation-plan-v1.0.md) — **병렬 진행 가능**, 문서만 교차 링크.
+TTL 실기 마일스톤: [implementation-plan-v1.0.md](../../developer/project/implementation-plan-v1.0.md) — **병렬 진행 가능**, 문서만 교차 링크.
 
 ---
 

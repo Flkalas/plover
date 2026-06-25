@@ -11,7 +11,7 @@
 
 ## 1. 이 단계에서 하는 일
 
-실기 대신 `plover_vm`으로:
+실기 대신 logic VM (developer)으로:
 
 1. Boot ROM이 sector를 RAM `$0800`에 복사하고
 2. SP/RP/GPR을 초기화한 뒤
@@ -39,11 +39,7 @@ python tools/gen_boot_fixtures.py
 
 ---
 
-## 3. Gate 1 — JMP handoff pytest
-
-```bash
-python -m pytest tests/test_boot_jmp_handoff.py -v
-```
+## 3. Gate 1 — JMP handoff regression
 
 **기대:**
 
@@ -54,10 +50,6 @@ python -m pytest tests/test_boot_jmp_handoff.py -v
 ---
 
 ## 4. Gate 2 — YAML 시나리오
-
-```bash
-python -m plover_vm scenario hw/scenarios/vm/boot_jmp_handoff.yaml
-```
 
 시나리오 요약 ([`boot_jmp_handoff.yaml`](../../hw/scenarios/vm/boot_jmp_handoff.yaml)):
 
@@ -80,28 +72,22 @@ python -m plover_vm scenario hw/scenarios/vm/boot_jmp_handoff.yaml
 
 ---
 
-## 5. Gate 3 — §7 체크리스트 pytest
+## 5. Gate 3 — §7 체크리스트 regression
 
 ```bash
-python -m pytest tests/test_boot_flags.py tests/test_boot_lowpage_sta.py \
   tests/test_boot_mailbox_idle.py tests/test_boot_reset_regression.py -v
 ```
 
 | 테스트 | 검증 |
 |--------|------|
-| `test_boot_flags` | KERNEL_BOOT `CMP` 후 Z/C |
-| `test_boot_lowpage_sta` | `$0000–$07FF` STA no-op |
-| `test_boot_mailbox_idle` | READ 후 Mailbox Idle |
-| `test_boot_reset_regression` | RESET → ROM vector |
+| milestone checklist | KERNEL_BOOT `CMP` 후 Z/C |
+| milestone checklist | `$0000–$07FF` STA no-op |
+| milestone checklist | READ 후 Mailbox Idle |
+| milestone checklist | RESET → ROM vector |
 
 ---
 
 ## 6. Gate 4 — Manual recovery regression
-
-```bash
-python -m pytest tests/test_boot_handoff.py -v
-python -m plover_vm scenario hw/scenarios/vm/boot_run.yaml
-```
 
 `boot_rom_manual.hex` — HALT 후 operator Run+RESET 경로 ([bootloader.md](../boot/bootloader.md) §3).
 
@@ -109,14 +95,9 @@ python -m plover_vm scenario hw/scenarios/vm/boot_run.yaml
 
 ## 7. Gate 5 — Full suite
 
-```bash
-python -m pytest tests/ -q
-```
-
 M4a 단독 최소:
 
 ```bash
-python -m pytest tests/test_boot_jmp_handoff.py tests/test_boot_handoff.py \
   tests/test_engine_parity.py -q
 ```
 

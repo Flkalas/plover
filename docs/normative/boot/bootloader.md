@@ -52,7 +52,7 @@ Used when Boot ROM ends in **HALT**, or when **Run** map and RAM vector reset ar
 |------|---------|
 | `hw/fixtures/boot/boot_rom.hex` | 2 KB image + vector |
 | `hw/fixtures/boot/ram_kernel.hex` | Expected RAM after copy |
-| `hw/tests/v2_boot_handoff.yaml` | hwsim scenario (decode + vector check) |
+| `hw/tests/v2_boot_handoff.yaml` | pre-flight sim scenario (decode + vector check) |
 
 ---
 

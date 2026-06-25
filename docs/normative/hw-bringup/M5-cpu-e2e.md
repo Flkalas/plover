@@ -14,7 +14,7 @@
 M1–M4b는 **수동 단계**로 CPU를 올립니다. M5는 그 결과를:
 
 - netlist 블록 병합
-- hwsim/cyclesim E2E 테스트
+- pre-flight sim/cycle sim E2E 테스트
 
 로 **회귀 가능**하게 만듭니다. 이후 netlist/배선 변경 시 자동 gate.
 
@@ -84,10 +84,9 @@ ROM 이미지 ([M3b §F1](M3b-fetch-execute.md#f1--instruction-fetch)):
 
 **expect:** HALT 시점 GPR 스냅샷 = M3b F6 기대값.
 
-### M5.6 — cyclesim parity
+### M5.6 — cycle sim parity
 
 ```bash
-python -m cyclesim run hw/tests/cpu_e2e.yaml   # TBD
 ```
 
 ---
@@ -95,9 +94,9 @@ python -m cyclesim run hw/tests/cpu_e2e.yaml   # TBD
 ## 4. M5 sign-off
 
 - [ ] `cpu.yaml`에 §3 블록 전부 include
-- [ ] `cpu_e2e.yaml` hwsim PASS
-- [ ] M3b 빵판 F6 trace와 hwsim GPR 일치 (스크린샷/로그 보관)
-- [ ] [hw-sim.md](../simulation/hw-sim.md)에 regen 명령 문서화
+- [ ] `cpu_e2e.yaml` pre-flight sim PASS
+- [ ] M3b 빵판 F6 trace와 pre-flight sim GPR 일치 (스크린샷/로그 보관)
+- [ ] [verification-gates.md](../../developer/verification-gates.md)에 regen 명령 문서화
 - [ ] `implementation-plan-v1.0.md` §2 M5 행 갱신
 
 ---

@@ -50,10 +50,6 @@ python tools/pack_control_store.py --build-fixtures
 
 **교차검증:**
 
-```bash
-python -m plover_vm scenario hw/scenarios/vm/boot_jmp_handoff.yaml
-```
-
 **Pass:** 첫 fetch가 Boot ROM 영역.
 
 ---
@@ -89,10 +85,6 @@ Boot ROM 완료 직후 ([boot-jmp-handoff.md](../boot-jmp-handoff.md) §5.1):
 
 **Sim gate:**
 
-```bash
-python -m pytest tests/test_boot_jmp_handoff.py -q
-```
-
 ---
 
 ## 6. G5 — Recovery (manual)
@@ -106,10 +98,6 @@ python -m pytest tests/test_boot_jmp_handoff.py -q
 3. `RESET` → PC=`$0800`.
 
 **Pass:**
-
-```bash
-python -m pytest tests/test_boot_handoff.py -q
-```
 
 ---
 

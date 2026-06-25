@@ -1,8 +1,8 @@
 # KiCad ↔ YAML netlist naming
 
-hwsim uses YAML netlists as the machine-readable source of truth. KiCad schematics in [`hw/kicad/plover/`](../hw/kicad/plover/) should export netlists that match these rules.
+pre-flight sim uses YAML netlists as the machine-readable source of truth. KiCad schematics in [`hw/kicad/plover/`](../hw/kicad/plover/) should export netlists that match these rules.
 
-**DIP pin numbers** (breadboard): [`hw/pinout/`](../hw/pinout/) — one YAML per BOM part; `python -m hwsim pinout 74HC283`.  
+**DIP pin numbers** (breadboard): [`hw/pinout/`](../hw/pinout/) — one YAML per BOM part; developer verification gate.  
 Logical pins in netlists (`A0`, `1Y`, …) map to physical pins via `plover_netlist` sections where names differ (e.g. 74HC283 `S0` → DIP pin 4).
 
 ## Reference designators
@@ -39,7 +39,6 @@ Mark in YAML as `VCC: pwr_vcc`, `GND: pwr_gnd`. Diff and sim ignore `type: power
 
 ```bash
 kicad-cli sch export netlist hw/kicad/plover/plover.kicad_sch -o hw/kicad/export/plover.net
-python -m hwsim diff-kicad hw/kicad/export/plover.net hw/netlist/blocks/clock.yaml
 ```
 
 CI compares normalized `(ref, pin) → net` pairs from KiCad S-expression netlist vs YAML.

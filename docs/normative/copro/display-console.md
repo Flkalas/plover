@@ -16,7 +16,7 @@ Normative text console and HDMI output for Plover v0.1. The **8-bit CPU does not
 | Active text raster | **320×200** | 40×8 by 25×8 |
 | Line buffer (host/Forth) | **256 B** | TIB — [software-memory-layout.md](software-memory-layout.md) |
 
-**PL-DOS / serial bring-up:** Until HDMI firmware ships, `plover_vm dos-shell` and UART log the same **40×25** semantics; long lines wrap or truncate at column 40.
+**PL-DOS / serial bring-up:** Until HDMI firmware ships, logic VM (developer) and UART log the same **40×25** semantics; long lines wrap or truncate at column 40.
 
 ---
 
@@ -111,7 +111,7 @@ Source 1×1     HDMI 2×2 block
 
 VDU/GFX mailbox commands are normative in [mailbox-protocol.md](mailbox-protocol.md) §2.1–2.3 (`0x10–0x31`). CPU writes text via `VDU_PUTCH` / `VDU_PRINT` and bitmap via `GFX_PLOT` / `GFX_BLIT`; RP2350 composes layers into the 320×240 back buffer.
 
-Reference stub: [`firmware/rp2350/mailbox_stub/main.c`](../firmware/rp2350/mailbox_stub/main.c) (vFDD + VDU handshake). VM model: [`plover_vm/memory/vdu.py`](../plover_vm/memory/vdu.py).
+Reference stub: [`firmware/rp2350/mailbox_stub/main.c`](../firmware/rp2350/mailbox_stub/main.c) (vFDD + VDU handshake). VM model: [logic VM (developer)](../logic VM/memory/vdu.py).
 
 ---
 
@@ -147,9 +147,9 @@ Normative Presenter implementation: [vm-rust.md](vm-rust.md). Python `VduState` 
 
 | Layer | Console |
 |-------|---------|
-| `plover_vm dos-shell` | Host terminal; wrap at 40 columns (soft) |
+| logic VM (developer) | Host terminal; wrap at 40 columns (soft) |
 | UART / serial module | Byte stream, `\n` after 40 cols optional |
-| hwsim / breadboard | LED/post only; no bitmap gate in M4 |
+| pre-flight sim / breadboard | LED/post only; no bitmap gate in M4 |
 
 ---
 

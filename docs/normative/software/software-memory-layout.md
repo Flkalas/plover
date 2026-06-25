@@ -2,7 +2,7 @@
 
 **Related:** [memory-map.md](../hardware/memory-map.md) · [software-roadmap.md](software-roadmap.md)
 
-Normative RAM regions for Forth, kernel, PL-DOS on the 64 KiB map (`plover_vm` and target hardware).
+Normative RAM regions for Forth, kernel, PL-DOS on the 64 KiB map (logic VM (developer) and target hardware).
 
 ## Global map
 
@@ -39,4 +39,4 @@ Normative RAM regions for Forth, kernel, PL-DOS on the 64 KiB map (`plover_vm` a
 | `FS_DIR_CACHE` | `$6000` | Mounted dir sector copy |
 | `HEAP_BASE` | `$6100` | Kernel allocator |
 
-Changes to these ranges require a doc revision and full regression (`pytest tests/`).
+Changes to these ranges require a doc revision and full regression (`regression tests/`).

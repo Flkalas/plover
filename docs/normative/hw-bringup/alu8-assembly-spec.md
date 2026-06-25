@@ -22,11 +22,6 @@
 
 **도구 (배선 전)**
 
-```bash
-python -m hwsim run hw/tests/alu8_full.yaml
-python -m hwsim export-schematic hw/netlist/blocks/alu8.yaml -o build/alu8-schematic.svg --html
-```
-
 인터랙티브 배선도: `build/alu8-schematic.html` — **14 DIP** (`153_L`×4 병합). glue: `Y_MUX_SEL` only; **CMP** = `net_y` + `net_c_hi` (no 7485). 제어 넷 주황색.
 
 ---
@@ -96,7 +91,7 @@ flowchart LR
 
 타이 하지 않은 제어 입력은 **GND**. 예외는 치트시트에 **VCC** 로 적힌 핀만 5 V.
 
-**INC/DEC 주의:** `net_b0..7` 을 INC/DEC용으로 바꾸지 말 것. B3a 빵판에서는 `153_B` **C2/C3 INC/DEC 상수가 하드와이어** — 작업자는 **`b_const_sel` + `b_sel`만** 설정 ([opcode 치트시트](b3-opcode.md)). 치트시트의 `b_const_bit1..7` 열은 hwsim parity용이며, **선택 단계 5 (`alu_decode`)** 에서만 물리 DIP가 필요합니다.
+**INC/DEC 주의:** `net_b0..7` 을 INC/DEC용으로 바꾸지 말 것. B3a 빵판에서는 `153_B` **C2/C3 INC/DEC 상수가 하드와이어** — 작업자는 **`b_const_sel` + `b_sel`만** 설정 ([opcode 치트시트](b3-opcode.md)). 치트시트의 `b_const_bit1..7` 열은 pre-flight sim parity용이며, **선택 단계 5 (`alu_decode`)** 에서만 물리 DIP가 필요합니다.
 
 ### 2.4 배선 습관
 
@@ -150,7 +145,7 @@ flowchart LR
 | 12+34 | 12 | 34 | 46 |
 | FF+01 | FF | 01 | 00, C_hi=1 |
 
-**hwsim:** `python -m hwsim run hw/tests/alu283_carry.yaml` (서브블록)
+**pre-flight sim:** developer verification gate (서브블록)
 
 **Pass 기준:** 캐리 연쇄 포함 8비트 덧셈 3케이스 일치.
 
@@ -231,12 +226,7 @@ flowchart LR
 | XOR | 12 | 34 | 26 |
 | INC | 12 | — | 13 |
 
-**hwsim**
-
-```bash
-python -m hwsim run hw/tests/alu8_full.yaml
-python -m hwsim run hw/tests/alu8_timing.yaml
-```
+**pre-flight sim**
 
 **Pass (B3a 완료):** 스모크 3 + 원하면 12 opcode 전부 Y LED 일치.
 
@@ -246,10 +236,6 @@ python -m hwsim run hw/tests/alu8_timing.yaml
 
 마이크로코드 CW에서 제어선을 자동 생성하려면 [`alu8_decode.yaml`](../../hw/netlist/blocks/alu8_decode.yaml) 블록 추가.  
 **권장:** 단계 4까지 **수동 DIP** 로 안정화한 뒤 디코드 IC/타이를 붙임.
-
-```bash
-python -m hwsim run hw/tests/alu_decode_full.yaml
-```
 
 ---
 
@@ -285,7 +271,7 @@ ALU 단독 Pass 후 [M1-b3-procedure.md](M1-b3-procedure.md) § B3b/B3c 진행:
 | **1일차** | 단계 0~1 — 전원, 283, ADD 스모크 |
 | **2일차** | 단계 2 — 153_B, SUB/INC/DEC |
 | **3일차** | 단계 3~4 — 153_L, 157_YBP, 12 opcode |
-| **4일차** | hwsim 대조, 배선 정리 |
+| **4일차** | pre-flight sim 대조, 배선 정리 |
 | **5일차** | 배선 정리, SUB 경로 shorten, B3b 574 |
 | **6일차** | B3c 클록, 오실로스코프 또는 1.7 MHz 폴백 |
 
@@ -293,9 +279,9 @@ ALU 단독 Pass 후 [M1-b3-procedure.md](M1-b3-procedure.md) § B3b/B3c 진행:
 
 ---
 
-## 6. hwsim ↔ 실기 대응
+## 6. pre-flight sim ↔ 실기 대응
 
-| hwsim | 브레드보드 |
+| pre-flight sim | 브레드보드 |
 |-------|------------|
 | `net_a*`, `net_b*` 자극 | DIP |
 | 제어 넷 | DIP / 치트시트 타이 |
@@ -316,14 +302,14 @@ ALU 단독 Pass 후 [M1-b3-procedure.md](M1-b3-procedure.md) § B3b/B3c 진행:
 | AND/OR/XOR/NOT만 | `net_lgc0..3`, `153_s0/s1` |
 | Logic | `net_lgc0..3`, `153_s0/s1` |
 | 전부 틀림 | 153 전원, Y LED 순서(y7..y0), GND 플로팅 |
-| hwsim PASS / 실기 FAIL | 타이(클록), 플로팅 제어, 5 V 레일 강하 |
+| pre-flight sim PASS / 실기 FAIL | 타이(클록), 플로팅 제어, 5 V 레일 강하 |
 
 ---
 
 ## 8. 완료 체크리스트 (ALU8 단독)
 
 - [ ] 14 IC ALU 전원·0.1 µF 완료 ([BOM.md](../../BOM.md))  
-- [ ] `alu8_full` hwsim PASS  
+- [ ] `alu8_full` pre-flight sim PASS  
 - [ ] 스모크 SUB / XOR / INC LED 일치  
 - [ ] (권장) opcode 치트시트 12종 전부  
 - [ ] SUB·캐리 경로 배선 최단화 기록  

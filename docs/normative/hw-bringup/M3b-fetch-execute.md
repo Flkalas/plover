@@ -129,7 +129,7 @@ ROM: CMP + BEQ; verify `PC_LOAD_EN` only when Z=1.
 
 ## 6. M3b sign-off
 
-- [ ] F0–F4 Pass on **breadboard** (not hwsim)
+- [ ] F0–F4 Pass on **breadboard** (not pre-flight sim)
 - [ ] Operand path: MBR latched before MEM_RD
 - [ ] No Flash param / `$4000` fetch in path
 - [ ] BEQ: FLG_Z gates `PC_LOAD_EN`

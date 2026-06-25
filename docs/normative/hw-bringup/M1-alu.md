@@ -38,11 +38,6 @@
 - 5 V, 0.1 µF/IC, 10 µF bulk
 - 배선 **전**:
 
-```bash
-python -m hwsim run hw/tests/alu8_full.yaml
-python -m hwsim run hw/tests/alu_b3_latch.yaml
-```
-
 ---
 
 ## Phase 요약
@@ -66,7 +61,7 @@ python -m hwsim run hw/tests/alu_b3_latch.yaml
 - [ ] B3b: CP 1회 후 Q = Y (SUB/XOR/INC)
 - [ ] B3c: SUB 벡터 ≥2 클록 @ 목표 주파수
 - [ ] 스코프 마진 기록 또는 derated 클록 문서화
-- [ ] `alu8_full` + `alu_b3_latch` hwsim PASS
+- [ ] `alu8_full` + `alu_b3_latch` pre-flight sim PASS
 
 ---
 

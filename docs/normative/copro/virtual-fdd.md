@@ -9,7 +9,7 @@ Virtual floppy disk device used by PL-DOS.
 
 ## Host implementation
 
-- `plover_vm/memory/vfdd.py` — `.img` file backed `read_sector`/`write_sector`
+- logic VM (developer) — `.img` file backed `read_sector`/`write_sector`
 - `kern/vfdd.py` — driver wrapper used by higher layers (PLFS, loader)
 - `kern/drives.py` / `crates/plover_os/src/drives.rs` — PL-DOS multi-drive manager (`mount`, `A:`/`B:` paths)
 

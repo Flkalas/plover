@@ -3,9 +3,6 @@
 **Version:** 1.0 (pre-release) · **Date:** 2026-06-24  
 **Status:** Active normative specification (breadboard)
 
-**Design rationale:** [research/design-rationale-v1.0.md](research/design-rationale-v1.0.md)  
-**Superseded prototype:** [prototype-flash-cw](../archive/prototype-flash-cw/README.md)
-
 **v1.0:** FSM-only **idx5** control, 3×GPR in CPLD, Extended TFR `0x10–0x15`, Flash `$4000` unused.
 
 ---
@@ -88,8 +85,6 @@ CPLD `ATF1504AS-10JU44` + PLCC→DIP (#15); Flash `SST39SF010A-70-4C-PHE` PDIP �
 | [hw-bringup/README.md](../hw-bringup/README.md) | M1–M5 breadboard bring-up |
 | [hw-bringup/breadboard-wiring.md](../hw-bringup/breadboard-wiring.md) | SoC wiring (no decode block) |
 
-Design rationale and exploration history: [research/README.md](research/README.md) (research, not normative).
-
 ---
 
 ## 7. Verification
@@ -97,7 +92,7 @@ Design rationale and exploration history: [research/README.md](research/README.m
 | Layer | Gate |
 |-------|------|
 | Breadboard | M1–M5 bring-up checklists ([hw-bringup/README.md](../hw-bringup/README.md)) |
-| FSM table | `python tools/verify_control_store.py --v1.0` |
+| FSM table | M3a checklist — opcode×phase logical consistency |
 | Scope | CPLD `REG_WE`, `MEM_RD`, `PC_LOAD_EN` vs FLG |
 
 ---

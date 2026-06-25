@@ -4,7 +4,7 @@
 |-------|-------|
 | **Milestone** | M2b |
 | **Goal** | GPR×4 + MUX + ALU + SRAM + NOR 소켓; 수동 ADD @ 2 MHz |
-| **hwsim** | `regfile_574`, `alu8_full`, `cpld_gpr_decode`, `mem_decode` |
+| **pre-flight sim** | `regfile_574`, `alu8_full`, `cpld_gpr_decode`, `mem_decode` |
 
 ---
 
@@ -46,14 +46,7 @@
 
 - [ ] G1–G6 전부 Pass
 - [ ] [memory sign-off](M2b-memory.md#5-m2b-메모리-sign-off-데이터패스와-합산)
-- [ ] hwsim 4종 PASS
-
-```bash
-python -m hwsim run hw/tests/regfile_574.yaml
-python -m hwsim run hw/tests/alu8_full.yaml
-python -m hwsim run hw/tests/cpld_gpr_decode.yaml
-python -m hwsim run hw/tests/mem_decode.yaml
-```
+- [ ] pre-flight sim 4종 PASS
 
 ---
 

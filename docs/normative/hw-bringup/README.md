@@ -3,8 +3,7 @@
 > **Normative v1.0:** CPLD FSM idx5 + 138×2 — [system-architecture.md](../hardware/system-architecture.md).  
 > **실구매 패키지:** [parts-on-hand.md](../project/parts-on-hand.md) · Wiring: [breadboard-wiring.md](breadboard-wiring.md).
 
-**마일스톤 계획:** [implementation-plan-v1.0.md](../project/implementation-plan-v1.0.md) (v1.0 content)  
-**아카이브 v1.0:** [prototype-flash-cw/](../archive/prototype-flash-cw/README.md)
+**마일스톤 계획:** [implementation-plan-v1.0.md](../../developer/project/implementation-plan-v1.0.md)
 
 초보 작업자도 **문서만 따라** 빵판 CPU를 올릴 수 있도록 단계별 시방서입니다.
 
@@ -67,33 +66,15 @@ flowchart LR
 
 | 문서 | 내용 |
 |------|------|
-| [M4a-boot-sim.md](M4a-boot-sim.md) | pytest·scenario |
+| [M4a-boot-sim.md](M4a-boot-sim.md) | 부트 시뮬 체크리스트 |
 | [M4b-boot-hardware.md](M4b-boot-hardware.md) | 빵판 부트 |
 | [M5-cpu-e2e.md](M5-cpu-e2e.md) | breadboard composite netlist |
 
 ---
 
-## 검증 명령
+## 사전 검증 (개발자)
 
-```bash
-# M1
-python -m hwsim run hw/tests/alu8_full.yaml
-
-# M2 (v1.0 breadboard)
-python -m hwsim run hw/tests/cpld_seq_add.yaml
-python -m hwsim run hw/tests/mem_decode_breadboard.yaml
-
-# M3
-python tools/pack_control_store.py --hybrid --build-fixtures
-python tools/verify_control_store.py --v1.0
-
-# P1 bypass (optional)
-python -m hwsim run hw/tests/cpu_cw_direct_add.yaml
-
-# 전체
-python -m hwsim run --all
-python -m pytest tests/ -q
-```
+Breadboard 전 시뮬·회귀 명령: [developer/verification-gates.md](../../developer/verification-gates.md).
 
 ---
 

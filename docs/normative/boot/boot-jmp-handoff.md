@@ -31,7 +31,7 @@ Use JMP handoff when the product path is **power-on → OS/shell** with v1.0 har
 
 After Boot ROM copies the image to **`$0800+`**, a single **`JMP $0800`** keeps the PC in the always-RAM band. No map switch is required for the first kernel instruction fetch.
 
-Decode reference: [plover_vm/decode.py](../plover_vm/decode.py) (same rules as hwsim CPLD stub).
+Decode reference: [microcode-spec.md](../hardware/microcode-spec.md) · [cpld-system-controller.md](../hardware/cpld-system-controller.md).
 
 ### ISA addressing note
 
@@ -168,7 +168,7 @@ If warm reset into the kernel, full low-page RAM, or runtime vector tables are r
 
 ## 7. Verification checklist
 
-Prove JMP handoff integrity and hardware regression in `plover_vm` / `hw/scenarios/vm/`.
+Breadboard 및 개발자 사전 검증: [developer/verification-gates.md](../../developer/verification-gates.md).
 
 | Check | Method / expected result |
 |-------|--------------------------|
@@ -178,39 +178,6 @@ Prove JMP handoff integrity and hardware regression in `plover_vm` / `hw/scenari
 | **Boot-mode low-page write ignore** | Kernel **`STA`** to **`$0000–$07FF`** is a bus **no-op** (RAM/ROM contents unchanged). |
 | **Flag determinism** | Trace Z/C from kernel entry through mandatory **`CMP`** — independent of Boot ROM flag leftovers. |
 | **Mailbox coprocessor sync** | After vFDD sector READ and JMP: RP2350 / `Mailbox` model **Idle** — kernel **`MB_CMD`** accepted. |
-
-### Logic VM procedure
-
-1. Load Boot ROM + CW fixtures.
-2. Apply Boot ROM preconditions (fixture `ram_init` or simulated block-copy).
-3. Load kernel stub at **`$0800`**.
-4. Keep **`map_mode=0`**.
-5. `reset()` then `run()` — expect PC at kernel entry without map change.
-
-Existing manual-handoff gate: [tests/test_boot_handoff.py](../tests/test_boot_handoff.py) (`map_mode=1`). Add or extend a test with **`map_mode=0`** and Boot ROM ending in **`JMP $0800`**.
-
-### Scenario sketch (`hw/scenarios/vm/`)
-
-```yaml
-engine: fast
-map_mode: 0
-load:
-  nor: hw/fixtures/boot/boot_rom_jmp.hex
-  cw: hw/fixtures/control/cw.hex
-ram_init:
-  - addr: 0x0E00
-    bytes: [0x00, 0xE0]       # SP = $E000 (Boot ROM pre-init stand-in)
-  - addr: 0x0F00
-    bytes: [0x00, 0xF6]       # RP = $F600
-  - addr: 0x0800
-    bytes: [0x0A]             # HALT — continuity smoke; full KERNEL_BOOT via plover_asm
-actions:
-  - type: reset
-    map_mode: 0
-expect:
-  pc: 0x0800
-  halted: true
-```
 
 ### Fixtures
 

@@ -62,7 +62,7 @@ See [mailbox-protocol.md](mailbox-protocol.md) §2.4.
 
 | Layer | v0.1 |
 |-------|------|
-| `plover_vm` | [`ApuState`](../plover_vm/memory/apu.py) — register + optional `mix_samples()` for tests |
+| logic VM (developer) | [`ApuState`](../logic VM/memory/apu.py) — register + optional `mix_samples()` for tests |
 | Host speaker | **Deferred v0.2** |
 | Forth / PL-DOS | `BEEP ( period duration -- )` minimal API |
 | Gate | `apu_smoke.pls` + VM register assert; hardware 1 kHz on oscilloscope |

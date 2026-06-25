@@ -102,7 +102,7 @@ REG_WE=1 @ CLK↑ → regs(REG_WSEL) <= d_in
 2. `OPC=0x01` (ADD), FSM 자동 3 phase @ `net_clk2`.
 3. 관측: R2 = `0x46`.
 
-**Pass:** scope에서 3 phase strobes; R2=`0x46`. hwsim: `cpld_seq_add.yaml`.
+**Pass:** scope에서 3 phase strobes; R2=`0x46`. pre-flight sim: `cpld_seq_add.yaml`.
 
 **게이트:** 각 Execute 반주기 **≤250 ns** ([alu-opcodes-timing.md](../hardware/alu-opcodes-timing.md)).
 

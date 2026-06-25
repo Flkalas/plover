@@ -54,11 +54,11 @@ flowchart LR
 | PASS_B | 0 | 0 | 0 | 1 | FF&B → use A=all 1 in stimulus |
 | ADD/SUB/INC/DEC/CMP | * | * | * | * | Unused; `157_YBP` selects **sum** |
 
-Golden vectors: [`tools/alu8_cases.py`](../tools/alu8_cases.py) — all 12 opcodes bit-exact in hwsim.
+Golden vectors: [`tools/alu8_cases.py`](../tools/alu8_cases.py) — all 12 opcodes bit-exact in pre-flight sim.
 
 ## Critical path (unchanged B1)
 
-**SUB / CMP (Y)** @ max (hwsim):  
+**SUB / CMP (Y)** @ max (pre-flight sim):  
 `net_b0` → `04_BINV` → `153_B` → `283` → `157_YBP` → `net_y0` — target **≤160 ns** (B1 measured **151 ns**).
 
 ## IC budget (DIP)
@@ -84,7 +84,6 @@ python tools/gen_alu_b3_clock_netlist.py
 python tools/gen_alu8_full_test.py
 python tools/gen_alu8_opcode_timing.py
 python tools/gen_opcode_cheatsheet.py
-python -m hwsim run --all
 ```
 
 ## Optional future

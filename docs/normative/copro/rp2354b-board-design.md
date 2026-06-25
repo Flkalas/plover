@@ -446,11 +446,6 @@ Aligned with [M4b-boot-hardware.md](../hw-bringup/M4b-boot-hardware.md):
 
 Simulation cross-check:
 
-```bash
-python -m plover_vm scenario hw/scenarios/vm/boot_jmp_handoff.yaml
-python -m pytest tests/test_boot_jmp_handoff.py -q
-```
-
 ---
 
 ## 14. Open items (TBD)

@@ -22,9 +22,6 @@ In v1.0 breadboard bring-up (M1–M5) the shell is represented by a scripted sce
 
 ```bash
 cargo test -p plover_os
-cargo run -p plover_vm -- dos-shell
-cargo run -p plover_vm --features sdl -- dos-shell --gui
-cargo run -p plover_vm -- scenario hw/scenarios/vm/dos_boot.yaml
 ```
 
 Interactive shell: prompt `A>` (current drive), lines truncated to 40 characters (Python parity). `plsrun`/`ccrun`/`ldrun` require Python on `PATH`.

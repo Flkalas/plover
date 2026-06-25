@@ -14,9 +14,9 @@
 | **예** | v1.0 하드웨어 + 패킹된 마이크로코드/매크로 ISA로 **실물에서** 직접 사용 가능 |
 | **부분** | 하드웨어 자원은 있으나 ISA·데이터 경로가 불완전, 또는 소프트웨어 관례로만 대체 |
 | **아니오** | v1.0 normative 경로에 없음 |
-| **VM만** | `plover_vm` fast/macro 엔진·시나리오용 — **빵판 실기와 별도** (교육 시뮬·회귀용) |
+| **비실기(미패킹)** | opcode·시나리오에만 존재 — **빵판 실기와 별도** |
 
-**판정 원칙:** 컴파일러 백엔드가 **`.sram.hex`로 내려 실제 CPU에서 실행**하는 것을 기준으로 한다. VM fast path만 있는 기능은 **아니오** 또는 **VM만**으로 표기한다.
+**판정 원칙:** 컴파일러 백엔드가 **`.sram.hex`로 내려 실제 CPU에서 실행**하는 것을 기준으로 한다. 비실기 전용 기능은 **아니오** 또는 **비실기(미패킹)**으로 표기한다.
 
 ---
 
@@ -33,7 +33,7 @@
 
 | 평가 범주 | 시스템 구현자 대상 질문 | 컴파일러 구현 시 요구 근거 | v1.0 답변 | 근거·비고 |
 |-----------|-------------------------|---------------------------|-----------|-----------|
-| 레지스터 | **16비트 포인터**를 담을 **전용 포인터 레지스터** 또는 **8비트 레지스터 쌍(Register Pair)** 이 존재합니까? | 8비트 데이터 버스에서 64 KiB 주소 공간 탐색·포인터 변수 할당 | **부분** | **PC·MBR**는 16비트(574+161)이나 **페치/버스 전용** — 프로그램이 일반 포인터로 쓸 수 없음 ([system-architecture.md](../hardware/system-architecture.md)). normative GPR **R0–R2** (3fixed); **R3 미사용**. 16비트 값은 **RAM 셀 2바이트** 또는 다중 `LDA`/`STA`/`STA16`로 처리. **VM만:** `W0–W3` (`OP_WMOV`/`OP_WADD_RR`, [isa.py](../../plover_vm/macro/isa.py)) — fast path 전용. |
+| 레지스터 | **16비트 포인터**를 담을 **전용 포인터 레지스터** 또는 **8비트 레지스터 쌍(Register Pair)** 이 존재합니까? | 8비트 데이터 버스에서 64 KiB 주소 공간 탐색·포인터 변수 할당 | **부분** | **PC·MBR**는 16비트(574+161)이나 **페치/버스 전용** — 프로그램이 일반 포인터로 쓸 수 없음 ([system-architecture.md](../hardware/system-architecture.md)). normative GPR **R0–R2** (3fixed); **R3 미사용**. 16비트 값은 **RAM 셀 2바이트** 또는 다중 `LDA`/`STA`/`STA16`로 처리. **비실기:** reserved opcode namespace only|
 | 레지스터 | 누산기 외 **범용 레지스터 3~4개 이상**이 확보되어 있습니까? | 레지스터 스필링·메모리 접근 감소, 최적화된 코드 생성 | **부분** | CPLD **R0–R2** 3×8비트 (3fixed read: R0→A, R1→B) ([cpld-system-controller.md](../hardware/cpld-system-controller.md)). **ADD** 고정 **R0,R1→R2**. **레지스터 간 복사**는 implied **TFR `0x10–0x15`** (1바이트, 피연산자 없음); **`0x0C` (구 MOV) reserved**. 대부분 연산·`LDA`/`STA`는 **R0 중심(ACC형)**. [calling-convention-v0.1.md](calling-convention-v0.1.md): R0=인자/반환, R1=스크래치, R2=결과. |
 
 ---
@@ -42,8 +42,8 @@
 
 | 평가 범주 | 시스템 구현자 대상 질문 | 컴파일러 구현 시 요구 근거 | v1.0 답변 | 근거·비고 |
 |-----------|-------------------------|---------------------------|-----------|-----------|
-| 스택 | **16비트 하드웨어 SP**와 **PUSH/POP**, **CALL/RET** 명령이 구현되어 있습니까? | 복귀 주소 저장, 인자 전달, 호출 규약·컨텍스트 스위칭 | **아니오** (CALL/RET **부분**) | **SP:** RAM 셀 **`$0E00`** (16-bit LE), Boot ROM이 초기값 기록 — **하드웨어 SP 레지스터 없음** ([software-memory-layout.md](software-memory-layout.md), [boot-jmp-handoff.md](../boot/boot-jmp-handoff.md)). **PUSH/POP:** 전용 opcode 없음. **CALL/RET:** opcode 정의·VM fast path 있음 ([isa.py](../../plover_vm/macro/isa.py))이나 **마이크로코드 미패킹 (TBD)** ([microcode-spec.md](../hardware/microcode-spec.md) §CALL/RET). 실물 S2 게이트는 [calling-convention-v0.1.md](calling-convention-v0.1.md) + `test_call_ret.py` — **소프트웨어 리턴 스택** (`RP` @ `$0F00`). |
-| 스택 | **SP 값**을 범용 레지스터로 복사하거나 **산술 연산**할 데이터 경로가 있습니까? | 프레임 포인터 설정, `SP+offset` 지역 변수 주소 | **부분** | `LDA`/`STA`로 **`$0E00`/`$0E01`** 읽기·쓰기 가능. **단일 명령 `ADD SP, imm`** 없음. 16비트 SP 증감은 **8비트 ALU 다중 스텝** 또는 **VM만** `WADD_RR`/`WCMP16`. FP = SP 복사본을 GPR·RAM에 유지하는 **소프트웨어 관례**로만 가능. |
+| 스택 | **16비트 하드웨어 SP**와 **PUSH/POP**, **CALL/RET** 명령이 구현되어 있습니까? | 복귀 주소 저장, 인자 전달, 호출 규약·컨텍스트 스위칭 | **아니오** (CALL/RET **부분**) | **SP:** RAM 셀 **`$0E00`** (16-bit LE), Boot ROM이 초기값 기록 — **하드웨어 SP 레지스터 없음** ([software-memory-layout.md](software-memory-layout.md), [boot-jmp-handoff.md](../boot/boot-jmp-handoff.md)). **PUSH/POP:** 전용 opcode 없음. **CALL/RET:** opcode 정의·미패킹 상태.py](../../logic VM/macro/isa.py))이나 **마이크로코드 미패킹 (TBD)** ([microcode-spec.md](../hardware/microcode-spec.md) §CALL/RET). 실물 S2 게이트는 [calling-convention-v0.1.md](calling-convention-v0.1.md) + S2 bring-up checklist — **소프트웨어 리턴 스택** (`RP` @ `$0F00`). |
+| 스택 | **SP 값**을 범용 레지스터로 복사하거나 **산술 연산**할 데이터 경로가 있습니까? | 프레임 포인터 설정, `SP+offset` 지역 변수 주소 | **부분** | `LDA`/`STA`로 **`$0E00`/`$0E01`** 읽기·쓰기 가능. **단일 명령 `ADD SP, imm`** 없음. 16비트 SP 증감은 **8비트 ALU 다중 스텝** 소프트웨어 다중 스텝으로 처리. FP = SP 복사본을 GPR·RAM에 유지하는 **소프트웨어 관례**로만 가능. |
 
 ---
 
@@ -60,7 +60,7 @@
 
 | 평가 범주 | 시스템 구현자 대상 질문 | 컴파일러 구현 시 요구 근거 | v1.0 답변 | 근거·비고 |
 |-----------|-------------------------|---------------------------|-----------|-----------|
-| 제어 | **Zero, Carry, Sign, Overflow** 개별 플래그 조건 분기가 완전히 지원됩니까? | `if`/`while`/`for` 등을 조건부 점프로 번역 | **부분** | **하드웨어 플래그:** **Z, C** 만 — **574 FLG** 래치 ([hardware-architecture-synthesis.md](../hardware/research/hardware-architecture-synthesis.md)). **Sign(N)·Overflow(V) 없음.** **조건 분기:** **`BEQ`** (Z) — 마이크로코드 패킹됨. **`BCS`** (C, unsigned ≥) — opcode·VM fast path만, **마이크로코드 미패킹**. **`BNE`/`BLT`/`BGT` 등 없음** — `CMP`+`BEQ`/`JMP` 조합으로 일부 대체. 부호 있는 비교는 **추가 런타임 루틴** 필요. |
+| 제어 | **Zero, Carry, Sign, Overflow** 개별 플래그 조건 분기가 완전히 지원됩니까? | `if`/`while`/`for` 등을 조건부 점프로 번역 | **부분** | **하드웨어 플래그:** **Z, C** 만 — **574 FLG** 래치 ([microcode-spec.md](../hardware/microcode-spec.md)). **Sign(N)·Overflow(V) 없음.** **조건 분기:** **`BEQ`** (Z) — 마이크로코드 패킹됨. **`BCS`** (C, unsigned ≥) — opcode·미패킹 상태. **`BNE`/`BLT`/`BGT` 등 없음** — `CMP`+`BEQ`/`JMP` 조합으로 일부 대체. 부호 있는 비교는 **추가 런타임 루틴** 필요. |
 
 ---
 
