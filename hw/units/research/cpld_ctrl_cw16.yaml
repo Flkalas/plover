@@ -1,0 +1,29 @@
+version: 1
+block: cpld_ctrl_cw16
+units:
+  - id: addr_157
+    kind: mux2_addr
+    label: CW addr 157
+    stage: 1
+    package_ref: U_ADDR_157
+    slot: bit1
+  - id: flash_cw
+    kind: rom16
+    label: Flash $4000 CW
+    stage: 2
+    package_ref: U_FLASH_CW
+  - id: latch_stb
+    kind: latch8
+    label: strobe 574
+    stage: 3
+    package_ref: U_LATCH_STB
+  - id: latch_alu
+    kind: latch8
+    label: ALU cw 574
+    stage: 3
+    package_ref: U_LATCH_ALU
+  - id: beq_and
+    kind: and_gate
+    label: BEQ PC_LOAD∧Z
+    stage: 4
+    package_ref: U_BEQ_AND

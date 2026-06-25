@@ -1,0 +1,2500 @@
+version: 1
+block: cpld_ctrl_counter
+description: counter_template — 161 phase + opcode template SOP + 153 w_sel + 574 strobes
+instances:
+  - ref: U_PH_161
+    part: 74HC161
+    pins:
+      CLK: net_clk
+      ENP: pwr_vcc
+      ENT: pwr_vcc
+      LOAD: net_macro_end
+      CLR: pwr_vcc
+      QA: net_phase0
+      QB: net_phase1
+      QC: pwr_gnd
+      QD: pwr_gnd
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_OPC_138
+    part: 74HC138
+    pins:
+      A: net_opc0
+      B: net_opc1
+      C: net_opc2
+      G1: pwr_vcc
+      G2A: pwr_gnd
+      G2B: pwr_gnd
+      Y0: net_opc_cls0
+      Y1: net_opc_cls1
+      Y2: net_opc_cls2
+      Y3: net_opc_cls3
+      Y4: net_opc_cls4
+      Y5: net_opc_cls5
+      Y6: net_opc_cls6
+      Y7: net_opc_cls7
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_1
+    part: 74HC04
+    pins:
+      A: net_opc1
+      Y: net_nopc1_31
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_2
+    part: 74HC04
+    pins:
+      A: net_opc2
+      Y: net_nopc2_32
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_3
+    part: 74HC04
+    pins:
+      A: net_opc3
+      Y: net_nopc3_33
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_4
+    part: 74HC04
+    pins:
+      A: net_opc4
+      Y: net_nopc4_34
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_1
+    part: 74HC08
+    pins:
+      A: net_opc0
+      B: net_nopc1_31
+      Y: net_a_35
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_2
+    part: 74HC08
+    pins:
+      A: net_a_35
+      B: net_nopc2_32
+      Y: net_a_36
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_3
+    part: 74HC08
+    pins:
+      A: net_a_36
+      B: net_nopc3_33
+      Y: net_a_37
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_4
+    part: 74HC08
+    pins:
+      A: net_a_37
+      B: net_nopc4_34
+      Y: net_a_38
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_5
+    part: 74HC04
+    pins:
+      A: net_opc1
+      Y: net_nopc1_39
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_6
+    part: 74HC04
+    pins:
+      A: net_opc4
+      Y: net_nopc4_40
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_5
+    part: 74HC08
+    pins:
+      A: net_opc0
+      B: net_nopc1_39
+      Y: net_a_41
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_6
+    part: 74HC08
+    pins:
+      A: net_a_41
+      B: net_opc2
+      Y: net_a_42
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_7
+    part: 74HC08
+    pins:
+      A: net_a_42
+      B: net_opc3
+      Y: net_a_43
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_8
+    part: 74HC08
+    pins:
+      A: net_a_43
+      B: net_nopc4_40
+      Y: net_a_44
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_1
+    part: 74HC32
+    pins:
+      A: net_a_38
+      B: net_a_44
+      Y: net_o_45
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_9
+    part: 74HC08
+    pins:
+      A: net_o_45
+      B: pwr_vcc
+      Y: net_tpl0
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_7
+    part: 74HC04
+    pins:
+      A: net_opc0
+      Y: net_nopc0_46
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_8
+    part: 74HC04
+    pins:
+      A: net_opc2
+      Y: net_nopc2_47
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_9
+    part: 74HC04
+    pins:
+      A: net_opc3
+      Y: net_nopc3_48
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_10
+    part: 74HC04
+    pins:
+      A: net_opc4
+      Y: net_nopc4_49
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_10
+    part: 74HC08
+    pins:
+      A: net_nopc0_46
+      B: net_opc1
+      Y: net_a_50
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_11
+    part: 74HC08
+    pins:
+      A: net_a_50
+      B: net_nopc2_47
+      Y: net_a_51
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_12
+    part: 74HC08
+    pins:
+      A: net_a_51
+      B: net_nopc3_48
+      Y: net_a_52
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_13
+    part: 74HC08
+    pins:
+      A: net_a_52
+      B: net_nopc4_49
+      Y: net_a_53
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_11
+    part: 74HC04
+    pins:
+      A: net_opc0
+      Y: net_nopc0_54
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_12
+    part: 74HC04
+    pins:
+      A: net_opc1
+      Y: net_nopc1_55
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_13
+    part: 74HC04
+    pins:
+      A: net_opc2
+      Y: net_nopc2_56
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_14
+    part: 74HC04
+    pins:
+      A: net_opc4
+      Y: net_nopc4_57
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_14
+    part: 74HC08
+    pins:
+      A: net_nopc0_54
+      B: net_nopc1_55
+      Y: net_a_58
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_15
+    part: 74HC08
+    pins:
+      A: net_a_58
+      B: net_nopc2_56
+      Y: net_a_59
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_16
+    part: 74HC08
+    pins:
+      A: net_a_59
+      B: net_opc3
+      Y: net_a_60
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_17
+    part: 74HC08
+    pins:
+      A: net_a_60
+      B: net_nopc4_57
+      Y: net_a_61
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_2
+    part: 74HC32
+    pins:
+      A: net_a_53
+      B: net_a_61
+      Y: net_o_62
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_18
+    part: 74HC08
+    pins:
+      A: net_o_62
+      B: pwr_vcc
+      Y: net_tpl1
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_15
+    part: 74HC04
+    pins:
+      A: net_opc2
+      Y: net_nopc2_63
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_16
+    part: 74HC04
+    pins:
+      A: net_opc3
+      Y: net_nopc3_64
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_17
+    part: 74HC04
+    pins:
+      A: net_opc4
+      Y: net_nopc4_65
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_19
+    part: 74HC08
+    pins:
+      A: net_opc0
+      B: net_opc1
+      Y: net_a_66
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_20
+    part: 74HC08
+    pins:
+      A: net_a_66
+      B: net_nopc2_63
+      Y: net_a_67
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_21
+    part: 74HC08
+    pins:
+      A: net_a_67
+      B: net_nopc3_64
+      Y: net_a_68
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_22
+    part: 74HC08
+    pins:
+      A: net_a_68
+      B: net_nopc4_65
+      Y: net_a_69
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_18
+    part: 74HC04
+    pins:
+      A: net_opc1
+      Y: net_nopc1_70
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_19
+    part: 74HC04
+    pins:
+      A: net_opc2
+      Y: net_nopc2_71
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_20
+    part: 74HC04
+    pins:
+      A: net_opc4
+      Y: net_nopc4_72
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_23
+    part: 74HC08
+    pins:
+      A: net_opc0
+      B: net_nopc1_70
+      Y: net_a_73
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_24
+    part: 74HC08
+    pins:
+      A: net_a_73
+      B: net_nopc2_71
+      Y: net_a_74
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_25
+    part: 74HC08
+    pins:
+      A: net_a_74
+      B: net_opc3
+      Y: net_a_75
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_26
+    part: 74HC08
+    pins:
+      A: net_a_75
+      B: net_nopc4_72
+      Y: net_a_76
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_21
+    part: 74HC04
+    pins:
+      A: net_opc4
+      Y: net_nopc4_77
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_27
+    part: 74HC08
+    pins:
+      A: net_opc0
+      B: net_opc1
+      Y: net_a_78
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_28
+    part: 74HC08
+    pins:
+      A: net_a_78
+      B: net_opc2
+      Y: net_a_79
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_29
+    part: 74HC08
+    pins:
+      A: net_a_79
+      B: net_opc3
+      Y: net_a_80
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_30
+    part: 74HC08
+    pins:
+      A: net_a_80
+      B: net_nopc4_77
+      Y: net_a_81
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_3
+    part: 74HC32
+    pins:
+      A: net_a_69
+      B: net_a_76
+      Y: net_o_82
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_4
+    part: 74HC32
+    pins:
+      A: net_o_82
+      B: net_a_81
+      Y: net_o_83
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_31
+    part: 74HC08
+    pins:
+      A: net_o_83
+      B: pwr_vcc
+      Y: net_tpl2
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_22
+    part: 74HC04
+    pins:
+      A: net_opc0
+      Y: net_nopc0_84
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_23
+    part: 74HC04
+    pins:
+      A: net_opc1
+      Y: net_nopc1_85
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_24
+    part: 74HC04
+    pins:
+      A: net_opc2
+      Y: net_nopc2_86
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_25
+    part: 74HC04
+    pins:
+      A: net_opc3
+      Y: net_nopc3_87
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_32
+    part: 74HC08
+    pins:
+      A: net_nopc0_84
+      B: net_nopc1_85
+      Y: net_a_88
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_33
+    part: 74HC08
+    pins:
+      A: net_a_88
+      B: net_nopc2_86
+      Y: net_a_89
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_34
+    part: 74HC08
+    pins:
+      A: net_a_89
+      B: net_nopc3_87
+      Y: net_a_90
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_35
+    part: 74HC08
+    pins:
+      A: net_a_90
+      B: net_opc4
+      Y: net_a_91
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_26
+    part: 74HC04
+    pins:
+      A: net_opc1
+      Y: net_nopc1_92
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_27
+    part: 74HC04
+    pins:
+      A: net_opc2
+      Y: net_nopc2_93
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_28
+    part: 74HC04
+    pins:
+      A: net_opc3
+      Y: net_nopc3_94
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_36
+    part: 74HC08
+    pins:
+      A: net_opc0
+      B: net_nopc1_92
+      Y: net_a_95
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_37
+    part: 74HC08
+    pins:
+      A: net_a_95
+      B: net_nopc2_93
+      Y: net_a_96
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_38
+    part: 74HC08
+    pins:
+      A: net_a_96
+      B: net_nopc3_94
+      Y: net_a_97
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_39
+    part: 74HC08
+    pins:
+      A: net_a_97
+      B: net_opc4
+      Y: net_a_98
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_29
+    part: 74HC04
+    pins:
+      A: net_opc0
+      Y: net_nopc0_99
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_30
+    part: 74HC04
+    pins:
+      A: net_opc2
+      Y: net_nopc2_100
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_31
+    part: 74HC04
+    pins:
+      A: net_opc3
+      Y: net_nopc3_101
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_40
+    part: 74HC08
+    pins:
+      A: net_nopc0_99
+      B: net_opc1
+      Y: net_a_102
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_41
+    part: 74HC08
+    pins:
+      A: net_a_102
+      B: net_nopc2_100
+      Y: net_a_103
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_42
+    part: 74HC08
+    pins:
+      A: net_a_103
+      B: net_nopc3_101
+      Y: net_a_104
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_43
+    part: 74HC08
+    pins:
+      A: net_a_104
+      B: net_opc4
+      Y: net_a_105
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_32
+    part: 74HC04
+    pins:
+      A: net_opc2
+      Y: net_nopc2_106
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_33
+    part: 74HC04
+    pins:
+      A: net_opc3
+      Y: net_nopc3_107
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_44
+    part: 74HC08
+    pins:
+      A: net_opc0
+      B: net_opc1
+      Y: net_a_108
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_45
+    part: 74HC08
+    pins:
+      A: net_a_108
+      B: net_nopc2_106
+      Y: net_a_109
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_46
+    part: 74HC08
+    pins:
+      A: net_a_109
+      B: net_nopc3_107
+      Y: net_a_110
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_47
+    part: 74HC08
+    pins:
+      A: net_a_110
+      B: net_opc4
+      Y: net_a_111
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_34
+    part: 74HC04
+    pins:
+      A: net_opc0
+      Y: net_nopc0_112
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_35
+    part: 74HC04
+    pins:
+      A: net_opc1
+      Y: net_nopc1_113
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_36
+    part: 74HC04
+    pins:
+      A: net_opc3
+      Y: net_nopc3_114
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_48
+    part: 74HC08
+    pins:
+      A: net_nopc0_112
+      B: net_nopc1_113
+      Y: net_a_115
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_49
+    part: 74HC08
+    pins:
+      A: net_a_115
+      B: net_opc2
+      Y: net_a_116
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_50
+    part: 74HC08
+    pins:
+      A: net_a_116
+      B: net_nopc3_114
+      Y: net_a_117
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_51
+    part: 74HC08
+    pins:
+      A: net_a_117
+      B: net_opc4
+      Y: net_a_118
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_37
+    part: 74HC04
+    pins:
+      A: net_opc1
+      Y: net_nopc1_119
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_38
+    part: 74HC04
+    pins:
+      A: net_opc3
+      Y: net_nopc3_120
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_52
+    part: 74HC08
+    pins:
+      A: net_opc0
+      B: net_nopc1_119
+      Y: net_a_121
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_53
+    part: 74HC08
+    pins:
+      A: net_a_121
+      B: net_opc2
+      Y: net_a_122
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_54
+    part: 74HC08
+    pins:
+      A: net_a_122
+      B: net_nopc3_120
+      Y: net_a_123
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_55
+    part: 74HC08
+    pins:
+      A: net_a_123
+      B: net_opc4
+      Y: net_a_124
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_5
+    part: 74HC32
+    pins:
+      A: net_a_91
+      B: net_a_98
+      Y: net_o_125
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_6
+    part: 74HC32
+    pins:
+      A: net_o_125
+      B: net_a_105
+      Y: net_o_126
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_7
+    part: 74HC32
+    pins:
+      A: net_o_126
+      B: net_a_111
+      Y: net_o_127
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_8
+    part: 74HC32
+    pins:
+      A: net_o_127
+      B: net_a_118
+      Y: net_o_128
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_9
+    part: 74HC32
+    pins:
+      A: net_o_128
+      B: net_a_124
+      Y: net_o_129
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_56
+    part: 74HC08
+    pins:
+      A: net_o_129
+      B: pwr_vcc
+      Y: net_tpl3
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_39
+    part: 74HC04
+    pins:
+      A: net_opc0
+      Y: net_nopc0_130
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_40
+    part: 74HC04
+    pins:
+      A: net_opc1
+      Y: net_nopc1_131
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_41
+    part: 74HC04
+    pins:
+      A: net_opc3
+      Y: net_nopc3_132
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_42
+    part: 74HC04
+    pins:
+      A: net_opc4
+      Y: net_nopc4_133
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_57
+    part: 74HC08
+    pins:
+      A: net_nopc0_130
+      B: net_nopc1_131
+      Y: net_a_134
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_58
+    part: 74HC08
+    pins:
+      A: net_a_134
+      B: net_opc2
+      Y: net_a_135
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_59
+    part: 74HC08
+    pins:
+      A: net_a_135
+      B: net_nopc3_132
+      Y: net_a_136
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_60
+    part: 74HC08
+    pins:
+      A: net_a_136
+      B: net_nopc4_133
+      Y: net_a_137
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_61
+    part: 74HC08
+    pins:
+      A: net_a_137
+      B: pwr_vcc
+      Y: net_tpl4
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_43
+    part: 74HC04
+    pins:
+      A: net_opc1
+      Y: net_nopc1_138
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_44
+    part: 74HC04
+    pins:
+      A: net_opc3
+      Y: net_nopc3_139
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_45
+    part: 74HC04
+    pins:
+      A: net_opc4
+      Y: net_nopc4_140
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_62
+    part: 74HC08
+    pins:
+      A: net_opc0
+      B: net_nopc1_138
+      Y: net_a_141
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_63
+    part: 74HC08
+    pins:
+      A: net_a_141
+      B: net_opc2
+      Y: net_a_142
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_64
+    part: 74HC08
+    pins:
+      A: net_a_142
+      B: net_nopc3_139
+      Y: net_a_143
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_65
+    part: 74HC08
+    pins:
+      A: net_a_143
+      B: net_nopc4_140
+      Y: net_a_144
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_66
+    part: 74HC08
+    pins:
+      A: net_a_144
+      B: pwr_vcc
+      Y: net_tpl5
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_46
+    part: 74HC04
+    pins:
+      A: net_opc0
+      Y: net_nopc0_145
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_47
+    part: 74HC04
+    pins:
+      A: net_opc2
+      Y: net_nopc2_146
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_48
+    part: 74HC04
+    pins:
+      A: net_opc4
+      Y: net_nopc4_147
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_67
+    part: 74HC08
+    pins:
+      A: net_nopc0_145
+      B: net_opc1
+      Y: net_a_148
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_68
+    part: 74HC08
+    pins:
+      A: net_a_148
+      B: net_nopc2_146
+      Y: net_a_149
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_69
+    part: 74HC08
+    pins:
+      A: net_a_149
+      B: net_opc3
+      Y: net_a_150
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_70
+    part: 74HC08
+    pins:
+      A: net_a_150
+      B: net_nopc4_147
+      Y: net_a_151
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_71
+    part: 74HC08
+    pins:
+      A: net_a_151
+      B: pwr_vcc
+      Y: net_tpl6
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_49
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_152
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_50
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_153
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_72
+    part: 74HC08
+    pins:
+      A: net_ph0n_152
+      B: net_ph1n_153
+      Y: net_a_154
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_73
+    part: 74HC08
+    pins:
+      A: net_tpl0
+      B: net_a_154
+      Y: net_a_155
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_51
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_156
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_74
+    part: 74HC08
+    pins:
+      A: net_phase0
+      B: net_ph1n_156
+      Y: net_a_157
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_75
+    part: 74HC08
+    pins:
+      A: net_tpl0
+      B: net_a_157
+      Y: net_a_158
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_52
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_159
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_76
+    part: 74HC08
+    pins:
+      A: net_ph0n_159
+      B: net_phase1
+      Y: net_a_160
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_77
+    part: 74HC08
+    pins:
+      A: net_tpl0
+      B: net_a_160
+      Y: net_a_161
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_53
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_162
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_54
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_163
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_78
+    part: 74HC08
+    pins:
+      A: net_ph0n_162
+      B: net_ph1n_163
+      Y: net_a_164
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_79
+    part: 74HC08
+    pins:
+      A: net_tpl1
+      B: net_a_164
+      Y: net_a_165
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_55
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_166
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_80
+    part: 74HC08
+    pins:
+      A: net_phase0
+      B: net_ph1n_166
+      Y: net_a_167
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_81
+    part: 74HC08
+    pins:
+      A: net_tpl1
+      B: net_a_167
+      Y: net_a_168
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_56
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_169
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_57
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_170
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_82
+    part: 74HC08
+    pins:
+      A: net_ph0n_169
+      B: net_ph1n_170
+      Y: net_a_171
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_83
+    part: 74HC08
+    pins:
+      A: net_tpl2
+      B: net_a_171
+      Y: net_a_172
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_58
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_173
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_84
+    part: 74HC08
+    pins:
+      A: net_phase0
+      B: net_ph1n_173
+      Y: net_a_174
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_85
+    part: 74HC08
+    pins:
+      A: net_tpl2
+      B: net_a_174
+      Y: net_a_175
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_59
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_176
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_60
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_177
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_86
+    part: 74HC08
+    pins:
+      A: net_ph0n_176
+      B: net_ph1n_177
+      Y: net_a_178
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_87
+    part: 74HC08
+    pins:
+      A: net_tpl4
+      B: net_a_178
+      Y: net_a_179
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_61
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_180
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_88
+    part: 74HC08
+    pins:
+      A: net_phase0
+      B: net_ph1n_180
+      Y: net_a_181
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_89
+    part: 74HC08
+    pins:
+      A: net_tpl4
+      B: net_a_181
+      Y: net_a_182
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_62
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_183
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_63
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_184
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_90
+    part: 74HC08
+    pins:
+      A: net_ph0n_183
+      B: net_ph1n_184
+      Y: net_a_185
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_91
+    part: 74HC08
+    pins:
+      A: net_tpl5
+      B: net_a_185
+      Y: net_a_186
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_64
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_187
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_65
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_188
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_92
+    part: 74HC08
+    pins:
+      A: net_ph0n_187
+      B: net_ph1n_188
+      Y: net_a_189
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_93
+    part: 74HC08
+    pins:
+      A: net_tpl1
+      B: net_a_189
+      Y: net_a_190
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_66
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_191
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_94
+    part: 74HC08
+    pins:
+      A: net_phase0
+      B: net_ph1n_191
+      Y: net_a_192
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_95
+    part: 74HC08
+    pins:
+      A: net_tpl1
+      B: net_a_192
+      Y: net_a_193
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_67
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_194
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_68
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_195
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_96
+    part: 74HC08
+    pins:
+      A: net_ph0n_194
+      B: net_ph1n_195
+      Y: net_a_196
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_97
+    part: 74HC08
+    pins:
+      A: net_tpl2
+      B: net_a_196
+      Y: net_a_197
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_69
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_198
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_98
+    part: 74HC08
+    pins:
+      A: net_phase0
+      B: net_ph1n_198
+      Y: net_a_199
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_99
+    part: 74HC08
+    pins:
+      A: net_tpl2
+      B: net_a_199
+      Y: net_a_200
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_70
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_201
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_71
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_202
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_100
+    part: 74HC08
+    pins:
+      A: net_ph0n_201
+      B: net_ph1n_202
+      Y: net_a_203
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_101
+    part: 74HC08
+    pins:
+      A: net_tpl6
+      B: net_a_203
+      Y: net_a_204
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_72
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_205
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_73
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_206
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_102
+    part: 74HC08
+    pins:
+      A: net_ph0n_205
+      B: net_ph1n_206
+      Y: net_a_207
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_103
+    part: 74HC08
+    pins:
+      A: net_tpl0
+      B: net_a_207
+      Y: net_a_208
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_74
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_209
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_104
+    part: 74HC08
+    pins:
+      A: net_phase0
+      B: net_ph1n_209
+      Y: net_a_210
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_105
+    part: 74HC08
+    pins:
+      A: net_tpl0
+      B: net_a_210
+      Y: net_a_211
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_75
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_212
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_106
+    part: 74HC08
+    pins:
+      A: net_ph0n_212
+      B: net_phase1
+      Y: net_a_213
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_107
+    part: 74HC08
+    pins:
+      A: net_tpl0
+      B: net_a_213
+      Y: net_a_214
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_76
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_215
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_77
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_216
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_108
+    part: 74HC08
+    pins:
+      A: net_ph0n_215
+      B: net_ph1n_216
+      Y: net_a_217
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_109
+    part: 74HC08
+    pins:
+      A: net_tpl2
+      B: net_a_217
+      Y: net_a_218
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_78
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_219
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_110
+    part: 74HC08
+    pins:
+      A: net_phase0
+      B: net_ph1n_219
+      Y: net_a_220
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_111
+    part: 74HC08
+    pins:
+      A: net_tpl2
+      B: net_a_220
+      Y: net_a_221
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_79
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_222
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_80
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_223
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_112
+    part: 74HC08
+    pins:
+      A: net_ph0n_222
+      B: net_ph1n_223
+      Y: net_a_224
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_113
+    part: 74HC08
+    pins:
+      A: net_tpl3
+      B: net_a_224
+      Y: net_a_225
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_81
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_226
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_82
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_227
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_114
+    part: 74HC08
+    pins:
+      A: net_ph0n_226
+      B: net_ph1n_227
+      Y: net_a_228
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_115
+    part: 74HC08
+    pins:
+      A: net_tpl3
+      B: net_a_228
+      Y: net_a_229
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_83
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_230
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_84
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_231
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_116
+    part: 74HC08
+    pins:
+      A: net_ph0n_230
+      B: net_ph1n_231
+      Y: net_a_232
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_117
+    part: 74HC08
+    pins:
+      A: net_tpl3
+      B: net_a_232
+      Y: net_a_233
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_85
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_234
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_86
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_235
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_118
+    part: 74HC08
+    pins:
+      A: net_ph0n_234
+      B: net_ph1n_235
+      Y: net_a_236
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_119
+    part: 74HC08
+    pins:
+      A: net_tpl3
+      B: net_a_236
+      Y: net_a_237
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_87
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_238
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_88
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_239
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_120
+    part: 74HC08
+    pins:
+      A: net_ph0n_238
+      B: net_ph1n_239
+      Y: net_a_240
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_121
+    part: 74HC08
+    pins:
+      A: net_tpl3
+      B: net_a_240
+      Y: net_a_241
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_89
+    part: 74HC04
+    pins:
+      A: net_phase0
+      Y: net_ph0n_242
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_04_90
+    part: 74HC04
+    pins:
+      A: net_phase1
+      Y: net_ph1n_243
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_122
+    part: 74HC08
+    pins:
+      A: net_ph0n_242
+      B: net_ph1n_243
+      Y: net_a_244
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_123
+    part: 74HC08
+    pins:
+      A: net_tpl3
+      B: net_a_244
+      Y: net_a_245
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_10
+    part: 74HC32
+    pins:
+      A: net_a_161
+      B: net_a_168
+      Y: net_o_246
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_11
+    part: 74HC32
+    pins:
+      A: net_o_246
+      B: net_a_193
+      Y: net_o_247
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_12
+    part: 74HC32
+    pins:
+      A: net_o_247
+      B: net_a_225
+      Y: net_o_248
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_13
+    part: 74HC32
+    pins:
+      A: net_o_248
+      B: net_a_229
+      Y: net_o_249
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_14
+    part: 74HC32
+    pins:
+      A: net_o_249
+      B: net_a_233
+      Y: net_o_250
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_15
+    part: 74HC32
+    pins:
+      A: net_o_250
+      B: net_a_237
+      Y: net_o_251
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_16
+    part: 74HC32
+    pins:
+      A: net_o_251
+      B: net_a_241
+      Y: net_o_252
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_17
+    part: 74HC32
+    pins:
+      A: net_o_252
+      B: net_a_245
+      Y: net_o_253
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_124
+    part: 74HC08
+    pins:
+      A: net_o_253
+      B: pwr_vcc
+      Y: net_reg_we
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_18
+    part: 74HC32
+    pins:
+      A: net_a_165
+      B: net_a_190
+      Y: net_o_254
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_125
+    part: 74HC08
+    pins:
+      A: net_o_254
+      B: pwr_vcc
+      Y: net_mem_rd
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_19
+    part: 74HC32
+    pins:
+      A: net_a_175
+      B: net_a_200
+      Y: net_o_255
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_20
+    part: 74HC32
+    pins:
+      A: net_o_255
+      B: net_a_221
+      Y: net_o_256
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_126
+    part: 74HC08
+    pins:
+      A: net_o_256
+      B: pwr_vcc
+      Y: net_mem_wr
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_21
+    part: 74HC32
+    pins:
+      A: net_a_155
+      B: net_a_158
+      Y: net_o_257
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_22
+    part: 74HC32
+    pins:
+      A: net_o_257
+      B: net_a_161
+      Y: net_o_258
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_23
+    part: 74HC32
+    pins:
+      A: net_o_258
+      B: net_a_172
+      Y: net_o_259
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_24
+    part: 74HC32
+    pins:
+      A: net_o_259
+      B: net_a_197
+      Y: net_o_260
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_25
+    part: 74HC32
+    pins:
+      A: net_o_260
+      B: net_a_218
+      Y: net_o_261
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_127
+    part: 74HC08
+    pins:
+      A: net_o_261
+      B: pwr_vcc
+      Y: net_y_oe
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_32_26
+    part: 74HC32
+    pins:
+      A: net_a_182
+      B: net_a_186
+      Y: net_o_262
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CPLD_CTRL_COUNTER_08_128
+    part: 74HC08
+    pins:
+      A: net_o_262
+      B: pwr_vcc
+      Y: net_pc_load_en
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_WSEL_153
+    part: 74HC153
+    pins:
+      1G: pwr_gnd
+      2G: pwr_gnd
+      A: net_opc0
+      B: net_opc1
+      1C0: pwr_gnd
+      1C1: pwr_vcc
+      1C2: pwr_gnd
+      1C3: pwr_vcc
+      1Y: net_wsel0
+      2C0: pwr_gnd
+      2C1: pwr_vcc
+      2C2: pwr_vcc
+      2C3: pwr_gnd
+      2Y: net_wsel1
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_CTRL_574
+    part: 74HC574
+    pins:
+      CLK: net_clk
+      OE: pwr_gnd
+      VCC: pwr_vcc
+      GND: pwr_gnd
+      D0: net_reg_we
+      Q0: net_reg_we_lat
+      D1: net_mem_rd
+      Q1: net_mem_rd_lat
+      D2: net_mem_wr
+      Q2: net_mem_wr_lat
+      D3: net_y_oe
+      Q3: net_y_oe_lat
+      D4: net_wsel0
+      Q4: net_wsel0_lat
+      D5: net_wsel1
+      Q5: net_wsel1_lat
+      D6: net_pc_load_en
+      Q6: net_pc_load_en_lat
+      D7: pwr_gnd
+      Q7: net_rsv_lat
+  - ref: U_BEQ_AND
+    part: 74HC08
+    pins:
+      A: net_pc_load_en_lat
+      B: net_flg_z
+      Y: net_pc_load
+      VCC: pwr_vcc
+      GND: pwr_gnd
+nets:
+  - name: net_a_102
+    width: 1
+  - name: net_a_103
+    width: 1
+  - name: net_a_104
+    width: 1
+  - name: net_a_105
+    width: 1
+  - name: net_a_108
+    width: 1
+  - name: net_a_109
+    width: 1
+  - name: net_a_110
+    width: 1
+  - name: net_a_111
+    width: 1
+  - name: net_a_115
+    width: 1
+  - name: net_a_116
+    width: 1
+  - name: net_a_117
+    width: 1
+  - name: net_a_118
+    width: 1
+  - name: net_a_121
+    width: 1
+  - name: net_a_122
+    width: 1
+  - name: net_a_123
+    width: 1
+  - name: net_a_124
+    width: 1
+  - name: net_a_134
+    width: 1
+  - name: net_a_135
+    width: 1
+  - name: net_a_136
+    width: 1
+  - name: net_a_137
+    width: 1
+  - name: net_a_141
+    width: 1
+  - name: net_a_142
+    width: 1
+  - name: net_a_143
+    width: 1
+  - name: net_a_144
+    width: 1
+  - name: net_a_148
+    width: 1
+  - name: net_a_149
+    width: 1
+  - name: net_a_150
+    width: 1
+  - name: net_a_151
+    width: 1
+  - name: net_a_154
+    width: 1
+  - name: net_a_155
+    width: 1
+  - name: net_a_157
+    width: 1
+  - name: net_a_158
+    width: 1
+  - name: net_a_160
+    width: 1
+  - name: net_a_161
+    width: 1
+  - name: net_a_164
+    width: 1
+  - name: net_a_165
+    width: 1
+  - name: net_a_167
+    width: 1
+  - name: net_a_168
+    width: 1
+  - name: net_a_171
+    width: 1
+  - name: net_a_172
+    width: 1
+  - name: net_a_174
+    width: 1
+  - name: net_a_175
+    width: 1
+  - name: net_a_178
+    width: 1
+  - name: net_a_179
+    width: 1
+  - name: net_a_181
+    width: 1
+  - name: net_a_182
+    width: 1
+  - name: net_a_185
+    width: 1
+  - name: net_a_186
+    width: 1
+  - name: net_a_189
+    width: 1
+  - name: net_a_190
+    width: 1
+  - name: net_a_192
+    width: 1
+  - name: net_a_193
+    width: 1
+  - name: net_a_196
+    width: 1
+  - name: net_a_197
+    width: 1
+  - name: net_a_199
+    width: 1
+  - name: net_a_200
+    width: 1
+  - name: net_a_203
+    width: 1
+  - name: net_a_204
+    width: 1
+  - name: net_a_207
+    width: 1
+  - name: net_a_208
+    width: 1
+  - name: net_a_210
+    width: 1
+  - name: net_a_211
+    width: 1
+  - name: net_a_213
+    width: 1
+  - name: net_a_214
+    width: 1
+  - name: net_a_217
+    width: 1
+  - name: net_a_218
+    width: 1
+  - name: net_a_220
+    width: 1
+  - name: net_a_221
+    width: 1
+  - name: net_a_224
+    width: 1
+  - name: net_a_225
+    width: 1
+  - name: net_a_228
+    width: 1
+  - name: net_a_229
+    width: 1
+  - name: net_a_232
+    width: 1
+  - name: net_a_233
+    width: 1
+  - name: net_a_236
+    width: 1
+  - name: net_a_237
+    width: 1
+  - name: net_a_240
+    width: 1
+  - name: net_a_241
+    width: 1
+  - name: net_a_244
+    width: 1
+  - name: net_a_245
+    width: 1
+  - name: net_a_35
+    width: 1
+  - name: net_a_36
+    width: 1
+  - name: net_a_37
+    width: 1
+  - name: net_a_38
+    width: 1
+  - name: net_a_41
+    width: 1
+  - name: net_a_42
+    width: 1
+  - name: net_a_43
+    width: 1
+  - name: net_a_44
+    width: 1
+  - name: net_a_50
+    width: 1
+  - name: net_a_51
+    width: 1
+  - name: net_a_52
+    width: 1
+  - name: net_a_53
+    width: 1
+  - name: net_a_58
+    width: 1
+  - name: net_a_59
+    width: 1
+  - name: net_a_60
+    width: 1
+  - name: net_a_61
+    width: 1
+  - name: net_a_66
+    width: 1
+  - name: net_a_67
+    width: 1
+  - name: net_a_68
+    width: 1
+  - name: net_a_69
+    width: 1
+  - name: net_a_73
+    width: 1
+  - name: net_a_74
+    width: 1
+  - name: net_a_75
+    width: 1
+  - name: net_a_76
+    width: 1
+  - name: net_a_78
+    width: 1
+  - name: net_a_79
+    width: 1
+  - name: net_a_80
+    width: 1
+  - name: net_a_81
+    width: 1
+  - name: net_a_88
+    width: 1
+  - name: net_a_89
+    width: 1
+  - name: net_a_90
+    width: 1
+  - name: net_a_91
+    width: 1
+  - name: net_a_95
+    width: 1
+  - name: net_a_96
+    width: 1
+  - name: net_a_97
+    width: 1
+  - name: net_a_98
+    width: 1
+  - name: net_clk
+    width: 1
+  - name: net_flg_z
+    width: 1
+  - name: net_macro_end
+    width: 1
+  - name: net_mem_rd
+    width: 1
+  - name: net_mem_rd_lat
+    width: 1
+  - name: net_mem_wr
+    width: 1
+  - name: net_mem_wr_lat
+    width: 1
+  - name: net_nopc0_112
+    width: 1
+  - name: net_nopc0_130
+    width: 1
+  - name: net_nopc0_145
+    width: 1
+  - name: net_nopc0_46
+    width: 1
+  - name: net_nopc0_54
+    width: 1
+  - name: net_nopc0_84
+    width: 1
+  - name: net_nopc0_99
+    width: 1
+  - name: net_nopc1_113
+    width: 1
+  - name: net_nopc1_119
+    width: 1
+  - name: net_nopc1_131
+    width: 1
+  - name: net_nopc1_138
+    width: 1
+  - name: net_nopc1_31
+    width: 1
+  - name: net_nopc1_39
+    width: 1
+  - name: net_nopc1_55
+    width: 1
+  - name: net_nopc1_70
+    width: 1
+  - name: net_nopc1_85
+    width: 1
+  - name: net_nopc1_92
+    width: 1
+  - name: net_nopc2_100
+    width: 1
+  - name: net_nopc2_106
+    width: 1
+  - name: net_nopc2_146
+    width: 1
+  - name: net_nopc2_32
+    width: 1
+  - name: net_nopc2_47
+    width: 1
+  - name: net_nopc2_56
+    width: 1
+  - name: net_nopc2_63
+    width: 1
+  - name: net_nopc2_71
+    width: 1
+  - name: net_nopc2_86
+    width: 1
+  - name: net_nopc2_93
+    width: 1
+  - name: net_nopc3_101
+    width: 1
+  - name: net_nopc3_107
+    width: 1
+  - name: net_nopc3_114
+    width: 1
+  - name: net_nopc3_120
+    width: 1
+  - name: net_nopc3_132
+    width: 1
+  - name: net_nopc3_139
+    width: 1
+  - name: net_nopc3_33
+    width: 1
+  - name: net_nopc3_48
+    width: 1
+  - name: net_nopc3_64
+    width: 1
+  - name: net_nopc3_87
+    width: 1
+  - name: net_nopc3_94
+    width: 1
+  - name: net_nopc4_133
+    width: 1
+  - name: net_nopc4_140
+    width: 1
+  - name: net_nopc4_147
+    width: 1
+  - name: net_nopc4_34
+    width: 1
+  - name: net_nopc4_40
+    width: 1
+  - name: net_nopc4_49
+    width: 1
+  - name: net_nopc4_57
+    width: 1
+  - name: net_nopc4_65
+    width: 1
+  - name: net_nopc4_72
+    width: 1
+  - name: net_nopc4_77
+    width: 1
+  - name: net_o_125
+    width: 1
+  - name: net_o_126
+    width: 1
+  - name: net_o_127
+    width: 1
+  - name: net_o_128
+    width: 1
+  - name: net_o_129
+    width: 1
+  - name: net_o_246
+    width: 1
+  - name: net_o_247
+    width: 1
+  - name: net_o_248
+    width: 1
+  - name: net_o_249
+    width: 1
+  - name: net_o_250
+    width: 1
+  - name: net_o_251
+    width: 1
+  - name: net_o_252
+    width: 1
+  - name: net_o_253
+    width: 1
+  - name: net_o_254
+    width: 1
+  - name: net_o_255
+    width: 1
+  - name: net_o_256
+    width: 1
+  - name: net_o_257
+    width: 1
+  - name: net_o_258
+    width: 1
+  - name: net_o_259
+    width: 1
+  - name: net_o_260
+    width: 1
+  - name: net_o_261
+    width: 1
+  - name: net_o_262
+    width: 1
+  - name: net_o_45
+    width: 1
+  - name: net_o_62
+    width: 1
+  - name: net_o_82
+    width: 1
+  - name: net_o_83
+    width: 1
+  - name: net_opc0
+    width: 1
+  - name: net_opc1
+    width: 1
+  - name: net_opc2
+    width: 1
+  - name: net_opc3
+    width: 1
+  - name: net_opc4
+    width: 1
+  - name: net_opc_cls0
+    width: 1
+  - name: net_opc_cls1
+    width: 1
+  - name: net_opc_cls2
+    width: 1
+  - name: net_opc_cls3
+    width: 1
+  - name: net_opc_cls4
+    width: 1
+  - name: net_opc_cls5
+    width: 1
+  - name: net_opc_cls6
+    width: 1
+  - name: net_opc_cls7
+    width: 1
+  - name: net_pc_load
+    width: 1
+  - name: net_pc_load_en
+    width: 1
+  - name: net_pc_load_en_lat
+    width: 1
+  - name: net_ph0n_152
+    width: 1
+  - name: net_ph0n_159
+    width: 1
+  - name: net_ph0n_162
+    width: 1
+  - name: net_ph0n_169
+    width: 1
+  - name: net_ph0n_176
+    width: 1
+  - name: net_ph0n_183
+    width: 1
+  - name: net_ph0n_187
+    width: 1
+  - name: net_ph0n_194
+    width: 1
+  - name: net_ph0n_201
+    width: 1
+  - name: net_ph0n_205
+    width: 1
+  - name: net_ph0n_212
+    width: 1
+  - name: net_ph0n_215
+    width: 1
+  - name: net_ph0n_222
+    width: 1
+  - name: net_ph0n_226
+    width: 1
+  - name: net_ph0n_230
+    width: 1
+  - name: net_ph0n_234
+    width: 1
+  - name: net_ph0n_238
+    width: 1
+  - name: net_ph0n_242
+    width: 1
+  - name: net_ph1n_153
+    width: 1
+  - name: net_ph1n_156
+    width: 1
+  - name: net_ph1n_163
+    width: 1
+  - name: net_ph1n_166
+    width: 1
+  - name: net_ph1n_170
+    width: 1
+  - name: net_ph1n_173
+    width: 1
+  - name: net_ph1n_177
+    width: 1
+  - name: net_ph1n_180
+    width: 1
+  - name: net_ph1n_184
+    width: 1
+  - name: net_ph1n_188
+    width: 1
+  - name: net_ph1n_191
+    width: 1
+  - name: net_ph1n_195
+    width: 1
+  - name: net_ph1n_198
+    width: 1
+  - name: net_ph1n_202
+    width: 1
+  - name: net_ph1n_206
+    width: 1
+  - name: net_ph1n_209
+    width: 1
+  - name: net_ph1n_216
+    width: 1
+  - name: net_ph1n_219
+    width: 1
+  - name: net_ph1n_223
+    width: 1
+  - name: net_ph1n_227
+    width: 1
+  - name: net_ph1n_231
+    width: 1
+  - name: net_ph1n_235
+    width: 1
+  - name: net_ph1n_239
+    width: 1
+  - name: net_ph1n_243
+    width: 1
+  - name: net_phase0
+    width: 1
+  - name: net_phase1
+    width: 1
+  - name: net_reg_we
+    width: 1
+  - name: net_reg_we_lat
+    width: 1
+  - name: net_rsv_lat
+    width: 1
+  - name: net_tpl0
+    width: 1
+  - name: net_tpl1
+    width: 1
+  - name: net_tpl2
+    width: 1
+  - name: net_tpl3
+    width: 1
+  - name: net_tpl4
+    width: 1
+  - name: net_tpl5
+    width: 1
+  - name: net_tpl6
+    width: 1
+  - name: net_wsel0
+    width: 1
+  - name: net_wsel0_lat
+    width: 1
+  - name: net_wsel1
+    width: 1
+  - name: net_wsel1_lat
+    width: 1
+  - name: net_y_oe
+    width: 1
+  - name: net_y_oe_lat
+    width: 1
+  - name: pwr_vcc
+    width: 1
+  - name: pwr_gnd
+    width: 1
