@@ -12,9 +12,9 @@
 
 | 항목 | 내용 |
 |------|------|
-| **지금** | ALU hwsim + breadboard CPU gate + **plover_vm** |
-| **시뮬** | [hwsim](docs/simulation/hw-sim.md) · [plover_vm Rust](docs/simulation/vm-rust.md) |
-| **CPU** | ATF1504 GPR · **10b CW** · 2×32K SRAM · 138×2 CE |
+| **지금** | M1–M5 breadboard bring-up (normative) |
+| **개발** | [hwsim](docs/developer/simulation/hw-sim.md) · [plover_vm](docs/developer/simulation/vm-rust.md) |
+| **CPU** | ATF1504 GPR · **FSM-only idx5** · 2×32K SRAM · 138×2 CE |
 | **BOM** | ~48 74HC + **ATF1504AS** + **SST39×1** + **IS62×2** |
 
 ---
@@ -22,21 +22,19 @@
 ## 아키텍처 (v1.0)
 
 ```
-Flash 10b CW (CW_L/CW_H) ──→ alu8 + CPLD REG_SEL
-ATF1504 GPR q_a/q_b ────────→ ALU A/B
-138×2 + glue ───────────────→ RAM/ROM /CE · mailbox
-SST39SF010A ────────────────→ boot + microcode
+IR[4:0] ──► CPLD idx5 FSM ──► alu8 + GPR (R0–R2)
+138×2 + glue ───────────────► RAM/ROM /CE · mailbox
+SST39SF010A ────────────────► boot ROM (Flash $4000 CW 미사용)
 ```
 
-명세: [docs/hardware/system-architecture.md](docs/hardware/system-architecture.md) · 배선: [breadboard-wiring.md](docs/hw-bringup/breadboard-wiring.md)
+명세: [docs/normative/hardware/system-architecture.md](docs/normative/hardware/system-architecture.md) · 배선: [docs/normative/hw-bringup/breadboard-wiring.md](docs/normative/hw-bringup/breadboard-wiring.md)
 
 ---
 
-## hwsim
+## 개발자 (시뮬·VM)
 
 ```bash
 python -m hwsim run --all
-python -m hwsim run hw/tests/mem_decode_breadboard.yaml
 ```
 
-결과: `build/hwsim/<test>/` — [hw-sim.md](docs/simulation/hw-sim.md)
+[developer/simulation/hw-sim.md](docs/developer/simulation/hw-sim.md) · [verification-gates.md](docs/developer/verification-gates.md)

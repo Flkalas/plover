@@ -2,7 +2,7 @@
 
 **작성일:** 2026-06-01  
 **대상:** 설계·코드·시뮬레이션 검토자  
-**활성 명세:** [system-architecture.md](../hardware/system-architecture.md)
+**활성 명세:** [system-architecture.md](../../normative/hardware/system-architecture.md)
 
 ---
 
@@ -37,7 +37,7 @@ RP2350B                       Mailbox copro (펌웨어 stub만)
 - **Mode B (Run):** 전 영역 RAM, `$FFFC` 벡터 → RAM (운영자 DIP + RESET)  
 - **10-bit CW:** B9–B8 REG_SEL, B7–B4 ALU_OP, B3 REG_WE, B2 Y_OE, B1 MEM_RD, B0 MEM_WR  
 
-상세: [memory-map.md](../hardware/memory-map.md), [microcode-spec.md](../hardware/microcode-spec.md), [parts-on-hand.md](../project/parts-on-hand.md)
+상세: [memory-map.md](../../normative/hardware/memory-map.md), [microcode-spec.md](../../normative/hardware/microcode-spec.md), [parts-on-hand.md](../../normative/project/parts-on-hand.md)
 
 ---
 
@@ -75,7 +75,7 @@ python -m hwsim run hw/tests/mem_decode.yaml
 아티팩트: `build/hwsim/<test>/` — `report.html`, `waves.json`, `timing_report.json`  
 뷰어: [hw/viewer/index.html](../hw/viewer/index.html)
 
-**ALU netlist regen (Phase B2):** `gen_alu_decode_netlist.py` → `gen_alu8_netlist.py` → `gen_alu_b3_netlist.py` → `gen_alu_b3_clock_netlist.py` → `gen_alu8_full_test.py` → `gen_alu8_opcode_timing.py` → `gen_opcode_cheatsheet.py` — see [hw-sim.md](hw-sim.md). ALU breadboard: **16** DIP IC ([BOM.md](../BOM.md)).
+**ALU netlist regen (Phase B2):** `gen_alu_decode_netlist.py` → `gen_alu8_netlist.py` → `gen_alu_b3_netlist.py` → `gen_alu_b3_clock_netlist.py` → `gen_alu8_full_test.py` → `gen_alu8_opcode_timing.py` → `gen_opcode_cheatsheet.py` — see [hw-sim.md](hw-sim.md). ALU breadboard: **16** DIP IC ([BOM.md](../../../BOM.md)).
 
 ### 4.2 v2 회귀 테스트 (5건)
 
@@ -155,7 +155,7 @@ python -m pytest tests/ -q
 
 ## 6. ISA · macroasm · CW
 
-### 6.1 v1.0 hardware / ISA ([microcode-spec.md](../hardware/microcode-spec.md))
+### 6.1 v1.0 hardware / ISA ([microcode-spec.md](../../normative/hardware/microcode-spec.md))
 
 | Op | Mnemonic | 비고 |
 |----|----------|------|
@@ -287,11 +287,11 @@ firmware/rp2350/mailbox_stub/main.c   RP2350 stub (normative doc 참조)
 
 ## 10. 검토 체크리스트 (제안)
 
-1. **명세** — [system-architecture.md](../hardware/system-architecture.md) vs [BOM.md](../BOM.md) vs [memory-map.md](../hardware/memory-map.md) 일치  
+1. **명세** — [system-architecture.md](../../normative/hardware/system-architecture.md) vs [BOM.md](../../../BOM.md) vs [memory-map.md](../../normative/hardware/memory-map.md) 일치  
 2. **hwsim** — `python -m hwsim run --all` → **17/17 PASS** (74HC comb; no OSC — VM + scope for clock/CPLD timing)  
 3. **VM** — `python -m pytest tests/ -q` → **23/23 PASS**  
 4. **Decode** — `v2_mem_decode` 파형 vs [MapDecoder](../plover_vm/decode.py) truth table  
-5. **CW** — [pack_control_store.py](../tools/pack_control_store.py) 8b map vs [microcode-spec.md](../hardware/microcode-spec.md)  
+5. **CW** — [pack_control_store.py](../tools/pack_control_store.py) 8b map vs [microcode-spec.md](../../normative/hardware/microcode-spec.md)  
 6. **데모** — `run_fib_demo.py`, `run_fib_20000_demo.py` 출력 수치  
 7. **레거시** — `cpld_regfile.yaml` LEGACY 주석, v1 문서 superseded 표기  
 

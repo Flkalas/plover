@@ -1,12 +1,12 @@
 # 8-bit ALU block (`alu8.yaml`)
 
-BOM **14** 74HC DIP IC (hwsim **~28** instances + behavioral glue), 12 `alu_sel` operations per [microcode-spec](../../../docs/hardware/microcode-spec.md).
+BOM **14** 74HC DIP IC (hwsim **~28** instances + behavioral glue), 12 `alu_sel` operations per [microcode-spec](../../../docs/normative/hardware/microcode-spec.md).
 
 **Phase A/B1:** `153_B` B-path MUX · 산술 Y **`157_YBP`** (sum bypass).  
 **Phase B2:** Gigatron **`153_L`** — **08/32/86/04_N/157_OUT 제거**.  
 **CMP flags:** **`ALU_CMP_SUB`** — `net_cmp_z` = (`net_y==0`), `net_cmp_c_ge` = `net_c_hi` (no **74HC85** on breadboard).
 
-Integrated with 574: [`alu_b3.yaml`](alu_b3.yaml) · design: [`docs/hardware/alu8-phase-b.md`](../../../docs/hardware/alu8-phase-b.md) · bring-up: [`docs/hw-bringup/alu8-assembly-spec.md`](../../../docs/hw-bringup/alu8-assembly-spec.md).
+Integrated with 574: [`alu_b3.yaml`](alu_b3.yaml) · design: [`docs/normative/hardware/alu8-phase-b.md`](../../../docs/normative/hardware/alu8-phase-b.md) · bring-up: [`docs/normative/hw-bringup/alu8-assembly-spec.md`](../../../docs/normative/hw-bringup/alu8-assembly-spec.md).
 
 ## IC map (physical)
 
@@ -20,7 +20,7 @@ Integrated with 574: [`alu_b3.yaml`](alu_b3.yaml) · design: [`docs/hardware/alu
 | `U_ALU_04_BINV_*` | 74HC04 | 8 (gates) | `~B[i]` for 153_B C1 |
 | `U_ALU_CMP_SUB` | *(behavioral)* | 1 | CMP Z/C_GE from SUB result (no 7485) |
 
-Breadboard: eight hwsim `ALU_153_SLICE` refs map to **four** 74HC153 DIP (one active mux per pair) — see [`docs/hardware/alu8-phase-b.md`](../../../docs/hardware/alu8-phase-b.md).
+Breadboard: eight hwsim `ALU_153_SLICE` refs map to **four** 74HC153 DIP (one active mux per pair) — see [`docs/normative/hardware/alu8-phase-b.md`](../../../docs/normative/hardware/alu8-phase-b.md).
 
 Regenerate:
 
@@ -93,4 +93,4 @@ Vectors: [`tools/alu8_cases.py`](../../../tools/alu8_cases.py)
 
 ## BOM
 
-[ BOM.md](../../../BOM.md) — ALU **14** DIP IC · [bom-maintenance.md](../../../docs/project/bom-maintenance.md) — 검산/이력.
+[ BOM.md](../../../BOM.md) — ALU **14** DIP IC · [bom-maintenance.md](../../../docs/developer/project/bom-maintenance.md) — 검산/이력.

@@ -1,4 +1,4 @@
-"""Generate docs/hw-bringup/b3-opcode.md from shared ALU test vectors."""
+"""Generate docs/normative/hw-bringup/b3-opcode.md from shared ALU test vectors."""
 from __future__ import annotations
 
 import sys
@@ -83,7 +83,7 @@ def main() -> None:
         "",
     ]
 
-    out = ROOT / "docs" / "hw-bringup" / "b3-opcode.md"
+    out = ROOT / "docs" / "normative" / "hw-bringup" / "b3-opcode.md"
     out.write_text("\n".join(lines), encoding="utf-8")
     print(f"wrote {out}")
 

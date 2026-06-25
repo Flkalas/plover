@@ -1,7 +1,7 @@
 # 개발 데모 프로그램 명세 요약
 
 **대상:** 데모·워크숍·I/O 검증 프로그램을 만드는 개발자  
-**Related:** [vm-rust.md](../simulation/vm-rust.md) · [runtime-api.md](runtime-api.md) · [basic-system.md](basic-system.md) · [game-api.md](game-api.md) · [mailbox-protocol.md](../copro/mailbox-protocol.md)
+**Related:** [vm-rust.md](../simulation/vm-rust.md) · [runtime-api.md](runtime-api.md) · [basic-system.md](basic-system.md) · [game-api.md](game-api.md) · [mailbox-protocol.md](../../normative/copro/mailbox-protocol.md)
 
 Plover에서 “데모 프로그램”은 **화면·소리·입력**을 사람이 직접 확인하거나, CI가 최소 동작을 게이트하는 **체험/검증용 소프트웨어**를 말합니다. 게임 본편·벤치마크와 목적이 다릅니다.
 
@@ -127,7 +127,7 @@ python basic/tokenize.py hw/fixtures/basic/pong.bas pong.tok
 | APU | `0x50`–`0x57` | `APU_SET_CTRL`, `APU_CH_WRITE`, `APU_NOTE_ON`, `APU_CH_SYNC` |
 | HID | `0x40`–`0x43` | `HID_KEY_READ`, `HID_MOUSE_READ`, `HID_INJECT` (테스트) |
 
-상세: [mailbox-protocol.md](../copro/mailbox-protocol.md) §2.6 GFX v0.2, §2.4 APU v0.2.
+상세: [mailbox-protocol.md](../../normative/copro/mailbox-protocol.md) §2.6 GFX v0.2, §2.4 APU v0.2.
 
 ### 4.2 공통 런타임 `rt_*` (트랙 B·향후 Forth/C)
 
