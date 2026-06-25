@@ -33,8 +33,8 @@
 
 | 평가 범주 | 시스템 구현자 대상 질문 | 컴파일러 구현 시 요구 근거 | v1.0 답변 | 근거·비고 |
 |-----------|-------------------------|---------------------------|-----------|-----------|
-| 레지스터 | **16비트 포인터**를 담을 **전용 포인터 레지스터** 또는 **8비트 레지스터 쌍(Register Pair)** 이 존재합니까? | 8비트 데이터 버스에서 64 KiB 주소 공간 탐색·포인터 변수 할당 | **부분** | **PC·MBR**는 16비트(574+161)이나 **페치/버스 전용** — 프로그램이 일반 포인터로 쓸 수 없음 ([hardware-architecture-synthesis.md](../hardware/hardware-architecture-synthesis.md)). GPR **R0–R3**는 각 **8비트**. 16비트 값은 **RAM 셀 2바이트** 또는 다중 `LDA`/`STA`/`STA16`로 처리. **VM만:** `W0–W3` (`OP_WMOV`/`OP_WADD_RR`, [isa.py](../../plover_vm/macro/isa.py)) — fast path 전용, 마이크로코드 미패킹. |
-| 레지스터 | 누산기 외 **범용 레지스터 3~4개 이상**이 확보되어 있습니까? | 레지스터 스필링·메모리 접근 감소, 최적화된 코드 생성 | **부분** | CPLD **R0–R3** 4×8비트 dual-read ([cpld-system-controller.md](../hardware/cpld-system-controller.md)). 그러나 **ADD**는 마이크로코드 고정 **R0,R1→R2** ([reg_sel.py](../../hw/micro/reg_sel.py)). **`MOV`**만 operand `(dst<<4)|src`로 4레지 선택 ([microcode-spec.md](../hardware/microcode-spec.md) §MOV). 대부분 연산·`LDA`/`STA`는 **R0 중심(ACC형)**. 컴파일러 레지스터 할당기가 쓸 **일반 3-address ALU**는 아님. [calling-convention-v0.1.md](calling-convention-v0.1.md): R0=인자/반환, R1=스크래치, R2=결과, R3=선택적 callee-saved. |
+| 레지스터 | **16비트 포인터**를 담을 **전용 포인터 레지스터** 또는 **8비트 레지스터 쌍(Register Pair)** 이 존재합니까? | 8비트 데이터 버스에서 64 KiB 주소 공간 탐색·포인터 변수 할당 | **부분** | **PC·MBR**는 16비트(574+161)이나 **페치/버스 전용** — 프로그램이 일반 포인터로 쓸 수 없음 ([system-architecture.md](../hardware/system-architecture.md)). normative GPR **R0–R2** (3fixed); **R3 미사용**. 16비트 값은 **RAM 셀 2바이트** 또는 다중 `LDA`/`STA`/`STA16`로 처리. **VM만:** `W0–W3` (`OP_WMOV`/`OP_WADD_RR`, [isa.py](../../plover_vm/macro/isa.py)) — fast path 전용. |
+| 레지스터 | 누산기 외 **범용 레지스터 3~4개 이상**이 확보되어 있습니까? | 레지스터 스필링·메모리 접근 감소, 최적화된 코드 생성 | **부분** | CPLD **R0–R2** 3×8비트 (3fixed read: R0→A, R1→B) ([cpld-system-controller.md](../hardware/cpld-system-controller.md)). **ADD** 고정 **R0,R1→R2**. **레지스터 간 복사**는 implied **TFR `0x10–0x15`** (1바이트, 피연산자 없음); **`0x0C` (구 MOV) reserved**. 대부분 연산·`LDA`/`STA`는 **R0 중심(ACC형)**. [calling-convention-v0.1.md](calling-convention-v0.1.md): R0=인자/반환, R1=스크래치, R2=결과. |
 
 ---
 
@@ -102,7 +102,7 @@
 | 2 | `LDA16` / `LDA [abs16]` (간접 로드) | 포인터 역참조 |
 | 3 | `LDA [R+imm8]` 또는 인덱스 레지 1개 | 배열·오프셋 |
 | 4 | `PUSH R` / `POP R` (SP=RAM 셀 또는 HW SP) | 프롤로그 단순화 |
-| 5 | operand 2바이트 + ALU에 Rs/Rd 필드 | 레지 할당·`MOV` 이상의 연산 |
+| 5 | operand 2바이트 + ALU에 Rs/Rd 필드 | 레지 할당·TFR 이상의 범용 연산 |
 | 6 | `ADC`/`SBC` 또는 명시적 16비트 carry 체인 | 포인터·`int` 연산 |
 | 7 | `SHR`/`SHL` (최소 1방향) | 인덱스 스케일 |
 | 8 | `BNE` + 부호 비교용 N/V 또는 비교 루틴 ABI | 완전한 `if`/`while` |

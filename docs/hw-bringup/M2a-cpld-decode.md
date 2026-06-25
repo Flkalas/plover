@@ -6,7 +6,7 @@
 | **IC** | ATF1504AS-10JU44 (PLCC-44) |
 | **Goal** | JED 소각 + 벤치에서 **3fixed GPR** + **phase FSM** 확인 |
 | **Normative** | [cpld-system-controller.md](../hardware/cpld-system-controller.md) v1.0 |
-| **hwsim** | `cpld_seq_add.yaml` · P1: `cpu_cw_direct_add.yaml` |
+| **hwsim** | `cpld_seq_add.yaml` · `cpld_seq_tfr.yaml` · P1: `cpu_cw_direct_add.yaml` |
 
 > **저장소:** ABEL/JED는 아직 리포에 없을 수 있음. 본 문서는 **배선·검증 절차**. JED 확정 후 `hw/cpld/` 에 추가.
 

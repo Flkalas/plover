@@ -9,22 +9,25 @@
 
 ## 1. Executive summary
 
+> **Snapshot note:** Rows below marked *superseded* describe the **pre-refinement** breadboard (10b Flash CW). **Normative v1.0** = header link + [system-architecture.md](system-architecture.md) — **CPLD FSM idx5, 574×3, no Flash CW @ `$4000`**.
+
 | Topic | Conclusion |
 |-------|------------|
 | **SUB / ALU** | Gigatron-style **153+283+2's complement** matches hwsim/cyclesim. Worst-case comb delay **151 ns @ 74HC max** (not Gemini LVC ~30 ns). |
 | **Purchases** | **74HC DIP** breadboard kit — not 74LVC. Phase B2 ALU ICs essentially complete; **ATF1504AS-10JU44** (PLCC-44). |
-| **Control split** | **ROM** = **10b CW** (2 B/slot) + boot; **574 CW_L/CW_H** latch; **CPLD** = **GPR only** (~40 MC); **Reg_Sel** in CW B9–B8; **138×2 + 08/32/04** = `/CE` + mailbox; **574 FLG**. |
+| **Control split** *(superseded)* | **ROM** = 10b CW + boot; **574 CW_L/CW_H**; CPLD GPR-only — see [prototype-flash-cw](../archive/prototype-flash-cw/README.md). |
+| **Control split** *(normative v1.0)* | **CPLD FSM idx5** + **574×3** (PC/MBR/FLG); Flash boot/utility only; **138×2 + 08/32/04** = `/CE` + mailbox. |
 | **Parasitics** | **CPLD GPR** ≈ **−20% wire hops** vs archived external-GPR path. **138×2** ≈ −8% on CE/map nets. |
-| **Breadboard v1.0** | **ATF1504 GPR** + **138×2** + glue + **5×574** (PC/MBR/CW_L/CW_H/FLG) + TTL alu8. **1504 sufficient.** |
+| **Breadboard v1.0** *(normative)* | **ATF1504 FSM+GPR ~38 MC** + **138×2** + glue + **3×574** + TTL alu8. |
 | **PCB track** | Same logic on [BOM-3v3.md](../BOM-3v3.md) (separate BOM). |
 | **138 + map** | 138 = coarse `/CE`; **Mode A/B, mailbox, `$FFFC`** = discrete gates ([memory-map.md](memory-map.md)). |
 
-**Decisions (v1.0):**
+**Decisions (normative v1.0, 2026-06-24):**
 
-1. **ATF1504AS-10JU44** (PLCC-44) — GPR + `w_sel`/`r_sel` mux only (~36–40 MC).
+1. **ATF1504AS-10JU44** (PLCC-44) — **idx5 phase FSM + 3fixed GPR** (~38 MC).
 2. **74HC138×2** — two-stage CE; **+1 purchase** (total 2).
-3. **10b CW** — Reg_Sel packed in Flash; bus control direct from CW_L.
-4. **Single bring-up** — M2a CPLD GPR → M2b 138×2 ([breadboard-wiring.md](../hw-bringup/breadboard-wiring.md)).
+3. **FSM-only** — no Flash CW burn; operands via **MBR** fetch path.
+4. **Single bring-up** — M2a CPLD FSM → M2b 138×2 ([breadboard-wiring.md](../hw-bringup/breadboard-wiring.md)).
 
 ---
 

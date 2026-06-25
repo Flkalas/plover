@@ -1,7 +1,7 @@
-# Classic memory model comparison ??Plover v1.0
+# Classic memory model comparison ? Plover v1.0
 
 **Status:** Reference synthesis (2026-06-13)  
-**Related:** [memory-map.md](memory-map.md) · [system-architecture.md](system-architecture.md) · [boot-jmp-handoff.md](../boot/boot-jmp-handoff.md) · [bootloader.md](../boot/bootloader.md) · [software-memory-layout.md](../software/software-memory-layout.md) · [vm-rust.md](../simulation/vm-rust.md) · [archive/gemini/Plover-????-????-???????.md](../archive/gemini/Plover-????-????-???????.md)
+**Related:** [memory-map.md](memory-map.md) ? [system-architecture.md](system-architecture.md) ? [boot-jmp-handoff.md](../boot/boot-jmp-handoff.md) ? [bootloader.md](../boot/bootloader.md) ? [software-memory-layout.md](../software/software-memory-layout.md) ? [vm-rust.md](../simulation/vm-rust.md) ? [archive/gemini/Plover-????-????-???????.md](../archive/gemini/Plover-????-????-???????.md)
 
 This document summarizes how Plover v1.0 compares to **8086 Real Mode**, **Commodore 64 bank switching**, and **Z80 I/O mapping**, including the distinction between **JMP handoff** (implemented) and **SYS_CTRL soft-reset** (planned v0.2).
 
@@ -14,12 +14,12 @@ This document summarizes how Plover v1.0 compares to **8086 Real Mode**, **Commo
 | Hardware MMU / virtual memory? | **No** |
 | Hardware memory protection? | **No** |
 | CPU address space | **64 KiB flat** (`A15:0` on the bus) |
-| Address translation inside CPU? | **No** ??decode is **138×2 + discrete gates** outside the CPLD |
+| Address translation inside CPU? | **No** ??decode is **138?2 + discrete gates** outside the CPLD |
 | First boot to kernel | **Automatic** via Boot ROM **`JMP $0800`** ([boot-jmp-handoff.md](../boot/boot-jmp-handoff.md)) |
-| Runtime MAP change from software? | **No** ??`MAP_MODE` is a **DIP switch** input |
+| Runtime MAP change from software? | **No** ? `MAP_MODE` is a **DIP switch** input |
 | Warm reset into kernel | **Manual** Run + RESET, or future **SYS_CTRL** (v0.2) |
-| Beyond 64 KiB | **Mailbox coprocessor** (VDU, vFDD, HID, APU) ??CPU map external |
-| Rust `plover_mmu` crate | **VM memory decode layer** ??not a hardware MMU |
+| Beyond 64 KiB | **Mailbox coprocessor** (VDU, vFDD, HID, APU) ? CPU map external |
+| Rust `plover_mmu` crate | **VM memory decode layer** ? not a hardware MMU |
 
 **One-line positioning:** Plover is a **64 KiB flat Real-Mode-class** machine (like 6502/C64/Z80 base map) with **MS-DOS-style external expansion** (copro + virtual devices), **automatic chain load on first boot** (JMP handoff), but **without** 8086 segmentation, Z80 `IN`/`OUT`, or C64-style runtime bank ports.
 
@@ -27,15 +27,15 @@ This document summarizes how Plover v1.0 compares to **8086 Real Mode**, **Commo
 
 ## 2. Terminology
 
-Three different ??MMU??meanings appear in project docs:
+Three different "MMU" meanings appear in project docs:
 
 | Term | Meaning |
 |------|---------|
-| **Hardware MMU** | Page tables, virtual memory, protection ??**not present** on Plover v1.0 breadboard |
+| **Hardware MMU** | Page tables, virtual memory, protection ? **not present** on Plover v1.0 breadboard |
 | **`plover_mmu` (Rust crate)** | Simulator: 64 KiB map decode, NOR/RAM, Mailbox MMIO bridge ([vm-rust.md](../simulation/vm-rust.md)) |
-| **MAP_MODE / A15 decode** | Physical chip-select and ROM overlay ??**not** an MMU; combinatorial glue + operator DIP |
+| **MAP_MODE / A15 decode** | Physical chip-select and ROM overlay ? **not** an MMU; combinatorial glue + operator DIP |
 
-Archive notes ([8??-???????-?????.md](../archive/gemini/8??-???????-?????.md)) explicitly describe the OS model as **no MMU ??fixed task control blocks; no preemption** (consistent with v1.0 no-IRQ policy).
+Archive notes describe the OS model as **no MMU ? fixed task control blocks; no preemption** (consistent with v1.0 no-IRQ policy).
 
 ---
 
@@ -91,7 +91,7 @@ CPLD: comb only         CPLD: comb only              CPLD: FSM + MMIO @ $FF08
 
 ### Why JMP handoff works without MAP switch
 
-`$0800??FEFF` decodes as **RAM in both Boot and Run modes**. After Boot ROM copies the kernel and pre-inits SP/RP/GPR ([boot-jmp-handoff.md](../boot/boot-jmp-handoff.md) §5), **`JMP $0800`** keeps the PC in the always-RAM band ??no DIP change required for the first kernel fetch.
+`$0800??FEFF` decodes as **RAM in both Boot and Run modes**. After Boot ROM copies the kernel and pre-inits SP/RP/GPR ([boot-jmp-handoff.md](../boot/boot-jmp-handoff.md) ?5), **`JMP $0800`** keeps the PC in the always-RAM band ??no DIP change required for the first kernel fetch.
 
 ### JMP handoff limitations
 
@@ -177,7 +177,7 @@ All four are **??one bug can kill the OS??* class machines. Plover documents thi
 | Warm reset ??OS | DIP Run + RESET (or future SYS_CTRL) | Warm boot / Ctrl+Alt+Del | `SYS` / reset vector | Warm boot |
 | MAP at first kernel run | **Boot** (low page still ROM) | Real mode | Bank port state | N/A |
 
-**Correction vs older prose:** First boot is **not** ??ROM HALT ??operator DIP + RESET??on the product path. That sequence is the **manual recovery** path ([bootloader.md](../boot/bootloader.md) §3). Normative product flow: [boot-jmp-handoff.md](../boot/boot-jmp-handoff.md).
+**Correction vs older prose:** First boot is **not** ??ROM HALT ??operator DIP + RESET??on the product path. That sequence is the **manual recovery** path ([bootloader.md](../boot/bootloader.md) ?3). Normative product flow: [boot-jmp-handoff.md](../boot/boot-jmp-handoff.md).
 
 ---
 
@@ -199,9 +199,9 @@ Plover is **more limited in CPU address space** (64 KiB vs 640 KiB) and **lacks 
 
 ## 12. 8086 BIU vs Plover decode (teaching note)
 
-**8086:** The Bus Interface Unit computes **physical = (segment × 16) + offset** inside the CPU to expose a 1 MiB space from 16-bit registers.
+**8086:** The Bus Interface Unit computes **physical = (segment ? 16) + offset** inside the CPU to expose a 1 MiB space from 16-bit registers.
 
-**Plover:** The CPU presents **16-bit addresses unchanged**. A **MapDecoder** (sim) or **138×2 + glue** (hardware) selects ROM, RAM1, RAM2, or Mailbox. There is no segment register and no in-CPU adder for map extension.
+**Plover:** The CPU presents **16-bit addresses unchanged**. A **MapDecoder** (sim) or **138?2 + glue** (hardware) selects ROM, RAM1, RAM2, or Mailbox. There is no segment register and no in-CPU adder for map extension.
 
 Reference implementation: [plover_mmu/src/decode.rs](../../crates/plover_mmu/src/decode.rs), [plover_vm/decode.py](../../plover_vm/decode.py).
 
@@ -213,7 +213,7 @@ Reference implementation: [plover_mmu/src/decode.rs](../../crates/plover_mmu/src
 |---------|--------|
 | ~~**v1.1 discrete MMU**~~ | **Archived, not adopted** ??[pre-v1.1-mmu/](../archive/pre-v1.1-mmu/README.md). Plover stays **C64/Apple II-class flat 64 KiB** for single-thread Forth. |
 | **`SYS_CTRL` @ `$FF08`** (v0.2) | Software MAP_MODE + soft-reset ??closer to C64 port / 8086 firmware map control |
-| **IRQ** | RAM vectors under Run map become mandatory; JMP-only Boot map more constraining ([boot-jmp-handoff.md](../boot/boot-jmp-handoff.md) §6) |
+| **IRQ** | RAM vectors under Run map become mandatory; JMP-only Boot map more constraining ([boot-jmp-handoff.md](../boot/boot-jmp-handoff.md) ?6) |
 | **v1.0 CPU control** | CPLD idx5 FSM-only ? [system-architecture.md](system-architecture.md) (normative); ISA `op_legacy` + TFR `0x10?0x15` |
 | **FPGA / SDRAM** ([fpga-target-guide.md](fpga-target-guide.md)) | Larger physical backing; logical 64 KiB map may remain for software compat |
 
@@ -240,4 +240,4 @@ Until v0.2, comparisons to ??software-controlled reset/map??systems should treat
 | Date | Note |
 |------|------|
 | 2026-06-13 | Initial synthesis ??classic CPU comparison, boot-path correction, MMU terminology |
-| 2026-06-13 | §13 ??v1.1 discrete MMU roadmap row |
+| 2026-06-13 | ?13 ??v1.1 discrete MMU roadmap row |
