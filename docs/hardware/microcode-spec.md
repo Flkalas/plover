@@ -1,231 +1,182 @@
-﻿# Microcode Specification v1.0
+# Microcode Specification v1.0
 
+**Normative:** v1.0 breadboard (Pareto winner + FSM-only + idx5 refinement)  
 **Related:** [rom-architecture.md](rom-architecture.md) · [cpld-system-controller.md](cpld-system-controller.md)  
-**Archived:** [microcode-spec-v0.1.md](../archive/pre-v0.1/microcode-spec-v0.1.md) · [pre-v1.0](../archive/pre-v1.0/README.md)
+**Design rationale:** [research/design-rationale-v1.0.md](research/design-rationale-v1.0.md) · [cpu-4axis-arch-search-report.md](cpu-4axis-arch-search-report.md) (research)  
+**Superseded prototype:** [prototype-flash-cw](../archive/prototype-flash-cw/README.md)
 
 ---
 
-## 1. Macro ISA (draft GPR machine)
+## 1. Architecture
+
+| Axis | Choice | Rationale |
+|------|--------|-----------|
+| Opcode | **`op_legacy`** core + **Extended `0x10–0x1F`** (TFR `0x10–0x15`) | 5-bit opcode field `[4:0]` |
+| Index | **`idx5`** | CPLD FSM key `(opcode[4:0]<<2)\|phase` — **128 logical slots** |
+| Decode | **`dec_cpld_seq`** | Phase FSM in CPLD; **no `alu8_decode`** |
+| CPLD | **`cpld_3fixed`** | R0→A, R1→B; R2 via internal read for XFER |
+| CW/Flash | **`cw_fsm_only`** | **No Flash param/CW** — FSM opcode table only |
+
+**No Flash fetch** at macro_start for control. Flash `$4000` region **unused** ([rom-architecture.md](rom-architecture.md)).
+
+### 1.1 idx5 (CPLD internal only)
+
+```text
+fsm_index[6:0] = (opcode[4:0] << 2) | phase[1:0]
+```
+
+| | idx4 (archive / Pareto record) | idx5 (normative) |
+|---|-------------------------------|------------------|
+| Opcode bits | `[3:0]` | **`[4:0]`** |
+| Logical slots | 64 | **128** |
+| Physical Flash | v1.0 `$4000` CW | **none** — CPLD PLA only |
+| IR → CPLD | 4 wires | **5 wires** (`IR[4]` added) |
+
+---
+
+## 2. Macro ISA
+
+### 2.0 Instruction formats (encoding)
+
+Opcode field: **bits `[4:0]`** of the first instruction byte. Bits `[7:5]` are **reserved (0)** for normative opcodes.
+
+| Format | Size | Layout |
+|--------|------|--------|
+| **Implied** | 1 B | `[7:5]=0`, `[4:0]=opcode` — TFR, HALT |
+| **Imm8** | 2 B | byte0: opcode; byte1: imm8 — LDA, STA, CMP, ADD, LDIO, STIO |
+| **Abs16** | 3 B | byte0: opcode; bytes1–2: addr LE — BEQ, JMP, CALL, STA16 |
+
+**Extended opcode group:** `0x10–0x1F` officially allocated.
+
+| Range | Use |
+|-------|-----|
+| `0x10–0x15` | TFR (normative) |
+| `0x16–0x1F` | Reserved |
+
+### 2.1 Core (`0x01–0x0F`)
 
 | Op | Mnemonic | Summary |
 |----|----------|---------|
-| `0x01` | ADD | Rdst ← R0 op R1 (phased) |
-| `0x02` | LDA | Load from mem |
-| `0x03` | STA | Store to mem |
+| `0x01` | ADD | R2 ← R0 + R1 (3-phase) |
+| `0x02` | LDA | Load from mem → R0 |
+| `0x03` | STA | Store R0 to mem |
 | `0x04` | BEQ | Branch if Z |
 | `0x05` | JMP | Jump |
-| `0x06` | CALL | Subroutine |
-| `0x07` | RET | Return |
-| `0x08` | LDIO | Load from `$FF00+` |
-| `0x09` | STIO | Store to MMIO |
+| `0x06` | CALL | Subroutine (TBD) |
+| `0x07` | RET | Return (TBD) |
+| `0x08` | LDIO | Load MMIO → R0 |
+| `0x09` | STIO | Store R0 to MMIO |
 | `0x0A` | HALT | Stop |
+| `0x0C` | — | **Reserved** (was MOV) |
+| `0x0D` | CMP | R0 − imm; flags only |
+| `0x0F` | STA16 | Store abs16 (boot) |
 
-Operand byte follows opcode (2-byte header) unless extended by micro-sequence.
+### 2.2 Implied transfer (`0x10–0x15`)
 
----
+| Op | Mnemonic | Action |
+|----|----------|--------|
+| `0x10` | TFR01 | R0 ← R1 |
+| `0x11` | TFR02 | R0 ← R2 |
+| `0x12` | TFR10 | R1 ← R0 |
+| `0x13` | TFR12 | R1 ← R2 |
+| `0x14` | TFR20 | R2 ← R0 |
+| `0x15` | TFR21 | R2 ← R1 |
 
-## 2. Ten-bit control word
+### 2.3 Phase counts (CPLD FSM)
 
-| Bit | Signal | Latch |
-|-----|--------|-------|
-| B9–B8 | `REG_SEL[1:0]` | **574 CW_H** → CPLD GPR |
-| B7–B4 | `ALU_OP[3:0]` | **574 CW_L** → ALU decode |
-| B3 | `REG_WE` | CW_L → CPLD |
-| B2 | `Y_OE` | CW_L → bus (direct) |
-| B1 | `MEM_RD` | CW_L → 245/Flash |
-| B0 | `MEM_WR` | CW_L → SRAM |
-
-Pack: `tools/pack_control_store.py` · Flash base **`$4000`** · **2 bytes/slot**.
-
----
-
-## 3. Micro-sequences and Reg_Sel (Flash)
-
-Each macro opcode runs **1–3 micro-phases**. Control-store index and Flash bytes:
-
-```
-store_index = ((opcode[3:0] << 2) | phase[1:0])
-Flash_lo    = $4000 + 2 * store_index
-Flash_hi    = $4000 + 2 * store_index + 1   -- REG_SEL[1:0] in bits 1:0
-```
-
-`REG_SEL[1:0]` per row comes from [`hw/micro/reg_sel.py`](../hw/micro/reg_sel.py) — packed into CW at build time, **not** CPLD PLA.
-
-When `REG_WE=1`, CPLD latches `d_in` into `w_sel` (= REG_SEL) on **CLK↑**. Async read `q_a`/`q_b` ~10 ns typ.
-
-Verify: `python tools/verify_control_store.py` · `hw/fixtures/control/cw.hex`.
-
-### Summary (packed in Flash)
-
-| Op | Phases | Store idx (ph0…) | CW lo (ph0…) | CW hi / REG_SEL | Status |
-|----|--------|------------------|--------------|-----------------|--------|
-| ADD `0x01` | 3 | 4, 5, 6 | `14`, `14`, `1C` | `00`, `01`, `02` | packed |
-| LDA `0x02` | 2 | 8, 9 | `02`, `08` | `00`, `00` | packed |
-| STA `0x03` | 2 | 12, 13 | `04`, `01` | `00`, `00` | packed |
-| BEQ `0x04` | 2 | 16, 17 | `20`, `00` | `00`, `00` | packed |
-| CMP `0x0D` | 3 | 52, 53, 54 | `B0`, `B0`, `00` | `00`, `01`, `00` | packed |
-| JMP `0x05` | 1 | 20 | `00` | `00` | packed |
-| CALL `0x06` | 1 | 24 | — | — | TBD |
-| RET `0x07` | 1 | 28 | — | — | TBD |
-| HALT `0x0A` | 1 | 40 | `00` | `00` | packed |
-| LDIO `0x08` | 2 | 32, 33 | `02`, `08` | `00`, `00` | packed |
-| STIO `0x09` | 2 | 36, 37 | `04`, `01` | `00`, `00` | packed |
-| MOV `0x0C` | 1 | 48 | `00` | `00` | packed |
-| STA16 `0x0F` | 2 | 60, 61 | `04`, `01` | `00`, `00` | packed |
-
-CW lo `00` + hi `00` means all control deasserted (ALU NOP). Unprogrammed slots read `00/00`; macro **phase count** (`plover_vm/macro/isa.py`) terminates the sequence.
+| Op | Phases | Template |
+|----|--------|----------|
+| ADD | 3 | ALU_REG |
+| LDA, LDIO | 2 | MEM_LD |
+| STA, STIO, STA16 | 2 | MEM_ST |
+| CMP | 3 | ALU_REG (flags_only) |
+| TFR `0x10–0x15` | 1 | XFER |
+| BEQ | 2 | BEQ |
+| JMP, HALT, CALL, RET | 1 | BRANCH |
 
 ---
 
-### ADD (`0x01`)
+## 3. FSM-only control (`cw_fsm_only`)
 
-| Ph | Idx | Flash lo/hi | CW lo | CW hi | Reg_Sel | ALU | REG_WE | Y_OE | MEM_RD | MEM_WR | Action |
-|----|-----|-------------|-------|-------|---------|-----|--------|------|--------|--------|--------|
-| 0 | 4 | `$4008` / `$4009` | `14` | `00` | 00 (R0) | ADD | 0 | 1 | 0 | 0 | Drive ALU A ← R0 |
-| 1 | 5 | `$400A` / `$400B` | `14` | `01` | 01 (R1) | ADD | 0 | 1 | 0 | 0 | Drive ALU B ← R1 |
-| 2 | 6 | `$400C` / `$400D` | `1C` | `02` | 10 (R2) | ADD | 1 | 1 | 0 | 0 | Latch ALU Y → Rdst |
+| Mechanism | Source |
+|-----------|--------|
+| `w_sel` | Internal FSM opcode/template table |
+| `PC_LOAD_EN` | Opcode + `FLG_Z` @ macro_end |
+| Operand address | **MBR** from fetch (no PARAM) |
+| ALU / bus strobes | FSM registered outputs per §4 |
 
----
-
-### LDA (`0x02`)
-
-| Ph | Idx | Flash | CW | Reg_Sel | ALU | REG_WE | Y_OE | MEM_RD | MEM_WR | Action |
-|----|-----|-------|-----|---------|-----|--------|------|--------|--------|--------|
-| 0 | 8 | `$4008` | `02` | 00 | NOP | 0 | 0 | 1 | 0 | `[operand]` → bus |
-| 1 | 9 | `$4009` | `08` | 00 | NOP | 1 | 0 | 0 | 0 | Bus → R0 |
+Verify: `python tools/verify_control_store.py --v1.0`
 
 ---
 
-### STA (`0x03`)
+## 4. Per-phase control strobes
 
-| Ph | Idx | Flash | CW | Reg_Sel | ALU | REG_WE | Y_OE | MEM_RD | MEM_WR | Action |
-|----|-----|-------|-----|---------|-----|--------|------|--------|--------|--------|
-| 0 | 12 | `$400C` | `04` | 00 | NOP | 0 | 1 | 0 | 0 | R0 → bus (via ALU Y) |
-| 1 | 13 | `$400D` | `01` | 00 | NOP | 0 | 0 | 0 | 1 | Write bus to `[operand]` |
+See [cpld-system-controller.md](cpld-system-controller.md) §7 for full tables.
 
----
+Summary:
 
-### BEQ (`0x04`)
-
-Compare via ALU SUB; branch decision uses latched **Z** from phase 0 (macro engine).  
-**Y_OE=0** on compare phase — flags only; ALU Y must not drive the data bus.
-
-| Ph | Idx | Flash | CW | Reg_Sel | ALU | REG_WE | Y_OE | MEM_RD | MEM_WR | Action |
-|----|-----|-------|-----|---------|-----|--------|------|--------|--------|--------|
-| 0 | 16 | `$4010` | `20` | 00 | SUB | 0 | **0** | 0 | 0 | R0 − imm; update Z/C (no bus drive) |
-| 1 | 17 | `$4011` | `00` | 00 | NOP | 0 | 0 | 0 | 0 | Macro: PC ← target if Z |
+| Template | Key strobes |
+|----------|-------------|
+| ALU_REG | ph0–1: Y_OE; ph2: REG_WE, w_sel=R2, FLG_WE |
+| MEM_LD | ph0: MEM_RD; ph1: REG_WE, w_sel=R0 |
+| MEM_ST | ph0: Y_OE; ph1: MEM_WR |
+| XFER | ph0: REG_WE, w_sel=dst |
+| BEQ | ph0: ALU SUB; end: PC_LOAD_EN<=FLG_Z |
+| JMP | end: PC_LOAD_EN<=1 |
 
 ---
 
-### CMP (`0x0D`)
+## 5. Internal `w_sel` (not exported)
 
-R0 − imm; **flags only** (discard Y). Uses **`CW_CMP_EXEC`** = `0xB0` (`ALU_OP=CMP`, `Y_OE=0`, `REG_WE=0`).
+| Template | Phase | `w_sel` |
+|----------|-------|---------|
+| ALU_REG | ph2 | R2 |
+| MEM_LD | ph1 | R0 |
+| XFER | ph0 | opcode→dst |
+| ADD imm | ph0/1 | R1 (optional) |
 
-| Ph | Idx | Flash | CW | Reg_Sel | ALU | REG_WE | Y_OE | MEM_RD | MEM_WR | Action |
-|----|-----|-------|-----|---------|-----|--------|------|--------|--------|--------|
-| 0 | 52 | `$4034` | `B0` | 00 (R0) | CMP | 0 | **0** | 0 | 0 | A ← R0 |
-| 1 | 53 | `$4035` | `B0` | 01 (imm) | CMP | 0 | **0** | 0 | 0 | B ← imm; SUB flags settle |
-| 2 | 54 | `$4036` | `00` | — | NOP | 0 | 0 | 0 | 0 | — |
+### XFER opcode → (src, dst)
 
-hwsim bus gate: [`cmp_y_oe_bus`](../hw/tests/cmp_y_oe_bus.yaml) — `Y_OE=1` drives `net_d*`; `Y_OE=0` → tri-state.
-
----
-
-### JMP (`0x05`)
-
-| Ph | Idx | Flash | CW | Reg_Sel | ALU | REG_WE | Y_OE | MEM_RD | MEM_WR | Action |
-|----|-----|-------|-----|---------|-----|--------|------|--------|--------|--------|
-| 0 | 20 | `$4014` | `00` | 00 | NOP | 0 | 0 | 0 | 0 | Macro: PC ← `[operand]` |
-
----
-
-### HALT (`0x0A`)
-
-| Ph | Idx | Flash | CW | Reg_Sel | ALU | REG_WE | Y_OE | MEM_RD | MEM_WR | Action |
-|----|-----|-------|-----|---------|-----|--------|------|--------|--------|--------|
-| 0 | 40 | `$4028` | `00` | 00 | NOP | 0 | 0 | 0 | 0 | Macro: stop fetch/decode |
+| Opcode | src | dst |
+|--------|-----|-----|
+| TFR01 `0x10` | R1 | R0 |
+| TFR02 `0x11` | R2 | R0 |
+| TFR10 `0x12` | R0 | R1 |
+| TFR12 `0x13` | R2 | R1 |
+| TFR20 `0x14` | R0 | R2 |
+| TFR21 `0x15` | R1 | R2 |
 
 ---
 
-### CALL (`0x06`) — planned, not packed
+## 6. Branch macros
 
-| Ph | Reg_Sel | REG_WE | MEM_RD | MEM_WR | Action (draft) |
-|----|---------|--------|--------|--------|----------------|
-| 0 | 00 | 0 | 0 | 0 | Push return PC; PC ← `[operand]` (macro + stack TBD) |
+| Op | `PC_LOAD_EN` @ macro_end |
+|----|--------------------------|
+| BEQ | `FLG_Z` |
+| JMP | unconditional |
+| CALL/RET/HALT | TBD |
 
-*No rows in `cw.hex` yet. Target phase count: 1 (stub) until stack micro-sequence is defined.*
-
----
-
-### RET (`0x07`) — planned, not packed
-
-| Ph | Reg_Sel | REG_WE | MEM_RD | MEM_WR | Action (draft) |
-|----|---------|--------|--------|--------|----------------|
-| 0 | 00 | 0 | 0 | 0 | PC ← popped return address (macro + stack TBD) |
-
-*No rows in `cw.hex` yet.*
+Operand (abs16) latched in MBR during fetch — see [M3b-fetch-execute.md](../hw-bringup/M3b-fetch-execute.md).
 
 ---
 
-### LDIO (`0x08`) — packed
+## 7. ALU controls
 
-Same CW pattern as LDA; effective address `0xFF00 | (imm8 & 0xFF)` (CPLD `MAILBOX_EN`).
+CPLD drives `cin`, `b_sel`, `b_const_sel`, `lgc3:0`, `y_mux_sel` — no `alu8_decode`.
 
-| Ph | Reg_Sel | ALU | REG_WE | Y_OE | MEM_RD | MEM_WR | Action (draft) |
-|----|---------|-----|--------|------|--------|--------|----------------|
-| 0 | 00 | NOP | 0 | 0 | 1 | 0 | MMIO read → bus |
-| 1 | 00 | NOP | 1 | 0 | 0 | 0 | Bus → R0 |
-
-Packed: ph0 `02`, ph1 `08` (same as LDA).
+**2 MHz budget:** worst-case **136 ns** ([alu-opcodes-timing.md](alu-opcodes-timing.md)).
 
 ---
 
-### STIO (`0x09`) — packed
+## 8. `/NMI`
 
-Same CW pattern as STA; MMIO write via CPLD decode.
-
-| Ph | Reg_Sel | ALU | REG_WE | Y_OE | MEM_RD | MEM_WR | Action (draft) |
-|----|---------|-----|--------|------|--------|--------|----------------|
-| 0 | 00 | NOP | 0 | 1 | 0 | 0 | R0 → bus |
-| 1 | 00 | NOP | 0 | 0 | 0 | 1 | Write bus to MMIO `[operand]` |
-
-Packed: ph0 `04`, ph1 `01` (same as STA).
+Inactive (pull-up). No MMU/IRQ.
 
 ---
 
-### MOV (`0x0C`) — packed
+## Appendix A — 16-bit CW (`cw16_direct`, P1 bench only)
 
-| Ph | Idx | Flash | CW | Action |
-|----|-----|-------|-----|--------|
-| 0 | 48 | `$4030` | `00` | Macro: `R[dst] ← R[src]` (`imm = (dst<<4)|src`) |
-
----
-
-### STA16 (`0x0F`) — packed (boot)
-
-| Ph | Idx | Flash | CW | Reg_Sel | ALU | REG_WE | Y_OE | MEM_RD | MEM_WR | Action |
-|----|-----|-------|-----|---------|-----|--------|------|--------|--------|--------|
-| 0 | 60 | `$403C` | `04` | 00 | NOP | 0 | 1 | 0 | 0 | R0 → bus |
-| 1 | 61 | `$403D` | `01` | 00 | NOP | 0 | 0 | 0 | 1 | Write bus to **abs16** operand |
-
-3-byte insn: `op, addr_lo, addr_hi`. Used by Boot ROM block-copy ([boot-jmp-handoff.md](../boot/boot-jmp-handoff.md)).
-
----
-
-## 4. ALU opcode map (CW B7–B4)
-
-Maps to [alu8](hw/netlist/blocks/alu8.md) `alu_sel`:
-
-| ALU_OP | Operation |
-|--------|-----------|
-| 0 | NOP |
-| 1 | ADD |
-| 2 | SUB |
-| … | See alu-opcodes-timing.md |
-
-**CMP:** Y follows SUB datapath; **Z** = (`Y==0`), **C_GE** = `net_c_hi` (`net_cmp_z`, `net_cmp_c_ge`) — see [alu8.md](../hw/netlist/blocks/alu8.md).
-
-**2 MHz Execute comb budget:** worst-case ALU Y **151 ns** (SUB/CMP/DEC); ADD/INC **108 ns** @ max ([alu-opcodes-timing.md](alu-opcodes-timing.md) v1.3). ADD micro-sequence ph0–2 must complete operand→Y within **250 ns** half-period before GPR latch (CPLD or 574).
+P1 `DECODE_BYPASS` — not normative SoC path.
 
 ---
 
@@ -233,7 +184,6 @@ Maps to [alu8](hw/netlist/blocks/alu8.md) `alu_sel`:
 
 | Date | Note |
 |------|------|
-| 2026-06-02 | BEQ ph0 `Y_OE=0` (`20`); CMP `0x0D` packed (`B0`×2); `cmp_y_oe_bus` hwsim |
-| 2026-06-01 | 8b CW; external 574 GPR (archived v0.1) |
-| 2026-06-10 | v0.2 — CPLD internal GPR write via `w_sel` |
-| 2026-06-01 | §3 full packed table (ADD–HALT); CALL/RET/LDIO/STIO draft |
+| 2026-06-24 | idx5 FSM decode; ISA `[4:0]`; per-phase strobes; operand datapath |
+| 2026-06-24 | FSM-only; TFR `0x10–0x15`; `0x0C` reserved |
+| 2026-06-10 | v1.0 archived |

@@ -2,7 +2,7 @@
 
 **Normative:** [docs/hardware/system-architecture.md](docs/hardware/system-architecture.md) v1.0  
 **실구매 패키지:** [docs/project/parts-on-hand.md](docs/project/parts-on-hand.md)  
-**1세트 부품 명세** · 5 V · 74HC DIP 빵판 · **CPLD GPR ~40 MC + 138×2 + 10b CW**  
+**1세트 부품 명세** · 5 V · 74HC DIP 빵판 · **CPLD FSM idx5 ~38 MC + 138×2** (Flash `$4000` CW 미사용)  
 PCB 3.3 V 대응 목록: [BOM-3v3.md](BOM-3v3.md) (**중복 주문 금지**)  
 이력 · 검산 · 발주 기록: [docs/project/bom-maintenance.md](docs/project/bom-maintenance.md)
 
@@ -18,16 +18,16 @@ PCB 3.3 V 대응 목록: [BOM-3v3.md](BOM-3v3.md) (**중복 주문 금지**)
 | ALU | 5 | 74HC153 | Dual 4-to-1 line data selector/multiplexer | 8 | B 피연산자 경로 선택 + 논리 연산 결과 선택 | |
 | ALU | 6 | 74HC157 | Quad 2-line to 1-line data selector/multiplexer | 2 | 산술 결과와 논리 결과 중 ALU 출력 선택 | |
 | ALU | 7 | 74HC04 | Hex inverter | 2 | B 피연산자 부호·논리 반전 | |
-| CPU · 주소 | 11 | 74HC574 | Octal D-type flip-flop, 3-state | **5** | PC/MBR/**CW_L/CW_H**/FLG | 10b CW = +1 vs 8b |
+| CPU · 주소 | 11 | 74HC574 | Octal D-type flip-flop, 3-state | **3** | PC/MBR/FLG | FSM-only — no CW latch |
 | CPU · 주소 | 11a | 74HC138N | 3-to-8 line decoder | **2** | CE half-select + coarse map (**×1 보유, +1 주문**) | |
 | CPU · 주소 | 11b | 74HC08 / 74HC32 | AND / OR | 2 each | CE glue + mailbox/MAP + BEQ | |
 | CPU · 주소 | 12 | 74HC161 | 4-bit synchronous binary counter | 3 | PC 하위·명령 실행 단계(phase) 카운트 | |
 | CPU · 주소 | 13 | 74HC157 | Quad 2-line to 1-line data selector/multiplexer | 2 | 주소 버스 하위 8비트 선택 | #6과 합산 4 |
-| CPLD · 스위치 | 14 | ATF1504AS-10JU44 | CPLD, 64 MC — **GPR only ~40 MC** | 1 | R0–R3 FF; Reg_Sel from CW | PLCC-44 |
+| CPLD · 스위치 | 14 | ATF1504AS-10JU44 | CPLD, 64 MC — **FSM + GPR ~38 MC** | 1 | R0–R3 FF; phase FSM; opcode table | PLCC-44 |
 | CPLD · 스위치 | 15 | *(PLCC-44→DIP)* | PLCC-44 → 2.54 mm DIP 어댑터 | 1 | #14 CPLD 빵판 장착 | |
 | CPLD · 스위치 | 16 | *(1C2P slide or DIP-1)* | Single-pole 2-position switch | 1 | Boot/Run MAP_MODE | |
 | 버스 · 메모리 | 17 | 74HC245 | Octal bus transceiver | 1 | SRAM 데이터 버스 ↔ CPU 버스 레지스터 | |
-| 버스 · 메모리 | 18 | SST39SF010A-70-4C-PHE | 128K×8 parallel NOR Flash | 1 | 부트·10b CW·유틸리티 | PDIP-32 직결 |
+| 버스 · 메모리 | 18 | SST39SF010A-70-4C-PHE | 128K×8 parallel NOR Flash | 1 | 부트·유틸리티 (`$4000` CW 미사용) | PDIP-32 직결 |
 | 버스 · 메모리 | 19 | IS62C256AL-45ULI-TR | 32K×8 static RAM | 2 | 실행 RAM 64 KB | |
 | 클록 | 20 | *(4 MHz half-can osc)* | Crystal oscillator, 4.000 MHz, HC-49 half | 1 | 마스터 클록 | |
 | 클록 | 21 | 74HC74 | Dual D-type flip-flop | 1 | 4 MHz → 2 MHz 분주 | |

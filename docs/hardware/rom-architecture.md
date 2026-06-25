@@ -10,7 +10,7 @@ ROM is the **code of law** for the system: deterministic rules for boot, datapat
 
 | Segment | Purpose | CPU visibility |
 |---------|---------|----------------|
-| **Control** | `{opcode, phase}` → **10-bit CW** | Execute phase only (separate Flash addr mux) |
+| **Control** | **CPLD FSM** (idx5) — no Flash CW @ `$4000` | Execute phases in ATF1504 |
 | **Boot** | POST, bootloader, reset vector | Mode A: `$0000–$07FF`, `$FFFC` |
 | **Utility** | Fonts, LUTs, fixed routines | ROM in Mode A; shadowed to RAM `$0800+` |
 
@@ -32,24 +32,27 @@ ROM is the **code of law** for the system: deterministic rules for boot, datapat
 |--------------|---------|------------------|
 | `$0000–$07FF` | Boot + bootloader | `$0000–$07FF` ROM |
 | `$0800–$3FFF` | Utility (fonts, tables) | Copy source |
-| `$4000–$4FFF` | **10b microcode store** (2048×2 B) | Exec addr `{opcode,phase}` |
+| `$4000–$4FFF` | **Reserved** (no CW burn; FSM-only) | Not used in normative v1.0 |
 | `$FFFC–$FFFF` | Reset vector image | `$FFFC` enclave |
 
-Microcode base **`$4000`** and slot count **2048** match `tools/pack_control_store.py` (`CW_FLASH_BASE`, `STORE_SLOTS`).
+Normative v1.0: Flash **`$4000–$4FFF` is unused** — control is entirely in the CPLD FSM ([microcode-spec.md](microcode-spec.md)). The superseded 10b CW layout is documented in [prototype-flash-cw](../archive/prototype-flash-cw/README.md).
 
 ---
 
-## 3. Control segment
+## 3. Control (CPLD FSM — normative v1.0)
 
-**Addressing (v1.0 packer):**
+Micro-phase strobes come from the **ATF1504 phase FSM** keyed by `(opcode[4:0]<<2)|phase` — see [cpld-system-controller.md](cpld-system-controller.md).
+
+Verify opcode table: `python tools/verify_control_store.py --v1.0`
+
+### Archived Flash CW (prototype-flash-cw only)
 
 ```
-store_index = ((opcode[3:0] << 2) | phase[1:0])   // 6 bits → 0..63 active ISA
+store_index = ((opcode[3:0] << 2) | phase[1:0])   // idx4, 64 slots
 Flash_lo    = $4000 + 2 * store_index
-Flash_hi    = $4000 + 2 * store_index + 1        // REG_SEL[1:0] in bits 1:0
 ```
 
-| Property | Value |
+| Property | Value (prototype-flash-cw) |
 |----------|-------|
 | Logical index width | 6 bits (`opcode[3:0]` × `phase[1:0]`) |
 | Active slots (macro ISA) | 16 opcode nibbles × 4 phases = **64** indices (0–63) |
@@ -62,7 +65,7 @@ The 4096-byte region is a **sparse physical container**: the macro ISA (`0x01–
 - Latch: **574 CW_L** + **574 CW_H** at execute edge.
 - Not fetched via PC; **execute-phase** address mux drives Flash.
 
-Pack / verify: `python tools/pack_control_store.py` · `python tools/verify_control_store.py`
+Pack / verify (archive): `python tools/pack_control_store.py --build-fixtures` · `python tools/verify_control_store.py --archive-flash-cw`
 
 ---
 
