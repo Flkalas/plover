@@ -2,7 +2,7 @@
 
 **Related:** [bootloader.md](bootloader.md) · [memory-map.md](../hardware/memory-map.md) · [software-memory-layout.md](../software/software-memory-layout.md)
 
-Software-only boot handoff: Boot ROM loads the kernel into RAM and **`JMP`s to `$0800`** without operator DIP/RESET or CPLD changes. This is **방식 1** from the modern-boot comparison notes in [archive/gemini/Plover-부팅과-현대-시스템-비교.md](archive/gemini/Plover-부팅과-현대-시스템-비교.md).
+Software-only boot handoff: Boot ROM loads the kernel into RAM and **`JMP`s to `$0800`** without operator DIP/RESET or CPLD changes. This is **방식 1** from the modern-boot comparison notes in [archive/gemini/Plover-부팅과-현대-시스템-비교.md](../archive/gemini/Plover-부팅과-현대-시스템-비교.md).
 
 ---
 

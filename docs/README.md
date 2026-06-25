@@ -15,11 +15,12 @@ Hardware prose uses **v1.0**; software and copro API scope stays **software v0.1
 
 ## Tiers
 
-| Tier | Audience | Start here |
-|------|----------|------------|
-| **Normative** | Learners, bring-up | [hardware/system-architecture.md](hardware/system-architecture.md) · [plover-whitepaper.md](project/plover-whitepaper.md) |
-| **Research** | Design history | [hardware/research/README.md](hardware/research/README.md) |
-| **Developer** | Sim, VM, CI | [simulation/hw-sim.md](simulation/hw-sim.md) · `pytest` |
+| Tier | Audience | Start here | Link policy |
+|------|----------|------------|-------------|
+| **Normative** | Learners, bring-up | [hardware/system-architecture.md](hardware/system-architecture.md) · [plover-whitepaper.md](project/plover-whitepaper.md) | v1.0 facts only — no backlinks to search reports |
+| **Research** | Design history | [hardware/research/README.md](hardware/research/README.md) | May cite normative specs; update here for exploration |
+| **Archive** | Superseded drafts | [archive/README.md](archive/README.md) | Read-only reference |
+| **Developer** | Sim, VM, CI | [simulation/hw-sim.md](simulation/hw-sim.md) · `pytest` | |
 
 ## Quick start (developers)
 
@@ -47,7 +48,10 @@ Hardware prose uses **v1.0**; software and copro API scope stays **software v0.1
 |----------|-------------|
 | [hardware/research/README.md](hardware/research/README.md) | Research index |
 | [hardware/research/design-rationale-v1.0.md](hardware/research/design-rationale-v1.0.md) | Why v1.0 |
-| [hardware/cpu-4axis-arch-search-report.md](hardware/cpu-4axis-arch-search-report.md) | 4-axis search record |
+| [hardware/research/cpu-4axis-arch-search-report.md](hardware/research/cpu-4axis-arch-search-report.md) | 4-axis search record |
+| [hardware/research/hardware-architecture-synthesis.md](hardware/research/hardware-architecture-synthesis.md) | Purchases, parasitics |
+| [hardware/research/classic-memory-model-comparison.md](hardware/research/classic-memory-model-comparison.md) | Memory model comparison |
+| [hardware/research/cpld-ctrl-extract/](hardware/research/cpld-ctrl-extract/README.md) | CPLD control extract + viewers |
 
 ## Bring-up (M1–M5)
 

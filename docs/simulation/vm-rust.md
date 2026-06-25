@@ -1,6 +1,6 @@
 # Plover VM Rust runtime (v0.1)
 
-**Source:** [archive/gemini/rust_vm_migration_and_virtualization.md](archive/gemini/rust_vm_migration_and_virtualization.md)  
+**Source:** [archive/gemini/rust_vm_migration_and_virtualization.md](../archive/gemini/rust_vm_migration_and_virtualization.md)  
 **Related:** [system-architecture.md](../hardware/system-architecture.md), [mailbox-protocol.md](mailbox-protocol.md), [display-console.md](display-console.md)
 
 Normative **Rust** implementation of the logic VM (`plover_vm`), replacing Python for integrated Presenter + multi-threaded audio. Python `plover_vm/` remains during transition as parity oracle.

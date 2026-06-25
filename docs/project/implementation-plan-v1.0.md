@@ -11,7 +11,7 @@ Single active milestone document. Supersedes archived [v0.2 / v1.x plans](../arc
 
 Deliver a **v1.0 breadboard-prototype 8-bit CPU** with:
 
-- CPLD GPR + 138×2 + 10b CW (see [system-architecture.md](../hardware/system-architecture.md); legacy 574 path in [archive/pre-v0.1/](archive/pre-v0.1/README.md))
+- CPLD GPR + 138×2 + 10b CW (see [system-architecture.md](../hardware/system-architecture.md); legacy 574 path in [archive/pre-v0.1/](../archive/pre-v0.1/README.md))
 - Single SST39SF010A (boot + 10b CW + utility)
 - 2× IS62C256 (64 KB via A15)
 - MMIO Mailbox @ `$FF00` (polling, no IRQ)
