@@ -6,9 +6,12 @@ import argparse
 import sys
 from pathlib import Path
 
+from simulators.cyclesim.export.alu8_netlist import export_alu8_func
 from simulators.cyclesim.program import ProgramRunner
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_BUILD = REPO_ROOT / "build" / "cyclesim"
 
 
 def cmd_run(args: argparse.Namespace) -> int:
@@ -35,6 +38,18 @@ def cmd_test(_: argparse.Namespace) -> int:
     return pytest.main([str(tests), "-q"])
 
 
+def cmd_export_alu8(args: argparse.Namespace) -> int:
+    out = Path(args.output) if args.output else DEFAULT_BUILD / "alu8_func.yaml"
+    units = Path(args.units) if args.units else DEFAULT_BUILD / "alu8_func.units.yaml"
+    if args.no_units:
+        units = None
+    nl, up = export_alu8_func(out, units)
+    print(f"wrote {nl}")
+    if up:
+        print(f"wrote {up}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="simulators.cyclesim")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -49,6 +64,14 @@ def main(argv: list[str] | None = None) -> int:
 
     test_p = sub.add_parser("test", help="Run pytest suite")
     test_p.set_defaults(func=cmd_test)
+
+    exp_p = sub.add_parser("export", help="Export netlists")
+    exp_sub = exp_p.add_subparsers(dest="export_target", required=True)
+    alu_p = exp_sub.add_parser("alu8", help="Export alu8 functional-block netlist")
+    alu_p.add_argument("-o", "--output", help="Netlist YAML path")
+    alu_p.add_argument("--units", help="Units catalog YAML path")
+    alu_p.add_argument("--no-units", action="store_true", help="Skip units file")
+    alu_p.set_defaults(func=cmd_export_alu8)
 
     args = parser.parse_args(argv)
     return int(args.func(args))
