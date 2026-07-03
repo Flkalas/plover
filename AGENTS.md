@@ -42,3 +42,22 @@ For work **outside** an active plan, only commit when the user asks or the sessi
 If the user asked for commits in the **same thread or plan**, treat that as permission for those commits. If scope is mixed, **split commits** rather than skipping.
 
 When implementing a **Cursor plan**, commit in-session per **Plan execution (auto-commit)** above — do not defer to a later turn or wait for an extra commit message from the user.
+
+---
+
+## Document tiers (normative truth)
+
+When answering **hardware architecture**, **bring-up**, or **decode/CPLD/ALU** questions:
+
+| Tier | Path | Use |
+|------|------|-----|
+| **Normative** | `docs/normative/**` | **Single source of truth** — cite and edit here |
+| **Developer** | `docs/developer/**` | Sim, CI, generators (not for external learners) |
+| **Research** | `docs/hardware/research/**` | Exploration only — **do not** treat as current spec |
+| **Archive** | `docs/archive/**` | Superseded — **do not** cite unless user asks for history |
+
+**Anchor docs:** [control-and-decode.md](docs/normative/hardware/control-and-decode.md), [system-architecture.md](docs/normative/hardware/system-architecture.md).
+
+**Do not** implement bring-up or normative edits based on archive/research content unless the user explicitly requests historical comparison.
+
+**Stale normative terms** (after 2026-07 ALU refactor): `inc_en`, `INC_B_SEL`, `INC_2C2`, `14 IC` for ALU BOM, `b_sel`/`b_const_sel` as SoC signal names (use `net_bctrl0..3`).

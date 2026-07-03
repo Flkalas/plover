@@ -26,6 +26,13 @@ FORBIDDEN = [
     (re.compile(r"hardware/research/", re.I), "hardware/research/"),
     (re.compile(r"\.\./hardware/research/", re.I), "../hardware/research/"),
     (re.compile(r"\(research/", re.I), "(research/"),
+    (re.compile(r"\binc_en\b", re.I), "inc_en"),
+    (re.compile(r"\bINC_B_SEL\b"), "INC_B_SEL"),
+    (re.compile(r"\bINC_2C2\b"), "INC_2C2"),
+    (re.compile(r"\bnet_inc_en\b", re.I), "net_inc_en"),
+    (re.compile(r"\b14\s+IC\b"), "14 IC"),
+    (re.compile(r"\bnet_b_sel\b", re.I), "net_b_sel"),
+    (re.compile(r"\bb_const_sel\b", re.I), "b_const_sel"),
 ]
 
 

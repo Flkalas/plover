@@ -10,12 +10,14 @@ This tree contains **v1.0 confirmed facts** only — hardware specs, bring-up, s
 |----------|-------------|
 | [project/plover-whitepaper.md](project/plover-whitepaper.md) | Project overview |
 | [hardware/system-architecture.md](hardware/system-architecture.md) | **Single source of truth** (v1.0) |
+| [hardware/control-and-decode.md](hardware/control-and-decode.md) | **CPLD vs Flash vs ALU decode roles** |
 | [hw-bringup/README.md](hw-bringup/README.md) | M1–M5 breadboard bring-up |
 
 ## Hardware (v1.0)
 
 | Document | Description |
 |----------|-------------|
+| [hardware/control-and-decode.md](hardware/control-and-decode.md) | CPLD / Flash / M1 decode split |
 | [hardware/microcode-spec.md](hardware/microcode-spec.md) | FSM-only ISA, idx5 |
 | [hardware/cpld-system-controller.md](hardware/cpld-system-controller.md) | ATF1504 GPR + idx5 FSM |
 | [hardware/memory-map.md](hardware/memory-map.md) | Address map |
