@@ -27,7 +27,7 @@ ALU_153_SLICE:
 
 ALU_CMP_SUB:
   t_pd: {typ_ns: 95, max_ns: 151}
-  source: "CMP flags from SUB Y and net_c_hi (same order as SUB critical path)"
+  source: "CMP flags behavioral upper bound; pin-chain SUB Y = 136 ns (alu-opcodes-timing §3.1)"
 
 ALU_Y_MUX_SEL:
   t_pd: {typ_ns: 2, max_ns: 5}

@@ -18,6 +18,9 @@ Reg_Sel: [`hw/micro/reg_sel.py`](../hw/micro/reg_sel.py). Parity: `pytest tests/
 | **cyclesim** | **micro phase** | **YAML netlist chips (zero-delay comb)** |
 | hwsim | nanoseconds | Same netlist + datasheet delays |
 
+**v1.0 SoC path:** [`datapath_p1.yaml`](../../hw/netlist/blocks/datapath_p1.yaml) — CPLD FSM drives `net_bctrl*`/`cin` (no `alu8_decode`).  
+**M1 / isolated decode tests:** [`alu8_decode.yaml`](../../hw/netlist/blocks/alu8_decode.yaml).
+
 One **tick** = one micro phase: apply CW / stimulus → combinational fixpoint → optional **574 CP ↑** when `REG_WE` and `LOAD_R*`.
 
 ## Commands

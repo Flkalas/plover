@@ -99,8 +99,11 @@ DECODE_DIP: dict[DecodeSplit, int] = {
     DecodeSplit.DEC_CPLD_SEQ: 0,
 }
 
-# Critical-path SUB delay @ 74HC max (ns) — alu-opcodes-timing / alu_b3_sub_critical
-DELAY_SUB_WITH_DECODE = 151
+# Critical-path delays @ 74HC max (ns) — alu-opcodes-timing / hwsim
+DELAY_SUB_DATAPATH = 136  # pin-chain SUB/CMP Y
+DELAY_ALU_INC = 153  # worst-case Y (cin ripple)
+DELAY_ALU_CMP_SUB_MODEL = 151  # behavioral upper bound (flags block)
+DELAY_SUB_WITH_DECODE = DELAY_SUB_DATAPATH  # v1.0 FSM: no alu8_decode on path
 DELAY_DECODE_SAVED = 15  # control nets bypass alu_decode
 DELAY_CPLD_SEQ_PENALTY = 5  # registered CPLD ctrl vs comb CW
 

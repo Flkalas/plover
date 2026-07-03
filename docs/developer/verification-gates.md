@@ -20,6 +20,8 @@ python -m hwsim run hw/tests/cpu_cw_direct_add.yaml
 
 Artifacts: `build/hwsim/<test>/`
 
+Regenerate normative ALU timing table §3.1: `python tools/gen_alu_opcodes_timing_doc.py` (after `alu8_opcode_timing`).
+
 See [simulation/hw-sim.md](simulation/hw-sim.md).
 
 ## Software — pytest
