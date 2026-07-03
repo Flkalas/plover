@@ -24,7 +24,7 @@
 
 | 포함 | 제외 |
 |------|------|
-| ALU8 (Phase B2, 14 DIP) | CPLD GPR (M2) |
+| ALU8 (Phase B2, 12 DIP) | CPLD GPR (M2) |
 | 574 ACC 1개 (B3b/c) | ROM, microcode |
 | 2 MHz `net_clk2` | 부트, Mailbox |
 

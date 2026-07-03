@@ -15,9 +15,8 @@ PCB 3.3 V 대응 목록: [BOM-3v3.md](BOM-3v3.md) (**중복 주문 금지**)
 | 인프라 · 배선 | 3a | *(SOP28/SSOP28 dual)* | SOP28↔DIP adapter | 2 | **#19 SRAM** SOP → 빵판 DIP | |
 | 인프라 · 배선 | 3c | *(SOIC-24→DIP)* | SOIC-24↔DIP adapter | 3 | **#24 LVC245** SOIC → 빵판 DIP | |
 | ALU | 4 | 74HC283N | 4-bit binary full adder | 2 | 8비트 덧셈·뺄셈·증감 연산 | |
-| ALU | 5 | 74HC153 | Dual 4-to-1 line data selector/multiplexer | 8 | B 피연산자 경로 선택 + 논리 연산 결과 선택 | |
+| ALU | 5 | 74HC153 | Dual 4-to-1 line data selector/multiplexer | 8 | 비트슬라이스 Gigatron (mux1 논리 + mux2 B경로) | |
 | ALU | 6 | 74HC157 | Quad 2-line to 1-line data selector/multiplexer | 2 | 산술 결과와 논리 결과 중 ALU 출력 선택 | |
-| ALU | 7 | 74HC04 | Hex inverter | 2 | B 피연산자 부호·논리 반전 | |
 | CPU · 주소 | 11 | 74HC574 | Octal D-type flip-flop, 3-state | **3** | PC/MBR/FLG | FSM-only — no CW latch |
 | CPU · 주소 | 11a | 74HC138N | 3-to-8 line decoder | **2** | CE half-select + coarse map (**×1 보유, +1 주문**) | |
 | CPU · 주소 | 11b | 74HC08 / 74HC32 | AND / OR | 2 each | CE glue + mailbox/MAP + BEQ | |
@@ -31,7 +30,7 @@ PCB 3.3 V 대응 목록: [BOM-3v3.md](BOM-3v3.md) (**중복 주문 금지**)
 | 버스 · 메모리 | 19 | IS62C256AL-45ULI-TR | 32K×8 static RAM | 2 | 실행 RAM 64 KB | |
 | 클록 | 20 | *(4 MHz half-can osc)* | Crystal oscillator, 4.000 MHz, HC-49 half | 1 | 마스터 클록 | |
 | 클록 | 21 | 74HC74 | Dual D-type flip-flop | 1 | 4 MHz → 2 MHz 분주 | |
-| 클록 | 22 | 74HC04 | Hex inverter | 1 | 클록 버퍼·극성 반전 | #7과 합산 **3** |
+| 클록 | 22 | 74HC04 | Hex inverter | 1 | 클록 버퍼·극성 반전 | |
 | 클록 | 23 | 74HC14 | Hex Schmitt-trigger inverter | 2 | 클록 배포·완만한 입력 정형 | |
 | 레벨 시프트 | 24 | SN74LVC8T245DWR | 8-bit dual-supply bus transceiver, SOIC-24 | 3 | 5 V ↔ 3.3 V | #3c |
 | 전원 · 프로그래밍 | 25 | PWR080015 | Breadboard power supply module, 5 V / 3.3 V | 1 | 빵판 전원 | |

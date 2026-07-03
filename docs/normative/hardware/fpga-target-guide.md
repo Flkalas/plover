@@ -194,7 +194,7 @@ Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있
 
 ### 6.2 ALU 타이밍
 
-조합 ALU worst **151 ns @ max** (SUB Y; B1 arith path, [alu-opcodes-timing.md](alu-opcodes-timing.md)) — **2 MHz** (250 ns 반주기) **충분** (slack ~99 ns). Logic opcodes **46 ns** (B2 `153_L`). CMP flags via **comparator** (~65 ns). **50 MHz** (20 ns)에서는 **행위적 단일 사이클 ALU** 가 일반적.
+조합 ALU worst **151 ns @ max** (SUB Y; arith path, [alu-opcodes-timing.md](alu-opcodes-timing.md)) — **2 MHz** (250 ns 반주기) **충분** (slack ~99 ns). Logic opcodes **46 ns** (153 mux1). CMP flags via **comparator** (~65 ns). **50 MHz** (20 ns)에서는 **행위적 단일 사이클 ALU** 가 일반적.
 
 ---
 

@@ -15,7 +15,7 @@ flowchart LR
   I1["138 coarse A15"]
   I2["138 fine A14-A12"]
   G["08/32/04 glue"]
-  ALU["alu8 14 DIP"]
+  ALU["alu8 12 DIP"]
   IR["IR OPC4:0"] --> CPLD
   ROM --> IR
   CPLD --> ALU

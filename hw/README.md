@@ -13,7 +13,7 @@ Electrical netlist, timing, and block tests for breadboard bring-up.
 | [viewer/schematic.html](viewer/schematic.html) | DIP schematic SVG viewer (zoom) |
 | [kicad/](kicad/plover/) | KiCad schematics (see [docs/normative/hardware/hw-schematic.md](../docs/normative/hardware/hw-schematic.md)) |
 
-See [netlist/blocks/alu8.md](netlist/blocks/alu8.md) for **Phase B2** ALU (14 IC: `153_B`, `153_L`, `157_YBP`; CMP via SUB; SUB **151 ns**, logic **46 ns** @ max).  
+See [netlist/blocks/alu8.md](netlist/blocks/alu8.md) for **Phase B2** ALU (14 IC: `U_ALU_153_0..7`, `157_YBP`; CMP via SUB; SUB **151 ns**, logic **46 ns** @ max).  
 Breadboard phases: [docs/normative/hw-bringup/M1-b3-procedure.md](../docs/normative/hw-bringup/M1-b3-procedure.md) · [docs/normative/hw-bringup/b3-opcode.md](../docs/normative/hw-bringup/b3-opcode.md).
 
 Boot ROM: **`boot_rom.hex`** = JMP product path; **`boot_rom_manual.hex`** = DIP Run recovery — [docs/normative/boot/boot-jmp-handoff.md](../docs/normative/boot/boot-jmp-handoff.md).

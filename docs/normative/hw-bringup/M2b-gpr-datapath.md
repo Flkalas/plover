@@ -28,8 +28,8 @@
 |-----------|----------|
 | `q_a0..7` | `net_a0..7` |
 | `q_b0..7` | `net_b0..7` |
-| `cin`, `b_sel`, `b_const_sel` | 283 / 153_B |
-| `lgc3..0` | 153_L |
+| `cin`, `b_sel`, `b_const_sel` | 283 / 153 mux2 |
+| `lgc3..0` | 153 mux1 |
 | `y_mux_sel` | 157_YBP select |
 
 | ALU 출력 | 목적지 |

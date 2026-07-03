@@ -1,45 +1,54 @@
-# ALU Phase B — Gigatron 153 logic + B1 arith bypass
+# ALU Phase B — Gigatron 153 bit-slice (logic + B_CTRL)
 
-**Status:** **implemented** (2026-06-02)  
-**Netlist:** [`tools/gen_alu8_netlist.py`](../tools/gen_alu8_netlist.py) Phase B2
+**Status:** **implemented** (2026-07)  
+**Netlist:** [`tools/gen_alu8_netlist.py`](../../../tools/gen_alu8_netlist.py) pure B_CTRL bit-slice
 
 ## Architecture
 
 | Layer | Blocks | Role |
 |-------|--------|------|
-| **B1 (frozen)** | `153_B×4`, `04_BINV`, `283×2`, `157_YBP×2` | SUB/ADD/INC/DEC/CMP **Y** |
-| **B2** | `153_L×8` (`ALU_153_SLICE`) | AND/OR/XOR/NOT/PASS via Gigatron mux trick |
+| **B-path** | `U_ALU_153_i` mux2, `283×2`, `157_YBP×2` | SUB/ADD/INC/DEC/CMP **Y** |
+| **Logic** | `U_ALU_153_i` mux1 (Gigatron) | AND/OR/XOR/NOT/PASS via operand select |
+| **INC glue** | `ALU_INC_B_SEL`, `ALU_INC_2C2` | INC only — B-select + per-bit `2C2` |
 | **CMP** | `ALU_CMP_SUB` | Z/C_GE from SUB (`Y==0`, `net_c_hi`) — no 7485 |
 | **Glue** | `ALU_Y_MUX_SEL` | `net_y_mux_sel = s0 \| s1` → 157 picks sum vs logic |
 
+Each bit `i` uses one **74HC153** (`U_ALU_153_i`):
+
+| Mux | Pins | Role |
+|-----|------|------|
+| **mux1** | `1C0..3` = `net_lgc*`, `1Y` = `net_y_logic[i]` | Gigatron logic |
+| **mux2** | `2C0..3` = `net_bctrl*`, `2Y` = `net_b_add[i]` | B_CTRL data inputs |
+| **A/B** | `net_a[i]`, `net_b153_sel[i]` | Operand select (+ INC B override) |
+
 ```mermaid
 flowchart LR
-  subgraph arith [B1 arith]
-    Binv[04_BINV]
-    MUXB[153_B]
-    ADD[283]
-    YBP[157_YBP]
-    Binv --> MUXB --> ADD --> YBP
+  subgraph perbit [Per bit i]
+    INC[INC_B_SEL]
+    BIT[U_ALU_153_i]
+    INC --> BIT
+    BIT -->|1Y| Ylogic[net_y_logic]
+    BIT -->|2Y| Badd[net_b_add]
   end
-  subgraph logic [B2 logic]
-    SL[153_L per bit]
-    SL --> YBP
-  end
-  A[net_a] --> SL
-  B[net_b] --> SL
+  Badd --> ADD[283]
+  ADD --> YBP[157_YBP]
+  Ylogic --> YBP
   YBP --> Y[net_y]
 ```
 
-## Gigatron 153 slice (per bit)
+## Operand select (shared 153 A/B pins)
 
-`sel = A | (B<<1)` where **A** = `net_a[i]`, **B** = `net_b[i]`:
+All opcodes: `A = net_a[i]`, `B = net_b153_sel[i]` (INC forces B=1 via glue).  
+`sel = A | (B<<1)` drives both mux1 and mux2.
 
-| sel | A | B | C0 | C1 | C2 | C3 | Result |
-|-----|---|---|----|----|----|-----|--------|
-| 0 | 0 | 0 | * | * | * | * | C0 |
-| 1 | 0 | 1 | * | * | * | * | C1 |
-| 2 | 1 | 0 | * | * | * | * | C2 |
-| 3 | 1 | 1 | * | * | * | * | C3 |
+## Gigatron mux1 (per bit)
+
+| sel | A | B | Result |
+|-----|---|---|--------|
+| 0 | 0 | 0 | C0 |
+| 1 | 0 | 1 | C1 |
+| 2 | 1 | 0 | C2 |
+| 3 | 1 | 1 | C3 |
 
 ### Opcode → C0..C3 (`net_lgc0..3`, shared 8-bit)
 
@@ -54,25 +63,34 @@ flowchart LR
 | PASS_B | 0 | 0 | 0 | 1 | FF&B → use A=all 1 in stimulus |
 | ADD/SUB/INC/DEC/CMP | * | * | * | * | Unused; `157_YBP` selects **sum** |
 
-Golden vectors: [`tools/alu8_cases.py`](../tools/alu8_cases.py) — all 12 opcodes bit-exact in pre-flight sim.
+Golden vectors: [`tools/alu8_cases.py`](../../../tools/alu8_cases.py) — all 12 opcodes bit-exact in pre-flight sim.
 
-## Critical path (unchanged B1)
+## B_CTRL mux2 (`net_bctrl3..0` → `2C3..2C0`)
+
+| Opcode | bctrl[3:0] | Behaviour |
+|--------|------------|-----------|
+| ADD | `1100` | B[i] pass |
+| SUB/CMP | `0011` | ~B[i] (no 74HC04) |
+| DEC | `1111` | constant 1 |
+| INC | — | `net_inc_en=1` + `ALU_INC_2C2` per-bit tie |
+
+## Critical path
 
 **SUB / CMP (Y)** @ max (pre-flight sim):  
-`net_b0` → `04_BINV` → `153_B` → `283` → `157_YBP` → `net_y0` — target **≤160 ns** (B1 measured **151 ns**).
+`net_b0` → `U_ALU_153_0.B` → `2Y` → `283` → `157_YBP` → `net_y0` — **~133 ns** (04 hop removed).
+
+**Logic** @ max: `U_ALU_153_0.1Y` → `157_YBP` — **46 ns**.
 
 ## IC budget (DIP)
 
 | Part | Qty |
 |------|-----|
 | 74HC283 | 2 |
-| 74HC153 (B-path) | 4 |
-| 74HC153 (logic slices, 1 mux/IC) | 4 |
+| 74HC153 (bit-slice) | **8** |
 | 74HC157 (YBP) | 2 |
-| 74HC04 (~B) | 2 |
-| **ALU total** | **14** |
+| **ALU total** | **12** |
 
-(Logic uses 4 packages with one 4:1 mux each; B-path uses both muxes per package.)
+(Plus behavioral glue: `INC_B_SEL`, `INC_2C2`, `Y_MUX_SEL`, `CMP_SUB`.)
 
 ## Regen
 
@@ -85,7 +103,3 @@ python tools/gen_alu8_full_test.py
 python tools/gen_alu8_opcode_timing.py
 python tools/gen_opcode_cheatsheet.py
 ```
-
-## Optional future
-
-Pack eight logic slices into fewer 153 packages with shared A/B per DIP (Gigatron 10-IC style) — optional BOM/wiring shrink; not required for 2 MHz timing closure.

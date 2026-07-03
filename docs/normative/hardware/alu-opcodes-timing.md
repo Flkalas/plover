@@ -29,28 +29,28 @@
 | 12–15 | — | *(예약)* | NOP 취급 | — |
 
 - **A** · **B**: `net_a0..7`, `net_b0..7` (CPU: ACC.Q → A 직결, B ← CPLD `q_b` 또는 SRAM).
-- **INC/DEC**: `net_b0..7` 구동 금지 — `153_B` MUX: INC=`b_const_sel=1,b_sel=0`; DEC=`b_const_sel=1,b_sel=1` ([bringup §INC/DEC](../hw-bringup/b3-opcode.md)).
+- **INC/DEC**: `net_b0..7` 구동 금지 — INC=`net_inc_en=1`; DEC=`bctrl=1111` ([bringup §INC/DEC](../hw-bringup/b3-opcode.md)).
 
 ---
 
 ## 2. 제어 신호 (`alu_sel` → 하드와이어)
 
-| sel | Op | cin | b_sel | b_const_sel | s1:s0 | lgc3:0 | 153_B (sel) |
-|-----|-----|-----|-------|-------------|-------|--------|-------------|
-| 0 | NOP | 0 | 0 | 0 | 00 | 0000 | 0 — B |
-| 1 | ADD | 0 | 0 | 0 | 00 | 0000 | 0 — B |
-| 2 | SUB | 1 | 1 | 0 | 00 | 0000 | 1 — ~B |
-| 3 | AND | 0 | 0 | 0 | 01 | 0001 | — |
-| 4 | OR | 0 | 0 | 0 | 10 | 0111 | — |
-| 5 | XOR | 0 | 0 | 0 | 11 | 0110 | — |
-| 6 | NOT | 0 | 0 | 0 | 11 | 1000 | — |
-| 7 | PASS_A | 0 | 0 | 0 | 01 | 0001 | B=FF mask |
-| 8 | PASS_B | 0 | 0 | 0 | 01 | 0001 | A=FF mask |
-| 9 | INC | 0 | 0 | **1** | 00 | 0000 | 2 — `0x01` |
-| 10 | DEC | 0 | **1** | **1** | 00 | 0000 | 3 — `0xFF` |
-| 11 | CMP | 1 | 1 | 0 | 00 | 0000 | 1 — ~B |
+| sel | Op | cin | bctrl3:0 | inc | s1:s0 | lgc3:0 |
+|-----|-----|-----|----------|-----|-------|--------|
+| 0 | NOP | 0 | 0000 | 0 | 00 | 0000 |
+| 1 | ADD | 0 | 1100 | 0 | 00 | 0000 |
+| 2 | SUB | 1 | 0011 | 0 | 00 | 0000 |
+| 3 | AND | 0 | 0000 | 0 | 01 | 0001 |
+| 4 | OR | 0 | 0000 | 0 | 10 | 0111 |
+| 5 | XOR | 0 | 0000 | 0 | 11 | 0110 |
+| 6 | NOT | 0 | 0000 | 0 | 11 | 1000 |
+| 7 | PASS_A | 0 | 0000 | 0 | 01 | 0001 |
+| 8 | PASS_B | 0 | 0000 | 0 | 01 | 0001 |
+| 9 | INC | 0 | 0000 | 1 | 00 | 0000 |
+| 10 | DEC | 0 | 1111 | 0 | 00 | 0000 |
+| 11 | CMP | 1 | 0011 | 0 | 00 | 0000 |
 
-`lgc3:0` → `net_lgc3..0` (153_L C inputs). Logic ops: `s0|s1` → **157_YBP** selects `net_y_logic`.
+`lgc3:0` → `net_lgc3..0` (153 mux1 C inputs). Logic ops: `s0|s1` → **157_YBP** selects `net_y_logic`.
 
 ---
 
@@ -64,31 +64,31 @@
 |-----|-----|-----------|----------|------------------|------|
 | 0 | NOP | adder | **108** | 142 | sum path (Y=0) |
 | 1 | ADD | adder | **108** | 142 | 283 → **157_YBP** |
-| 2 | SUB | **critical** | **151** | **99** | **시스템 worst-case** (B1 유지) |
-| 3 | AND | logic | **46** | 204 | `153_L` → 157_YBP |
+| 2 | SUB | **critical** | **~133** | **~117** | **시스템 worst-case** (no 04 BINV) |
+| 3 | AND | logic | **46** | 204 | `U_ALU_153_*` mux1 → 157_YBP |
 | 4 | OR | logic | **46** | 204 | |
 | 5 | XOR | logic | **46** | 204 | |
 | 6 | NOT | logic | **46** | 204 | |
 | 7 | PASS_A | logic | **46** | 204 | AND pattern + B=FF |
 | 8 | PASS_B | logic | **46** | 204 | AND pattern + A=FF |
-| 9 | INC | adder | **108** | 142 | `153_B` → `0x01` |
-| 10 | DEC | adder | **151** | **99** | `153_B` → `0xFF` (~B path) |
-| 11 | CMP | **critical** | **151** | **99** | Y = SUB; flags §3.5 |
+| 9 | INC | adder | **108** | 142 | mux2 → `0x01` |
+| 10 | DEC | adder | **~133** | **~117** | bctrl all-ones |
+| 11 | CMP | **critical** | **~133** | **~117** | Y = SUB; flags §3.5 |
 
 측정: [`alu8_opcode_timing`](../hw/tests/alu8_opcode_timing.yaml) · `build/pre-flight sim/alu8_opcode_timing/timing_report.json` (@ **max**).
 
-**worst-case (Y):** **SUB / CMP / DEC** — **151 ns** (slack **99 ns** @ 250 ns Execute half-period).  
+**worst-case (Y):** **SUB / CMP / DEC** — **~133 ns** (slack **~117 ns** @ 250 ns Execute half-period).  
 **fastest:** logic opcodes — **46 ns**.
 
-**Comb-limited Fmax (SUB 기준):** \(F \approx 1 / (2 \times 151\,\text{ns}) \approx 3.3\,\text{MHz}\) (574 setup·CPLD·Flash 별도). 명목 **2 MHz:** slack = 250 − 151 = **99 ns**.
+**Comb-limited Fmax (SUB 기준):** \(F \approx 1 / (2 \times 133\,\text{ns}) \approx 3.8\,\text{MHz}\) (574 setup·CPLD·Flash 별도). 명목 **2 MHz:** slack = 250 − 133 = **~117 ns**.
 
 ### 3.2 canonical critical path (bit0, @ max)
 
 | Op | ref.pin hop chain |
 |----|-------------------|
-| **SUB / CMP / DEC** | `net_b0` → `04_BINV_0` → `153_B_0.1C1` → `1Y` → `283_LO.B0` → `C4` → `283_HI.C4` → `157_YBP_0.1A` → `1Y` |
+| **SUB / CMP / DEC** | `net_b0` → `U_ALU_153_0.B` → `2Y` → `283_LO.B0` → `C4` → `283_HI.C4` → `157_YBP_0.1A` → `1Y` |
 | **ADD / INC / NOP** | `283_LO.A0` → `C4` → `283_HI.C4` → `157_YBP_0.1A` → `1Y` |
-| **AND / OR / XOR / NOT / PASS** | `153_L_0.A` → `Y` → `157_YBP_0.4B` → `4Y` |
+| **AND / OR / XOR / NOT / PASS** | `U_ALU_153_0.1Y` → `157_YBP_0.4B` → `4Y` |
 
 ### 3.3 ACC 래치 (Y → 574.Q)
 
@@ -102,13 +102,13 @@ B3c 브링업 경로 — ALU 출력이 **다음 posedge** 전에 setup 만족해
 
 ### 3.5 CMP 플래그 (SUB 유도, no 7485)
 
-`ALU_CMP_SUB`: CMP/SUB 시 (`b_sel=1`, `cin=1`) **Z** = all `net_y==0`, **C_GE** = `net_c_hi`.  
+`ALU_CMP_SUB`: CMP/SUB 시 (`bctrl` SUB pattern, `cin=1`) **Z** = all `net_y==0`, **C_GE** = `net_c_hi`.  
 pre-flight sim [`alu8_cmp_sub`](../hw/tests/alu8_cmp_sub.yaml) — 플래그는 Y 경로와 **동일 오더**:
 
 | 구간 | typ (ns) | max (ns) | 비고 |
 |------|----------|----------|------|
-| `net_b0` → `net_cmp_z` | — | **151** | SUB/CMP critical path |
-| `net_b0` → `net_cmp_c_ge` | — | **151** | via `net_c_hi` @ 283 |
+| `net_b0` → `net_cmp_z` | — | **~133** | SUB/CMP critical path |
+| `net_b0` → `net_cmp_c_ge` | — | **~133** | via `net_c_hi` @ 283 |
 
 실기: `net_cmp_z` / `net_cmp_c_ge` → FLG 574 또는 CPLD; Execute 말 샘플 ([`alu8.md`](../hw/netlist/blocks/alu8.md)).
 
@@ -133,10 +133,10 @@ v1.0 CPU는 **10-bit CW** (B9–B8 `REG_SEL` in Flash hi byte; B7–B0 bus/ALU i
 |--------|-------------------|-------------------|
 | [`alu8_full`](../hw/tests/alu8_full.yaml) | 12 opcode 기능 | — |
 | [`alu8_opcode_timing`](../hw/tests/alu8_opcode_timing.yaml) | 12 opcode slack | SUB **151** ns, logic **46** ns, ADD **108** ns |
-| [`alu8_timing`](../hw/tests/alu8_timing.yaml) | ADD carry · logic hop | ADD **108** ns, `153_L` **46** ns |
+| [`alu8_timing`](../hw/tests/alu8_timing.yaml) | ADD carry · logic hop | ADD **108** ns, `U_ALU_153_0` logic **46** ns |
 | [`alu8_cmp_sub`](../hw/tests/alu8_cmp_sub.yaml) | CMP flags | `cmp_z` / `cmp_c_ge` **151** ns @ max |
 | [`alu_b3_sub_critical`](../hw/tests/alu_b3_sub_critical.yaml) | SUB | **151** ns @ max; slack **99** ns |
-| [`alu_b3_xor_critical`](../hw/tests/alu_b3_xor_critical.yaml) | XOR | **46** ns (`153_L` → 157_YBP) |
+| [`alu_b3_xor_critical`](../hw/tests/alu_b3_xor_critical.yaml) | XOR | **46** ns (`U_ALU_153_0` mux1 → 157_YBP) |
 | [`alu_b3_latch`](../hw/tests/alu_b3_latch.yaml) | ACC setup | **51** ns (153→574 CP) |
 | [`alu_decode_timing`](../hw/tests/alu_decode_timing.yaml) | CW→SUB | **151** ns |
 | [`alu283_carry`](../hw/tests/alu283_carry.yaml) | 283 only | ripple **90** ns |
@@ -179,7 +179,8 @@ CPU E2E (Flash 70 ns + CPLD read 10–15 ns + ALU)는 별도 `cpu_v1_*` / `cpld_
 
 | 날짜 | 내용 |
 |------|------|
-| 2026-06-02 | Phase B2: Gigatron `153_L`, **16** IC, opcode timing matrix, logic **46 ns** |
+| 2026-07-03 | Bit-slice `U_ALU_153_0..7` + AB bus; timing paths updated |
+| 2026-06-02 | Phase B2: Gigatron logic, **14** IC, opcode timing matrix, logic **46 ns** |
 | 2026-06-02 | Phase B1: SUB **151 ns** max (`157_B2` 제거, `157_YBP` sum bypass) |
 | 2026-06-02 | Phase A: SUB 179 ns max, `7485` CMP flags §3.5, 제어표 `sub` 제거 |
 | 2026-06-01 | 12 opcode · 제어 · typ/max 지연 · pre-flight sim 교차표 초판 |

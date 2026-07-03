@@ -11,7 +11,7 @@
 
 | Item | Specification |
 |------|---------------|
-| **CPU** | 8-bit TTL datapath: custom ALU (74HC, 14 DIP) + **3×GPR in ATF1504** (R0→A, R1→B, R2=result) |
+| **CPU** | 8-bit TTL datapath: custom ALU (74HC, 12 DIP) + **3×GPR in ATF1504** (R0→A, R1→B, R2=result) |
 | **Control** | **FSM-only (idx5)** — `(opcode[4:0]<<2)\|phase` in CPLD; **no Flash CW**; **no `alu8_decode`** |
 | **ISA** | Opcode **`[4:0]`**; core `0x01–0x0F` + **Extended `0x10–0x1F`** (TFR `0x10–0x15`); `0x0C` reserved |
 | **System CPLD** | **ATF1504AS-10JU44** — GPR + idx5 sequencer (~38 MC) |
