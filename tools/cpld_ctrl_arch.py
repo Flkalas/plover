@@ -23,10 +23,13 @@ from cpld_ctrl_model import (
 )
 from flash_cw_timing import EXEC_HALF_NS, budget_for_arch
 
-DELAY_SUB_WITH_DECODE = 151
+DELAY_SUB_DATAPATH = 136
+DELAY_ALU_INC = 153
+DELAY_ALU_CMP_SUB_MODEL = 151
+DELAY_SUB_WITH_DECODE = DELAY_SUB_DATAPATH
 DELAY_DECODE_SAVED = 15
 DELAY_EXT_CTRL_PENALTY = 8
-DELAY_CW16_DIRECT = DELAY_SUB_WITH_DECODE - DELAY_DECODE_SAVED
+DELAY_CW16_DIRECT = DELAY_SUB_DATAPATH
 
 GPR_ONLY_MC = 26
 BASELINE_MC = 38
@@ -243,8 +246,10 @@ def _strobe_outputs() -> list[str]:
 def _alu_outputs() -> list[str]:
     return [
         "cin",
-        "b_sel",
-        "b_const_sel",
+        "bctrl0",
+        "bctrl1",
+        "bctrl2",
+        "bctrl3",
         "lgc0",
         "lgc1",
         "lgc2",

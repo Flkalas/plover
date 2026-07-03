@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
-from cpld_ctrl_model import build_v10_ctrl_table  # noqa: E402
+from cpld_ctrl_model import _legacy_cw16_b_fields, build_v10_ctrl_table  # noqa: E402
 from pack_control_store import FSM_OPCODE_TABLE, pack_cw16  # noqa: E402
 
 NL_DIR = ROOT / "hw" / "netlist" / "research"
@@ -438,14 +438,15 @@ def build_cw16_netlist() -> NetlistBuild:
     nb.register_gate(refrom, kind="rom16", label="Flash $4000 CW", stage=2, unit_id="flash_cw")
 
     sample = next(r for r in build_v10_ctrl_table() if r.mem_rd)
+    leg_b_sel, leg_b_const = _legacy_cw16_b_fields(sample)
     _ = pack_cw16(
         reg_we=sample.reg_we,
         mem_rd=sample.mem_rd,
         mem_wr=sample.mem_wr,
         y_oe=sample.y_oe,
         cin=sample.cin,
-        b_sel=sample.b_sel,
-        b_const_sel=sample.b_const_sel,
+        b_sel=leg_b_sel,
+        b_const_sel=leg_b_const,
         lgc=sample.lgc0 | (sample.lgc1 << 1) | (sample.lgc2 << 2) | (sample.lgc3 << 3),
         y_mux_sel=sample.y_mux_sel,
     )

@@ -37,8 +37,10 @@ OUTPUT_FIELDS = (
     "mem_wr",
     "y_oe",
     "cin",
-    "b_sel",
-    "b_const_sel",
+    "bctrl0",
+    "bctrl1",
+    "bctrl2",
+    "bctrl3",
     "lgc0",
     "lgc1",
     "lgc2",
@@ -62,8 +64,10 @@ class CtrlRow:
     mem_wr: int = 0
     y_oe: int = 0
     cin: int = 0
-    b_sel: int = 0
-    b_const_sel: int = 0
+    bctrl0: int = 0
+    bctrl1: int = 0
+    bctrl2: int = 0
+    bctrl3: int = 0
     lgc0: int = 0
     lgc1: int = 0
     lgc2: int = 0
@@ -108,19 +112,29 @@ class CtrlRow:
 def _alu_from_op(alu_op: int) -> dict[str, int]:
     name = _ALU_OP_TO_NAME.get(alu_op, "NOP")
     cin, b0, b1, b2, b3, l0, l1, l2, l3, y_mux = signature(name)
-    from alu8_cases import BCTRL_ADD
-
-    bpat = (b0, b1, b2, b3)
     return {
         "cin": cin,
-        "b_sel": 1 if bpat == BCTRL_ADD else 0,
-        "b_const_sel": 0,
+        "bctrl0": b0,
+        "bctrl1": b1,
+        "bctrl2": b2,
+        "bctrl3": b3,
         "lgc0": l0,
         "lgc1": l1,
         "lgc2": l2,
         "lgc3": l3,
         "y_mux_sel": y_mux,
     }
+
+
+def _legacy_cw16_b_fields(row: CtrlRow) -> tuple[int, int]:
+    """Map 4-bit B_CTRL to archived Flash CW16 2-bit B mux select."""
+    from alu8_cases import BCTRL_ADD, BCTRL_DEC
+
+    bpat = (row.bctrl0, row.bctrl1, row.bctrl2, row.bctrl3)
+    return (
+        1 if bpat == BCTRL_ADD else 0,
+        1 if bpat == BCTRL_DEC else 0,
+    )
 
 
 
@@ -319,8 +333,10 @@ def alu_truth_table(
     rows = rows or build_v10_ctrl_table()
     outputs = [
         "cin",
-        "b_sel",
-        "b_const_sel",
+        "bctrl0",
+        "bctrl1",
+        "bctrl2",
+        "bctrl3",
         "lgc0",
         "lgc1",
         "lgc2",
@@ -328,12 +344,18 @@ def alu_truth_table(
         "y_mux_sel",
     ]
     slot_count = 128 if idx_key == "idx5" else 64
-    return idx_truth_table(
-        rows,
-        outputs,
-        idx_key=idx_key,
-        slot_count=slot_count,
-    )
+    by_idx: dict[int, dict[str, int]] = {}
+    for row in rows:
+        idx = row.idx5 if idx_key == "idx5" else row.idx4
+        by_idx[idx] = {"idx": idx, **{sig: getattr(row, sig) for sig in outputs}}
+    out: list[dict[str, int]] = []
+    for idx in range(slot_count):
+        base = dict(by_idx.get(idx, {"idx": idx}))
+        base["idx"] = idx
+        for sig in outputs:
+            base.setdefault(sig, 0)
+        out.append(base)
+    return out
 
 
 def flash_cw10_rows(rows: list[CtrlRow] | None = None) -> list[dict[str, int]]:

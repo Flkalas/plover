@@ -59,7 +59,7 @@ def test_beq_ph0_sub():
     r = _row(OP_BEQ, 0)
     assert r.alu_op == ALU_SUB
     assert r.y_oe == 0
-    assert r.cin == 1 and r.b_sel == 1
+    assert r.cin == 1 and (r.bctrl0, r.bctrl1, r.bctrl2, r.bctrl3) == (1, 1, 0, 0)
 
 
 def test_baseline_fsm():
