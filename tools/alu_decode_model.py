@@ -1,7 +1,7 @@
 """ALU operation signatures and truth-table builder for decode search."""
 from __future__ import annotations
 
-from alu8_cases import CASES, LOGIC_C
+from alu8_cases import BCTRL_ADD, BCTRL_DEC, BCTRL_SUB, CASES, LOGIC_C
 
 PROFILE_LEGACY = "legacy"
 PROFILE_Y_MUX = "y_mux"
@@ -14,7 +14,7 @@ OP_NAMES = [name for name, *_ in CASES]
 LOGIC_OPS = ("AND", "OR", "XOR", "NOT", "PASS_A", "PASS_B")
 ARITH_OPS = ("NOP", "ADD", "SUB", "CMP", "INC", "DEC")
 
-# alu_op[0]->lgc3, alu_op[1]->lgc2, alu_op[2]->lgc1, alu_op[3]->lgc0 (breadboard direct wire)
+
 def encode_lgc_direct(lgc: tuple[int, int, int, int]) -> int:
     l0, l1, l2, l3 = lgc
     return (l0 << 3) | (l1 << 2) | (l2 << 1) | l3
@@ -39,7 +39,8 @@ def logic_reserved_codes() -> set[int]:
 
 
 ARITH_GROUPS: dict[str, list[str]] = {
-    "zero": ["NOP", "ADD"],
+    "nop": ["NOP"],
+    "add": ["ADD"],
     "sub": ["SUB"],
     "cmp": ["CMP"],
     "inc": ["INC"],
@@ -47,21 +48,26 @@ ARITH_GROUPS: dict[str, list[str]] = {
 }
 
 # Canonical control signature per operation (before opcode assignment).
-# Tuple: (cin, b_sel, b_const_sel, lgc0, lgc1, lgc2, lgc3, y_mux)
+# Tuple: (cin, bctrl0..3, inc_en, lgc0..3, y_mux)
+def _bctrl_sig(pat: tuple[int, int, int, int]) -> tuple[int, int, int, int]:
+    return pat
+
+
 _SIGNATURES: dict[str, tuple[int, ...]] = {
-    "NOP": (0, 0, 0, 0, 0, 0, 0, 0),
-    "ADD": (0, 0, 0, 0, 0, 0, 0, 0),
-    "SUB": (1, 1, 0, 0, 0, 0, 0, 0),
-    "AND": (0, 0, 0, 0, 0, 0, 1, 1),
-    "OR": (0, 0, 0, 0, 1, 1, 1, 1),
-    "XOR": (0, 0, 0, 0, 1, 1, 0, 1),
-    "NOT": (0, 0, 0, 1, 0, 0, 0, 1),
-    "PASS_A": (0, 0, 0, 0, 0, 0, 1, 1),
-    "PASS_B": (0, 0, 0, 0, 0, 0, 1, 1),
-    "INC": (0, 0, 1, 0, 0, 0, 0, 0),
-    "DEC": (0, 1, 1, 0, 0, 0, 0, 0),
-    "CMP": (1, 1, 0, 0, 0, 0, 0, 0),
+    "NOP": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 0, 0, 0, 0),
+    "ADD": (0, *_bctrl_sig(BCTRL_ADD), 0, 0, 0, 0, 0, 0),
+    "SUB": (1, *_bctrl_sig(BCTRL_SUB), 0, 0, 0, 0, 0, 0),
+    "AND": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 0, 0, 1, 1),
+    "OR": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 1, 1, 1, 1),
+    "XOR": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 1, 1, 0, 1),
+    "NOT": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 1, 0, 0, 0, 1),
+    "PASS_A": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 0, 0, 1, 1),
+    "PASS_B": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 0, 0, 1, 1),
+    "INC": (0, *_bctrl_sig((0, 0, 0, 0)), 1, 0, 0, 0, 0, 0),
+    "DEC": (0, *_bctrl_sig(BCTRL_DEC), 0, 0, 0, 0, 0, 0),
+    "CMP": (1, *_bctrl_sig(BCTRL_SUB), 0, 0, 0, 0, 0, 0),
 }
+
 
 def _legacy_s0_s1_from_op(name: str) -> tuple[int, int]:
     idx = OP_NAMES.index(name)
@@ -98,11 +104,14 @@ def build_assignment_from_codes(codes_by_sig: dict[tuple[int, ...], int]) -> dic
 
 
 def _control_row(name: str, profile: str) -> dict[str, int]:
-    cin, b_sel, b_cst, l0, l1, l2, l3, y_mux = signature(name)
+    cin, b0, b1, b2, b3, inc_en, l0, l1, l2, l3, y_mux = signature(name)
     row: dict[str, int] = {
         "net_cin": cin,
-        "net_b_sel": b_sel,
-        "net_b_const_sel": b_cst,
+        "net_bctrl0": b0,
+        "net_bctrl1": b1,
+        "net_bctrl2": b2,
+        "net_bctrl3": b3,
+        "net_inc_en": inc_en,
         "net_lgc0": l0,
         "net_lgc1": l1,
         "net_lgc2": l2,
@@ -112,17 +121,14 @@ def _control_row(name: str, profile: str) -> dict[str, int]:
         s0, s1 = _legacy_s0_s1_from_op(name)
         row["net_153_s0"] = s0
         row["net_153_s1"] = s1
-        row["b_const_hi"] = 1 if name == "DEC" else 0
     elif profile == PROFILE_Y_MUX:
         row["net_y_mux_sel"] = y_mux
-        row["b_const_hi"] = 1 if name == "DEC" else 0
     elif profile == PROFILE_LGC_DIRECT:
         if name in LOGIC_OPS:
             code = encode_lgc_direct((l0, l1, l2, l3))
             row["net_lgc0"], row["net_lgc1"], row["net_lgc2"], row["net_lgc3"] = lgc_from_opcode_direct(
                 code
             )
-        # arithmetic: lgc not driven by decode (forced 0 in datapath); rows stay 0
     return row
 
 
@@ -168,10 +174,17 @@ def build_table(
 
 
 def profile_outputs(profile: str) -> list[str]:
-    arith = ["net_cin", "net_b_sel", "net_b_const_sel"]
+    arith = [
+        "net_cin",
+        "net_bctrl0",
+        "net_bctrl1",
+        "net_bctrl2",
+        "net_bctrl3",
+        "net_inc_en",
+    ]
     lgc = ["net_lgc0", "net_lgc1", "net_lgc2", "net_lgc3"]
     if profile == PROFILE_LEGACY:
-        return ["net_cin", "net_153_s0", "net_153_s1", "net_b_sel", "net_b_const_sel", *lgc]
+        return [*arith, "net_153_s0", "net_153_s1", *lgc]
     if profile == PROFILE_Y_MUX:
         return [*arith, *lgc, "net_y_mux_sel"]
     if profile == PROFILE_LGC_DIRECT:
@@ -180,11 +193,7 @@ def profile_outputs(profile: str) -> list[str]:
 
 
 def profile_options(profile: str) -> dict:
-    if profile == PROFILE_LEGACY:
-        return {"include_b_const_hi": True, "include_cmp_n": True}
-    if profile == PROFILE_Y_MUX:
-        return {"include_b_const_hi": True, "include_cmp_n": True}
-    return {"include_b_const_hi": False, "include_cmp_n": True}
+    return {"include_cmp_n": True}
 
 
 def merge_lgc_direct(arith_codes: dict[str, int]) -> dict[str, int]:
@@ -197,9 +206,10 @@ def merge_lgc_direct(arith_codes: dict[str, int]) -> dict[str, int]:
 
 
 def default_lgc_direct_arith() -> dict[str, int]:
-    """Best exhaustive layout (37 decode gates); SUB/CMP at 0x0B/0x0F."""
+    """Best exhaustive layout; SUB/CMP at 0x0B/0x0F."""
     return {
-        "zero": 0x00,
+        "nop": 0x00,
+        "add": 0x02,
         "sub": 0x0B,
         "cmp": 0x0F,
         "inc": 0x0D,
@@ -227,10 +237,13 @@ def assignment_notes(assignment: dict[str, int]) -> list[str]:
 def verify_signatures_match_cases() -> None:
     """Ensure canonical signatures agree with LOGIC_C / ctrl for each op index."""
     for idx, (name, _a, _b, _y, c) in enumerate(CASES):
-        cin, b_sel, b_cst, l0, l1, l2, l3, y_mux = signature(name)
+        cin, b0, b1, b2, b3, inc_en, l0, l1, l2, l3, y_mux = signature(name)
         assert int(c.get("net_cin", 0)) == cin
-        assert int(c.get("net_b_sel", 0)) == b_sel
-        assert int(c.get("net_b_const_sel", 0)) == b_cst
+        assert int(c.get("net_bctrl0", 0)) == b0
+        assert int(c.get("net_bctrl1", 0)) == b1
+        assert int(c.get("net_bctrl2", 0)) == b2
+        assert int(c.get("net_bctrl3", 0)) == b3
+        assert int(c.get("net_inc_en", 0)) == inc_en
         lgc = LOGIC_C.get(idx, (0, 0, 0, 0))
         assert (l0, l1, l2, l3) == lgc
         if y_mux:

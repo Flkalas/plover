@@ -603,14 +603,14 @@ instances:
     pins:
       A: net_dec_o_77
       B: pwr_vcc
-      Y: net_b_sel
+      Y: net_bctrl0
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_28
     part: 74HC04
     pins:
-      A: net_alu_op1
-      Y: net_dec_n1_79
+      A: net_alu_op0
+      Y: net_dec_n0_79
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_29
@@ -620,142 +620,142 @@ instances:
       Y: net_dec_n2_80
       VCC: pwr_vcc
       GND: pwr_gnd
+  - ref: U_DEC_04_30
+    part: 74HC04
+    pins:
+      A: net_alu_op3
+      Y: net_dec_n3_81
+      VCC: pwr_vcc
+      GND: pwr_gnd
   - ref: U_DEC_08_44
     part: 74HC08
     pins:
-      A: net_alu_op0
-      B: net_dec_n1_79
-      Y: net_dec_a_81
+      A: net_dec_n0_79
+      B: net_alu_op1
+      Y: net_dec_a_82
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_45
     part: 74HC08
     pins:
-      A: net_dec_a_81
+      A: net_dec_a_82
       B: net_dec_n2_80
-      Y: net_dec_a_82
+      Y: net_dec_a_83
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_46
     part: 74HC08
     pins:
-      A: net_dec_a_82
-      B: net_alu_op3
-      Y: net_dec_a_83
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_04_30
-    part: 74HC04
-    pins:
-      A: net_alu_op0
-      Y: net_dec_n0_84
+      A: net_dec_a_83
+      B: net_dec_n3_81
+      Y: net_dec_a_84
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_31
     part: 74HC04
     pins:
-      A: net_alu_op2
-      Y: net_dec_n2_85
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_08_47
-    part: 74HC08
-    pins:
-      A: net_dec_n0_84
-      B: net_alu_op1
-      Y: net_dec_a_86
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_08_48
-    part: 74HC08
-    pins:
-      A: net_dec_a_86
-      B: net_dec_n2_85
-      Y: net_dec_a_87
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_08_49
-    part: 74HC08
-    pins:
-      A: net_dec_a_87
-      B: net_alu_op3
-      Y: net_dec_a_88
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_32_10
-    part: 74HC32
-    pins:
-      A: net_dec_a_83
-      B: net_dec_a_88
-      Y: net_dec_o_89
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_08_50
-    part: 74HC08
-    pins:
-      A: net_dec_o_89
-      B: pwr_vcc
-      Y: net_b_const_sel
+      A: net_alu_op0
+      Y: net_dec_n0_85
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_32
     part: 74HC04
     pins:
-      A: net_alu_op0
-      Y: net_dec_n0_91
+      A: net_alu_op2
+      Y: net_dec_n2_86
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_47
+    part: 74HC08
+    pins:
+      A: net_dec_n0_85
+      B: net_alu_op1
+      Y: net_dec_a_87
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_48
+    part: 74HC08
+    pins:
+      A: net_dec_a_87
+      B: net_dec_n2_86
+      Y: net_dec_a_88
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_49
+    part: 74HC08
+    pins:
+      A: net_dec_a_88
+      B: net_alu_op3
+      Y: net_dec_a_89
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_33
     part: 74HC04
     pins:
-      A: net_alu_op3
-      Y: net_dec_n3_92
+      A: net_alu_op2
+      Y: net_dec_n2_90
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_50
+    part: 74HC08
+    pins:
+      A: net_alu_op0
+      B: net_alu_op1
+      Y: net_dec_a_91
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_51
     part: 74HC08
     pins:
-      A: net_dec_n0_91
-      B: net_alu_op1
-      Y: net_dec_a_93
+      A: net_dec_a_91
+      B: net_dec_n2_90
+      Y: net_dec_a_92
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_52
     part: 74HC08
     pins:
-      A: net_dec_a_93
-      B: net_alu_op2
-      Y: net_dec_a_94
+      A: net_dec_a_92
+      B: net_alu_op3
+      Y: net_dec_a_93
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_32_10
+    part: 74HC32
+    pins:
+      A: net_dec_a_84
+      B: net_dec_a_89
+      Y: net_dec_o_94
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_32_11
+    part: 74HC32
+    pins:
+      A: net_dec_o_94
+      B: net_dec_a_93
+      Y: net_dec_o_95
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_53
     part: 74HC08
     pins:
-      A: net_dec_a_94
-      B: net_dec_n3_92
-      Y: net_dec_a_95
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_08_54
-    part: 74HC08
-    pins:
-      A: net_dec_a_95
+      A: net_dec_o_95
       B: pwr_vcc
-      Y: net_lgc0
+      Y: net_bctrl1
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_34
     part: 74HC04
     pins:
-      A: net_alu_op0
-      Y: net_dec_n0_97
+      A: net_alu_op1
+      Y: net_dec_n1_97
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_35
     part: 74HC04
     pins:
-      A: net_alu_op1
-      Y: net_dec_n1_98
+      A: net_alu_op2
+      Y: net_dec_n2_98
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_36
@@ -765,23 +765,23 @@ instances:
       Y: net_dec_n3_99
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_DEC_08_55
+  - ref: U_DEC_08_54
     part: 74HC08
     pins:
-      A: net_dec_n0_97
-      B: net_dec_n1_98
+      A: net_alu_op0
+      B: net_dec_n1_97
       Y: net_dec_a_100
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_DEC_08_56
+  - ref: U_DEC_08_55
     part: 74HC08
     pins:
       A: net_dec_a_100
-      B: net_alu_op2
+      B: net_dec_n2_98
       Y: net_dec_a_101
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_DEC_08_57
+  - ref: U_DEC_08_56
     part: 74HC08
     pins:
       A: net_dec_a_101
@@ -792,42 +792,42 @@ instances:
   - ref: U_DEC_04_37
     part: 74HC04
     pins:
-      A: net_alu_op1
-      Y: net_dec_n1_103
+      A: net_alu_op0
+      Y: net_dec_n0_103
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_38
     part: 74HC04
     pins:
-      A: net_alu_op3
-      Y: net_dec_n3_104
+      A: net_alu_op2
+      Y: net_dec_n2_104
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_57
+    part: 74HC08
+    pins:
+      A: net_dec_n0_103
+      B: net_alu_op1
+      Y: net_dec_a_105
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_58
     part: 74HC08
     pins:
-      A: net_alu_op0
-      B: net_dec_n1_103
-      Y: net_dec_a_105
+      A: net_dec_a_105
+      B: net_dec_n2_104
+      Y: net_dec_a_106
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_59
     part: 74HC08
     pins:
-      A: net_dec_a_105
-      B: net_alu_op2
-      Y: net_dec_a_106
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_08_60
-    part: 74HC08
-    pins:
       A: net_dec_a_106
-      B: net_dec_n3_104
+      B: net_alu_op3
       Y: net_dec_a_107
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_DEC_32_11
+  - ref: U_DEC_32_12
     part: 74HC32
     pins:
       A: net_dec_a_102
@@ -835,26 +835,26 @@ instances:
       Y: net_dec_o_108
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_DEC_08_61
+  - ref: U_DEC_08_60
     part: 74HC08
     pins:
       A: net_dec_o_108
       B: pwr_vcc
-      Y: net_lgc1
+      Y: net_bctrl2
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_39
     part: 74HC04
     pins:
-      A: net_alu_op0
-      Y: net_dec_n0_110
+      A: net_alu_op1
+      Y: net_dec_n1_110
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_40
     part: 74HC04
     pins:
-      A: net_alu_op1
-      Y: net_dec_n1_111
+      A: net_alu_op2
+      Y: net_dec_n2_111
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_41
@@ -864,23 +864,23 @@ instances:
       Y: net_dec_n3_112
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_DEC_08_62
+  - ref: U_DEC_08_61
     part: 74HC08
     pins:
-      A: net_dec_n0_110
-      B: net_dec_n1_111
+      A: net_alu_op0
+      B: net_dec_n1_110
       Y: net_dec_a_113
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_DEC_08_63
+  - ref: U_DEC_08_62
     part: 74HC08
     pins:
       A: net_dec_a_113
-      B: net_alu_op2
+      B: net_dec_n2_111
       Y: net_dec_a_114
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_DEC_08_64
+  - ref: U_DEC_08_63
     part: 74HC08
     pins:
       A: net_dec_a_114
@@ -891,42 +891,42 @@ instances:
   - ref: U_DEC_04_42
     part: 74HC04
     pins:
-      A: net_alu_op1
-      Y: net_dec_n1_116
+      A: net_alu_op0
+      Y: net_dec_n0_116
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_43
     part: 74HC04
     pins:
-      A: net_alu_op3
-      Y: net_dec_n3_117
+      A: net_alu_op2
+      Y: net_dec_n2_117
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_64
+    part: 74HC08
+    pins:
+      A: net_dec_n0_116
+      B: net_alu_op1
+      Y: net_dec_a_118
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_65
     part: 74HC08
     pins:
-      A: net_alu_op0
-      B: net_dec_n1_116
-      Y: net_dec_a_118
+      A: net_dec_a_118
+      B: net_dec_n2_117
+      Y: net_dec_a_119
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_66
     part: 74HC08
     pins:
-      A: net_dec_a_118
-      B: net_alu_op2
-      Y: net_dec_a_119
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_08_67
-    part: 74HC08
-    pins:
       A: net_dec_a_119
-      B: net_dec_n3_117
+      B: net_alu_op3
       Y: net_dec_a_120
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_DEC_32_12
+  - ref: U_DEC_32_13
     part: 74HC32
     pins:
       A: net_dec_a_115
@@ -934,67 +934,68 @@ instances:
       Y: net_dec_o_121
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_DEC_08_68
+  - ref: U_DEC_08_67
     part: 74HC08
     pins:
       A: net_dec_o_121
       B: pwr_vcc
-      Y: net_lgc2
+      Y: net_bctrl3
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_44
     part: 74HC04
     pins:
-      A: net_alu_op2
-      Y: net_dec_n2_123
+      A: net_alu_op1
+      Y: net_dec_n1_123
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_45
     part: 74HC04
     pins:
-      A: net_alu_op3
-      Y: net_dec_n3_124
+      A: net_alu_op2
+      Y: net_dec_n2_124
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_68
+    part: 74HC08
+    pins:
+      A: net_alu_op0
+      B: net_dec_n1_123
+      Y: net_dec_a_125
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_69
     part: 74HC08
     pins:
-      A: net_alu_op0
-      B: net_alu_op1
-      Y: net_dec_a_125
+      A: net_dec_a_125
+      B: net_dec_n2_124
+      Y: net_dec_a_126
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_70
     part: 74HC08
     pins:
-      A: net_dec_a_125
-      B: net_dec_n2_123
-      Y: net_dec_a_126
+      A: net_dec_a_126
+      B: net_alu_op3
+      Y: net_dec_a_127
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_71
     part: 74HC08
     pins:
-      A: net_dec_a_126
-      B: net_dec_n3_124
-      Y: net_dec_a_127
+      A: net_dec_a_127
+      B: pwr_vcc
+      Y: net_inc_en
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_46
     part: 74HC04
     pins:
       A: net_alu_op0
-      Y: net_dec_n0_128
+      Y: net_dec_n0_129
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_47
-    part: 74HC04
-    pins:
-      A: net_alu_op1
-      Y: net_dec_n1_129
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_04_48
     part: 74HC04
     pins:
       A: net_alu_op3
@@ -1004,8 +1005,8 @@ instances:
   - ref: U_DEC_08_72
     part: 74HC08
     pins:
-      A: net_dec_n0_128
-      B: net_dec_n1_129
+      A: net_dec_n0_129
+      B: net_alu_op1
       Y: net_dec_a_131
       VCC: pwr_vcc
       GND: pwr_gnd
@@ -1025,112 +1026,111 @@ instances:
       Y: net_dec_a_133
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_DEC_04_49
-    part: 74HC04
-    pins:
-      A: net_alu_op3
-      Y: net_dec_n3_134
-      VCC: pwr_vcc
-      GND: pwr_gnd
   - ref: U_DEC_08_75
     part: 74HC08
     pins:
+      A: net_dec_a_133
+      B: pwr_vcc
+      Y: net_lgc0
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_04_48
+    part: 74HC04
+    pins:
       A: net_alu_op0
-      B: net_alu_op1
-      Y: net_dec_a_135
+      Y: net_dec_n0_135
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_DEC_08_76
-    part: 74HC08
+  - ref: U_DEC_04_49
+    part: 74HC04
     pins:
-      A: net_dec_a_135
-      B: net_alu_op2
-      Y: net_dec_a_136
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_08_77
-    part: 74HC08
-    pins:
-      A: net_dec_a_136
-      B: net_dec_n3_134
-      Y: net_dec_a_137
+      A: net_alu_op1
+      Y: net_dec_n1_136
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_50
     part: 74HC04
     pins:
-      A: net_alu_op0
-      Y: net_dec_n0_138
+      A: net_alu_op3
+      Y: net_dec_n3_137
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_76
+    part: 74HC08
+    pins:
+      A: net_dec_n0_135
+      B: net_dec_n1_136
+      Y: net_dec_a_138
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_77
+    part: 74HC08
+    pins:
+      A: net_dec_a_138
+      B: net_alu_op2
+      Y: net_dec_a_139
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_78
+    part: 74HC08
+    pins:
+      A: net_dec_a_139
+      B: net_dec_n3_137
+      Y: net_dec_a_140
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_51
     part: 74HC04
     pins:
       A: net_alu_op1
-      Y: net_dec_n1_139
+      Y: net_dec_n1_141
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_52
     part: 74HC04
     pins:
-      A: net_alu_op2
-      Y: net_dec_n2_140
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_08_78
-    part: 74HC08
-    pins:
-      A: net_dec_n0_138
-      B: net_dec_n1_139
-      Y: net_dec_a_141
+      A: net_alu_op3
+      Y: net_dec_n3_142
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_79
     part: 74HC08
     pins:
-      A: net_dec_a_141
-      B: net_dec_n2_140
-      Y: net_dec_a_142
+      A: net_alu_op0
+      B: net_dec_n1_141
+      Y: net_dec_a_143
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_80
     part: 74HC08
     pins:
-      A: net_dec_a_142
-      B: net_alu_op3
-      Y: net_dec_a_143
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_32_13
-    part: 74HC32
-    pins:
-      A: net_dec_a_127
-      B: net_dec_a_133
-      Y: net_dec_o_144
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_32_14
-    part: 74HC32
-    pins:
-      A: net_dec_o_144
-      B: net_dec_a_137
-      Y: net_dec_o_145
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_32_15
-    part: 74HC32
-    pins:
-      A: net_dec_o_145
-      B: net_dec_a_143
-      Y: net_dec_o_146
+      A: net_dec_a_143
+      B: net_alu_op2
+      Y: net_dec_a_144
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_81
     part: 74HC08
     pins:
+      A: net_dec_a_144
+      B: net_dec_n3_142
+      Y: net_dec_a_145
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_32_14
+    part: 74HC32
+    pins:
+      A: net_dec_a_140
+      B: net_dec_a_145
+      Y: net_dec_o_146
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_82
+    part: 74HC08
+    pins:
       A: net_dec_o_146
       B: pwr_vcc
-      Y: net_lgc3
+      Y: net_lgc1
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_04_53
@@ -1143,23 +1143,22 @@ instances:
   - ref: U_DEC_04_54
     part: 74HC04
     pins:
-      A: net_alu_op2
-      Y: net_dec_n2_149
+      A: net_alu_op1
+      Y: net_dec_n1_149
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_DEC_08_82
-    part: 74HC08
+  - ref: U_DEC_04_55
+    part: 74HC04
     pins:
-      A: net_dec_n0_148
-      B: net_alu_op1
-      Y: net_dec_a_150
+      A: net_alu_op3
+      Y: net_dec_n3_150
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_83
     part: 74HC08
     pins:
-      A: net_dec_a_150
-      B: net_dec_n2_149
+      A: net_dec_n0_148
+      B: net_dec_n1_149
       Y: net_dec_a_151
       VCC: pwr_vcc
       GND: pwr_gnd
@@ -1167,7 +1166,7 @@ instances:
     part: 74HC08
     pins:
       A: net_dec_a_151
-      B: net_alu_op3
+      B: net_alu_op2
       Y: net_dec_a_152
       VCC: pwr_vcc
       GND: pwr_gnd
@@ -1175,101 +1174,290 @@ instances:
     part: 74HC08
     pins:
       A: net_dec_a_152
-      B: pwr_vcc
-      Y: net_b_const_hi
+      B: net_dec_n3_150
+      Y: net_dec_a_153
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_04_56
+    part: 74HC04
+    pins:
+      A: net_alu_op1
+      Y: net_dec_n1_154
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_04_57
+    part: 74HC04
+    pins:
+      A: net_alu_op3
+      Y: net_dec_n3_155
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_86
     part: 74HC08
     pins:
-      A: net_b_const_hi
-      B: pwr_vcc
-      Y: net_b_const_bit1
+      A: net_alu_op0
+      B: net_dec_n1_154
+      Y: net_dec_a_156
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_87
     part: 74HC08
     pins:
-      A: net_b_const_hi
-      B: pwr_vcc
-      Y: net_b_const_bit2
+      A: net_dec_a_156
+      B: net_alu_op2
+      Y: net_dec_a_157
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_88
     part: 74HC08
     pins:
-      A: net_b_const_hi
-      B: pwr_vcc
-      Y: net_b_const_bit3
+      A: net_dec_a_157
+      B: net_dec_n3_155
+      Y: net_dec_a_158
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_32_15
+    part: 74HC32
+    pins:
+      A: net_dec_a_153
+      B: net_dec_a_158
+      Y: net_dec_o_159
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_89
     part: 74HC08
     pins:
-      A: net_b_const_hi
+      A: net_dec_o_159
       B: pwr_vcc
-      Y: net_b_const_bit4
+      Y: net_lgc2
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_DEC_08_90
-    part: 74HC08
-    pins:
-      A: net_b_const_hi
-      B: pwr_vcc
-      Y: net_b_const_bit5
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_08_91
-    part: 74HC08
-    pins:
-      A: net_b_const_hi
-      B: pwr_vcc
-      Y: net_b_const_bit6
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_08_92
-    part: 74HC08
-    pins:
-      A: net_b_const_hi
-      B: pwr_vcc
-      Y: net_b_const_bit7
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_DEC_04_55
+  - ref: U_DEC_04_58
     part: 74HC04
     pins:
       A: net_alu_op2
       Y: net_dec_n2_161
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_DEC_08_93
+  - ref: U_DEC_04_59
+    part: 74HC04
+    pins:
+      A: net_alu_op3
+      Y: net_dec_n3_162
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_90
     part: 74HC08
     pins:
       A: net_alu_op0
       B: net_alu_op1
-      Y: net_dec_a_162
+      Y: net_dec_a_163
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_91
+    part: 74HC08
+    pins:
+      A: net_dec_a_163
+      B: net_dec_n2_161
+      Y: net_dec_a_164
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_92
+    part: 74HC08
+    pins:
+      A: net_dec_a_164
+      B: net_dec_n3_162
+      Y: net_dec_a_165
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_04_60
+    part: 74HC04
+    pins:
+      A: net_alu_op0
+      Y: net_dec_n0_166
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_04_61
+    part: 74HC04
+    pins:
+      A: net_alu_op1
+      Y: net_dec_n1_167
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_04_62
+    part: 74HC04
+    pins:
+      A: net_alu_op3
+      Y: net_dec_n3_168
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_93
+    part: 74HC08
+    pins:
+      A: net_dec_n0_166
+      B: net_dec_n1_167
+      Y: net_dec_a_169
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_94
     part: 74HC08
     pins:
-      A: net_dec_a_162
-      B: net_dec_n2_161
-      Y: net_dec_a_163
+      A: net_dec_a_169
+      B: net_alu_op2
+      Y: net_dec_a_170
       VCC: pwr_vcc
       GND: pwr_gnd
   - ref: U_DEC_08_95
     part: 74HC08
     pins:
-      A: net_dec_a_163
-      B: net_alu_op3
-      Y: net_dec_a_164
+      A: net_dec_a_170
+      B: net_dec_n3_168
+      Y: net_dec_a_171
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_DEC_04_56
+  - ref: U_DEC_04_63
     part: 74HC04
     pins:
-      A: net_dec_a_164
+      A: net_alu_op3
+      Y: net_dec_n3_172
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_96
+    part: 74HC08
+    pins:
+      A: net_alu_op0
+      B: net_alu_op1
+      Y: net_dec_a_173
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_97
+    part: 74HC08
+    pins:
+      A: net_dec_a_173
+      B: net_alu_op2
+      Y: net_dec_a_174
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_98
+    part: 74HC08
+    pins:
+      A: net_dec_a_174
+      B: net_dec_n3_172
+      Y: net_dec_a_175
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_04_64
+    part: 74HC04
+    pins:
+      A: net_alu_op0
+      Y: net_dec_n0_176
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_04_65
+    part: 74HC04
+    pins:
+      A: net_alu_op1
+      Y: net_dec_n1_177
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_04_66
+    part: 74HC04
+    pins:
+      A: net_alu_op2
+      Y: net_dec_n2_178
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_99
+    part: 74HC08
+    pins:
+      A: net_dec_n0_176
+      B: net_dec_n1_177
+      Y: net_dec_a_179
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_100
+    part: 74HC08
+    pins:
+      A: net_dec_a_179
+      B: net_dec_n2_178
+      Y: net_dec_a_180
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_101
+    part: 74HC08
+    pins:
+      A: net_dec_a_180
+      B: net_alu_op3
+      Y: net_dec_a_181
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_32_16
+    part: 74HC32
+    pins:
+      A: net_dec_a_165
+      B: net_dec_a_171
+      Y: net_dec_o_182
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_32_17
+    part: 74HC32
+    pins:
+      A: net_dec_o_182
+      B: net_dec_a_175
+      Y: net_dec_o_183
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_32_18
+    part: 74HC32
+    pins:
+      A: net_dec_o_183
+      B: net_dec_a_181
+      Y: net_dec_o_184
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_102
+    part: 74HC08
+    pins:
+      A: net_dec_o_184
+      B: pwr_vcc
+      Y: net_lgc3
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_04_67
+    part: 74HC04
+    pins:
+      A: net_alu_op2
+      Y: net_dec_n2_186
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_103
+    part: 74HC08
+    pins:
+      A: net_alu_op0
+      B: net_alu_op1
+      Y: net_dec_a_187
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_104
+    part: 74HC08
+    pins:
+      A: net_dec_a_187
+      B: net_dec_n2_186
+      Y: net_dec_a_188
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_08_105
+    part: 74HC08
+    pins:
+      A: net_dec_a_188
+      B: net_alu_op3
+      Y: net_dec_a_189
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_DEC_04_68
+    part: 74HC04
+    pins:
+      A: net_dec_a_189
       Y: net_cmp_n
       VCC: pwr_vcc
       GND: pwr_gnd
@@ -1312,226 +1500,191 @@ instances:
       C4: net_c_hi
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_ALU_04_BINV_0
-    part: 74HC04
-    pins:
-      A: net_b0
-      Y: net_b_inv0
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_ALU_04_BINV_1
-    part: 74HC04
-    pins:
-      A: net_b1
-      Y: net_b_inv1
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_ALU_04_BINV_2
-    part: 74HC04
-    pins:
-      A: net_b2
-      Y: net_b_inv2
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_ALU_04_BINV_3
-    part: 74HC04
-    pins:
-      A: net_b3
-      Y: net_b_inv3
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_ALU_04_BINV_4
-    part: 74HC04
-    pins:
-      A: net_b4
-      Y: net_b_inv4
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_ALU_04_BINV_5
-    part: 74HC04
-    pins:
-      A: net_b5
-      Y: net_b_inv5
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_ALU_04_BINV_6
-    part: 74HC04
-    pins:
-      A: net_b6
-      Y: net_b_inv6
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_ALU_04_BINV_7
-    part: 74HC04
-    pins:
-      A: net_b7
-      Y: net_b_inv7
-      VCC: pwr_vcc
-      GND: pwr_gnd
-  - ref: U_ALU_153_B_0
+  - ref: U_ALU_153_0
     part: 74HC153
     pins:
-      1C0: net_b0
-      1C1: net_b_inv0
-      1C2: pwr_vcc
-      1C3: pwr_vcc
+      1C0: net_lgc0
+      1C1: net_lgc1
+      1C2: net_lgc2
+      1C3: net_lgc3
       1G: pwr_gnd
-      1Y: net_b_add0
-      2C0: net_b1
-      2C1: net_b_inv1
-      2C2: pwr_gnd
-      2C3: pwr_vcc
+      1Y: net_y_logic0
+      2C0: net_bctrl0
+      2C1: net_bctrl1
+      2C2: net_153_2c20
+      2C3: net_bctrl3
+      2G: pwr_gnd
+      2Y: net_b_add0
+      A: net_a0
+      B: net_b153_sel0
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_ALU_153_1
+    part: 74HC153
+    pins:
+      1C0: net_lgc0
+      1C1: net_lgc1
+      1C2: net_lgc2
+      1C3: net_lgc3
+      1G: pwr_gnd
+      1Y: net_y_logic1
+      2C0: net_bctrl0
+      2C1: net_bctrl1
+      2C2: net_153_2c21
+      2C3: net_bctrl3
       2G: pwr_gnd
       2Y: net_b_add1
-      A: net_b_sel
-      B: net_b_const_sel
+      A: net_a1
+      B: net_b153_sel1
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_ALU_153_B_1
+  - ref: U_ALU_153_2
     part: 74HC153
     pins:
-      1C0: net_b2
-      1C1: net_b_inv2
-      1C2: pwr_gnd
-      1C3: pwr_vcc
+      1C0: net_lgc0
+      1C1: net_lgc1
+      1C2: net_lgc2
+      1C3: net_lgc3
       1G: pwr_gnd
-      1Y: net_b_add2
-      2C0: net_b3
-      2C1: net_b_inv3
-      2C2: pwr_gnd
-      2C3: pwr_vcc
+      1Y: net_y_logic2
+      2C0: net_bctrl0
+      2C1: net_bctrl1
+      2C2: net_153_2c22
+      2C3: net_bctrl3
+      2G: pwr_gnd
+      2Y: net_b_add2
+      A: net_a2
+      B: net_b153_sel2
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_ALU_153_3
+    part: 74HC153
+    pins:
+      1C0: net_lgc0
+      1C1: net_lgc1
+      1C2: net_lgc2
+      1C3: net_lgc3
+      1G: pwr_gnd
+      1Y: net_y_logic3
+      2C0: net_bctrl0
+      2C1: net_bctrl1
+      2C2: net_153_2c23
+      2C3: net_bctrl3
       2G: pwr_gnd
       2Y: net_b_add3
-      A: net_b_sel
-      B: net_b_const_sel
+      A: net_a3
+      B: net_b153_sel3
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_ALU_153_B_2
+  - ref: U_ALU_153_4
     part: 74HC153
     pins:
-      1C0: net_b4
-      1C1: net_b_inv4
-      1C2: pwr_gnd
-      1C3: pwr_vcc
+      1C0: net_lgc0
+      1C1: net_lgc1
+      1C2: net_lgc2
+      1C3: net_lgc3
       1G: pwr_gnd
-      1Y: net_b_add4
-      2C0: net_b5
-      2C1: net_b_inv5
-      2C2: pwr_gnd
-      2C3: pwr_vcc
+      1Y: net_y_logic4
+      2C0: net_bctrl0
+      2C1: net_bctrl1
+      2C2: net_153_2c24
+      2C3: net_bctrl3
+      2G: pwr_gnd
+      2Y: net_b_add4
+      A: net_a4
+      B: net_b153_sel4
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_ALU_153_5
+    part: 74HC153
+    pins:
+      1C0: net_lgc0
+      1C1: net_lgc1
+      1C2: net_lgc2
+      1C3: net_lgc3
+      1G: pwr_gnd
+      1Y: net_y_logic5
+      2C0: net_bctrl0
+      2C1: net_bctrl1
+      2C2: net_153_2c25
+      2C3: net_bctrl3
       2G: pwr_gnd
       2Y: net_b_add5
-      A: net_b_sel
-      B: net_b_const_sel
+      A: net_a5
+      B: net_b153_sel5
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_ALU_153_B_3
+  - ref: U_ALU_153_6
     part: 74HC153
     pins:
-      1C0: net_b6
-      1C1: net_b_inv6
-      1C2: pwr_gnd
-      1C3: pwr_vcc
+      1C0: net_lgc0
+      1C1: net_lgc1
+      1C2: net_lgc2
+      1C3: net_lgc3
       1G: pwr_gnd
-      1Y: net_b_add6
-      2C0: net_b7
-      2C1: net_b_inv7
-      2C2: pwr_gnd
-      2C3: pwr_vcc
+      1Y: net_y_logic6
+      2C0: net_bctrl0
+      2C1: net_bctrl1
+      2C2: net_153_2c26
+      2C3: net_bctrl3
       2G: pwr_gnd
-      2Y: net_b_add7
-      A: net_b_sel
-      B: net_b_const_sel
+      2Y: net_b_add6
+      A: net_a6
+      B: net_b153_sel6
       VCC: pwr_vcc
       GND: pwr_gnd
-  - ref: U_ALU_153_L_0
-    part: ALU_153_SLICE
+  - ref: U_ALU_153_7
+    part: 74HC153
     pins:
-      A: net_a0
-      B: net_b0
-      C0: net_lgc0
-      C1: net_lgc1
-      C2: net_lgc2
-      C3: net_lgc3
-      G: pwr_gnd
-      Y: net_y_logic0
-  - ref: U_ALU_153_L_1
-    part: ALU_153_SLICE
-    pins:
-      A: net_a1
-      B: net_b1
-      C0: net_lgc0
-      C1: net_lgc1
-      C2: net_lgc2
-      C3: net_lgc3
-      G: pwr_gnd
-      Y: net_y_logic1
-  - ref: U_ALU_153_L_2
-    part: ALU_153_SLICE
-    pins:
-      A: net_a2
-      B: net_b2
-      C0: net_lgc0
-      C1: net_lgc1
-      C2: net_lgc2
-      C3: net_lgc3
-      G: pwr_gnd
-      Y: net_y_logic2
-  - ref: U_ALU_153_L_3
-    part: ALU_153_SLICE
-    pins:
-      A: net_a3
-      B: net_b3
-      C0: net_lgc0
-      C1: net_lgc1
-      C2: net_lgc2
-      C3: net_lgc3
-      G: pwr_gnd
-      Y: net_y_logic3
-  - ref: U_ALU_153_L_4
-    part: ALU_153_SLICE
-    pins:
-      A: net_a4
-      B: net_b4
-      C0: net_lgc0
-      C1: net_lgc1
-      C2: net_lgc2
-      C3: net_lgc3
-      G: pwr_gnd
-      Y: net_y_logic4
-  - ref: U_ALU_153_L_5
-    part: ALU_153_SLICE
-    pins:
-      A: net_a5
-      B: net_b5
-      C0: net_lgc0
-      C1: net_lgc1
-      C2: net_lgc2
-      C3: net_lgc3
-      G: pwr_gnd
-      Y: net_y_logic5
-  - ref: U_ALU_153_L_6
-    part: ALU_153_SLICE
-    pins:
-      A: net_a6
-      B: net_b6
-      C0: net_lgc0
-      C1: net_lgc1
-      C2: net_lgc2
-      C3: net_lgc3
-      G: pwr_gnd
-      Y: net_y_logic6
-  - ref: U_ALU_153_L_7
-    part: ALU_153_SLICE
-    pins:
+      1C0: net_lgc0
+      1C1: net_lgc1
+      1C2: net_lgc2
+      1C3: net_lgc3
+      1G: pwr_gnd
+      1Y: net_y_logic7
+      2C0: net_bctrl0
+      2C1: net_bctrl1
+      2C2: net_153_2c27
+      2C3: net_bctrl3
+      2G: pwr_gnd
+      2Y: net_b_add7
       A: net_a7
-      B: net_b7
-      C0: net_lgc0
-      C1: net_lgc1
-      C2: net_lgc2
-      C3: net_lgc3
-      G: pwr_gnd
-      Y: net_y_logic7
+      B: net_b153_sel7
+      VCC: pwr_vcc
+      GND: pwr_gnd
+  - ref: U_ALU_INC_B_SEL
+    part: ALU_INC_B_SEL
+    pins:
+      EN: net_inc_en
+      B_IN0: net_b0
+      B_OUT0: net_b153_sel0
+      B_IN1: net_b1
+      B_OUT1: net_b153_sel1
+      B_IN2: net_b2
+      B_OUT2: net_b153_sel2
+      B_IN3: net_b3
+      B_OUT3: net_b153_sel3
+      B_IN4: net_b4
+      B_OUT4: net_b153_sel4
+      B_IN5: net_b5
+      B_OUT5: net_b153_sel5
+      B_IN6: net_b6
+      B_OUT6: net_b153_sel6
+      B_IN7: net_b7
+      B_OUT7: net_b153_sel7
+  - ref: U_ALU_INC_2C2
+    part: ALU_INC_2C2
+    pins:
+      EN: net_inc_en
+      BCTRL2: net_bctrl2
+      OUT0: net_153_2c20
+      OUT1: net_153_2c21
+      OUT2: net_153_2c22
+      OUT3: net_153_2c23
+      OUT4: net_153_2c24
+      OUT5: net_153_2c25
+      OUT6: net_153_2c26
+      OUT7: net_153_2c27
   - ref: U_ALU_157_YBP_0
     part: 74HC157
     pins:
@@ -1588,8 +1741,11 @@ instances:
       Y6: net_y6
       Y7: net_y7
       C_HI: net_c_hi
-      B_SEL: net_b_sel
       CIN: net_cin
+      BCTRL0: net_bctrl0
+      BCTRL1: net_bctrl1
+      BCTRL2: net_bctrl2
+      BCTRL3: net_bctrl3
       Z: net_cmp_z
       C_GE: net_cmp_c_ge
 nets:
@@ -1608,9 +1764,15 @@ nets:
     width: 1
   - name: net_153_s1
     width: 1
-  - name: net_b_sel
+  - name: net_bctrl0
     width: 1
-  - name: net_b_const_sel
+  - name: net_bctrl1
+    width: 1
+  - name: net_bctrl2
+    width: 1
+  - name: net_bctrl3
+    width: 1
+  - name: net_inc_en
     width: 1
   - name: net_lgc0
     width: 1
@@ -1619,22 +1781,6 @@ nets:
   - name: net_lgc2
     width: 1
   - name: net_lgc3
-    width: 1
-  - name: net_b_const_bit1
-    width: 1
-  - name: net_b_const_bit2
-    width: 1
-  - name: net_b_const_bit3
-    width: 1
-  - name: net_b_const_bit4
-    width: 1
-  - name: net_b_const_bit5
-    width: 1
-  - name: net_b_const_bit6
-    width: 1
-  - name: net_b_const_bit7
-    width: 1
-  - name: net_b_const_hi
     width: 1
   - name: net_cmp_n
     width: 1
@@ -1679,35 +1825,65 @@ nets:
     width: 1
   - name: net_dec_a_133
     width: 1
-  - name: net_dec_a_135
+  - name: net_dec_a_138
     width: 1
-  - name: net_dec_a_136
-    width: 1
-  - name: net_dec_a_137
+  - name: net_dec_a_139
     width: 1
   - name: net_dec_a_14
     width: 1
-  - name: net_dec_a_141
-    width: 1
-  - name: net_dec_a_142
+  - name: net_dec_a_140
     width: 1
   - name: net_dec_a_143
     width: 1
-  - name: net_dec_a_15
+  - name: net_dec_a_144
     width: 1
-  - name: net_dec_a_150
+  - name: net_dec_a_145
+    width: 1
+  - name: net_dec_a_15
     width: 1
   - name: net_dec_a_151
     width: 1
   - name: net_dec_a_152
     width: 1
-  - name: net_dec_a_16
+  - name: net_dec_a_153
     width: 1
-  - name: net_dec_a_162
+  - name: net_dec_a_156
+    width: 1
+  - name: net_dec_a_157
+    width: 1
+  - name: net_dec_a_158
+    width: 1
+  - name: net_dec_a_16
     width: 1
   - name: net_dec_a_163
     width: 1
   - name: net_dec_a_164
+    width: 1
+  - name: net_dec_a_165
+    width: 1
+  - name: net_dec_a_169
+    width: 1
+  - name: net_dec_a_170
+    width: 1
+  - name: net_dec_a_171
+    width: 1
+  - name: net_dec_a_173
+    width: 1
+  - name: net_dec_a_174
+    width: 1
+  - name: net_dec_a_175
+    width: 1
+  - name: net_dec_a_179
+    width: 1
+  - name: net_dec_a_180
+    width: 1
+  - name: net_dec_a_181
+    width: 1
+  - name: net_dec_a_187
+    width: 1
+  - name: net_dec_a_188
+    width: 1
+  - name: net_dec_a_189
     width: 1
   - name: net_dec_a_19
     width: 1
@@ -1779,35 +1955,41 @@ nets:
     width: 1
   - name: net_dec_a_8
     width: 1
-  - name: net_dec_a_81
-    width: 1
   - name: net_dec_a_82
     width: 1
   - name: net_dec_a_83
     width: 1
-  - name: net_dec_a_86
+  - name: net_dec_a_84
     width: 1
   - name: net_dec_a_87
     width: 1
   - name: net_dec_a_88
     width: 1
+  - name: net_dec_a_89
+    width: 1
   - name: net_dec_a_9
+    width: 1
+  - name: net_dec_a_91
+    width: 1
+  - name: net_dec_a_92
     width: 1
   - name: net_dec_a_93
     width: 1
-  - name: net_dec_a_94
-    width: 1
-  - name: net_dec_a_95
-    width: 1
   - name: net_dec_n0_0
     width: 1
-  - name: net_dec_n0_110
+  - name: net_dec_n0_103
     width: 1
-  - name: net_dec_n0_128
+  - name: net_dec_n0_116
     width: 1
-  - name: net_dec_n0_138
+  - name: net_dec_n0_129
+    width: 1
+  - name: net_dec_n0_135
     width: 1
   - name: net_dec_n0_148
+    width: 1
+  - name: net_dec_n0_166
+    width: 1
+  - name: net_dec_n0_176
     width: 1
   - name: net_dec_n0_22
     width: 1
@@ -1821,23 +2003,27 @@ nets:
     width: 1
   - name: net_dec_n0_67
     width: 1
-  - name: net_dec_n0_84
+  - name: net_dec_n0_79
     width: 1
-  - name: net_dec_n0_91
+  - name: net_dec_n0_85
     width: 1
-  - name: net_dec_n0_97
+  - name: net_dec_n1_110
     width: 1
-  - name: net_dec_n1_103
+  - name: net_dec_n1_123
     width: 1
-  - name: net_dec_n1_111
+  - name: net_dec_n1_136
     width: 1
-  - name: net_dec_n1_116
+  - name: net_dec_n1_141
     width: 1
-  - name: net_dec_n1_129
+  - name: net_dec_n1_149
     width: 1
-  - name: net_dec_n1_139
+  - name: net_dec_n1_154
+    width: 1
+  - name: net_dec_n1_167
     width: 1
   - name: net_dec_n1_17
+    width: 1
+  - name: net_dec_n1_177
     width: 1
   - name: net_dec_n1_32
     width: 1
@@ -1845,21 +2031,25 @@ nets:
     width: 1
   - name: net_dec_n1_48
     width: 1
-  - name: net_dec_n1_79
-    width: 1
-  - name: net_dec_n1_98
+  - name: net_dec_n1_97
     width: 1
   - name: net_dec_n2_1
     width: 1
+  - name: net_dec_n2_104
+    width: 1
+  - name: net_dec_n2_111
+    width: 1
+  - name: net_dec_n2_117
+    width: 1
   - name: net_dec_n2_12
     width: 1
-  - name: net_dec_n2_123
-    width: 1
-  - name: net_dec_n2_140
-    width: 1
-  - name: net_dec_n2_149
+  - name: net_dec_n2_124
     width: 1
   - name: net_dec_n2_161
+    width: 1
+  - name: net_dec_n2_178
+    width: 1
+  - name: net_dec_n2_186
     width: 1
   - name: net_dec_n2_33
     width: 1
@@ -1873,21 +2063,31 @@ nets:
     width: 1
   - name: net_dec_n2_80
     width: 1
-  - name: net_dec_n2_85
+  - name: net_dec_n2_86
     width: 1
-  - name: net_dec_n3_104
+  - name: net_dec_n2_90
+    width: 1
+  - name: net_dec_n2_98
     width: 1
   - name: net_dec_n3_112
-    width: 1
-  - name: net_dec_n3_117
-    width: 1
-  - name: net_dec_n3_124
     width: 1
   - name: net_dec_n3_13
     width: 1
   - name: net_dec_n3_130
     width: 1
-  - name: net_dec_n3_134
+  - name: net_dec_n3_137
+    width: 1
+  - name: net_dec_n3_142
+    width: 1
+  - name: net_dec_n3_150
+    width: 1
+  - name: net_dec_n3_155
+    width: 1
+  - name: net_dec_n3_162
+    width: 1
+  - name: net_dec_n3_168
+    width: 1
+  - name: net_dec_n3_172
     width: 1
   - name: net_dec_n3_18
     width: 1
@@ -1905,7 +2105,7 @@ nets:
     width: 1
   - name: net_dec_n3_63
     width: 1
-  - name: net_dec_n3_92
+  - name: net_dec_n3_81
     width: 1
   - name: net_dec_n3_99
     width: 1
@@ -1915,11 +2115,15 @@ nets:
     width: 1
   - name: net_dec_o_121
     width: 1
-  - name: net_dec_o_144
-    width: 1
-  - name: net_dec_o_145
-    width: 1
   - name: net_dec_o_146
+    width: 1
+  - name: net_dec_o_159
+    width: 1
+  - name: net_dec_o_182
+    width: 1
+  - name: net_dec_o_183
+    width: 1
+  - name: net_dec_o_184
     width: 1
   - name: net_dec_o_37
     width: 1
@@ -1937,7 +2141,9 @@ nets:
     width: 1
   - name: net_dec_o_77
     width: 1
-  - name: net_dec_o_89
+  - name: net_dec_o_94
+    width: 1
+  - name: net_dec_o_95
     width: 1
 
   - name: net_a0
@@ -1978,9 +2184,15 @@ nets:
     width: 1
   - name: net_153_s1
     width: 1
-  - name: net_b_sel
+  - name: net_bctrl0
     width: 1
-  - name: net_b_const_sel
+  - name: net_bctrl1
+    width: 1
+  - name: net_bctrl2
+    width: 1
+  - name: net_bctrl3
+    width: 1
+  - name: net_inc_en
     width: 1
   - name: net_lgc0
     width: 1
@@ -1998,7 +2210,7 @@ nets:
   - name: net_cmp_c_ge
     width: 1
     probes: [cmp_c_ge]
-  - name: net_b_inv0
+  - name: net_b153_sel0
     width: 1
   - name: net_b_add0
     width: 1
@@ -2006,7 +2218,9 @@ nets:
     width: 1
   - name: net_y_logic0
     width: 1
-  - name: net_b_inv1
+  - name: net_153_2c20
+    width: 1
+  - name: net_b153_sel1
     width: 1
   - name: net_b_add1
     width: 1
@@ -2014,7 +2228,9 @@ nets:
     width: 1
   - name: net_y_logic1
     width: 1
-  - name: net_b_inv2
+  - name: net_153_2c21
+    width: 1
+  - name: net_b153_sel2
     width: 1
   - name: net_b_add2
     width: 1
@@ -2022,7 +2238,9 @@ nets:
     width: 1
   - name: net_y_logic2
     width: 1
-  - name: net_b_inv3
+  - name: net_153_2c22
+    width: 1
+  - name: net_b153_sel3
     width: 1
   - name: net_b_add3
     width: 1
@@ -2030,7 +2248,9 @@ nets:
     width: 1
   - name: net_y_logic3
     width: 1
-  - name: net_b_inv4
+  - name: net_153_2c23
+    width: 1
+  - name: net_b153_sel4
     width: 1
   - name: net_b_add4
     width: 1
@@ -2038,7 +2258,9 @@ nets:
     width: 1
   - name: net_y_logic4
     width: 1
-  - name: net_b_inv5
+  - name: net_153_2c24
+    width: 1
+  - name: net_b153_sel5
     width: 1
   - name: net_b_add5
     width: 1
@@ -2046,7 +2268,9 @@ nets:
     width: 1
   - name: net_y_logic5
     width: 1
-  - name: net_b_inv6
+  - name: net_153_2c25
+    width: 1
+  - name: net_b153_sel6
     width: 1
   - name: net_b_add6
     width: 1
@@ -2054,13 +2278,17 @@ nets:
     width: 1
   - name: net_y_logic6
     width: 1
-  - name: net_b_inv7
+  - name: net_153_2c26
+    width: 1
+  - name: net_b153_sel7
     width: 1
   - name: net_b_add7
     width: 1
   - name: net_sum7
     width: 1
   - name: net_y_logic7
+    width: 1
+  - name: net_153_2c27
     width: 1
   - name: net_y0
     width: 1

@@ -38,6 +38,6 @@ checks:
     budget_ns: 250
     min_slack_ns: 0
   - type: slack
-    path: [U_ALU_153_L_0.A, U_ALU_153_L_0.Y, U_ALU_157_YBP_0.4B, U_ALU_157_YBP_0.4Y]
+    path: [U_ALU_153_0.A, U_ALU_153_0.1Y, U_ALU_157_YBP_0.4B, U_ALU_157_YBP_0.4Y]
     budget_ns: 250
     min_slack_ns: 0

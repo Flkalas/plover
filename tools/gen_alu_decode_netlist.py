@@ -1,12 +1,33 @@
 """Generate hw/netlist/blocks/alu_decode.yaml — 4-bit alu_op to ALU control (74HC04/08/32)."""
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 
+from alu_decode_cost import score_truth_table
 from alu_opcode_decode import CTRL_NETS, LGC_NETS, op_bits, truth_table
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "hw" / "netlist" / "blocks" / "alu_decode.yaml"
+
+
+@dataclass(frozen=True)
+class GateCount:
+    n04: int
+    n08: int
+    n32: int
+
+    @property
+    def total(self) -> int:
+        return self.n04 + self.n08 + self.n32
+
+    def __str__(self) -> str:
+        return f"{self.n04}x04 {self.n08}x08 {self.n32}x32 total={self.total}"
+
+
+def legacy_gate_count(rows: list[dict], *, cmp_op: int = 11) -> GateCount:
+    cost = score_truth_table(rows, CTRL_NETS + LGC_NETS, cmp_op=cmp_op, include_cmp_n=True)
+    return GateCount(cost.n04, cost.n08, cost.n32)
 
 
 class NetlistGen:
@@ -99,8 +120,9 @@ class NetlistGen:
             {"A": src, "B": "pwr_vcc", "Y": dst, "VCC": "pwr_vcc", "GND": "pwr_gnd"},
         )
 
-    def build(self) -> None:
-        table = truth_table()
+    def build(self, table: list[dict] | None = None) -> None:
+        if table is None:
+            table = truth_table()
 
         for sig in CTRL_NETS + LGC_NETS:
             ops = [r["op"] for r in table if r.get(sig, 0) == 1]
@@ -110,16 +132,6 @@ class NetlistGen:
             else:
                 self._buf("pwr_gnd", sig)
 
-        ops_hi = [r["op"] for r in table if r.get("b_const_hi", 0) == 1]
-        if ops_hi:
-            term = self._or_many([self._match_op(op) for op in ops_hi])
-            self._buf(term, "net_b_const_hi")
-        else:
-            self._buf("pwr_gnd", "net_b_const_hi")
-
-        for i in range(1, 8):
-            self._buf("net_b_const_hi", f"net_b_const_bit{i}")
-
         # cmp_n active low on CMP (op 11)
         m11 = self._match_op(11)
         ref = self._new04()
@@ -128,6 +140,16 @@ class NetlistGen:
             "74HC04",
             {"A": m11, "Y": "net_cmp_n", "VCC": "pwr_vcc", "GND": "pwr_gnd"},
         )
+
+    def gate_count(self, rows: list[dict], *, cmp_op: int = 11) -> GateCount:
+        saved = (self._n04, self._n08, self._n32, list(self.instances), set(self.internal_nets))
+        self._n04 = self._n08 = self._n32 = 0
+        self.instances = []
+        self.internal_nets = set()
+        self.build(rows)
+        cost = GateCount(self._n04, self._n08, self._n32)
+        self._n04, self._n08, self._n32, self.instances, self.internal_nets = saved
+        return cost
 
     def write(self) -> None:
         self.build()
@@ -144,11 +166,7 @@ class NetlistGen:
         ]
         for sig in CTRL_NETS + LGC_NETS:
             nets += [f"  - name: {sig}", "    width: 1"]
-        for i in range(1, 8):
-            nets += [f"  - name: net_b_const_bit{i}", "    width: 1"]
         nets += [
-            "  - name: net_b_const_hi",
-            "    width: 1",
             "  - name: net_cmp_n",
             "    width: 1",
             "    probes: [cmp_n]",

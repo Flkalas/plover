@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
-from alu8_cases import CASES, bits  # noqa: E402
+from alu8_cases import BCTRL_SUB, CASES, bits  # noqa: E402
 
 SLOT = 600
 
@@ -15,6 +15,40 @@ SLOT = 600
 def write_set(d: dict[str, int], indent: int = 6) -> list[str]:
     sp = " " * indent
     return [f"{sp}{k}: {d[k]}" for k in sorted(d.keys(), key=lambda x: (len(x), x))]
+
+
+def _arith_path(name: str, c: dict[str, int]) -> list[str]:
+    bctrl = tuple(c.get(f"net_bctrl{i}", 0) for i in range(4))
+    if name in ("SUB", "CMP") or bctrl == BCTRL_SUB:
+        return [
+            "net_b0",
+            "U_ALU_153_0.B",
+            "U_ALU_153_0.2Y",
+            "U_ALU_283_LO.B0",
+            "U_ALU_283_LO.C4",
+            "U_ALU_283_HI.C4",
+            "U_ALU_157_YBP_0.1A",
+            "U_ALU_157_YBP_0.1Y",
+        ]
+    if name == "INC" or c.get("net_inc_en"):
+        return [
+            "net_inc_en",
+            "U_ALU_INC_B_SEL.B_OUT0",
+            "U_ALU_153_0.B",
+            "U_ALU_153_0.2Y",
+            "U_ALU_283_LO.B0",
+            "U_ALU_283_LO.C4",
+            "U_ALU_283_HI.C4",
+            "U_ALU_157_YBP_0.1A",
+            "U_ALU_157_YBP_0.1Y",
+        ]
+    return [
+        "U_ALU_283_LO.A0",
+        "U_ALU_283_LO.C4",
+        "U_ALU_283_HI.C4",
+        "U_ALU_157_YBP_0.1A",
+        "U_ALU_157_YBP_0.1Y",
+    ]
 
 
 def main() -> None:
@@ -33,35 +67,15 @@ def main() -> None:
     lines.append("checks:")
     for i, (name, _a, _b, _exp, c) in enumerate(CASES):
         s0, s1 = c.get("net_153_s0", 0), c.get("net_153_s1", 0)
-        b_sel = c.get("net_b_sel", 0)
         if s0 or s1:
             path = [
-                "U_ALU_153_L_0.A",
-                "U_ALU_153_L_0.Y",
+                "U_ALU_153_0.A",
+                "U_ALU_153_0.1Y",
                 "U_ALU_157_YBP_0.4B",
                 "U_ALU_157_YBP_0.4Y",
             ]
-        elif name in ("SUB", "CMP", "DEC") or b_sel:
-            path = [
-                "net_b0",
-                "U_ALU_04_BINV_0.A",
-                "U_ALU_04_BINV_0.Y",
-                "U_ALU_153_B_0.1C1",
-                "U_ALU_153_B_0.1Y",
-                "U_ALU_283_LO.B0",
-                "U_ALU_283_LO.C4",
-                "U_ALU_283_HI.C4",
-                "U_ALU_157_YBP_0.1A",
-                "U_ALU_157_YBP_0.1Y",
-            ]
         else:
-            path = [
-                "U_ALU_283_LO.A0",
-                "U_ALU_283_LO.C4",
-                "U_ALU_283_HI.C4",
-                "U_ALU_157_YBP_0.1A",
-                "U_ALU_157_YBP_0.1Y",
-            ]
+            path = _arith_path(name, c)
         lines += [
             f"  - type: slack",
             f"    label: {name}",

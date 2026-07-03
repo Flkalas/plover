@@ -3,18 +3,18 @@ from __future__ import annotations
 
 from alu8_cases import CASES, LOGIC_C
 
-# Maps alu8_cases ctrl() keys to ALU net names.
 CTRL_NETS = [
     "net_cin",
     "net_153_s0",
     "net_153_s1",
-    "net_b_sel",
-    "net_b_const_sel",
+    "net_bctrl0",
+    "net_bctrl1",
+    "net_bctrl2",
+    "net_bctrl3",
+    "net_inc_en",
 ]
 
 LGC_NETS = ["net_lgc0", "net_lgc1", "net_lgc2", "net_lgc3"]
-
-B_CONST_HI_KEY = "b_const_hi"  # drives net_b_const_bit1..7 together
 
 
 def opcode_control(op: int) -> dict[str, int]:
@@ -25,11 +25,6 @@ def opcode_control(op: int) -> dict[str, int]:
     out: dict[str, int] = {}
     for k in CTRL_NETS:
         out[k] = int(c.get(k, 0))
-    hi = 0
-    for i in range(1, 8):
-        hi = int(c.get(f"net_b_const_bit{i}", 0))
-        break
-    out["b_const_hi"] = hi
     out["net_cmp_n"] = 0 if op == 11 else 1
     cpat = LOGIC_C.get(op, (0, 0, 0, 0))
     for i, net in enumerate(LGC_NETS):
@@ -40,7 +35,6 @@ def opcode_control(op: int) -> dict[str, int]:
 def _nop_ctrl() -> dict[str, int]:
     return {
         **{k: 0 for k in CTRL_NETS},
-        "b_const_hi": 0,
         "net_cmp_n": 1,
     }
 

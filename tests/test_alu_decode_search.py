@@ -52,7 +52,7 @@ def test_legacy_score_matches_netlist_gen():
     gen_cost = gen.gate_count(rows, cmp_op=11)
     scored = legacy_gate_count(rows, cmp_op=11)
     assert gen_cost == scored
-    assert gen_cost.total == 166
+    assert gen_cost.total == 191
 
 
 def test_y_mux_profile_not_worse_than_legacy():
@@ -61,7 +61,7 @@ def test_y_mux_profile_not_worse_than_legacy():
     y_mux = score_assignment(cur, PROFILE_Y_MUX)
     assert legacy is not None and y_mux is not None
     assert y_mux.total <= legacy.total
-    assert y_mux.total == 154
+    assert y_mux.total == 179
 
 
 def test_minimal_profile_cheaper_than_y_mux():
@@ -70,7 +70,7 @@ def test_minimal_profile_cheaper_than_y_mux():
     minimal = score_assignment(cur, PROFILE_MINIMAL)
     assert y_mux is not None and minimal is not None
     assert minimal.total < y_mux.total
-    assert minimal.total == 104
+    assert minimal.total == 142
 
 
 def test_build_table_sub_cmp_distinct_codes():
@@ -78,7 +78,8 @@ def test_build_table_sub_cmp_distinct_codes():
     rows, cmp_op = build_table(assign, PROFILE_Y_MUX)
     assert cmp_op == 11
     assert rows[2]["net_cin"] == rows[11]["net_cin"] == 1
-    assert rows[2]["net_b_sel"] == rows[11]["net_b_sel"] == 1
+    assert rows[2]["net_bctrl0"] == rows[11]["net_bctrl0"] == 1
+    assert rows[2]["net_bctrl1"] == rows[11]["net_bctrl1"] == 1
 
 
 def test_alu8_y_unchanged_under_assignment_permutation():
@@ -111,7 +112,7 @@ def test_lgc_direct_logic_opcodes_match_wire():
 def test_lgc_direct_exhaustive_finds_optimal():
     found = search_lgc_direct(top=1)
     assert found
-    assert found[0]["cost"]["total"] == 37
+    assert found[0]["cost"]["total"] == 67
 
 
 def test_lgc_direct_better_than_minimal_sop():
@@ -125,8 +126,8 @@ def test_sop_dip_packing():
     assign = merge_lgc_direct(default_lgc_direct_arith())
     rows, cmp_op = build_table(assign, PROFILE_LGC_DIRECT)
     sop = score_sop(rows, PROFILE_LGC_DIRECT, cmp_op=cmp_op)
-    assert sop.gates == 37
-    assert sop.dips == 9
+    assert sop.gates == 70
+    assert sop.dips == 17
 
 
 def test_hc154_lgc_direct_default():
@@ -134,9 +135,9 @@ def test_hc154_lgc_direct_default():
     rows, cmp_op = build_table(assign, PROFILE_LGC_DIRECT)
     hc = score_hc154(rows, PROFILE_LGC_DIRECT, cmp_op=cmp_op)
     assert hc.parts["74HC154"] == 1
-    assert hc.parts.get("74HC00", 0) == 4  # 4 NAND gates
+    assert hc.parts.get("74HC00", 0) == 7
     decode_dips = pack_dips({"74HC154": 1, "74HC00": hc.parts.get("74HC00", 0)})
-    assert decode_dips <= 2
+    assert decode_dips <= 4
     assert hc.advanced_blocks == 1
 
 
@@ -146,10 +147,12 @@ def test_hc154_glue_semantics():
     by_op = {r["op"]: r for r in rows}
     assert by_op[0x0B]["net_cin"] == 1
     assert by_op[0x0F]["net_cin"] == 1
-    assert by_op[0x0B]["net_b_sel"] == by_op[0x0E]["net_b_sel"] == by_op[0x0F]["net_b_sel"] == 1
-    assert by_op[0x0D]["net_b_const_sel"] == by_op[0x0E]["net_b_const_sel"] == 1
+    assert by_op[0x0B]["net_bctrl0"] == by_op[0x0E]["net_bctrl0"] == by_op[0x0F]["net_bctrl0"] == 1
+    assert by_op[0x0D]["net_inc_en"] == 1
+    assert by_op[0x0E]["net_inc_en"] == 0
+    assert by_op[0x0E]["net_bctrl3"] == 1
     hc = score_hc154(rows, PROFILE_LGC_DIRECT, cmp_op=cmp_op)
-    assert hc.parts.get("74HC00", 0) == 4
+    assert hc.parts.get("74HC00", 0) == 7
 
 
 def test_cw_direct_zero_cost():
@@ -171,7 +174,7 @@ def test_pareto_cw_dominates_sop():
 def test_pareto_exhaustive_regression():
     found = search_lgc_direct(top=1)
     assert found
-    assert found[0]["cost"]["total"] == 37
+    assert found[0]["cost"]["total"] == 67
 
 
 def test_candidate_dict_has_arch_costs():
@@ -196,5 +199,5 @@ def test_pareto_front_nonempty():
 def test_lgc_direct_parallel_matches_serial():
   serial = search_lgc_direct(top=3, workers=1)
   parallel = search_lgc_direct(top=3, workers=2)
-  assert serial[0]["cost"]["total"] == parallel[0]["cost"]["total"] == 37
+  assert serial[0]["cost"]["total"] == parallel[0]["cost"]["total"] == 67
   assert serial[0]["assignment"] == parallel[0]["assignment"]

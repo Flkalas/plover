@@ -26,6 +26,6 @@ stimulus:
       net_b7: 0
 checks:
   - type: slack
-    path: [net_alu_op0, net_b0, U_ALU_04_BINV_0.A, U_ALU_04_BINV_0.Y, U_ALU_153_B_0.1C1, U_ALU_153_B_0.1Y, U_ALU_283_LO.B0, U_ALU_283_LO.C4, U_ALU_283_HI.C4, U_ALU_157_YBP_0.1A, U_ALU_157_YBP_0.1Y]
+    path: [net_alu_op0, net_b0, U_ALU_153_0.B, U_ALU_153_0.2Y, U_ALU_283_LO.B0, U_ALU_283_LO.C4, U_ALU_283_HI.C4, U_ALU_157_YBP_0.1A, U_ALU_157_YBP_0.1Y]
     budget_ns: 250
     min_slack_ns: 0
