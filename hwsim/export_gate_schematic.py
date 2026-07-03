@@ -30,6 +30,7 @@ def _gate_title(unit: ViewUnit) -> str:
         "not_gate": "NOT",
         "mux4_b": "MUX 4:1",
         "mux4_l": "MUX 4:1",
+        "mux4_bit": "MUX 4:1×2",
         "adder4": "ADD 4-bit",
         "mux2_y": "MUX 2:1",
         "and_gate": "AND",
@@ -51,7 +52,7 @@ def _gate_body_svg(kind: str, cx: float, cy: float) -> list[str]:
             f'L{cx + 8:.1f},{cy + 18:.1f} Z" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>',
             f'<circle cx="{cx + 16:.1f}" cy="{cy:.1f}" r="4" fill="none" stroke="#58a6ff" stroke-width="2"/>',
         ]
-    if kind in ("mux4_b", "mux4_l"):
+    if kind in ("mux4_b", "mux4_l", "mux4_bit"):
         return [
             f'<path d="M{cx - 32:.1f},{cy - 36:.1f} L{cx + 24:.1f},{cy - 20:.1f} '
             f'L{cx + 24:.1f},{cy + 20:.1f} L{cx - 32:.1f},{cy + 36:.1f} Z" '

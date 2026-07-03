@@ -20,7 +20,7 @@ pins:
   "16": { sym: VCC, role: power, desc: Positive supply }
   "14": { sym: A, role: input, desc: Operand select LSB (net_a[i]) }
 plover_netlist:
-  note: Phase B2 — eight refs U_ALU_153_L_0..7; breadboard may use 4×74HC153 (one active mux per DIP).
+  note: Deprecated — use 74HC153 dip16 (U_ALU_153_0..7 bit-slice). Kept for legacy ALU_153_SLICE netlists.
   map:
     G: { dip: 1 }
     B: { dip: 2 }

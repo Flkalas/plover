@@ -37,14 +37,21 @@ COL = {
     "io_in": 80.0,
     "not_gate": 220.0,
     "mux4_b": 400.0,
+    "mux4_bit": 580.0,
     "adder4": 580.0,
     "mux4_l": 760.0,
     "mux2_y": 940.0,
     "io_out": 1100.0,
 }
 
-# 74HC153 data inputs: netlist/extract use C0..C3; display as D0..D3
+# 74HC153 data inputs: netlist uses C0..C3 or 1C0..2C3; display as D0..D3
 _HC153_DATA_PIN = {"C0": "D0", "C1": "D1", "C2": "D2", "C3": "D3"}
+for _mux in ("1", "2"):
+    for _i in range(4):
+        _HC153_DATA_PIN[f"{_mux}C{_i}"] = f"D{_i}"
+
+_MUX4_BIT_LEFT_ORDER = ("1C0", "1C1", "1C2", "1C3", "2C0", "2C1", "2C2", "2C3")
+_MUX4_BIT_BOTTOM_ORDER = ("A", "B", "1G", "2G")
 
 
 @dataclass
@@ -73,6 +80,8 @@ def _bit_index(unit: ViewUnit) -> int | None:
     if unit.kind == "not_gate":
         return int(unit.id.split("_")[1])
     if unit.kind == "mux4_l":
+        return int(unit.id.split("_")[-1])
+    if unit.kind == "mux4_bit":
         return int(unit.id.split("_")[-1])
     if unit.kind == "mux2_y":
         return int(unit.id.split("_")[-1])
@@ -121,7 +130,7 @@ def _pin_description(kind: str, logical: str) -> str:
     """IC pin name for schematic label (not net or ALU purpose name)."""
     if not logical:
         return ""
-    if kind in ("mux4_b", "mux4_l") and logical in _HC153_DATA_PIN:
+    if kind in ("mux4_b", "mux4_l", "mux4_bit") and logical in _HC153_DATA_PIN:
         return _HC153_DATA_PIN[logical]
     return logical
 
@@ -151,8 +160,8 @@ def _short_label(unit: ViewUnit) -> str:
         return f"~B{bit}"
     if unit.kind == "mux4_b":
         return f"B{bit}"
-    if unit.kind == "mux4_l":
-        return f"L{bit}"
+    if unit.kind in ("mux4_l", "mux4_bit"):
+        return f"L{bit}" if unit.kind == "mux4_l" else f"153{bit}"
     if unit.kind == "mux2_y":
         return f"Y{bit}"
     if unit.id == "283_lo":
@@ -284,6 +293,15 @@ def _left_port_slots(ex: UnitExtract, left_nets: list[str]) -> list[_PortSlot]:
                 slots.append(_PortSlot("fixed", logical, value=fixed_by[logical]))
         return slots
 
+    if ex.unit.kind == "mux4_bit":
+        slots = []
+        for logical in _MUX4_BIT_LEFT_ORDER:
+            if logical in net_by and net_by[logical] in left_set:
+                slots.append(_PortSlot("net", logical, net=net_by[logical]))
+            elif logical in fixed_by:
+                slots.append(_PortSlot("fixed", logical, value=fixed_by[logical]))
+        return slots
+
     slots = []
     for net in _sort_left_ins(left_nets):
         logical = next(
@@ -303,6 +321,8 @@ def _bottom_port_slots(ex: UnitExtract, bottom_nets: list[str]) -> list[_PortSlo
     order: tuple[str, ...] | None
     if ex.unit.kind in ("mux4_b", "mux4_l"):
         order = ("A", "B", "G")
+    elif ex.unit.kind == "mux4_bit":
+        order = _MUX4_BIT_BOTTOM_ORDER
     elif ex.unit.kind == "mux2_y":
         order = ("S", "OE")
     else:
@@ -401,6 +421,12 @@ def _split_inputs_for_unit(ex: UnitExtract, in_nets: list[str]) -> tuple[list[st
         in_set = set(in_nets)
         net_by = _in_by_logical(ex)
         left = [net_by[p] for p in ("C0", "C1", "C2", "C3") if p in net_by and net_by[p] in in_set]
+        bottom = [net_by[p] for p in ("A", "B") if p in net_by and net_by[p] in in_set]
+        return left, bottom
+    if ex.unit.kind == "mux4_bit":
+        in_set = set(in_nets)
+        net_by = _in_by_logical(ex)
+        left = [net_by[p] for p in _MUX4_BIT_LEFT_ORDER if p in net_by and net_by[p] in in_set]
         bottom = [net_by[p] for p in ("A", "B") if p in net_by and net_by[p] in in_set]
         return left, bottom
     return _split_inputs(in_nets)

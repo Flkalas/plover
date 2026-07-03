@@ -79,19 +79,13 @@ def gate_move_summary(
     for part_key, by_pkg in optimized.items():
         for pkg_id, slot_map in by_pkg.items():
             for slot_key, ref in slot_map.items():
-                if part_key == "ALU_153_SLICE":
-                    opt_slots[ref] = GateSlot(pkg_id, "74HC153", None, int(slot_key.replace("mux", "")))
-                else:
-                    opt_slots[ref] = GateSlot(pkg_id, part_key, int(slot_key))
+                opt_slots[ref] = GateSlot(pkg_id, part_key, int(slot_key))
 
     def_slots: dict[str, GateSlot] = {}
     for part_key, by_pkg in default.items():
         for pkg_id, slot_map in by_pkg.items():
             for slot_key, ref in slot_map.items():
-                if part_key == "ALU_153_SLICE":
-                    def_slots[ref] = GateSlot(pkg_id, "74HC153", None, int(slot_key.replace("mux", "")))
-                else:
-                    def_slots[ref] = GateSlot(pkg_id, part_key, int(slot_key))
+                def_slots[ref] = GateSlot(pkg_id, part_key, int(slot_key))
 
     lines: list[str] = []
     moved = 0

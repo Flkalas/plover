@@ -177,6 +177,8 @@ def extract_unit(nl: Netlist, unit: ViewUnit) -> UnitExtract:
     elif unit.kind == "mux4_b":
         mux = int(unit.slot.replace("mux", ""))
         pkg, pins = _slice_153_b_mux(inst, mux)
+    elif unit.kind == "mux4_bit":
+        pkg, pins = _package_whole(inst)
     elif unit.kind == "mux4_l":
         pkg, pins = _package_whole(inst)
         pkg = PhysicalPackage(

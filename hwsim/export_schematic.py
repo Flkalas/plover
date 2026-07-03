@@ -26,22 +26,24 @@ PART_LAYOUT_ORDER: dict[str, int] = {
     "ALU_CMP_SUB": 55,
 }
 
-# Behavioral-only — omitted from assembly schematic (14 physical DIP).
-ALU8_ASSEMBLY_SKIP_REFS = frozenset({"U_ALU_Y_MUX_SEL", "U_ALU_CMP_SUB"})
+# Behavioral-only — omitted from assembly schematic (12 physical DIP).
+ALU8_ASSEMBLY_SKIP_REFS = frozenset(
+    {"U_ALU_Y_MUX_SEL", "U_ALU_CMP_SUB", "U_ALU_INC_B_SEL", "U_ALU_INC_2C2"}
+)
 
 CONTROL_NET_PREFIXES = (
     "net_lgc",
     "net_153_s",
     "net_y_mux_sel",
-    "net_b_sel",
-    "net_b_const",
+    "net_bctrl",
+    "net_inc_en",
     "net_cin",
     "net_cmp_z",
     "net_cmp_c_ge",
 )
 
 _ASSEMBLY_NOTE_ORPHAN = (
-    "glue: s0|s1 OR → net_y_mux_sel; cmp_z/c_ge from SUB (net_y, net_c_hi) — no extra DIP"
+    "glue: INC_B_SEL + INC_2C2 + y_mux_sel + cmp from SUB — no extra DIP"
 )
 
 POWER_PINS = frozenset({"VCC", "VDD", "GND", "VSS"})
@@ -59,6 +61,73 @@ class PhysicalPackage:
 
 
 ROUTE_STUB = 32.0
+
+ASSEMBLY_IO_PANEL_PKG = "__io_panel__"
+
+ASSEMBLY_LAYOUT = {
+    "cols": 3,
+    "body_w": 72.0,
+    "body_h": 100.0,
+    "pin_len": 18.0,
+    "gap_x": 156.0,
+    "gap_y": 88.0,
+    "margin": 40.0,
+    "route_stub": ROUTE_STUB,
+    "stub_step": 0,
+    "pin_label_off": 6,
+    "stagger": False,
+    "io_panel_width": 128,
+    "io_corridor": 72,
+    "io_chip_extra": 0,
+}
+
+_IO_SECTIONS: list[tuple[str, list[str]]] = [
+    ("A in", [f"net_a{i}" for i in range(8)]),
+    ("B in", [f"net_b{i}" for i in range(8)]),
+    (
+        "Control",
+        [
+            "net_153_s0",
+            "net_153_s1",
+            "net_lgc3",
+            "net_lgc2",
+            "net_lgc1",
+            "net_lgc0",
+            "net_bctrl3",
+            "net_bctrl2",
+            "net_bctrl1",
+            "net_bctrl0",
+            "net_inc_en",
+            "net_cin",
+            "net_y_mux_sel",
+        ],
+    ),
+    ("Y out", [f"net_y{i}" for i in range(8)] + ["net_cmp_c_ge", "net_cmp_z"]),
+]
+
+
+def _net_hub_center(pts: list[PinAnchor]) -> tuple[float, float]:
+    if not pts:
+        return 0.0, 0.0
+    return sum(p.x for p in pts) / len(pts), sum(p.y for p in pts) / len(pts)
+
+
+def _route_from_panel(
+    px: float,
+    py: float,
+    hx: float,
+    hy: float,
+    *,
+    stub: float = 32.0,
+    lane_x: float | None = None,
+    pin_side: str = "left",
+) -> str:
+    lane_x = (px + hx) / 2 if lane_x is None else lane_x
+    ex = px - stub if pin_side == "left" else px + stub
+    return (
+        f"{px:.1f},{py:.1f} {ex:.1f},{py:.1f} {lane_x:.1f},{py:.1f} "
+        f"{lane_x:.1f},{hy:.1f} {hx:.1f},{hy:.1f}"
+    )
 
 
 @dataclass
@@ -133,48 +202,10 @@ def _is_control_net(net: str) -> bool:
     return any(net == p or net.startswith(p) for p in CONTROL_NET_PREFIXES)
 
 
-def _alu153_slice_pin_to_153(mux: int, pin: str) -> str:
-    """Map ALU_153_SLICE pin to 74HC153 netlist symbol (mux 1 or 2)."""
-    if pin in ("A", "B", "VCC", "GND"):
-        return pin
-    if pin == "G":
-        return f"{mux}G"
-    if pin == "Y":
-        return f"{mux}Y"
-    if pin.startswith("C") and len(pin) == 2:
-        return f"{mux}{pin}"
-    return pin
-
-
 def _group_alu8_assembly(instances: list[Instance]) -> list[PhysicalPackage]:
-    """14 DIP packages — matches hw-bringup-alu8-assembly-spec / BOM (no 7485)."""
-    merged_l: dict[str, PhysicalPackage] = {}
-    rest: list[Instance] = []
-
-    for inst in instances:
-        if inst.ref in ALU8_ASSEMBLY_SKIP_REFS:
-            continue
-        if inst.part == "ALU_153_SLICE":
-            m = re.fullmatch(r"U_ALU_153_L_(\d+)", inst.ref)
-            if not m:
-                rest.append(inst)
-                continue
-            bit = int(m.group(1))
-            chip = bit // 2
-            mux = (bit % 2) + 1
-            pkg_id = f"U_ALU_153_L_{chip}"
-            if pkg_id not in merged_l:
-                merged_l[pkg_id] = PhysicalPackage(id=pkg_id, part="74HC153")
-            pkg = merged_l[pkg_id]
-            pkg.instance_refs.append(inst.ref)
-            for pin, net in inst.pins.items():
-                if not _skip_connection(pin, net):
-                    logical = _alu153_slice_pin_to_153(mux, pin)
-                    pkg.connections.append((logical, _normalize_net(pin, net), None))
-            continue
-        rest.append(inst)
-
-    return _group_logical(rest) + list(merged_l.values())
+    """12 DIP packages — Gigatron bit-slice 153×8 (glue skipped)."""
+    filtered = [i for i in instances if i.ref not in ALU8_ASSEMBLY_SKIP_REFS]
+    return _group_logical(filtered)
 
 
 def group_into_packages(
@@ -270,6 +301,34 @@ def _package_pin_count(part: str, pinout: dict) -> int:
     return 16
 
 
+def _pinout_power_net(dip: int, pinout: dict) -> str | None:
+    pins = pinout.get("pins", {})
+    if not isinstance(pins, dict):
+        return None
+    ent = pins.get(str(dip))
+    if not isinstance(ent, dict):
+        return None
+    sym = str(ent.get("sym", ""))
+    if sym in ("VCC", "VDD"):
+        return PWR_VCC
+    if sym in ("GND", "VSS"):
+        return PWR_GND
+    return None
+
+
+def _package_dip_connections(
+    pkg: PhysicalPackage,
+    pinout: dict,
+) -> dict[int, list[tuple[str, str, int | None]]]:
+    out: dict[int, list[tuple[str, str, int | None]]] = {}
+    for logical, net, gate in pkg.connections:
+        dip = _logical_to_dip_pin(logical, gate, pinout)
+        if dip is None:
+            continue
+        out.setdefault(dip, []).append((logical, net, gate))
+    return out
+
+
 def dip_pin_position(
     dip_pin: int,
     n_pins: int,
@@ -278,6 +337,8 @@ def dip_pin_position(
     body_w: float,
     body_h: float,
     pin_len: float = 16.0,
+    *,
+    pin_pitch: float | None = None,
 ) -> tuple[float, float, str]:
     """Pin 1 lower-left, notch up; left column 1..n/2 bottom-up, right top-down."""
     half = n_pins // 2
@@ -303,10 +364,24 @@ def _net_color(net: str) -> str:
 
 
 def _route_polyline(
-    x1: float, y1: float, x2: float, y2: float, side: str, stub: float = ROUTE_STUB
+    x1: float,
+    y1: float,
+    x2: float,
+    y2: float,
+    side: str,
+    stub: float = ROUTE_STUB,
+    *,
+    dip_pin: int | None = None,
+    n_pins: int = 16,
+    stub_step: float = 0.0,
 ) -> str:
     """Exit horizontally from pin (left pins go left, right pins go right), then to hub."""
-    ex = x1 - stub if side == "left" else x1 + stub
+    extra = 0.0
+    if dip_pin is not None and stub_step:
+        half = max(n_pins // 2, 1)
+        extra = ((dip_pin - 1) % half) * stub_step
+    effective = stub + extra
+    ex = x1 - effective if side == "left" else x1 + effective
     return f"{x1:.1f},{y1:.1f} {ex:.1f},{y1:.1f} {ex:.1f},{y2:.1f} {x2:.1f},{y2:.1f}"
 
 
@@ -354,6 +429,7 @@ def export_schematic_svg(
     *,
     cols: int = 5,
     assembly: bool | None = None,
+    layout_spec=None,
 ) -> str:
     if assembly is None:
         assembly = nl.block == "alu8"
@@ -371,7 +447,14 @@ def export_schematic_svg(
 
     positions: dict[str, tuple[float, float]] = {}
     sorted_pkgs = sorted(packages, key=_package_sort_key)
+    if layout_spec is not None and getattr(layout_spec, "positions_px", None):
+        for pkg in sorted_pkgs:
+            pos = layout_spec.positions_px.get(pkg.id)
+            if pos is not None:
+                positions[pkg.id] = pos
     for i, pkg in enumerate(sorted_pkgs):
+        if pkg.id in positions:
+            continue
         col = i % cols
         row = i // cols
         x_off = stagger_x if row % 2 == 1 else 0.0
@@ -383,6 +466,11 @@ def export_schematic_svg(
     rows = (len(sorted_pkgs) + cols - 1) // cols if sorted_pkgs else 1
     width = margin * 2 + (cols - 1) * pitch_x + body_w + stagger_x
     height = margin * 2 + 36 + rows * pitch_y
+    if positions:
+        max_x = max(x for x, _ in positions.values()) + body_w
+        max_y = max(y for _, y in positions.values()) + body_h
+        width = max(width, margin + max_x)
+        height = max(height, margin + max_y)
 
     anchors: list[PinAnchor] = []
     chip_elems: list[str] = []
@@ -555,7 +643,7 @@ def export_schematic_svg(
         f'<text x="{margin:.0f}" y="{margin + 12:.0f}" class="lbl-part">'
         f"block: {_esc(nl.block)}"
         + (
-            f" (assembly 14 DIP) | packages: {len(sorted_pkgs)} | "
+            f" (assembly 12 DIP) | packages: {len(sorted_pkgs)} | "
             f"signals: {signal_nets} | control: orange | {_ASSEMBLY_NOTE_ORPHAN} | "
             f"VCC: {vcc_count} GND: {gnd_count}"
             if assembly

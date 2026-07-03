@@ -11,25 +11,24 @@ def _unit(unit_id: str):
     return next(u for u in load_alu8_catalog() if u.id == unit_id)
 
 
-def test_not_gate_scope_pins_not_whole_chip():
+def test_mux4_bit_scope_pins():
     root = Path(__file__).resolve().parents[1]
     nl = load_netlist(root / "hw/netlist/blocks/alu8.yaml")
-    scope = unit_scope(nl, _unit("not_0"))
-    assert "net_b0" in scope.nets
-    assert "net_b_inv0" in scope.nets
-    assert len(scope.gate_pins) == 2
-    pkgs = {p.pkg for p in scope.gate_pins}
-    assert any("04" in p for p in pkgs)
+    scope = unit_scope(nl, _unit("mux4_bit_0"))
+    assert "net_a0" in scope.nets
+    assert "net_b153_sel0" in scope.nets
+    assert len(scope.gate_pins) >= 10
 
 
-def test_mux4_b_only_one_mux_pins():
+def test_mux4_bit_dual_mux_pins():
     root = Path(__file__).resolve().parents[1]
     nl = load_netlist(root / "hw/netlist/blocks/alu8.yaml")
-    scope = unit_scope(nl, _unit("mux4_b_0_1"))
-    logicals = {p.logical for p in scope.gate_pins if p.pkg == "U_ALU_153_B_0"}
+    scope = unit_scope(nl, _unit("mux4_bit_0"))
+    logicals = {p.logical for p in scope.gate_pins if p.pkg == "U_ALU_153_0"}
     assert "1Y" in logicals
-    assert "2Y" not in logicals
-    assert "2C0" not in logicals
+    assert "2Y" in logicals
+    assert "1C0" in logicals
+    assert "2C0" in logicals
 
 
 def test_adder_lo_gate_pins_and_carry_net():

@@ -72,38 +72,38 @@ variants:
         abstract:
           x_mm: 333.55
           y_mm: 499.1
-      U_ALU_153_B_0:
-        abstract:
-          x_mm: 397.25
-          y_mm: 243.6
-      U_ALU_153_L_0:
+      U_ALU_153_0:
         abstract:
           x_mm: 474.96
           y_mm: 189.0
-      U_ALU_153_B_1:
+      U_ALU_153_1:
         abstract:
-          x_mm: 301.7
-          y_mm: 89.6
-      U_ALU_153_L_1:
+          x_mm: 397.25
+          y_mm: 243.6
+      U_ALU_153_2:
         abstract:
           x_mm: 269.85
           y_mm: 308.0
-      U_ALU_153_B_2:
+      U_ALU_153_3:
         abstract:
-          x_mm: 429.1
-          y_mm: 107.1
-      U_ALU_153_L_2:
+          x_mm: 301.7
+          y_mm: 89.6
+      U_ALU_153_4:
         abstract:
           x_mm: 220.16
           y_mm: 216.3
-      U_ALU_153_B_3:
+      U_ALU_153_5:
         abstract:
-          x_mm: 315.71
-          y_mm: 417.2
-      U_ALU_153_L_3:
+          x_mm: 429.1
+          y_mm: 107.1
+      U_ALU_153_6:
         abstract:
           x_mm: 347.56
           y_mm: 352.8
+      U_ALU_153_7:
+        abstract:
+          x_mm: 315.71
+          y_mm: 417.2
       U_ALU_157_YBP_0:
         abstract:
           x_mm: 156.46
@@ -124,19 +124,6 @@ variants:
         U_ALU_04_BINV_#2:
           '1': U_ALU_04_BINV_6
           '2': U_ALU_04_BINV_7
-      ALU_153_SLICE:
-        U_ALU_153_L_0:
-          mux1: U_ALU_153_L_0
-          mux2: U_ALU_153_L_1
-        U_ALU_153_L_1:
-          mux1: U_ALU_153_L_2
-          mux2: U_ALU_153_L_3
-        U_ALU_153_L_2:
-          mux1: U_ALU_153_L_4
-          mux2: U_ALU_153_L_5
-        U_ALU_153_L_3:
-          mux1: U_ALU_153_L_6
-          mux2: U_ALU_153_L_7
     metrics:
       total_wire_mm:
         abstract: 70070.2
@@ -223,38 +210,38 @@ variants:
         abstract:
           x_mm: 333.55
           y_mm: 471.8
-      U_ALU_153_B_0:
-        abstract:
-          x_mm: 347.56
-          y_mm: 144.2
-      U_ALU_153_L_0:
+      U_ALU_153_0:
         abstract:
           x_mm: 474.96
           y_mm: 189.0
-      U_ALU_153_B_1:
+      U_ALU_153_1:
         abstract:
-          x_mm: 174.3
-          y_mm: 107.1
-      U_ALU_153_L_1:
+          x_mm: 347.56
+          y_mm: 144.2
+      U_ALU_153_2:
         abstract:
           x_mm: 301.7
           y_mm: 89.6
-      U_ALU_153_B_2:
+      U_ALU_153_3:
         abstract:
-          x_mm: 429.1
+          x_mm: 174.3
           y_mm: 107.1
-      U_ALU_153_L_2:
+      U_ALU_153_4:
         abstract:
           x_mm: 252.01
           y_mm: 189.0
-      U_ALU_153_B_3:
+      U_ALU_153_5:
         abstract:
-          x_mm: 220.16
-          y_mm: 380.1
-      U_ALU_153_L_3:
+          x_mm: 429.1
+          y_mm: 107.1
+      U_ALU_153_6:
         abstract:
           x_mm: 174.3
           y_mm: 298.2
+      U_ALU_153_7:
+        abstract:
+          x_mm: 220.16
+          y_mm: 380.1
       U_ALU_157_YBP_0:
         abstract:
           x_mm: 206.15
@@ -275,19 +262,6 @@ variants:
         U_ALU_04_BINV_#2:
           '1': U_ALU_04_BINV_6
           '2': U_ALU_04_BINV_7
-      ALU_153_SLICE:
-        U_ALU_153_L_0:
-          mux1: U_ALU_153_L_0
-          mux2: U_ALU_153_L_1
-        U_ALU_153_L_1:
-          mux1: U_ALU_153_L_2
-          mux2: U_ALU_153_L_3
-        U_ALU_153_L_2:
-          mux1: U_ALU_153_L_4
-          mux2: U_ALU_153_L_5
-        U_ALU_153_L_3:
-          mux1: U_ALU_153_L_6
-          mux2: U_ALU_153_L_7
     metrics:
       total_wire_mm:
         abstract: 59593.2

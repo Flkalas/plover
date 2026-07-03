@@ -34,5 +34,4 @@ pins:
 plover_netlist:
   note: alu8 ties 1G/2G to GND (always enabled). Netlist uses TI-style 1C* names.
   roles:
-    U_ALU_153_B_0..3: B-path mux — A=`net_b_sel`, B=`net_b_const_sel`; C0=B, C1=~B, C2=INC, C3=DEC
-    U_ALU_153_L_0..3: Gigatron logic — mux1/mux2 per DIP (hwsim slices L_2n/L_2n+1); A/B=operand sel, C*=net_lgc0..3
+    U_ALU_153_0..7: Gigatron bit-slice — mux1=logic (1C*=lgc, 1Y=y_logic), mux2=B-path (2C0=B, 2C1=~B, 2Y=b_add); A/B=`net_153_a/b[i]` via AB bus glue

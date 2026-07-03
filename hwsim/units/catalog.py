@@ -13,6 +13,7 @@ UNIT_KINDS = frozenset(
         "not_gate",
         "mux4_b",
         "mux4_l",
+        "mux4_bit",
         "adder4",
         "mux2_y",
         "and_gate",
@@ -29,6 +30,7 @@ CATEGORY_LABELS = {
     "not_gate": "NOT (~B)",
     "mux4_b": "MUX B-path",
     "mux4_l": "MUX Logic",
+    "mux4_bit": "MUX bit-slice",
     "adder4": "4-bit Adder",
     "mux2_y": "Y bypass",
     "and_gate": "AND",
@@ -60,36 +62,11 @@ def _build_alu8_units() -> list[ViewUnit]:
     for i in range(8):
         units.append(
             ViewUnit(
-                id=f"not_{i}",
-                kind="not_gate",
-                label=f"~B[{i}]",
+                id=f"mux4_bit_{i}",
+                kind="mux4_bit",
+                label=f"153[{i}] logic+B",
                 stage=2,
-                package_ref=f"U_ALU_04_BINV_{i}",
-            )
-        )
-
-    for chip in range(4):
-        for mux in (1, 2):
-            bit0 = chip * 2 + (mux - 1)
-            units.append(
-                ViewUnit(
-                    id=f"mux4_b_{chip}_{mux}",
-                    kind="mux4_b",
-                    label=f"153_B[{chip}] mux{mux} (b{bit0})",
-                    stage=2,
-                    package_ref=f"U_ALU_153_B_{chip}",
-                    slot=f"mux{mux}",
-                )
-            )
-
-    for i in range(8):
-        units.append(
-            ViewUnit(
-                id=f"mux4_l_{i}",
-                kind="mux4_l",
-                label=f"153_L[{i}]",
-                stage=3,
-                package_ref=f"U_ALU_153_L_{i}",
+                package_ref=f"U_ALU_153_{i}",
             )
         )
 

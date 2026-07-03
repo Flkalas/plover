@@ -16,8 +16,11 @@ A_OPERAND_BITS = tuple(f"net_a{i}" for i in range(8))
 IO_CONTROL = frozenset(
     {
         "net_cin",
-        "net_b_sel",
-        "net_b_const_sel",
+        "net_bctrl0",
+        "net_bctrl1",
+        "net_bctrl2",
+        "net_bctrl3",
+        "net_inc_en",
         "net_lgc0",
         "net_lgc1",
         "net_lgc2",
@@ -32,7 +35,8 @@ IO_CONTROL = frozenset(
 
 # Nets that exist in netlist but stay inside the ALU block (no IO stub).
 INTERNAL_NET_PREFIXES = (
-    "net_b_inv",
+    "net_b153_sel",
+    "net_153_2c2",
     "net_b_add",
     "net_sum",
     "net_y_logic",

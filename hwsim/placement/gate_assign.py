@@ -252,13 +252,7 @@ def gate_assign_to_slot_map(
     for part_key, by_pkg in gate_assign.items():
         for pkg_id, slot_map in by_pkg.items():
             for slot_key, ref in slot_map.items():
-                if part_key == "ALU_153_SLICE":
-                    mux = int(slot_key.replace("mux", ""))
-                    result[ref] = GateSlot(
-                        package_id=pkg_id, part="74HC153", gate=None, mux=mux
-                    )
-                else:
-                    result[ref] = GateSlot(
+                result[ref] = GateSlot(
                         package_id=pkg_id, part=part_key, gate=int(slot_key)
                     )
     return result

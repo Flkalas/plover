@@ -49,6 +49,10 @@ def _assembly_package_for_ref(nl: Netlist, ref: str) -> str:
     return ref
 
 
+def _153_pin_logical(pin: str) -> str:
+    return pin
+
+
 def _153_mux_logical(mux: int, pin: str) -> str:
     if pin in ("A", "B", "VCC", "GND"):
         return pin
@@ -114,6 +118,15 @@ def _gate_pins_from_extracted(
             sym = _153_mux_logical(mux, logical)
             _add_gate_pin(pins, pkg=asm_pkg, part="74HC153", logical=sym)
 
+    elif unit.kind == "mux4_bit":
+        asm_pkg = unit.package_ref
+        inst = next(i for i in nl.instances if i.ref == unit.package_ref)
+        for pin in inst.pins:
+            if pin in ("A", "B", "VCC", "GND"):
+                _add_gate_pin(pins, pkg=asm_pkg, part="74HC153", logical=pin)
+            elif pin in ("1G", "2G", "1Y", "2Y") or pin.startswith(("1C", "2C")):
+                _add_gate_pin(pins, pkg=asm_pkg, part="74HC153", logical=pin)
+
     elif unit.kind == "mux4_l":
         bit = int(unit.package_ref.rsplit("_", 1)[-1])
         mux = (bit % 2) + 1
@@ -149,7 +162,7 @@ def unit_scope(nl: Netlist, unit: ViewUnit) -> UnitScope:
     refs: set[str] = {unit.package_ref}
     if unit.kind == "not_gate":
         refs.add(unit.package_ref)
-    elif unit.kind == "mux4_l":
+    elif unit.kind == "mux4_bit":
         refs.add(unit.package_ref)
 
     return UnitScope(

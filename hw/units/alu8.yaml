@@ -1,134 +1,46 @@
 version: 1
 block: alu8
 units:
-  - id: not_0
-    kind: not_gate
-    label: ~B[0]
+  - id: mux4_bit_0
+    kind: mux4_bit
+    label: 153[0] logic+B
     stage: 2
-    package_ref: U_ALU_04_BINV_0
-  - id: not_1
-    kind: not_gate
-    label: ~B[1]
+    package_ref: U_ALU_153_0
+  - id: mux4_bit_1
+    kind: mux4_bit
+    label: 153[1] logic+B
     stage: 2
-    package_ref: U_ALU_04_BINV_1
-  - id: not_2
-    kind: not_gate
-    label: ~B[2]
+    package_ref: U_ALU_153_1
+  - id: mux4_bit_2
+    kind: mux4_bit
+    label: 153[2] logic+B
     stage: 2
-    package_ref: U_ALU_04_BINV_2
-  - id: not_3
-    kind: not_gate
-    label: ~B[3]
+    package_ref: U_ALU_153_2
+  - id: mux4_bit_3
+    kind: mux4_bit
+    label: 153[3] logic+B
     stage: 2
-    package_ref: U_ALU_04_BINV_3
-  - id: not_4
-    kind: not_gate
-    label: ~B[4]
+    package_ref: U_ALU_153_3
+  - id: mux4_bit_4
+    kind: mux4_bit
+    label: 153[4] logic+B
     stage: 2
-    package_ref: U_ALU_04_BINV_4
-  - id: not_5
-    kind: not_gate
-    label: ~B[5]
+    package_ref: U_ALU_153_4
+  - id: mux4_bit_5
+    kind: mux4_bit
+    label: 153[5] logic+B
     stage: 2
-    package_ref: U_ALU_04_BINV_5
-  - id: not_6
-    kind: not_gate
-    label: ~B[6]
+    package_ref: U_ALU_153_5
+  - id: mux4_bit_6
+    kind: mux4_bit
+    label: 153[6] logic+B
     stage: 2
-    package_ref: U_ALU_04_BINV_6
-  - id: not_7
-    kind: not_gate
-    label: ~B[7]
+    package_ref: U_ALU_153_6
+  - id: mux4_bit_7
+    kind: mux4_bit
+    label: 153[7] logic+B
     stage: 2
-    package_ref: U_ALU_04_BINV_7
-  - id: mux4_b_0_1
-    kind: mux4_b
-    label: 153_B[0] mux1 (b0)
-    stage: 2
-    package_ref: U_ALU_153_B_0
-    slot: mux1
-  - id: mux4_b_0_2
-    kind: mux4_b
-    label: 153_B[0] mux2 (b1)
-    stage: 2
-    package_ref: U_ALU_153_B_0
-    slot: mux2
-  - id: mux4_b_1_1
-    kind: mux4_b
-    label: 153_B[1] mux1 (b2)
-    stage: 2
-    package_ref: U_ALU_153_B_1
-    slot: mux1
-  - id: mux4_b_1_2
-    kind: mux4_b
-    label: 153_B[1] mux2 (b3)
-    stage: 2
-    package_ref: U_ALU_153_B_1
-    slot: mux2
-  - id: mux4_b_2_1
-    kind: mux4_b
-    label: 153_B[2] mux1 (b4)
-    stage: 2
-    package_ref: U_ALU_153_B_2
-    slot: mux1
-  - id: mux4_b_2_2
-    kind: mux4_b
-    label: 153_B[2] mux2 (b5)
-    stage: 2
-    package_ref: U_ALU_153_B_2
-    slot: mux2
-  - id: mux4_b_3_1
-    kind: mux4_b
-    label: 153_B[3] mux1 (b6)
-    stage: 2
-    package_ref: U_ALU_153_B_3
-    slot: mux1
-  - id: mux4_b_3_2
-    kind: mux4_b
-    label: 153_B[3] mux2 (b7)
-    stage: 2
-    package_ref: U_ALU_153_B_3
-    slot: mux2
-  - id: mux4_l_0
-    kind: mux4_l
-    label: 153_L[0]
-    stage: 3
-    package_ref: U_ALU_153_L_0
-  - id: mux4_l_1
-    kind: mux4_l
-    label: 153_L[1]
-    stage: 3
-    package_ref: U_ALU_153_L_1
-  - id: mux4_l_2
-    kind: mux4_l
-    label: 153_L[2]
-    stage: 3
-    package_ref: U_ALU_153_L_2
-  - id: mux4_l_3
-    kind: mux4_l
-    label: 153_L[3]
-    stage: 3
-    package_ref: U_ALU_153_L_3
-  - id: mux4_l_4
-    kind: mux4_l
-    label: 153_L[4]
-    stage: 3
-    package_ref: U_ALU_153_L_4
-  - id: mux4_l_5
-    kind: mux4_l
-    label: 153_L[5]
-    stage: 3
-    package_ref: U_ALU_153_L_5
-  - id: mux4_l_6
-    kind: mux4_l
-    label: 153_L[6]
-    stage: 3
-    package_ref: U_ALU_153_L_6
-  - id: mux4_l_7
-    kind: mux4_l
-    label: 153_L[7]
-    stage: 3
-    package_ref: U_ALU_153_L_7
+    package_ref: U_ALU_153_7
   - id: 283_lo
     kind: adder4
     label: 283 LO (a0-3)

@@ -6,11 +6,12 @@ from hwsim.netlist import load_netlist
 from hwsim.units.catalog import UNIT_KINDS, load_alu8_catalog, validate_catalog
 
 
-def test_alu8_catalog_has_34_units():
+def test_alu8_catalog_has_18_units():
     units = load_alu8_catalog()
-    assert len(units) == 34
+    assert len(units) == 18
     kinds = {u.kind for u in units}
-    assert kinds == UNIT_KINDS
+    assert "mux4_bit" in kinds
+    assert kinds <= UNIT_KINDS
 
 
 def test_catalog_validates_against_netlist():
@@ -26,6 +27,5 @@ def test_stage_counts():
     for u in units:
         stages[u.stage] = stages.get(u.stage, 0) + 1
     assert stages[1] == 2
-    assert stages[2] == 16
-    assert stages[3] == 8
+    assert stages[2] == 8
     assert stages[4] == 8

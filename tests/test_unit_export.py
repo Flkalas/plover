@@ -12,16 +12,16 @@ def test_export_units_writes_gate_svgs(tmp_path):
     out = tmp_path / "units"
     manifest = export_units(nl_path, output_dir=out, html=True, embed_manifest=True)
 
-    assert (out / "not_0.svg").is_file()
+    assert (out / "mux4_bit_0.svg").is_file()
     assert (out / "alu8-gates.svg").is_file()
     assert (out / "alu8-gates.html").is_file()
     assert (out / "manifest.json").is_file()
     assert (out / "index.html").is_file()
     assert not (out / "alu8-full.svg").exists()
-    assert len(manifest["units"]) == 34
+    assert len(manifest["units"]) == 18
     assert manifest.get("view") == "gate"
 
-    svg = (out / "not_0.svg").read_text(encoding="utf-8")
+    svg = (out / "mux4_bit_0.svg").read_text(encoding="utf-8")
     assert 'data-gate-view="1"' in svg
     assert 'id="gate"' in svg
     assert 'class="chip"' not in svg

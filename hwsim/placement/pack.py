@@ -7,7 +7,6 @@ import re
 from hwsim.export_schematic import (
     GATES_PER_CHIP,
     PhysicalPackage,
-    _alu153_slice_pin_to_153,
     _group_alu8_assembly,
     _instance_base,
     _instance_index,
@@ -79,22 +78,6 @@ def build_part_families(
     families: dict[str, PartFamily] = {}
 
     for part, part_units in by_part.items():
-        if part == "ALU_153_SLICE" and assembly:
-            pkg_ids = [p.id for p in packages if p.part == "74HC153" and "_L_" in p.id]
-            pkg_ids = sorted(set(pkg_ids))
-            slots = [
-                GateSlot(package_id=pid, part="74HC153", gate=None, mux=m)
-                for pid in pkg_ids
-                for m in (1, 2)
-            ]
-            families["ALU_153_SLICE"] = PartFamily(
-                part="ALU_153_SLICE",
-                packages=pkg_ids,
-                slots=slots,
-                unit_refs=[u.ref for u in part_units],
-            )
-            continue
-
         gpc = GATES_PER_CHIP.get(part)
         if gpc:
             pkg_ids = _package_ids_for_part(packages, part)
@@ -120,20 +103,6 @@ def default_slot_for_ref(
     *,
     assembly: bool,
 ) -> GateSlot | None:
-    if part == "ALU_153_SLICE" and assembly:
-        m = re.fullmatch(r"U_ALU_153_L_(\d+)", ref)
-        if not m:
-            return None
-        bit = int(m.group(1))
-        chip = bit // 2
-        mux = (bit % 2) + 1
-        return GateSlot(
-            package_id=f"U_ALU_153_L_{chip}",
-            part="74HC153",
-            gate=None,
-            mux=mux,
-        )
-
     gpc = GATES_PER_CHIP.get(part)
     if not gpc:
         return None
@@ -174,21 +143,6 @@ def apply_gate_assign(
     result: list[PhysicalPackage] = []
 
     for part_key, by_pkg in gate_assign.items():
-        if part_key == "ALU_153_SLICE":
-            for pkg_id, slot_map in by_pkg.items():
-                pkg = PhysicalPackage(id=pkg_id, part="74HC153")
-                for slot_key, ref in slot_map.items():
-                    mux = int(slot_key.replace("mux", ""))
-                    inst = inst_by_ref[ref]
-                    pkg.instance_refs.append(ref)
-                    for pin, net in inst.pins.items():
-                        if _skip_connection(pin, net):
-                            continue
-                        logical = _alu153_slice_pin_to_153(mux, pin)
-                        pkg.connections.append((logical, _normalize_net(pin, net), None))
-                result.append(pkg)
-            continue
-
         for pkg_id, slot_map in by_pkg.items():
             pkg = PhysicalPackage(id=pkg_id, part=part_key)
             for slot_key, ref in slot_map.items():
@@ -224,8 +178,6 @@ def merge_packages_with_assign(
         if pkg.id in reassigned_ids:
             continue
         if pkg.part in GATES_PER_CHIP and pkg.part in reassigned_parts:
-            continue
-        if "ALU_153_SLICE" in reassigned_parts and pkg.part == "74HC153" and "_L_" in pkg.id:
             continue
         kept.append(pkg)
 

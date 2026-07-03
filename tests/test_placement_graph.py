@@ -11,8 +11,8 @@ def test_alu8_gate_units():
     root = Path(__file__).resolve().parents[1]
     nl = load_netlist(root / "hw/netlist/blocks/alu8.yaml")
     units = build_gate_units(nl, skip_refs=ALU8_ASSEMBLY_SKIP_REFS)
-    reassignable = [u for u in units if u.part in ("74HC04", "ALU_153_SLICE")]
-    assert len(reassignable) == 16  # 8x 04 + 8x 153 slice
+    reassignable = [u for u in units if u.part in ("74HC04",)]
+    assert len(reassignable) == 8  # 8x 04 inverters (153 are native 74HC153)
     refs = {u.ref for u in units if u.part == "74HC04"}
     assert len(refs) == 8
 
