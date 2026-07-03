@@ -25,6 +25,7 @@ ROW = NODE_H + GATE_GAP
 ROW0 = 72.0
 ADD_H = 168.0
 CTRL_IO_MARGIN = 44.0
+OPERAND_IO_MARGIN = 72.0
 SIDE_STUB = 14.0
 CHANNEL_STEP = 10.0
 BOTTOM_STUB = 20.0
@@ -33,15 +34,14 @@ CONST_STUB = 20.0
 PORT_R = 3.0
 FIXED_PORT_COLOR = "#484f58"
 
+# Signal-flow columns: 153 (mux) → 283 (add) → 157 (Y). Operand IO uses bottom strip (Y);
+# control/decode uses ctrl strip; horizontal data uses left IO (X).
 COL = {
-    "io_in": 80.0,
-    "not_gate": 220.0,
-    "mux4_b": 400.0,
-    "mux4_bit": 580.0,
-    "adder4": 580.0,
-    "mux4_l": 760.0,
-    "mux2_y": 940.0,
-    "io_out": 1100.0,
+    "io_in": 72.0,
+    "mux4_bit": 360.0,
+    "adder4": 640.0,
+    "mux2_y": 920.0,
+    "io_out": 1120.0,
 }
 
 # 74HC153 data inputs: netlist uses C0..C3 or 1C0..2C3; display as D0..D3
@@ -111,7 +111,7 @@ def _layout_nodes(units: list[ViewUnit], nl: Netlist) -> list[NodeLayout]:
                 NodeLayout(unit.id, unit.kind, unit.label, x, y, NODE_W, h, ins, outs, ex.fixed_ports)
             )
             continue
-        col = COL.get(unit.kind, COL["mux4_l"])
+        col = COL.get(unit.kind, COL["mux4_bit"])
         row = bit if bit is not None else 0
         y = ROW0 + row * ROW
         nodes.append(
@@ -239,7 +239,7 @@ def _mini_gate_svg(kind: str, x: float, y: float, w: float, h: float) -> list[st
             f'<circle class="gate-symbol" pointer-events="none" cx="{bubble:.1f}" cy="{cy:.1f}" '
             f'r="3.5" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>',
         ]
-    if kind in ("mux4_b", "mux4_l"):
+    if kind in ("mux4_b", "mux4_l", "mux4_bit"):
         return [
             f'<path class="gate-symbol" pointer-events="none" d="M{x + 6:.1f},{y + 4:.1f} '
             f'L{x + w - 10:.1f},{y + h * 0.35:.1f} L{x + w - 10:.1f},{y + h * 0.65:.1f} '
@@ -429,7 +429,56 @@ def _split_inputs_for_unit(ex: UnitExtract, in_nets: list[str]) -> tuple[list[st
         left = [net_by[p] for p in _MUX4_BIT_LEFT_ORDER if p in net_by and net_by[p] in in_set]
         bottom = [net_by[p] for p in ("A", "B") if p in net_by and net_by[p] in in_set]
         return left, bottom
+    if ex.unit.kind == "adder4":
+        in_set = set(in_nets)
+        net_by = _in_by_logical(ex)
+        left_order = [f"A{i}" for i in range(4)] + [f"B{i}" for i in range(4)]
+        left = [net_by[p] for p in left_order if p in net_by and net_by[p] in in_set]
+        bottom = [net_by["C0"]] if "C0" in net_by and net_by["C0"] in in_set else []
+        return left, bottom
     return _split_inputs(in_nets)
+
+
+def _gate_anchor_sides(pts: list) -> set[str]:
+    return {p[3] for p in pts if len(p) >= 4 and p[2] != "io"}
+
+
+def _io_placement(
+    net: str,
+    pts: list,
+    *,
+    ctrl_io_y: float,
+    operand_io_y: float,
+    ins: list,
+    outs: list,
+) -> tuple[float, float, str, float, float]:
+    """Place external IO stub: X-axis (left) vs Y-axis (bottom strips)."""
+    gate_pts = [p for p in pts if len(p) >= 3 and p[2] != "io"]
+    sides = _gate_anchor_sides(pts)
+    color_gx = sum(p[0] for p in gate_pts) / len(gate_pts) if gate_pts else COL["mux4_bit"]
+
+    if _is_control_net(net):
+        return color_gx, ctrl_io_y, "middle", color_gx, ctrl_io_y + 12.0
+
+    if (is_a_operand_bit_net(net) or is_b_operand_bit_net(net)) and "bottom" in sides:
+        return color_gx, operand_io_y, "middle", color_gx, operand_io_y + 12.0
+
+    if sides == {"bottom"} or (sides <= {"bottom"} and not outs):
+        return color_gx, operand_io_y, "middle", color_gx, operand_io_y + 12.0
+
+    if ins and not outs:
+        gy = sum(p[1] for p in pts) / len(pts)
+        return COL["io_in"], gy, "start", COL["io_in"] + 8.0, gy + 3.0
+
+    if outs and not ins:
+        gy = sum(p[1] for p in pts) / len(pts)
+        return COL["io_out"], gy, "end", COL["io_out"] - 8.0, gy + 3.0
+
+    gy = sum(p[1] for p in pts) / len(pts)
+    gx = COL["io_in"] if net.startswith("net_a") or net.startswith("net_b") else COL["io_out"]
+    anchor = "start" if gx < 500 else "end"
+    tx = gx + (8.0 if anchor == "start" else -8.0)
+    return gx, gy, anchor, tx, gy + 3.0
 
 
 def _sort_left_ins(nets: list[str]) -> list[str]:
@@ -481,8 +530,9 @@ def export_gate_graph_svg(nl: Netlist, units: list[ViewUnit] | None = None) -> s
     node_by_id = {n.unit_id: n for n in nodes}
 
     width = COL["io_out"] + MARGIN + 32.0
-    height = ROW0 + 8 * ROW + MARGIN + CTRL_IO_MARGIN
+    height = ROW0 + 8 * ROW + MARGIN + CTRL_IO_MARGIN + OPERAND_IO_MARGIN
     ctrl_io_y = height - CTRL_IO_MARGIN + 16.0
+    operand_io_y = height - CTRL_IO_MARGIN - OPERAND_IO_MARGIN + 16.0
 
     # net -> Anchor list (port_x, port_y, unit_id, side, route_x, stub_y)
     anchors: dict[str, list[Anchor]] = {}
@@ -593,33 +643,16 @@ def export_gate_graph_svg(nl: Netlist, units: list[ViewUnit] | None = None) -> s
         ins = [p for p in plist if p.direction == "in"]
         color = _wire_color(net)
         short = net.removeprefix("net_")
-        if _is_control_net(net):
-            gate_pts = [p for p in pts if p[3] != "io"]
-            gx = sum(p[0] for p in gate_pts) / len(gate_pts) if gate_pts else COL["mux4_b"]
-            gy = ctrl_io_y
-            text_anchor = "middle"
-            tx = gx
-            ty = gy + 12.0
-        elif ins and not outs:
-            gx = COL["io_in"]
-            gy = sum(p[1] for p in pts) / len(pts)
-            text_anchor = "start"
-            tx = gx + 8
-            ty = gy + 3
-        elif outs and not ins:
-            gx = COL["io_out"]
-            gy = sum(p[1] for p in pts) / len(pts)
-            text_anchor = "end"
-            tx = gx - 8
-            ty = gy + 3
-        else:
-            gx = COL["io_in"] if net.startswith("net_a") or net.startswith("net_b") else COL["io_out"]
-            gy = sum(p[1] for p in pts) / len(pts)
-            text_anchor = "start" if gx < 400 else "end"
-            tx = gx + (8 if gx < 400 else -8)
-            ty = gy + 3
+        gx, gy, text_anchor, tx, ty = _io_placement(
+            net,
+            pts,
+            ctrl_io_y=ctrl_io_y,
+            operand_io_y=operand_io_y,
+            ins=ins,
+            outs=outs,
+        )
         io_elems.append(
-            f'<g class="io-net{" ctrl" if _is_control_net(net) else ""}" data-net="{_esc(net)}">'
+            f'<g class="io-net{" ctrl" if _is_control_net(net) else ""}{" operand" if (is_a_operand_bit_net(net) or is_b_operand_bit_net(net)) else ""}" data-net="{_esc(net)}">'
             f'<circle cx="{gx:.1f}" cy="{gy:.1f}" r="3" fill="{color}"/>'
             f'<text x="{tx:.1f}" y="{ty:.1f}" text-anchor="{text_anchor}" class="io-label">'
             f'{_esc(short)}</text>'
@@ -641,16 +674,18 @@ def export_gate_graph_svg(nl: Netlist, units: list[ViewUnit] | None = None) -> s
         wire_elems.extend(_render_branch_net(net, branch, color, ctrl))
 
     col_labels = [
-        (COL["not_gate"], "NOT"),
-        (COL["mux4_b"], "MUX B"),
-        (COL["adder4"], "ADD"),
-        (COL["mux4_l"], "MUX L"),
-        (COL["mux2_y"], "MUX Y"),
+        (COL["mux4_bit"], "153"),
+        (COL["adder4"], "283"),
+        (COL["mux2_y"], "157"),
     ]
     header_elems = [
         f'<text x="{MARGIN:.1f}" y="{MARGIN - 8:.1f}" class="title">ALU8 gate connectivity</text>',
         f'<text x="{MARGIN:.1f}" y="{MARGIN + 6:.1f}" class="subtitle">'
-        f'{len(units)} gates · logic view (not DIP)</text>',
+        f'{len(units)} gates · 153→283→157 columns · operand Y / control bottom</text>',
+        f'<text x="{COL["io_in"]:.1f}" y="{operand_io_y + 28:.1f}" class="strip-label">operand (Y)</text>',
+        f'<text x="{COL["io_in"]:.1f}" y="{ctrl_io_y + 28:.1f}" class="strip-label">control (Y)</text>',
+        f'<text x="{COL["io_in"] - 12:.1f}" y="{ROW0 + 3.5 * ROW:.1f}" text-anchor="end" '
+        f'class="strip-label">data (X)</text>',
     ]
     for cx, title in col_labels:
         header_elems.append(
@@ -678,6 +713,8 @@ def export_gate_graph_svg(nl: Netlist, units: list[ViewUnit] | None = None) -> s
     .gate-symbol,.node-label,.node-kind{pointer-events:none}
     .io-net{cursor:move}
     .io-net.ctrl circle{stroke:#d29922;stroke-width:1}
+    .io-net.operand circle{stroke:#58a6ff;stroke-width:1}
+    .strip-label{font-size:8px;fill:#484f58;font-weight:600}
     .port.in.fixed{stroke:#0d1117;stroke-width:0.5}
     .const-label{font-size:9px;fill:#8b949e;font-weight:600}
     .const-stub,.port-fixed,.port-group .pin-desc{pointer-events:none}

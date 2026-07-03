@@ -43,7 +43,7 @@ def test_control_net_corridor():
         (320.0, 152.0, "153_0_1", "bottom", 338.0, 168.0),
         (320.0, 272.0, "153_1_1", "bottom", 346.0, 288.0),
     ]
-    branch = layout_branch_net([io, *gates], "net_b_sel")
+    branch = layout_branch_net([io, *gates], "net_bctrl0")
     assert branch.topology == "corridor_vertical"
     trunk = next(s for s in branch.segments if s.role == "trunk")
     assert trunk.points[0] == (328.0, 1096.0)

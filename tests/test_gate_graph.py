@@ -43,6 +43,7 @@ def test_b_operand_io_labels_and_internal_inv():
 
     for i in range(8):
         assert f'class="io-label">a{i}</text>' in svg
+    assert 'class="io-net operand"' in svg or 'operand (Y)' in svg
     assert 'class="io-label">B</text>' not in svg
     assert 'class="io-bus"' not in svg
     assert 'class="io-net" data-net="net_b153_sel0"' not in svg
