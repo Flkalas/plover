@@ -8,6 +8,7 @@ from simulators.cyclesim.blocks.fsm import BranchAnd, CtrlLookup, PhaseCounter, 
 from simulators.cyclesim.blocks.gpr import GprRegfile
 from simulators.cyclesim.data.fsm_table import Template
 from simulators.cyclesim.data.isa import (
+    OP_ADD,
     OP_BEQ,
     OP_HALT,
     OP_JMP,
@@ -106,7 +107,9 @@ class CpuM3b:
         row = self.ctrl.load_opcode_phase(op, ph)
 
         if row and row.reg_we_r1:
-            self.gpr.regs[1] = self.current_operand & 0xFF
+            # ADD $00 keeps R1 for register-register add (fib loop).
+            if not (op == OP_ADD and self.current_operand == 0):
+                self.gpr.regs[1] = self.current_operand & 0xFF
 
         self.ctx.set("net_fetch", L)
         self.ctx.set("net_mem_rd", L)
@@ -121,6 +124,8 @@ class CpuM3b:
 
         if row and row.template == Template.MEM_LD and row.mem_rd:
             self.ctx.set("net_mem_rd", H)
+        if row and row.template == Template.MEM_ST and row.mem_wr:
+            self.ctx.set("net_mem_wr", H)
 
         self.ctx.comb_fixup()
 
@@ -131,6 +136,11 @@ class CpuM3b:
 
         if row and row.template == Template.MEM_LD and row.reg_we:
             self.gpr.regs[row.w_sel] = self._bus_data & 0xFF
+
+        if row and row.template == Template.ALU_REG and row.reg_we:
+            w = row.w_sel
+            val = sum((self.ctx.get(f"net_d{i}") & 1) << i for i in range(8))
+            self.gpr.regs[w] = val & 0xFF
 
         if row and row.template == Template.XFER and op in TFR_OPS:
             src, dst = TFR_REG_MAP[op]

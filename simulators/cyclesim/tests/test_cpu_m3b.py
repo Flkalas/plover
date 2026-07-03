@@ -39,3 +39,30 @@ def test_tfr20() -> None:
     runner.cpu.gpr.regs[0] = 0xAB
     runner.run_until_halt(max_steps=50)
     assert runner.gpr[2] == 0xAB
+
+
+def test_fib_upto_250() -> None:
+    """Largest Fibonacci term <= 250 is 233 (stops before 8-bit overflow on next step)."""
+    from simulators.cyclesim.fixtures.rom_builder import (
+        ADDR_FIB_B,
+        FIB_LIMIT,
+        build_fib_to_limit_rom,
+        last_fib_leq,
+    )
+
+    rom, ram_init, target = build_fib_to_limit_rom(FIB_LIMIT)
+    assert target == 233
+
+    runner = ProgramRunner()
+    runner.load_rom_bytes(rom, base=0)
+    for addr, val in ram_init.items():
+        runner.load_ram(addr, val)
+    runner.reset(pc=0)
+    steps = runner.run_until_halt(max_steps=2_000)
+    assert runner.halted, f"did not halt in {steps} steps"
+    exp_max, _exp_next = last_fib_leq(FIB_LIMIT)
+    assert exp_max == 233
+    assert runner.gpr[1] == exp_max
+    assert runner.gpr[0] == exp_max  # LDA $81 for CMP left R0 at result
+    assert runner.cpu.mem.read(ADDR_FIB_B) == exp_max
+
