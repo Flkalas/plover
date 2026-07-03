@@ -8,6 +8,7 @@ from pathlib import Path
 
 from simulators.cyclesim.export.block_viewer import (
     build_alu8_func_manifest,
+    build_alu8_func_viewer_payload,
     export_alu8_block_viewer,
     write_block_viewer_html,
 )
@@ -29,7 +30,8 @@ def test_manifest_net_count() -> None:
     assert manifest["summary"]["net_count"] == len(manifest["nets"])
     assert manifest["summary"]["net_count"] == 66
     assert manifest["summary"]["instance_count"] == 20
-    assert manifest["summary"]["unit_count"] == 20
+    assert manifest["schematic"]["width"] > 0
+    assert manifest["schematic"]["height"] > 0
 
 
 def test_net_b_add0_connections() -> None:
@@ -53,22 +55,27 @@ def test_port_net_flag() -> None:
     assert net["is_port"] is True
 
 
-def test_export_html_embeds_manifest(tmp_path: Path) -> None:
+def test_export_html_embeds_manifest_and_svg(tmp_path: Path) -> None:
     out = tmp_path / "index.html"
     export_alu8_block_viewer(out)
     text = out.read_text(encoding="utf-8")
     assert "/* EMBED_MANIFEST */" not in text
-    assert "<style>" in text
+    assert "/* EMBED_SVG */" not in text
+    assert "<svg" in text
+    assert "id=\"net-groups\"" not in text
     assert "const MANIFEST =" in text
     match = re.search(r"const MANIFEST = (\{.*?\});", text, re.S)
     assert match is not None
     manifest = json.loads(match.group(1))
     assert manifest["block"] == "alu8_func"
     assert len(manifest["nets"]) == 66
+    assert "schematic" in manifest
 
 
 def test_write_block_viewer_html(tmp_path: Path) -> None:
-    manifest = build_alu8_func_manifest()
-    path = write_block_viewer_html(manifest, tmp_path / "alu8_func" / "index.html")
+    manifest, svg = build_alu8_func_viewer_payload()
+    path = write_block_viewer_html(manifest, svg, tmp_path / "alu8_func" / "index.html")
     assert path.is_file()
-    assert "net_b_add0" in path.read_text(encoding="utf-8")
+    content = path.read_text(encoding="utf-8")
+    assert "U_MUX4_0" in content
+    assert "<svg" in content

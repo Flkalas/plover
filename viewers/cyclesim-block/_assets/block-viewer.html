@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>cyclesim block viewer</title>
+  <title>cyclesim block schematic</title>
   <link rel="stylesheet" href="block-viewer.css">
 </head>
 <body>
@@ -13,33 +13,25 @@
     <div id="summary" class="summary"></div>
   </header>
 
-  <section id="controls" class="controls">
-    <input type="search" id="search" placeholder="Search net, ref, pin…" autocomplete="off">
-    <label class="filter">
-      <input type="radio" name="filter" value="all" checked> All
-    </label>
-    <label class="filter">
-      <input type="radio" name="filter" value="ports"> Ports
-    </label>
-    <label class="filter">
-      <input type="radio" name="filter" value="probes"> Probes
-    </label>
-    <button type="button" id="tab-nets" class="tab active">Nets</button>
-    <button type="button" id="tab-instances" class="tab">Instances</button>
-  </section>
+  <div id="toolbar">
+    <input type="search" id="search" placeholder="Search net or ref…" autocomplete="off">
+    <button type="button" id="btn-fit">Fit</button>
+    <button type="button" id="btn-zin">+</button>
+    <button type="button" id="btn-zout">−</button>
+    <button type="button" id="btn-reset">100%</button>
+    <span id="zoom-label">100%</span>
+  </div>
 
-  <main id="panel-nets">
-    <div id="net-groups"></div>
-  </main>
-
-  <main id="panel-instances" hidden>
-    <div id="instance-summary"></div>
-  </main>
-
-  <footer id="trace-panel" class="trace-panel" hidden>
-    <h2 id="trace-title">Net trace</h2>
-    <div id="trace-cards"></div>
-  </footer>
+  <div id="main">
+    <div id="wrap">
+      <div id="stage">/* EMBED_SVG */</div>
+    </div>
+    <aside id="inspector">
+      <h2>Inspector</h2>
+      <p id="inspector-empty" class="muted">Click a net, wire, or symbol.</p>
+      <div id="inspector-body" hidden></div>
+    </aside>
+  </div>
 
   <script>
     const MANIFEST = /* EMBED_MANIFEST */;
