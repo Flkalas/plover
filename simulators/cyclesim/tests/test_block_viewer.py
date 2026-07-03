@@ -29,7 +29,8 @@ def test_manifest_net_count() -> None:
     manifest = build_alu8_func_manifest()
     assert manifest["summary"]["net_count"] == len(manifest["nets"])
     assert manifest["summary"]["net_count"] == 66
-    assert manifest["summary"]["instance_count"] == 20
+    assert manifest["summary"]["instance_count"] == 12
+    assert manifest["summary"]["unit_count"] == 12
     assert manifest["schematic"]["width"] > 0
     assert manifest["schematic"]["height"] > 0
 
@@ -37,22 +38,29 @@ def test_manifest_net_count() -> None:
 def test_net_b_add0_connections() -> None:
     net = _net(build_alu8_func_manifest(), "net_b_add0")
     refs = _conn_refs(net)
-    assert ("U_MUX4_0", "Y_BADD") in refs
-    assert ("U_ADD_LO", "B0") in refs
+    assert ("U_ALU_153_0", "2Y") in refs
+    assert ("U_ALU_283_LO", "B0") in refs
 
 
 def test_net_c_lo_drive_and_load() -> None:
     net = _net(build_alu8_func_manifest(), "net_c_lo")
     by_ref = {c["ref"]: c for c in net["connections"]}
-    assert by_ref["U_ADD_LO"]["dir"] == "drive"
-    assert by_ref["U_ADD_LO"]["pin"] == "COUT"
-    assert by_ref["U_ADD_HI"]["dir"] == "load"
-    assert by_ref["U_ADD_HI"]["pin"] == "CIN"
+    assert by_ref["U_ALU_283_LO"]["dir"] == "drive"
+    assert by_ref["U_ALU_283_LO"]["pin"] == "COUT"
+    assert by_ref["U_ALU_283_HI"]["dir"] == "load"
+    assert by_ref["U_ALU_283_HI"]["pin"] == "CIN"
 
 
 def test_port_net_flag() -> None:
     net = _net(build_alu8_func_manifest(), "net_a0")
     assert net["is_port"] is True
+
+
+def test_cmp_flags_port_only() -> None:
+    manifest = build_alu8_func_manifest()
+    cmp_z = _net(manifest, "net_cmp_z")
+    assert cmp_z["is_port"] is True
+    assert all(c["ref"] != "U_CMP_SUB" for c in cmp_z["connections"])
 
 
 def test_export_html_embeds_manifest_and_svg(tmp_path: Path) -> None:
@@ -69,6 +77,7 @@ def test_export_html_embeds_manifest_and_svg(tmp_path: Path) -> None:
     manifest = json.loads(match.group(1))
     assert manifest["block"] == "alu8_func"
     assert len(manifest["nets"]) == 66
+    assert manifest["summary"]["instance_count"] == 12
     assert "schematic" in manifest
 
 
@@ -77,5 +86,5 @@ def test_write_block_viewer_html(tmp_path: Path) -> None:
     path = write_block_viewer_html(manifest, svg, tmp_path / "alu8_func" / "index.html")
     assert path.is_file()
     content = path.read_text(encoding="utf-8")
-    assert "U_MUX4_0" in content
+    assert "U_ALU_153_0" in content
     assert "<svg" in content

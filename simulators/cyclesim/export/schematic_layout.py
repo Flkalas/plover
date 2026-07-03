@@ -49,21 +49,21 @@ class SchematicLayout:
 
 
 PART_PINS: dict[str, list[PinSpec]] = {
-    "FB_MUX4_SLICE": [
+    "74HC153": [
         PinSpec("A", "left", 0),
         PinSpec("B", "left", 1),
-        PinSpec("Y_LOGIC", "right", 0),
-        PinSpec("Y_BADD", "right", 1),
-        PinSpec("C0", "top", 0),
-        PinSpec("C1", "top", 1),
-        PinSpec("C2", "top", 2),
-        PinSpec("C3", "top", 3),
-        PinSpec("D0", "bottom", 0),
-        PinSpec("D1", "bottom", 1),
-        PinSpec("D2", "bottom", 2),
-        PinSpec("D3", "bottom", 3),
+        PinSpec("1Y", "right", 0),
+        PinSpec("2Y", "right", 1),
+        PinSpec("1C0", "top", 0),
+        PinSpec("1C1", "top", 1),
+        PinSpec("1C2", "top", 2),
+        PinSpec("1C3", "top", 3),
+        PinSpec("2C0", "bottom", 0),
+        PinSpec("2C1", "bottom", 1),
+        PinSpec("2C2", "bottom", 2),
+        PinSpec("2C3", "bottom", 3),
     ],
-    "FB_ADD4": [
+    "74HC283": [
         PinSpec("A0", "left", 0),
         PinSpec("A1", "left", 1),
         PinSpec("A2", "left", 2),
@@ -79,34 +79,20 @@ PART_PINS: dict[str, list[PinSpec]] = {
         PinSpec("S3", "right", 3),
         PinSpec("COUT", "right", 4),
     ],
-    "FB_MUX2_Y": [
-        PinSpec("A", "left", 0),
-        PinSpec("B", "left", 1),
-        PinSpec("S", "left", 2),
-        PinSpec("Y", "right", 0),
-    ],
-    "ALU_Y_MUX_SEL": [
-        PinSpec("S0", "left", 0),
-        PinSpec("S1", "left", 1),
-        PinSpec("SEL", "right", 0),
-    ],
-    "ALU_CMP_SUB": [
-        PinSpec("Y0", "left", 0),
-        PinSpec("Y1", "left", 1),
-        PinSpec("Y2", "left", 2),
-        PinSpec("Y3", "left", 3),
-        PinSpec("Y4", "left", 4),
-        PinSpec("Y5", "left", 5),
-        PinSpec("Y6", "left", 6),
-        PinSpec("Y7", "left", 7),
-        PinSpec("C_HI", "left", 8),
-        PinSpec("CIN", "left", 9),
-        PinSpec("BCTRL0", "bottom", 0),
-        PinSpec("BCTRL1", "bottom", 1),
-        PinSpec("BCTRL2", "bottom", 2),
-        PinSpec("BCTRL3", "bottom", 3),
-        PinSpec("Z", "right", 0),
-        PinSpec("C_GE", "right", 1),
+    "74HC157": [
+        PinSpec("1A", "left", 0),
+        PinSpec("2A", "left", 1),
+        PinSpec("3A", "left", 2),
+        PinSpec("4A", "left", 3),
+        PinSpec("1B", "left", 4),
+        PinSpec("2B", "left", 5),
+        PinSpec("3B", "left", 6),
+        PinSpec("4B", "left", 7),
+        PinSpec("S", "top", 1),
+        PinSpec("1Y", "right", 0),
+        PinSpec("2Y", "right", 1),
+        PinSpec("3Y", "right", 2),
+        PinSpec("4Y", "right", 3),
     ],
 }
 
@@ -180,19 +166,17 @@ def _bit_y(bit: int) -> float:
 
 
 def _layout_alu8_positions() -> dict[str, tuple[float, float]]:
-    col_mux4 = MARGIN + 100
-    col_add = col_mux4 + PITCH_X + 40
-    col_mux2 = col_add + PITCH_X + 40
-    col_glue = col_mux2 + PITCH_X + 20
+    col_153 = MARGIN + 100
+    col_283 = col_153 + PITCH_X + 40
+    col_157 = col_283 + PITCH_X + 40
 
     pos: dict[str, tuple[float, float]] = {}
     for i in range(8):
-        pos[f"U_MUX4_{i}"] = (col_mux4, _bit_y(i))
-        pos[f"U_MUX2_Y_{i}"] = (col_mux2, _bit_y(i))
-    pos["U_ADD_LO"] = (col_add, _bit_y(1))
-    pos["U_ADD_HI"] = (col_add, _bit_y(5))
-    pos["U_Y_MUX_SEL"] = (col_glue, _bit_y(0))
-    pos["U_CMP_SUB"] = (col_glue, _bit_y(3))
+        pos[f"U_ALU_153_{i}"] = (col_153, _bit_y(i))
+    pos["U_ALU_283_LO"] = (col_283, _bit_y(1))
+    pos["U_ALU_283_HI"] = (col_283, _bit_y(5))
+    pos["U_ALU_157_YBP_0"] = (col_157, (_bit_y(0) + _bit_y(3)) / 2)
+    pos["U_ALU_157_YBP_1"] = (col_157, (_bit_y(4) + _bit_y(7)) / 2)
     return pos
 
 
@@ -200,7 +184,7 @@ def _port_label_positions(port_names: set[str]) -> dict[str, tuple[float, float,
     """Global label positions: (x, y, side)."""
     labels: dict[str, tuple[float, float, str]] = {}
     left_x = MARGIN - 8
-    right_x = MARGIN + 100 + PITCH_X * 3 + 120
+    right_x = MARGIN + 100 + PITCH_X * 2 + 160
 
     for i in range(8):
         if f"net_a{i}" in port_names:

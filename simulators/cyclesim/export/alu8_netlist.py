@@ -1,4 +1,4 @@
-"""Generate alu8 functional-block YAML netlist (reference/alu8-phase-b.md)."""
+"""Generate alu8 12-DIP assembly YAML netlist (reference/alu8-phase-b.md)."""
 
 from __future__ import annotations
 
@@ -6,32 +6,32 @@ from pathlib import Path
 from typing import Any
 
 BLOCK_NAME = "alu8_func"
-DESCRIPTION = "v1.0 ALU — functional blocks (MUX4 slice, ADD4, MUX2 Y, CMP glue)"
+DESCRIPTION = "v1.0 ALU — 12 DIP assembly (153×8, 283×2, 157×2)"
 
 
-def _mux4_instance(bit: int) -> dict[str, Any]:
+def _153_instance(bit: int) -> dict[str, Any]:
     i = bit
     return {
-        "ref": f"U_MUX4_{i}",
-        "part": "FB_MUX4_SLICE",
+        "ref": f"U_ALU_153_{i}",
+        "part": "74HC153",
         "pins": {
             "A": f"net_a{i}",
             "B": f"net_b{i}",
-            "C0": "net_lgc0",
-            "C1": "net_lgc1",
-            "C2": "net_lgc2",
-            "C3": "net_lgc3",
-            "D0": "net_bctrl0",
-            "D1": "net_bctrl1",
-            "D2": "net_bctrl2",
-            "D3": "net_bctrl3",
-            "Y_LOGIC": f"net_y_logic{i}",
-            "Y_BADD": f"net_b_add{i}",
+            "1C0": "net_lgc0",
+            "1C1": "net_lgc1",
+            "1C2": "net_lgc2",
+            "1C3": "net_lgc3",
+            "2C0": "net_bctrl0",
+            "2C1": "net_bctrl1",
+            "2C2": "net_bctrl2",
+            "2C3": "net_bctrl3",
+            "1Y": f"net_y_logic{i}",
+            "2Y": f"net_b_add{i}",
         },
     }
 
 
-def _add4_instance(ref: str, a_lo: int, b_lo: int, s_lo: int, cin: str, cout: str) -> dict[str, Any]:
+def _283_instance(ref: str, a_lo: int, b_lo: int, s_lo: int, cin: str, cout: str) -> dict[str, Any]:
     pins: dict[str, str] = {
         "CIN": cin,
         "COUT": cout,
@@ -40,59 +40,28 @@ def _add4_instance(ref: str, a_lo: int, b_lo: int, s_lo: int, cin: str, cout: st
         pins[f"A{n}"] = f"net_a{a_lo + n}"
         pins[f"B{n}"] = f"net_b_add{b_lo + n}"
         pins[f"S{n}"] = f"net_sum{s_lo + n}"
-    return {"ref": ref, "part": "FB_ADD4", "pins": pins}
+    return {"ref": ref, "part": "74HC283", "pins": pins}
 
 
-def _mux2_instance(bit: int) -> dict[str, Any]:
-    i = bit
-    return {
-        "ref": f"U_MUX2_Y_{i}",
-        "part": "FB_MUX2_Y",
-        "pins": {
-            "A": f"net_sum{i}",
-            "B": f"net_y_logic{i}",
-            "S": "net_y_mux_sel",
-            "Y": f"net_y{i}",
-        },
-    }
+def _157_ybp_instance(ref: str, y_lo: int) -> dict[str, Any]:
+    pins: dict[str, str] = {"S": "net_y_mux_sel"}
+    for n in range(4):
+        i = y_lo + n
+        ch = n + 1
+        pins[f"{ch}A"] = f"net_sum{i}"
+        pins[f"{ch}B"] = f"net_y_logic{i}"
+        pins[f"{ch}Y"] = f"net_y{i}"
+    return {"ref": ref, "part": "74HC157", "pins": pins}
 
 
 def build_alu8_func_netlist() -> dict[str, Any]:
     instances: list[dict[str, Any]] = []
     for i in range(8):
-        instances.append(_mux4_instance(i))
-    instances.append(_add4_instance("U_ADD_LO", 0, 0, 0, "net_cin", "net_c_lo"))
-    instances.append(_add4_instance("U_ADD_HI", 4, 4, 4, "net_c_lo", "net_c_hi"))
-    for i in range(8):
-        instances.append(_mux2_instance(i))
-    instances.append(
-        {
-            "ref": "U_Y_MUX_SEL",
-            "part": "ALU_Y_MUX_SEL",
-            "pins": {
-                "S0": "net_153_s0",
-                "S1": "net_153_s1",
-                "SEL": "net_y_mux_sel",
-            },
-        }
-    )
-    instances.append(
-        {
-            "ref": "U_CMP_SUB",
-            "part": "ALU_CMP_SUB",
-            "pins": {
-                **{f"Y{i}": f"net_y{i}" for i in range(8)},
-                "C_HI": "net_c_hi",
-                "CIN": "net_cin",
-                "BCTRL0": "net_bctrl0",
-                "BCTRL1": "net_bctrl1",
-                "BCTRL2": "net_bctrl2",
-                "BCTRL3": "net_bctrl3",
-                "Z": "net_cmp_z",
-                "C_GE": "net_cmp_c_ge",
-            },
-        }
-    )
+        instances.append(_153_instance(i))
+    instances.append(_283_instance("U_ALU_283_LO", 0, 0, 0, "net_cin", "net_c_lo"))
+    instances.append(_283_instance("U_ALU_283_HI", 4, 4, 4, "net_c_lo", "net_c_hi"))
+    instances.append(_157_ybp_instance("U_ALU_157_YBP_0", 0))
+    instances.append(_157_ybp_instance("U_ALU_157_YBP_1", 4))
 
     nets: list[dict[str, Any]] = []
     for i in range(8):
@@ -136,57 +105,47 @@ def build_alu8_func_units() -> dict[str, Any]:
     for i in range(8):
         units.append(
             {
-                "id": f"mux4_bit_{i}",
-                "kind": "mux4_bit",
-                "label": f"FB_MUX4[{i}] logic+B",
+                "id": f"153_bit_{i}",
+                "kind": "hc153",
+                "label": f"74HC153[{i}]",
                 "stage": 2,
-                "package_ref": f"U_MUX4_{i}",
+                "package_ref": f"U_ALU_153_{i}",
             }
         )
     units.append(
         {
-            "id": "add4_lo",
-            "kind": "adder4",
-            "label": "FB_ADD4 LO (a0-3)",
+            "id": "283_lo",
+            "kind": "hc283",
+            "label": "74HC283 LO (a0-3)",
             "stage": 1,
-            "package_ref": "U_ADD_LO",
+            "package_ref": "U_ALU_283_LO",
         }
     )
     units.append(
         {
-            "id": "add4_hi",
-            "kind": "adder4",
-            "label": "FB_ADD4 HI (a4-7)",
+            "id": "283_hi",
+            "kind": "hc283",
+            "label": "74HC283 HI (a4-7)",
             "stage": 1,
-            "package_ref": "U_ADD_HI",
-        }
-    )
-    for i in range(8):
-        units.append(
-            {
-                "id": f"mux2_y_{i}",
-                "kind": "mux2_y",
-                "label": f"FB_MUX2_Y y[{i}]",
-                "stage": 4,
-                "package_ref": f"U_MUX2_Y_{i}",
-            }
-        )
-    units.append(
-        {
-            "id": "y_mux_sel",
-            "kind": "y_mux_sel",
-            "label": "ALU_Y_MUX_SEL",
-            "stage": 0,
-            "package_ref": "U_Y_MUX_SEL",
+            "package_ref": "U_ALU_283_HI",
         }
     )
     units.append(
         {
-            "id": "cmp_sub",
-            "kind": "cmp_sub",
-            "label": "ALU_CMP_SUB",
-            "stage": 5,
-            "package_ref": "U_CMP_SUB",
+            "id": "157_ybp_0",
+            "kind": "hc157",
+            "label": "74HC157 YBP y[0-3]",
+            "stage": 4,
+            "package_ref": "U_ALU_157_YBP_0",
+        }
+    )
+    units.append(
+        {
+            "id": "157_ybp_1",
+            "kind": "hc157",
+            "label": "74HC157 YBP y[4-7]",
+            "stage": 4,
+            "package_ref": "U_ALU_157_YBP_1",
         }
     )
     return {"version": 1, "block": BLOCK_NAME, "units": units}
@@ -261,7 +220,7 @@ def export_alu8_func(
 
 
 def port_net_names() -> set[str]:
-    """External port nets (matches archive alu8.yaml port set)."""
+    """External port nets (CPLD drive + ALU boundary)."""
     names: set[str] = set()
     for i in range(8):
         names.add(f"net_a{i}")

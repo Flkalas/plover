@@ -10,10 +10,10 @@ from simulators.cyclesim.export.schematic_layout import (
 )
 
 
-def test_twenty_symbol_instances() -> None:
+def test_twelve_symbol_instances() -> None:
     netlist = build_alu8_func_netlist()
     layout = layout_alu8_schematic(netlist, port_names=port_net_names())
-    assert len(layout.instances) == 20
+    assert len(layout.instances) == 12
 
 
 def test_net_b_add0_shared_anchors() -> None:
@@ -21,8 +21,8 @@ def test_net_b_add0_shared_anchors() -> None:
     layout = layout_alu8_schematic(netlist, port_names=port_net_names())
     anchors = net_anchor_map(layout)["net_b_add0"]
     refs = {(a.ref, a.pin) for a in anchors if a.ref and a.ref != "__port__"}
-    assert ("U_MUX4_0", "Y_BADD") in refs
-    assert ("U_ADD_LO", "B0") in refs
+    assert ("U_ALU_153_0", "2Y") in refs
+    assert ("U_ALU_283_LO", "B0") in refs
 
 
 def test_net_c_lo_add_chain() -> None:
@@ -30,8 +30,8 @@ def test_net_c_lo_add_chain() -> None:
     layout = layout_alu8_schematic(netlist, port_names=port_net_names())
     anchors = net_anchor_map(layout)["net_c_lo"]
     refs = {(a.ref, a.pin) for a in anchors if a.ref and a.ref != "__port__"}
-    assert ("U_ADD_LO", "COUT") in refs
-    assert ("U_ADD_HI", "CIN") in refs
+    assert ("U_ALU_283_LO", "COUT") in refs
+    assert ("U_ALU_283_HI", "CIN") in refs
 
 
 def test_svg_contains_symbols_and_nets() -> None:
@@ -40,7 +40,9 @@ def test_svg_contains_symbols_and_nets() -> None:
     assert w > 400 and h > 400
     assert "<svg" in svg
     assert 'class="symbol"' in svg
-    assert 'data-ref="U_MUX4_0"' in svg
+    assert 'data-ref="U_ALU_153_0"' in svg
+    assert 'data-ref="U_ALU_157_YBP_0"' in svg
+    assert "U_CMP_SUB" not in svg
     assert 'class="net"' in svg
     assert 'data-net="net_a0"' in svg
 

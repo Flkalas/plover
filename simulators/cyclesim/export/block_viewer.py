@@ -21,7 +21,7 @@ _EMBED_MANIFEST = "/* EMBED_MANIFEST */"
 _EMBED_SVG = "/* EMBED_SVG */"
 
 _DRIVE_PIN = re.compile(
-    r"^(Y(\d+)?|Y_[A-Z]+|S\d*|COUT|Z|C_GE|SEL)$",
+    r"^(1Y|2Y|[1-4]Y|S\d*|COUT|Z|C_GE|SEL)$",
     re.IGNORECASE,
 )
 
