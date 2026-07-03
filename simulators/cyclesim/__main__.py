@@ -7,11 +7,14 @@ import sys
 from pathlib import Path
 
 from simulators.cyclesim.export.alu8_netlist import export_alu8_func
+from simulators.cyclesim.export.block_viewer import export_alu8_block_viewer
 from simulators.cyclesim.program import ProgramRunner
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 CYCLESIM_ROOT = Path(__file__).resolve().parent
+REPO_ROOT = CYCLESIM_ROOT.parents[1]
 DEFAULT_BUILD = CYCLESIM_ROOT / "build"
+DEFAULT_HTML_OUT = REPO_ROOT / "viewers" / "cyclesim-block" / "alu8_func" / "index.html"
 
 
 def cmd_run(args: argparse.Namespace) -> int:
@@ -47,6 +50,10 @@ def cmd_export_alu8(args: argparse.Namespace) -> int:
     print(f"wrote {nl}")
     if up:
         print(f"wrote {up}")
+    if args.html:
+        html_path = Path(args.html_out) if args.html_out else DEFAULT_HTML_OUT
+        viewer = export_alu8_block_viewer(html_path)
+        print(f"wrote {viewer}")
     return 0
 
 
@@ -71,6 +78,8 @@ def main(argv: list[str] | None = None) -> int:
     alu_p.add_argument("-o", "--output", help="Netlist YAML path")
     alu_p.add_argument("--units", help="Units catalog YAML path")
     alu_p.add_argument("--no-units", action="store_true", help="Skip units file")
+    alu_p.add_argument("--html", action="store_true", help="Also write block viewer HTML")
+    alu_p.add_argument("--html-out", help="Block viewer HTML path (default: viewers/cyclesim-block/alu8_func/index.html)")
     alu_p.set_defaults(func=cmd_export_alu8)
 
     args = parser.parse_args(argv)

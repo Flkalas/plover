@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>cyclesim block viewer</title>
+  <link rel="stylesheet" href="block-viewer.css">
+</head>
+<body>
+  <header id="header">
+    <h1 id="block-title">block</h1>
+    <p id="block-desc"></p>
+    <div id="summary" class="summary"></div>
+  </header>
+
+  <section id="controls" class="controls">
+    <input type="search" id="search" placeholder="Search net, ref, pin…" autocomplete="off">
+    <label class="filter">
+      <input type="radio" name="filter" value="all" checked> All
+    </label>
+    <label class="filter">
+      <input type="radio" name="filter" value="ports"> Ports
+    </label>
+    <label class="filter">
+      <input type="radio" name="filter" value="probes"> Probes
+    </label>
+    <button type="button" id="tab-nets" class="tab active">Nets</button>
+    <button type="button" id="tab-instances" class="tab">Instances</button>
+  </section>
+
+  <main id="panel-nets">
+    <div id="net-groups"></div>
+  </main>
+
+  <main id="panel-instances" hidden>
+    <div id="instance-summary"></div>
+  </main>
+
+  <footer id="trace-panel" class="trace-panel" hidden>
+    <h2 id="trace-title">Net trace</h2>
+    <div id="trace-cards"></div>
+  </footer>
+
+  <script>
+    const MANIFEST = /* EMBED_MANIFEST */;
+  </script>
+  <script src="block-viewer.js"></script>
+</body>
+</html>
