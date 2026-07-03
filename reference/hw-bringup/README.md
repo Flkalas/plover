@@ -3,7 +3,7 @@
 > **Normative v1.0:** CPLD FSM idx5 + 138×2 — [system-architecture.md](../hardware/system-architecture.md).  
 > **실구매 패키지:** [parts-on-hand.md](../project/parts-on-hand.md) · Wiring: [breadboard-wiring.md](breadboard-wiring.md).
 
-**마일스톤 계획:** [implementation-plan-v1.0.md](../../developer/project/implementation-plan-v1.0.md)
+**마일스톤 계획:** [archive/MANIFEST.md](../../archive/MANIFEST.md)
 
 초보 작업자도 **문서만 따라** 빵판 CPU를 올릴 수 있도록 단계별 시방서입니다.
 
@@ -74,7 +74,7 @@ flowchart LR
 
 ## 사전 검증 (개발자)
 
-Breadboard 전 시뮬·회귀 명령: [developer/verification-gates.md](../../developer/verification-gates.md).
+Breadboard 전 시뮬·회귀 명령: [archive/MANIFEST.md](../../archive/MANIFEST.md).
 
 ---
 

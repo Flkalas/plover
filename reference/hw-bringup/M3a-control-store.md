@@ -65,7 +65,7 @@ Flash `$4000`: **unused** (FSM-only).
 Superseded **10b Flash CW** path — historical docs only:
 
 - [prototype-flash-cw microcode-spec](../../archive/prototype-flash-cw/microcode-spec-v1.0.md)
-- Archived tooling: [archived-code-guide.md](../../developer/archived-code-guide.md)
+- Archived tooling: [archived-code-guide.md](../../archive/MANIFEST.md)
 
 ---
 

@@ -168,7 +168,7 @@ If warm reset into the kernel, full low-page RAM, or runtime vector tables are r
 
 ## 7. Verification checklist
 
-Breadboard 및 개발자 사전 검증: [developer/verification-gates.md](../../developer/verification-gates.md).
+Breadboard 및 개발자 사전 검증: [archive/MANIFEST.md](../../archive/MANIFEST.md).
 
 | Check | Method / expected result |
 |-------|--------------------------|
@@ -196,7 +196,7 @@ Breadboard 및 개발자 사전 검증: [developer/verification-gates.md](../../
 | Boot ROM source | Block-copy + pre-init (§5) + **`JMP $0800`** instead of **HALT** |
 | [bootloader.md](bootloader.md) | JMP as product path; §3 manual path as recovery |
 | [fixtures/boot-rom.md](../fixtures/boot-rom.md) | Handoff `05 00 08`; pre-init offsets in image |
-| `docs/hardware/system-architecture.md` §4 | Automatic chain load |
+| [system-architecture.md](../hardware/system-architecture.md) §4 | Automatic chain load |
 | Tests | §7 checklist gates + regression on manual `boot_run.yaml` |
 
 No changes to CPLD, BOM, or [cpld-system-controller.md](cpld-system-controller.md).

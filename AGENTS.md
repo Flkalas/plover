@@ -45,30 +45,27 @@ When implementing a **Cursor plan**, commit in-session per **Plan execution (aut
 
 ---
 
-## Document tiers (normative truth)
+## Document tiers (reference truth)
 
 When answering **hardware architecture**, **bring-up**, or **decode/CPLD/ALU** questions:
 
 | Tier | Path | Use |
 |------|------|-----|
-| **Normative** | `docs/normative/**` | **Single source of truth** — cite and edit here |
-| **Developer** | `docs/developer/**` | Sim, CI, generators (not for external learners) |
-| **Research** | `docs/hardware/research/**` | Exploration only — **do not** treat as current spec |
-| **Archive** | `docs/archive/**` | Superseded — **do not** cite unless user asks for history |
+| **Reference** | `reference/**` + `plover-whitepaper.md` | **Single source of truth** — cite and edit here |
+| **Archive** | `archive/*.tar.gz` | Historical code/docs — **do not** cite for SoC unless user asks |
 
-**Anchor docs:** [control-and-decode.md](docs/normative/hardware/control-and-decode.md), [system-architecture.md](docs/normative/hardware/system-architecture.md).
+**Anchor docs:** [control-and-decode.md](reference/hardware/control-and-decode.md), [system-architecture.md](reference/hardware/system-architecture.md), [plover-whitepaper.md](plover-whitepaper.md).
 
-**Active hardware truth:** `docs/normative/**` only. Archived sim/code: [archived-code-guide.md](docs/developer/archived-code-guide.md) (`archive/bundles/*.tar.gz`).
+**Active hardware truth:** `reference/**` and `plover-whitepaper.md` only. Restore guide: [archive/MANIFEST.md](archive/MANIFEST.md).
 
 **Forbidden for SoC / bring-up answers** (unless user asks for history):
 
-- Citing or executing restored code from `archive/bundles/**`
-- `docs/hardware/research/**`, `docs/archive/**` as current spec
+- Citing or executing restored content from `archive/*.tar.gz`
 - Treating **`alu8_decode`** as the breadboard decode path
 - Flash **`$4000`** control-word burn, **`cpu_cw_direct`**, pareto MC as v1.0 gates
 
-**No feasibility from archived sim** — timing and fit use normative frozen numbers ([alu-opcodes-timing.md](docs/normative/hardware/alu-opcodes-timing.md)) and M2a lab checklist only.
+**No feasibility from archived sim** — timing and fit use reference frozen numbers ([alu-opcodes-timing.md](reference/hardware/alu-opcodes-timing.md)) and M2a lab checklist only.
 
-**Do not** implement bring-up or normative edits based on archive/research content unless the user explicitly requests historical comparison.
+**Do not** implement bring-up or reference edits based on archived tarball content unless the user explicitly requests historical comparison.
 
-**Stale normative terms** (after 2026-07 ALU refactor): `inc_en`, `INC_B_SEL`, `INC_2C2`, `14 IC` for ALU BOM, `b_sel`/`b_const_sel` as SoC signal names (use `net_bctrl0..3`).
+**Stale terms** (after 2026-07 ALU refactor): `inc_en`, `INC_B_SEL`, `INC_2C2`, `14 IC` for ALU BOM, `b_sel`/`b_const_sel` as SoC signal names (use `net_bctrl0..3`).

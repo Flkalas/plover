@@ -16,7 +16,7 @@ M5 is **not** a new solder step. After M1–M4b pass on hardware:
 1. Photograph / netlist log matches [breadboard-wiring.md](breadboard-wiring.md)
 2. F6 trace from [M3b-fetch-execute.md](M3b-fetch-execute.md) matches frozen FSM ([M3a](M3a-control-store.md) §2)
 
-Historical automated E2E (`cpu.yaml`) lives in archived `hw.tar.gz` — see [archived-code-guide.md](../../developer/archived-code-guide.md).
+Historical automated E2E (`cpu.yaml`) lives in archived `hw.tar.gz` — see [archived-code-guide.md](../../archive/MANIFEST.md).
 
 ---
 

@@ -4,7 +4,7 @@
 |-------|-------|
 | **Milestone** | M4a |
 | **Goal** | JMP handoff: boot ROM → RAM `$0800` → **`JMP $0800`** |
-| **Status** | Logic verified 2026-06-08 (archived VM — see [archived-code-guide.md](../../developer/archived-code-guide.md)) |
+| **Status** | Logic verified 2026-06-08 (archived VM — see [archived-code-guide.md](../../archive/MANIFEST.md)) |
 | **Normative** | [boot-jmp-handoff.md](../boot/boot-jmp-handoff.md) |
 
 ---

@@ -8,4 +8,4 @@ PL-DOS uses a small command shell on top of PLFS + `.PLR` loader.
 
 M1–M5 TTL CPU bring-up does **not** include PL-DOS on breadboard. Coprocessor firmware is separate ([rp2350-coprocessor.md](../copro/rp2350-coprocessor.md)).
 
-Historical VM scenarios and demos: archived bundles — [archived-code-guide.md](../../developer/archived-code-guide.md).
+Historical VM scenarios and demos: archived bundles — [archived-code-guide.md](../../archive/MANIFEST.md).

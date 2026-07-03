@@ -4,7 +4,7 @@ Host-side microkernel model used for early bring-up on logic VM (developer).
 
 ## Cooperative / polling model
 
-Normative v1.0 hardware has **no IRQ**. **S6** uses **polling I/O** (Mailbox status polls) and **cooperative** tasking — no preemptive scheduler. See [plover-whitepaper.md](../project/plover-whitepaper.md) §9.1.
+Normative v1.0 hardware has **no IRQ**. **S6** uses **polling I/O** (Mailbox status polls) and **cooperative** tasking — no preemptive scheduler. See [plover-whitepaper.md](../../plover-whitepaper.md) §9.1.
 
 ## Responsibilities
 
@@ -18,7 +18,7 @@ Normative v1.0 hardware has **no IRQ**. **S6** uses **polling I/O** (Mailbox sta
 
 - Kernel model: `kern/kernel.py`
 - Scenario kind: `kind: kernel` in `hw/scenarios/vm/os_boot.yaml`
-- Discovery spec: `docs/copro/device-discovery.md`
+- Discovery spec: [device-discovery.md](../copro/device-discovery.md)
 
 ## Gate
 

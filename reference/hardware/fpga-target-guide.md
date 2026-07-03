@@ -8,7 +8,7 @@
 
 **Related (TTL 실기):** [system-architecture.md](system-architecture.md) · [BOM.md](../../../BOM.md) (5 V) · [BOM-3v3.md](../../../BOM-3v3.md) (3.3 V PCB)  
 **Related (명세):** [microcode-spec.md](microcode-spec.md) · [memory-map.md](memory-map.md)  
-**개발자 검증:** [developer/verification-gates.md](../../developer/verification-gates.md)
+**개발자 검증:** [archive/MANIFEST.md](../../archive/MANIFEST.md)
 
 ---
 
@@ -28,7 +28,7 @@
 - TTL BOM과 **핀·전기 1:1** 대응 보장 (3.3 V FPGA 구현은 [BOM-3v3.md](../BOM-3v3.md) 정합이지 [BOM.md](../BOM.md) 5 V 버스와 동일하지 않음)
 - **합성 완료 RTL** — 저장소에 **아직 없음** (§8 로드맵)
 
-FPGA RTL 정합성은 [microcode-spec.md](microcode-spec.md) · `hw/fixtures/` · breadboard bring-up 체크리스트를 기준으로 한다. 사전 시뮬·회귀는 [developer/verification-gates.md](../../developer/verification-gates.md).
+FPGA RTL 정합성은 [microcode-spec.md](microcode-spec.md) · `hw/fixtures/` · breadboard bring-up 체크리스트를 기준으로 한다. 사전 시뮬·회귀는 [archive/MANIFEST.md](../../archive/MANIFEST.md).
 
 ### 1.4 레거시 Verilog
 
@@ -175,7 +175,7 @@ Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있
 
 ## 6. 속도 (MIPS) — 클록과 구현 방식
 
-**MIPS** = 초당 **매크로 명령**(opcode 1개) 수. v1.0 TTL 목표: [developer/project/roadmap-next.md](../../developer/project/roadmap-next.md).
+**MIPS** = 초당 **매크로 명령**(opcode 1개) 수. v1.0 TTL 목표: [archive/MANIFEST.md](../../archive/MANIFEST.md).
 
 | 프로파일 @ **2 MHz** | MIPS |
 |----------------------|------|
@@ -259,7 +259,7 @@ RTL 상단에서 **백엔드**만 교체할 수 있게 한다.
 | RTL sim | (예정) Verilator/Icarus + `hw/fixtures/sram/*.hex` |
 | FPGA on-board | (예정) SignalTap / LED — Fib 데모·단일 명령 스텝 |
 
-사전 시뮬·회귀 명령: [developer/verification-gates.md](../../developer/verification-gates.md).
+사전 시뮬·회귀 명령: [archive/MANIFEST.md](../../archive/MANIFEST.md).
 
 **Parity 목표:** normative ISA에서 **PC·GPR·Z/C·halt** 가 breadboard 관측과 RTL 행위가 일치.
 
@@ -277,7 +277,7 @@ RTL 상단에서 **백엔드**만 교체할 수 있게 한다.
 | F5 | Mailbox + RP2350 GPIO | [rp2350-coprocessor.md](rp2350-coprocessor.md) |
 | F6 | (선택) Parallel NOR/SRAM wrapper | [BOM-3v3.md](../BOM-3v3.md) |
 
-TTL 실기 마일스톤: [implementation-plan-v1.0.md](../../developer/project/implementation-plan-v1.0.md) — **병렬 진행 가능**, 문서만 교차 링크.
+TTL 실기 마일스톤: [archive/MANIFEST.md](../../archive/MANIFEST.md) — **병렬 진행 가능**, 문서만 교차 링크.
 
 ---
 

@@ -48,5 +48,5 @@ Each relocation record:
 
 ## CLI (archived)
 
-Compiler, assembler, and linker live in `host_toolchain.tar.gz`. See [archived-code-guide.md](../../developer/archived-code-guide.md).
+Compiler, assembler, and linker live in `host_toolchain.tar.gz`. See [archived-code-guide.md](../../archive/MANIFEST.md).
 

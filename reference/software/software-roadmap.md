@@ -1,6 +1,6 @@
 # Software roadmap (VM OS stack)
 
-**Related:** [software-memory-layout.md](software-memory-layout.md) · [implementation-plan-v1.0.md](../../developer/project/implementation-plan-v1.0.md) · [verification-gates.md](../../developer/verification-gates.md)
+**Related:** [software-memory-layout.md](software-memory-layout.md) · [archive/MANIFEST.md](../../archive/MANIFEST.md) · [archive/MANIFEST.md](../../archive/MANIFEST.md)
 
 Plover v0.1 software milestones **S0–S7** on logic VM (developer), then hardware bring-up (M1–M5).
 
@@ -44,8 +44,8 @@ Each milestone: add tests → cumulative `regression tests/` PASS → git commit
 
 ### S5 — Subset C philosophy
 
-v1.0 hardware has **no stack-pointer register** and **no frame-pointer datapath**. **S5 Subset C** targets a restricted dialect: **no unbounded recursion**, and all locals/parameters are **statically allocated** in fixed RAM cells ([subset-c.md](subset-c.md), [plover-whitepaper.md](../project/plover-whitepaper.md) §2.3.1).
+v1.0 hardware has **no stack-pointer register** and **no frame-pointer datapath**. **S5 Subset C** targets a restricted dialect: **no unbounded recursion**, and all locals/parameters are **statically allocated** in fixed RAM cells ([subset-c.md](subset-c.md), [plover-whitepaper.md](../../plover-whitepaper.md) §2.3.1).
 
 ### S6 — Microkernel philosophy
 
-**S6** adopts a **cooperative** scheduling model and **polling-only I/O** — no preemptive multitasking and no IRQ drivers on the normative breadboard ([os-kernel.md](os-kernel.md), [plover-whitepaper.md](../project/plover-whitepaper.md) §9.1).
+**S6** adopts a **cooperative** scheduling model and **polling-only I/O** — no preemptive multitasking and no IRQ drivers on the normative breadboard ([os-kernel.md](os-kernel.md), [plover-whitepaper.md](../../plover-whitepaper.md) §9.1).
