@@ -10,8 +10,8 @@ from simulators.cyclesim.export.alu8_netlist import export_alu8_func
 from simulators.cyclesim.program import ProgramRunner
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
-REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_BUILD = REPO_ROOT / "build" / "cyclesim"
+CYCLESIM_ROOT = Path(__file__).resolve().parent
+DEFAULT_BUILD = CYCLESIM_ROOT / "build"
 
 
 def cmd_run(args: argparse.Namespace) -> int:
