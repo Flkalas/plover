@@ -74,7 +74,9 @@ Golden vectors: [`tools/alu8_cases.py`](../../../tools/alu8_cases.py) — all 12
 ## Critical path
 
 **SUB / CMP (Y)** @ max (pre-flight sim):  
-`net_b0` → `U_ALU_153_0.B` → `2Y` → `283` → `157_YBP` → `net_y0` — **~133 ns** (04 hop removed).
+`net_b0` → `U_ALU_153_0.B` → `2Y` → `283` → `157_YBP` → `net_y0` — **136 ns**.
+
+**INC (Y)** @ max: `net_cin` → `283` → `157_YBP` — **153 ns** (system worst-case).
 
 **Logic** @ max: `U_ALU_153_0.1Y` → `157_YBP` — **46 ns**.
 
