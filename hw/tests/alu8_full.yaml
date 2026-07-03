@@ -25,17 +25,13 @@ stimulus:
       net_lgc1: 0
       net_lgc2: 0
       net_lgc3: 0
-      net_b_sel: 0
       net_153_s0: 0
       net_153_s1: 0
-      net_b_const_sel: 0
-      net_b_const_bit1: 0
-      net_b_const_bit2: 0
-      net_b_const_bit3: 0
-      net_b_const_bit4: 0
-      net_b_const_bit5: 0
-      net_b_const_bit6: 0
-      net_b_const_bit7: 0
+      net_bctrl0: 0
+      net_bctrl1: 0
+      net_bctrl2: 0
+      net_bctrl3: 0
+      net_inc_en: 0
   - at_ns: 600
     set:
       net_a0: 0
@@ -59,17 +55,13 @@ stimulus:
       net_lgc1: 0
       net_lgc2: 0
       net_lgc3: 0
-      net_b_sel: 0
       net_153_s0: 0
       net_153_s1: 0
-      net_b_const_sel: 0
-      net_b_const_bit1: 0
-      net_b_const_bit2: 0
-      net_b_const_bit3: 0
-      net_b_const_bit4: 0
-      net_b_const_bit5: 0
-      net_b_const_bit6: 0
-      net_b_const_bit7: 0
+      net_bctrl0: 0
+      net_bctrl1: 0
+      net_bctrl2: 1
+      net_bctrl3: 1
+      net_inc_en: 0
   - at_ns: 1200
     set:
       net_a0: 0
@@ -93,17 +85,13 @@ stimulus:
       net_lgc1: 0
       net_lgc2: 0
       net_lgc3: 0
-      net_b_sel: 1
       net_153_s0: 0
       net_153_s1: 0
-      net_b_const_sel: 0
-      net_b_const_bit1: 0
-      net_b_const_bit2: 0
-      net_b_const_bit3: 0
-      net_b_const_bit4: 0
-      net_b_const_bit5: 0
-      net_b_const_bit6: 0
-      net_b_const_bit7: 0
+      net_bctrl0: 1
+      net_bctrl1: 1
+      net_bctrl2: 0
+      net_bctrl3: 0
+      net_inc_en: 0
   - at_ns: 1800
     set:
       net_a0: 0
@@ -127,17 +115,13 @@ stimulus:
       net_lgc1: 0
       net_lgc2: 0
       net_lgc3: 1
-      net_b_sel: 0
       net_153_s0: 1
       net_153_s1: 0
-      net_b_const_sel: 0
-      net_b_const_bit1: 0
-      net_b_const_bit2: 0
-      net_b_const_bit3: 0
-      net_b_const_bit4: 0
-      net_b_const_bit5: 0
-      net_b_const_bit6: 0
-      net_b_const_bit7: 0
+      net_bctrl0: 0
+      net_bctrl1: 0
+      net_bctrl2: 0
+      net_bctrl3: 0
+      net_inc_en: 0
   - at_ns: 2400
     set:
       net_a0: 0
@@ -161,17 +145,13 @@ stimulus:
       net_lgc1: 1
       net_lgc2: 1
       net_lgc3: 1
-      net_b_sel: 0
       net_153_s0: 0
       net_153_s1: 1
-      net_b_const_sel: 0
-      net_b_const_bit1: 0
-      net_b_const_bit2: 0
-      net_b_const_bit3: 0
-      net_b_const_bit4: 0
-      net_b_const_bit5: 0
-      net_b_const_bit6: 0
-      net_b_const_bit7: 0
+      net_bctrl0: 0
+      net_bctrl1: 0
+      net_bctrl2: 0
+      net_bctrl3: 0
+      net_inc_en: 0
   - at_ns: 3000
     set:
       net_a0: 0
@@ -195,17 +175,13 @@ stimulus:
       net_lgc1: 1
       net_lgc2: 1
       net_lgc3: 0
-      net_b_sel: 0
       net_153_s0: 1
       net_153_s1: 1
-      net_b_const_sel: 0
-      net_b_const_bit1: 0
-      net_b_const_bit2: 0
-      net_b_const_bit3: 0
-      net_b_const_bit4: 0
-      net_b_const_bit5: 0
-      net_b_const_bit6: 0
-      net_b_const_bit7: 0
+      net_bctrl0: 0
+      net_bctrl1: 0
+      net_bctrl2: 0
+      net_bctrl3: 0
+      net_inc_en: 0
   - at_ns: 3600
     set:
       net_a0: 0
@@ -229,17 +205,13 @@ stimulus:
       net_lgc1: 0
       net_lgc2: 0
       net_lgc3: 0
-      net_b_sel: 0
       net_153_s0: 1
       net_153_s1: 1
-      net_b_const_sel: 0
-      net_b_const_bit1: 0
-      net_b_const_bit2: 0
-      net_b_const_bit3: 0
-      net_b_const_bit4: 0
-      net_b_const_bit5: 0
-      net_b_const_bit6: 0
-      net_b_const_bit7: 0
+      net_bctrl0: 0
+      net_bctrl1: 0
+      net_bctrl2: 0
+      net_bctrl3: 0
+      net_inc_en: 0
   - at_ns: 4200
     set:
       net_a0: 0
@@ -263,17 +235,13 @@ stimulus:
       net_lgc1: 0
       net_lgc2: 0
       net_lgc3: 1
-      net_b_sel: 0
       net_153_s0: 1
       net_153_s1: 0
-      net_b_const_sel: 0
-      net_b_const_bit1: 0
-      net_b_const_bit2: 0
-      net_b_const_bit3: 0
-      net_b_const_bit4: 0
-      net_b_const_bit5: 0
-      net_b_const_bit6: 0
-      net_b_const_bit7: 0
+      net_bctrl0: 0
+      net_bctrl1: 0
+      net_bctrl2: 0
+      net_bctrl3: 0
+      net_inc_en: 0
   - at_ns: 4800
     set:
       net_a0: 1
@@ -297,17 +265,13 @@ stimulus:
       net_lgc1: 0
       net_lgc2: 0
       net_lgc3: 1
-      net_b_sel: 0
       net_153_s0: 1
       net_153_s1: 0
-      net_b_const_sel: 0
-      net_b_const_bit1: 0
-      net_b_const_bit2: 0
-      net_b_const_bit3: 0
-      net_b_const_bit4: 0
-      net_b_const_bit5: 0
-      net_b_const_bit6: 0
-      net_b_const_bit7: 0
+      net_bctrl0: 0
+      net_bctrl1: 0
+      net_bctrl2: 0
+      net_bctrl3: 0
+      net_inc_en: 0
   - at_ns: 5400
     set:
       net_a0: 0
@@ -331,17 +295,13 @@ stimulus:
       net_lgc1: 0
       net_lgc2: 0
       net_lgc3: 0
-      net_b_sel: 0
       net_153_s0: 0
       net_153_s1: 0
-      net_b_const_sel: 1
-      net_b_const_bit1: 0
-      net_b_const_bit2: 0
-      net_b_const_bit3: 0
-      net_b_const_bit4: 0
-      net_b_const_bit5: 0
-      net_b_const_bit6: 0
-      net_b_const_bit7: 0
+      net_bctrl0: 0
+      net_bctrl1: 0
+      net_bctrl2: 0
+      net_bctrl3: 0
+      net_inc_en: 1
   - at_ns: 6000
     set:
       net_a0: 0
@@ -365,17 +325,13 @@ stimulus:
       net_lgc1: 0
       net_lgc2: 0
       net_lgc3: 0
-      net_b_sel: 1
       net_153_s0: 0
       net_153_s1: 0
-      net_b_const_sel: 1
-      net_b_const_bit1: 1
-      net_b_const_bit2: 1
-      net_b_const_bit3: 1
-      net_b_const_bit4: 1
-      net_b_const_bit5: 1
-      net_b_const_bit6: 1
-      net_b_const_bit7: 1
+      net_bctrl0: 1
+      net_bctrl1: 1
+      net_bctrl2: 1
+      net_bctrl3: 1
+      net_inc_en: 0
   - at_ns: 6600
     set:
       net_a0: 0
@@ -399,17 +355,13 @@ stimulus:
       net_lgc1: 0
       net_lgc2: 0
       net_lgc3: 0
-      net_b_sel: 1
       net_153_s0: 0
       net_153_s1: 0
-      net_b_const_sel: 0
-      net_b_const_bit1: 0
-      net_b_const_bit2: 0
-      net_b_const_bit3: 0
-      net_b_const_bit4: 0
-      net_b_const_bit5: 0
-      net_b_const_bit6: 0
-      net_b_const_bit7: 0
+      net_bctrl0: 1
+      net_bctrl1: 1
+      net_bctrl2: 0
+      net_bctrl3: 0
+      net_inc_en: 0
 expect:
   - at_ns: 400
     net_y0: 0

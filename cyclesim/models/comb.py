@@ -124,6 +124,38 @@ class Hc283(CycleModel):
         return changed
 
 
+class AluIncBSel(CycleModel):
+    part = "ALU_INC_B_SEL"
+
+    def eval_comb(self) -> bool:
+        drives = gates.eval_alu_inc_b_sel(
+            self.read_bit,
+            lambda p: p in self.pin_nets,
+        )
+        if drives is None:
+            return False
+        changed = False
+        for pin_d, val in drives.items():
+            changed |= self.ctx.drive_net(self.net_for(pin_d), val, self.ref)
+        return changed
+
+
+class AluInc2c2(CycleModel):
+    part = "ALU_INC_2C2"
+
+    def eval_comb(self) -> bool:
+        drives = gates.eval_alu_inc_2c2(
+            self.read_bit,
+            lambda p: p in self.pin_nets,
+        )
+        if drives is None:
+            return False
+        changed = False
+        for pin_d, val in drives.items():
+            changed |= self.ctx.drive_net(self.net_for(pin_d), val, self.ref)
+        return changed
+
+
 class AluYMuxSel(CycleModel):
     part = "ALU_Y_MUX_SEL"
 

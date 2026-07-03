@@ -451,6 +451,52 @@ class YBusBuf(ChipModel):
             self._drive(pin_d, val, t, "y_bus" if val != gates.Z else "high-z")
 
 
+class AluIncBSel(ChipModel):
+    """INC opcode: force 153 B select = 1; else pass net_b[i]."""
+
+    part = "ALU_INC_B_SEL"
+
+    def on_start(self) -> None:
+        self._update()
+
+    def on_net_change(self, net: str) -> None:
+        self._update()
+
+    def _update(self) -> None:
+        drives = gates.eval_alu_inc_b_sel(
+            self.read_bit,
+            lambda p: p in self.pin_nets,
+        )
+        if drives is None:
+            return
+        t = self.t_pd("ALU_INC_B_SEL", "t_pd", default=5)
+        for pin_d, val in drives.items():
+            self._drive(pin_d, val, t, "inc_b_sel")
+
+
+class AluInc2c2(ChipModel):
+    """INC: per-bit 153 2C2 (bit0=1); else pass net_bctrl2 to all bits."""
+
+    part = "ALU_INC_2C2"
+
+    def on_start(self) -> None:
+        self._update()
+
+    def on_net_change(self, net: str) -> None:
+        self._update()
+
+    def _update(self) -> None:
+        drives = gates.eval_alu_inc_2c2(
+            self.read_bit,
+            lambda p: p in self.pin_nets,
+        )
+        if drives is None:
+            return
+        t = self.t_pd("ALU_INC_2C2", "t_pd", default=5)
+        for pin_d, val in drives.items():
+            self._drive(pin_d, val, t, "inc_2c2")
+
+
 class AluYMuxSel(ChipModel):
     """157 Y bypass select: SEL = S0|S1 (logic → B=net_y_logic, arith → A=net_sum)."""
 
@@ -856,6 +902,8 @@ def create_model(ref: str, part: str, pins: dict[str, str], ctx: SimContext) -> 
         "74HC157": Hc157,
         "ALU_CMP_SUB": AluCmpFromSub,
         "Y_BUS_BUF": YBusBuf,
+        "ALU_INC_B_SEL": AluIncBSel,
+        "ALU_INC_2C2": AluInc2c2,
         "ALU_Y_MUX_SEL": AluYMuxSel,
         "74HC08": Hc08,
         "74HC32": Hc32,

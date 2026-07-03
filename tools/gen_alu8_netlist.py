@@ -1,4 +1,4 @@
-"""Generate hw/netlist/blocks/alu8.yaml — Phase B2: Gigatron 153 logic + B1 arith bypass."""
+"""Generate hw/netlist/blocks/alu8.yaml — pure Gigatron B_CTRL bit-slice (153×8, 12 DIP)."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -16,47 +16,52 @@ def _emit_283(lines: list[str], tag: str, a_lo: int, cin: str, cout: str) -> Non
     lines += ["      VCC: pwr_vcc", "      GND: pwr_gnd"]
 
 
-def _emit_153_b(lines: list[str], chip: int) -> None:
-    """Dual 4:1 B-path MUX: sel={b_const_sel,b_sel} → B, ~B, INC, DEC."""
-    lines += [f"  - ref: U_ALU_153_B_{chip}", "    part: 74HC153", "    pins:"]
-    b0, b1 = chip * 2, chip * 2 + 1
-    for ch, bit in [("1", b0), ("2", b1)]:
-        inc = "pwr_vcc" if bit == 0 else "pwr_gnd"
-        lines += [
-            f"      {ch}C0: net_b{bit}",
-            f"      {ch}C1: net_b_inv{bit}",
-            f"      {ch}C2: {inc}",
-            f"      {ch}C3: pwr_vcc",
-            f"      {ch}G: pwr_gnd",
-            f"      {ch}Y: net_b_add{bit}",
-        ]
+def _emit_153_bit(lines: list[str], bit: int) -> None:
+    """Gigatron bit-slice: mux1=lgc on 1C*, mux2=bctrl on 2C*; A/B = operands (+ INC B override)."""
     lines += [
-        "      A: net_b_sel",
-        "      B: net_b_const_sel",
+        f"  - ref: U_ALU_153_{bit}",
+        "    part: 74HC153",
+        "    pins:",
+        "      1C0: net_lgc0",
+        "      1C1: net_lgc1",
+        "      1C2: net_lgc2",
+        "      1C3: net_lgc3",
+        "      1G: pwr_gnd",
+        f"      1Y: net_y_logic{bit}",
+        "      2C0: net_bctrl0",
+        "      2C1: net_bctrl1",
+        f"      2C2: net_153_2c2{bit}",
+        "      2C3: net_bctrl3",
+        "      2G: pwr_gnd",
+        f"      2Y: net_b_add{bit}",
+        f"      A: net_a{bit}",
+        f"      B: net_b153_sel{bit}",
         "      VCC: pwr_vcc",
         "      GND: pwr_gnd",
     ]
 
 
-def _emit_153_l(lines: list[str], bit: int) -> None:
-    """Gigatron bit-slice: sel=A|B<<1, data=C0..C3 from decode (net_lgc0..3)."""
+def _emit_inc_2c2(lines: list[str]) -> None:
+    """INC: per-bit 2C2 override; else pass global net_bctrl2."""
     lines += [
-        f"  - ref: U_ALU_153_L_{bit}",
-        "    part: ALU_153_SLICE",
+        "  - ref: U_ALU_INC_2C2",
+        "    part: ALU_INC_2C2",
         "    pins:",
-        f"      A: net_a{bit}",
-        f"      B: net_b{bit}",
-        "      C0: net_lgc0",
-        "      C1: net_lgc1",
-        "      C2: net_lgc2",
-        "      C3: net_lgc3",
-        "      G: pwr_gnd",
-        f"      Y: net_y_logic{bit}",
+        "      EN: net_inc_en",
+        "      BCTRL2: net_bctrl2",
     ]
+    for i in range(8):
+        lines += [f"      OUT{i}: net_153_2c2{i}"]
+
+
+def _emit_inc_b_sel(lines: list[str]) -> None:
+    """INC: force 153 B select MSB=1 while operand net_b bus unchanged."""
+    lines += ["  - ref: U_ALU_INC_B_SEL", "    part: ALU_INC_B_SEL", "    pins:", "      EN: net_inc_en"]
+    for i in range(8):
+        lines += [f"      B_IN{i}: net_b{i}", f"      B_OUT{i}: net_b153_sel{i}"]
 
 
 def _emit_157_ybp(lines: list[str], chip: int) -> None:
-    """Arithmetic bypass: S=0 → sum, S=1 → logic (153_L); faster on ADD/SUB/INC/DEC/CMP."""
     lines += [f"  - ref: U_ALU_157_YBP_{chip}", "    part: 74HC157", "    pins:"]
     for ch in range(1, 5):
         bit = chip * 4 + ch - 1
@@ -69,14 +74,16 @@ def _emit_157_ybp(lines: list[str], chip: int) -> None:
 
 
 def _emit_cmp_sub(lines: list[str]) -> None:
-    """CMP Z/C_GE from SUB result (Y==0, c_hi); no 74HC85 on breadboard."""
     lines += ["  - ref: U_ALU_CMP_SUB", "    part: ALU_CMP_SUB", "    pins:"]
     for i in range(8):
         lines.append(f"      Y{i}: net_y{i}")
     lines += [
         "      C_HI: net_c_hi",
-        "      B_SEL: net_b_sel",
         "      CIN: net_cin",
+        "      BCTRL0: net_bctrl0",
+        "      BCTRL1: net_bctrl1",
+        "      BCTRL2: net_bctrl2",
+        "      BCTRL3: net_bctrl3",
         "      Z: net_cmp_z",
         "      C_GE: net_cmp_c_ge",
     ]
@@ -88,22 +95,11 @@ def main() -> None:
     _emit_283(lines, "LO", 0, "net_cin", "net_c_lo")
     _emit_283(lines, "HI", 4, "net_c_lo", "net_c_hi")
 
-    for i in range(8):
-        lines += [
-            f"  - ref: U_ALU_04_BINV_{i}",
-            "    part: 74HC04",
-            "    pins:",
-            f"      A: net_b{i}",
-            f"      Y: net_b_inv{i}",
-            "      VCC: pwr_vcc",
-            "      GND: pwr_gnd",
-        ]
-
-    for chip in range(4):
-        _emit_153_b(lines, chip)
-
     for bit in range(8):
-        _emit_153_l(lines, bit)
+        _emit_153_bit(lines, bit)
+
+    _emit_inc_b_sel(lines)
+    _emit_inc_2c2(lines)
 
     for chip in range(2):
         _emit_157_ybp(lines, chip)
@@ -126,8 +122,11 @@ def main() -> None:
         "net_cin",
         "net_153_s0",
         "net_153_s1",
-        "net_b_sel",
-        "net_b_const_sel",
+        "net_bctrl0",
+        "net_bctrl1",
+        "net_bctrl2",
+        "net_bctrl3",
+        "net_inc_en",
         "net_lgc0",
         "net_lgc1",
         "net_lgc2",
@@ -145,7 +144,7 @@ def main() -> None:
     ]
 
     for i in range(8):
-        for prefix in ("net_b_inv", "net_b_add", "net_sum", "net_y_logic"):
+        for prefix in ("net_b153_sel", "net_b_add", "net_sum", "net_y_logic", "net_153_2c2"):
             lines += [f"  - name: {prefix}{i}", "    width: 1"]
     for i in range(8):
         lines += [f"  - name: net_y{i}", "    width: 1"]
@@ -171,7 +170,6 @@ def main() -> None:
 
 
 def _patch_alu8_decode(root: Path, alu8_path: Path) -> None:
-    """Merge alu_decode.yaml (PLA) + alu8.yaml -> alu8_decode.yaml."""
     decode_path = root / "hw" / "netlist" / "blocks" / "alu8_decode.yaml"
     decode_only = root / "hw" / "netlist" / "blocks" / "alu_decode.yaml"
     if not decode_only.is_file():
@@ -202,7 +200,6 @@ def _split_yaml(text: str) -> tuple[str, str, str]:
 
 
 def _dedupe_alu_nets(dec_nets: str, alu_nets: str) -> str:
-    """Drop alu8 net entries already declared in the decode control section."""
     import re
 
     dec_names = set(re.findall(r"^- name: (net_\w+)", dec_nets, re.M))

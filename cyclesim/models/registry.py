@@ -9,6 +9,8 @@ from cyclesim.models.base import CycleModel
 if TYPE_CHECKING:
     from cyclesim.engine import CycleContext
 from cyclesim.models.comb import (
+    AluInc2c2,
+    AluIncBSel,
     AluCmpFromSub,
     AluYMuxSel,
     Hc04,
@@ -43,6 +45,8 @@ _COMB: dict[str, type[CycleModel]] = {
     "ALU_153_SLICE": Hc153Slice,
     "74HC157": Hc157,
     "74HC283": Hc283,
+    "ALU_INC_B_SEL": AluIncBSel,
+    "ALU_INC_2C2": AluInc2c2,
     "ALU_Y_MUX_SEL": AluYMuxSel,
     "ALU_CMP_SUB": AluCmpFromSub,
     "Y_BUS_BUF": YBusBuf,

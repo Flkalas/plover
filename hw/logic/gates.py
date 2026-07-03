@@ -39,6 +39,46 @@ def eval_alu_153_slice(read_bit: ReadBit) -> int | None:
     return val
 
 
+def eval_alu_inc_b_sel(read_bit: ReadBit, has_pin: HasPin) -> dict[str, int] | None:
+    """INC: drive 153 B select high; otherwise pass operand net_b[i]."""
+    en = read_bit("EN")
+    if en > 1:
+        return None
+    out: dict[str, int] = {}
+    for i in range(8):
+        pin = f"B_OUT{i}"
+        if not has_pin(pin):
+            continue
+        if en == 1:
+            out[pin] = H
+        else:
+            v = read_bit(f"B_IN{i}")
+            if v > 1:
+                return None
+            out[pin] = v
+    return out
+
+
+def eval_alu_inc_2c2(read_bit: ReadBit, has_pin: HasPin) -> dict[str, int] | None:
+    """INC: per-bit 153 2C2 (bit0=1, others=0); else broadcast net_bctrl2."""
+    en = read_bit("EN")
+    if en > 1:
+        return None
+    b2 = read_bit("BCTRL2")
+    if en == 0 and b2 > 1:
+        return None
+    out: dict[str, int] = {}
+    for i in range(8):
+        pin = f"OUT{i}"
+        if not has_pin(pin):
+            continue
+        if en == 1:
+            out[pin] = H if i == 0 else L
+        else:
+            out[pin] = b2
+    return out
+
+
 def eval_alu_y_mux_sel(read_bit: ReadBit) -> int | None:
     s0, s1 = read_bit("S0"), read_bit("S1")
     if s0 > 1 or s1 > 1:
@@ -47,7 +87,17 @@ def eval_alu_y_mux_sel(read_bit: ReadBit) -> int | None:
 
 
 def eval_alu_cmp_from_sub(read_bit: ReadBit) -> tuple[int, int] | None:
-    if read_bit("B_SEL") != 1 or read_bit("CIN") != 1:
+    """CMP when SUB path active: cin=1 and bctrl=1100 (~B pattern)."""
+    if read_bit("CIN") != 1:
+        return None
+    sub_pat = (1, 1, 0, 0)
+    got = (
+        read_bit("BCTRL0"),
+        read_bit("BCTRL1"),
+        read_bit("BCTRL2"),
+        read_bit("BCTRL3"),
+    )
+    if any(x > 1 for x in got) or got != sub_pat:
         return None
     ys = [read_bit(f"Y{i}") for i in range(8)]
     if any(y > 1 for y in ys):
