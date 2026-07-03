@@ -1,5 +1,7 @@
 /target/
 build/
+archive/build-*.tar.gz
+archive/target-*.tar.gz
 sim/wave.vcd
 archive/verilog-sim/sim/wave.vcd
 __pycache__/
