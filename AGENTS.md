@@ -12,6 +12,17 @@ When a **plan, user message, or session goal** says to finish with commits (e.g.
 
 Split into **separate commits** when changes belong to different concerns (e.g. UTF-8 recovery vs a new feature).
 
+### Plan execution (auto-commit)
+
+When **implementing an attached Cursor plan** (`.plan.md` with todos — e.g. “Implement the plan as specified”):
+
+- **Commit without a separate “커밋하세요” request** — plan execution is sufficient permission.
+- Finish with commits **before ending the turn** when plan todos are done (or at each logical unit if the plan lists “권장 커밋 단위”).
+- Follow the plan’s suggested commit splits when present; otherwise split by concern (netlist/sim, decode/tests, units, docs).
+- Exclude unrelated dirty files (e.g. fixtures touched by another task) unless the plan covers them.
+
+For work **outside** an active plan, only commit when the user asks or the session goal explicitly requires it.
+
 ### Never run without explicit user request
 
 - `git checkout -- .` or `git restore .` on tracked files (especially Korean markdown)
@@ -30,4 +41,4 @@ Split into **separate commits** when changes belong to different concerns (e.g. 
 
 If the user asked for commits in the **same thread or plan**, treat that as permission for those commits. If scope is mixed, **split commits** rather than skipping.
 
-Only create commits when the user or an active plan requests them; when they do, follow the procedure above in the same session — do not defer to a later turn.
+When implementing a **Cursor plan**, commit in-session per **Plan execution (auto-commit)** above — do not defer to a later turn or wait for an extra commit message from the user.
