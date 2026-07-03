@@ -58,6 +58,17 @@ When answering **hardware architecture**, **bring-up**, or **decode/CPLD/ALU** q
 
 **Anchor docs:** [control-and-decode.md](docs/normative/hardware/control-and-decode.md), [system-architecture.md](docs/normative/hardware/system-architecture.md).
 
+**Active hardware truth:** `docs/normative/**` only. Archived sim/code: [archived-code-guide.md](docs/developer/archived-code-guide.md) (`archive/bundles/*.tar.gz`).
+
+**Forbidden for SoC / bring-up answers** (unless user asks for history):
+
+- Citing or executing restored code from `archive/bundles/**`
+- `docs/hardware/research/**`, `docs/archive/**` as current spec
+- Treating **`alu8_decode`** as the breadboard decode path
+- Flash **`$4000`** control-word burn, **`cpu_cw_direct`**, pareto MC as v1.0 gates
+
+**No feasibility from archived sim** — timing and fit use normative frozen numbers ([alu-opcodes-timing.md](docs/normative/hardware/alu-opcodes-timing.md)) and M2a lab checklist only.
+
 **Do not** implement bring-up or normative edits based on archive/research content unless the user explicitly requests historical comparison.
 
 **Stale normative terms** (after 2026-07 ALU refactor): `inc_en`, `INC_B_SEL`, `INC_2C2`, `14 IC` for ALU BOM, `b_sel`/`b_const_sel` as SoC signal names (use `net_bctrl0..3`).

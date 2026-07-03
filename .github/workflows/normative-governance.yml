@@ -1,0 +1,41 @@
+name: Normative governance
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  normative:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Forbidden patterns in normative docs
+        run: |
+          set -euo pipefail
+          patterns=(
+            'hwsim'
+            'cyclesim'
+            'pytest'
+            'python -m'
+            'python tools/'
+            'tools/'
+            'cargo run'
+            'plover_vm'
+            '--engine micro'
+            '--engine macro'
+            '--engine fast'
+          )
+          failed=0
+          for pat in "${patterns[@]}"; do
+            if rg -n --glob '*.md' "$pat" docs/normative/; then
+              echo "::error::Forbidden pattern in normative docs: $pat"
+              failed=1
+            fi
+          done
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
+          echo "normative scrub OK"
