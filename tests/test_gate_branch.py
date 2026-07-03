@@ -20,35 +20,48 @@ def test_operand_bus_has_trunk_and_spokes():
     assert sum(1 for s in branch.segments if s.role == "spoke") == 3
 
 
-def test_operand_a_rises_on_y_before_x():
-    """net_a*: vertical trunk in 153|283 corridor, then row taps left/right."""
-    bus_x = 529.0
-    io = (bus_x, 1416.0, "io", "io", bus_x, 1416.0)
+def test_operand_a_rises_from_bottom_then_spans_x():
+    """net_a*: bottom IO ↑ to row Y, then horizontal trunk across corridor."""
+    bus_x = 399.0
+    io_y = 1416.0
+    row_y = 280.0
+    io = (bus_x, io_y, "io", "io", bus_x, io_y)
     gates = [
-        (640.0, 280.0, "283_lo", "left", 622.0, 280.0),
-        (389.0, 176.0, "mux4_bit_0", "bottom", 389.0, 198.0),
+        (718.0, row_y, "283_lo", "left", 700.0, row_y),
+        (389.0, 232.0, "mux4_bit_0", "bottom", 389.0, 254.0),
     ]
     branch = layout_branch_net([io, *gates], "net_a0")
-    assert branch.topology == "operand_a"
+    assert branch.topology == "operand_corridor"
     feeder = next(s for s in branch.segments if s.role == "trunk" and s.endpoint == "io")
-    assert feeder.points[0] == (bus_x, 1416.0)
-    assert feeder.points[1][0] == bus_x
-    assert feeder.points[1][1] < 1416.0
-    mux_spoke = next(s for s in branch.segments if s.endpoint == "mux4_bit_0")
-    assert mux_spoke.points[0][0] == bus_x
-    add_spoke = next(s for s in branch.segments if s.endpoint == "283_lo")
-    assert add_spoke.points[0][0] == bus_x
+    assert feeder.points[0] == (bus_x, io_y)
+    assert feeder.points[1] == (bus_x, row_y)
+    horiz = next(s for s in branch.segments if s.role == "trunk" and s.endpoint == "")
+    assert horiz.points[0][1] == horiz.points[1][1] == row_y
 
 
-def test_operand_bus_mixed_left_and_bottom():
-    """Operand net with left ports + bottom select (MUX L A/B after pin layout fix)."""
+def test_operand_b_two_point_bottom_feed_is_orthogonal():
+    """net_b* has IO + one 153 B port — must not use diagonal 2-point link."""
+    io = (611.0, 1416.0, "io", "io", 611.0, 1416.0)
+    gates = [(389.0, 232.0, "mux4_bit_0", "bottom", 389.0, 254.0)]
+    branch = layout_branch_net([io, *gates], "net_b0")
+    assert branch.topology == "operand_corridor"
+    feeder = next(s for s in branch.segments if s.role == "trunk" and s.endpoint == "io")
+    assert feeder.points[0][1] > feeder.points[1][1]
+    assert feeder.points[0][0] == feeder.points[1][0]
+    for seg in branch.segments:
+        for (x1, y1), (x2, y2) in zip(seg.points, seg.points[1:]):
+            assert abs(x1 - x2) < 0.01 or abs(y1 - y2) < 0.01
+
+
+def test_control_bus_mixed_left_and_bottom():
+    """Control net with left ports + bottom select uses horizontal bus + vertical spine."""
     io = (80.0, 128.0, "io", "io", 80.0, 128.0)
     gates = [
         (220.0, 124.0, "not_0", "left", 206.0, 124.0),
         (400.0, 86.0, "mux4_b_0_1", "left", 386.0, 86.0),
         (768.0, 176.0, "mux4_l_0", "bottom", 779.0, 196.0),
     ]
-    branch = layout_branch_net([io, *gates], "net_b0")
+    branch = layout_branch_net([io, *gates], "net_bctrl0")
     assert branch.topology == "bus_mixed"
     bottom_spoke = next(s for s in branch.segments if s.endpoint == "mux4_l_0")
     ys = [p[1] for p in bottom_spoke.points]

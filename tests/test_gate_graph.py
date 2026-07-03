@@ -55,13 +55,29 @@ def test_b_operand_io_labels_and_internal_inv():
     assert not is_external_net("net_b_add0")
 
     assert 'class="net" data-net="net_a0"' in svg
-    assert 'data-topology="operand_a"' in svg
+    assert 'data-topology="operand_corridor"' in svg
     import re
 
-    a0_io = re.search(r'class="io-net operand" data-net="net_a0"[^>]*><circle cx="([\d.]+)"', svg)
+    a0_io = re.search(r'class="io-net operand" data-net="net_a0"[^>]*><circle cx="([\d.]+)" cy="([\d.]+)"', svg)
     assert a0_io
     ax = float(a0_io.group(1))
-    assert 418.0 < ax < 640.0
+    ay = float(a0_io.group(2))
+    assert 390.0 < ax < 415.0
+    assert 1405.0 < ay < 1430.0
+    b0_io = re.search(r'class="io-net operand" data-net="net_b0"[^>]*><circle cx="([\d.]+)" cy="([\d.]+)"', svg)
+    assert b0_io
+    bx = float(b0_io.group(1))
+    by = float(b0_io.group(2))
+    assert 600.0 < bx < 625.0
+    assert by == ay
+    b0_wire = re.search(
+        r'<polyline class="wire-trunk" data-net="net_b0"[^>]*points="([^"]+)"',
+        svg,
+    )
+    assert b0_wire
+    coords = [tuple(map(float, p.split(","))) for p in b0_wire.group(1).split()]
+    for (x1, y1), (x2, y2) in zip(coords, coords[1:]):
+        assert abs(x1 - x2) < 0.01 or abs(y1 - y2) < 0.01
     assert 'data-route-x="' in svg
     assert svg.count('data-route-x="') >= 60
 

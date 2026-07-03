@@ -176,6 +176,82 @@ def _layout_link(pts: list[Anchor], net: str) -> BranchNet:
     return BranchNet("link", None, [], [WireSeg("link", "", _dedupe_xy(path))])
 
 
+def _corridor_row_y(left: list[Anchor], bottom: list[Anchor], fallback: float) -> float:
+    """Row height for the horizontal bus span between 153 and 283."""
+    left_ys = [_unpack(g)[1] for g in left]
+    if left_ys:
+        return min(left_ys)
+    stub_ys = [_unpack(g)[5] for g in bottom]
+    return min(stub_ys) if stub_ys else fallback
+
+
+def _layout_operand_corridor_a(
+    io: Anchor, left: list[Anchor], bottom: list[Anchor]
+) -> BranchNet:
+    """A bus: bottom IO ↑ to row Y, horizontal trunk across corridor, taps to 283 and 153."""
+    io_x, io_y, _, _, _, _ = _unpack(io)
+    row_y = _corridor_row_y(left, bottom, io_y)
+    junctions: list[tuple[float, float, str]] = []
+    segments: list[WireSeg] = []
+
+    tap_xs = [io_x, *(_unpack(a)[4] for a in left + bottom)]
+    x_lo, x_hi = min(tap_xs), max(tap_xs)
+
+    if io_y > row_y + 0.5:
+        segments.append(WireSeg("trunk", "io", [(io_x, io_y), (io_x, row_y)]))
+    segments.append(WireSeg("trunk", "", [(x_lo, row_y), (x_hi, row_y)]))
+
+    for anchor in sorted(left, key=lambda p: _unpack(p)[1]):
+        px, py, uid, _, rx, _ = _unpack(anchor)
+        junctions.append((rx, row_y, uid))
+        if abs(py - row_y) < 0.5:
+            segments.append(WireSeg("spoke", uid, [(rx, row_y), (px, py)]))
+        else:
+            segments.append(WireSeg("spoke", uid, _dedupe_xy([(rx, row_y), (rx, py), (px, py)])))
+
+    for anchor in sorted(bottom, key=lambda p: (_unpack(p)[5], _unpack(p)[4])):
+        px, py, uid, _, rx, stub_y = _unpack(anchor)
+        junctions.append((rx, row_y, uid))
+        segments.append(
+            WireSeg(
+                "spoke",
+                uid,
+                _dedupe_xy([(rx, row_y), (rx, stub_y), (rx, py), (px, py)]),
+            )
+        )
+
+    return BranchNet("operand_corridor", None, junctions, segments)
+
+
+def _layout_operand_corridor_b(io: Anchor, bottom: list[Anchor]) -> BranchNet:
+    """B bus: bottom IO ↑ to row stub Y, horizontal run to 153 B (bottom)."""
+    io_x, io_y, _, _, _, _ = _unpack(io)
+    junctions: list[tuple[float, float, str]] = []
+    segments: list[WireSeg] = []
+
+    stub_ys = [_unpack(g)[5] for g in bottom]
+    bus_y = min(stub_ys) if stub_ys else io_y
+    tap_xs = [io_x, *(_unpack(g)[4] for g in bottom)]
+    x_lo, x_hi = min(tap_xs), max(tap_xs)
+
+    if io_y > bus_y + 0.5:
+        segments.append(WireSeg("trunk", "io", [(io_x, io_y), (io_x, bus_y)]))
+    segments.append(WireSeg("trunk", "", [(x_lo, bus_y), (x_hi, bus_y)]))
+
+    for anchor in sorted(bottom, key=lambda p: (_unpack(p)[5], _unpack(p)[4])):
+        px, py, uid, _, rx, stub_y = _unpack(anchor)
+        junctions.append((rx, bus_y, uid))
+        segments.append(
+            WireSeg(
+                "spoke",
+                uid,
+                _dedupe_xy([(rx, bus_y), (rx, stub_y), (rx, py), (px, py)]),
+            )
+        )
+
+    return BranchNet("operand_corridor", None, junctions, segments)
+
+
 def _layout_operand_a(
     io: Anchor, left: list[Anchor], bottom: list[Anchor]
 ) -> BranchNet:
@@ -376,16 +452,18 @@ def layout_branch_net(pts: list[Anchor], net: str) -> BranchNet:
     if net.startswith("net_b_inv"):
         return _layout_link(pts, net)
 
-    if len(pts) == 2:
-        return _layout_link(pts, net)
-
     operand = is_b_operand_bit_net(net) or is_a_operand_bit_net(net)
     control = _is_control_net(net)
 
     if io and operand:
         if is_a_operand_bit_net(net) and left and bottom:
-            return _layout_operand_a(io, left, bottom)
+            return _layout_operand_corridor_a(io, left, bottom)
+        if is_b_operand_bit_net(net) and bottom:
+            return _layout_operand_corridor_b(io, bottom)
         return _layout_bus(io, gates, net)
+
+    if len(pts) == 2:
+        return _layout_link(pts, net)
 
     if io and control:
         if _is_153_left_data_net(net) and left and _is_column_fanout(left):

@@ -34,16 +34,20 @@ CONST_STUB = 20.0
 PORT_R = 3.0
 FIXED_PORT_COLOR = "#484f58"
 
-# Signal-flow columns: 153 (mux) → 283 (add) → 157 (Y). Operand IO uses bottom strip (Y);
-# control/decode uses ctrl strip; horizontal data uses left IO (X).
+# Signal-flow columns: 153 (mux) → corridor (A/B buses) → 283 (add) → 157 (Y).
+# Operand A/B IO enters from the bottom strip (Y↑), fans out per bit, then spans X in corridor.
+CORRIDOR_W = 300.0
+BUS_INSET = 44.0
+BUS_BIT_STEP = 18.0
 COL = {
     "io_in": 72.0,
     "mux4_bit": 360.0,
-    "adder4": 640.0,
-    "mux2_y": 920.0,
-    "io_out": 1120.0,
+    "adder4": 360.0 + NODE_W + CORRIDOR_W,
+    "mux2_y": 360.0 + NODE_W + CORRIDOR_W + 280.0,
+    "io_out": 360.0 + NODE_W + CORRIDOR_W + 480.0,
 }
-COL["a_bus"] = (COL["mux4_bit"] + NODE_W + COL["adder4"]) / 2
+COL["a_bus"] = COL["mux4_bit"] + NODE_W + BUS_INSET
+COL["b_bus"] = COL["adder4"] - BUS_INSET
 
 # 74HC153 data inputs: netlist uses C0..C3 or 1C0..2C3; display as D0..D3
 _HC153_DATA_PIN = {"C0": "D0", "C1": "D1", "C2": "D2", "C3": "D3"}
@@ -426,6 +430,11 @@ def _153_row_y(bit: int) -> float:
     return ROW0 + bit * ROW + NODE_H / 2
 
 
+def _operand_bus_stub_x(bus_col: float, bit: int) -> float:
+    """Spread a0..a7 / b0..b7 along X on the bottom operand strip."""
+    return bus_col + (bit - 3.5) * BUS_BIT_STEP
+
+
 def _split_inputs(in_nets: list[str]) -> tuple[list[str], list[str]]:
     """Data-path inputs on the left; decode/control selects on the bottom."""
     left: list[str] = []
@@ -498,14 +507,14 @@ def _io_stubs_for_net(
 
     bit = _a_bit_index(net)
     if bit is not None:
-        gx = COL["a_bus"] + (bit - 3.5) * CHANNEL_STEP
-        stubs.append(_IoStub(gx, operand_io_y, "middle", gx, operand_io_y + 12.0, "operand-y"))
+        gx = _operand_bus_stub_x(COL["a_bus"], bit)
+        stubs.append(_IoStub(gx, operand_io_y, "middle", gx, operand_io_y + 12.0, "operand-a"))
         return stubs
 
     if is_b_operand_bit_net(net):
         bit = int(net[5:])
-        gy = _153_row_y(bit)
-        stubs.append(_IoStub(COL["io_in"], gy, "start", COL["io_in"] + 8.0, gy + 3.0, "operand-x"))
+        gx = _operand_bus_stub_x(COL["b_bus"], bit)
+        stubs.append(_IoStub(gx, operand_io_y, "middle", gx, operand_io_y + 12.0, "operand-b"))
         return stubs
 
     if bottom_pts and not left_pts:
@@ -736,19 +745,22 @@ def export_gate_graph_svg(nl: Netlist, units: list[ViewUnit] | None = None) -> s
 
     col_labels = [
         (COL["mux4_bit"], "153"),
-        (COL["a_bus"] - 14.0, "A"),
+        (COL["a_bus"] - NODE_W / 2 - 12.0, "A"),
+        (COL["b_bus"] - NODE_W / 2 + 12.0, "B"),
         (COL["adder4"], "283"),
         (COL["mux2_y"], "157"),
     ]
     header_elems = [
         f'<text x="{MARGIN:.1f}" y="{MARGIN - 8:.1f}" class="title">ALU8 gate connectivity</text>',
         f'<text x="{MARGIN:.1f}" y="{MARGIN + 6:.1f}" class="subtitle">'
-        f'{len(units)} gates · A bus 153|283 · INC=cin+B₀ · C*←X</text>',
+        f'{len(units)} gates · A/B ↑ from bottom · INC=cin+B₀ · C*←X</text>',
         f'<text x="{COL["a_bus"]:.1f}" y="{operand_io_y + 28:.1f}" text-anchor="middle" '
-        f'class="strip-label">A0-7 bus (Y)</text>',
+        f'class="strip-label">A0-7 (bottom → Y)</text>',
+        f'<text x="{COL["b_bus"]:.1f}" y="{operand_io_y + 28:.1f}" text-anchor="middle" '
+        f'class="strip-label">B0-7 (bottom → Y)</text>',
         f'<text x="{COL["io_in"]:.1f}" y="{ctrl_io_y + 28:.1f}" class="strip-label">FSM ctrl (Y)</text>',
         f'<text x="{COL["io_in"] - 12:.1f}" y="{ROW0 + 2 * ROW:.1f}" text-anchor="end" '
-        f'class="strip-label">b0-7 / C* (X)</text>',
+        f'class="strip-label">C* decode (X)</text>',
     ]
     for cx, title in col_labels:
         header_elems.append(
