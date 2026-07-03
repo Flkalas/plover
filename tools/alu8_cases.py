@@ -7,6 +7,7 @@ BCTRL_ADD = (0, 0, 1, 1)  # C0=0 C2/C3=1 — B[i] pass
 BCTRL_SUB = (1, 1, 0, 0)  # C0/C1=1 C2/C3=0 — ~B[i]
 BCTRL_DEC = (1, 1, 1, 1)  # 1111 — constant 1
 BCTRL_NOP = (0, 0, 0, 0)
+BCTRL_ZERO = BCTRL_NOP  # mux2 all-zero → B_add=0 (INC)
 
 
 def bits(prefix: str, val: int) -> dict[str, int]:
@@ -19,7 +20,6 @@ def ctrl(
     s0: int = 0,
     s1: int = 0,
     bctrl: tuple[int, int, int, int] = BCTRL_NOP,
-    inc_en: int = 0,
     lgc0: int = 0,
     lgc1: int = 0,
     lgc2: int = 0,
@@ -34,7 +34,6 @@ def ctrl(
         "net_bctrl1": bctrl[1],
         "net_bctrl2": bctrl[2],
         "net_bctrl3": bctrl[3],
-        "net_inc_en": inc_en,
         "net_lgc0": lgc0,
         "net_lgc1": lgc1,
         "net_lgc2": lgc2,
@@ -53,7 +52,7 @@ CASES: list[tuple[str, int, int, int, dict[str, int]]] = [
     ("NOT", 0x12, 0x00, 0xED, ctrl(s0=1, s1=1, lgc0=1)),
     ("PASS_A", 0x12, 0xFF, 0x12, ctrl(s0=1, lgc3=1)),
     ("PASS_B", 0xFF, 0x34, 0x34, ctrl(s0=1, lgc3=1)),
-    ("INC", 0x12, 0x00, 0x13, ctrl(inc_en=1)),
+    ("INC", 0x12, 0x00, 0x13, ctrl(cin=1, bctrl=BCTRL_ZERO)),
     ("DEC", 0x12, 0x00, 0x11, ctrl(bctrl=BCTRL_DEC)),
     ("CMP", 0x12, 0x34, 0xDE, ctrl(cin=1, bctrl=BCTRL_SUB)),
 ]

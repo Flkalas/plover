@@ -43,6 +43,7 @@ COL = {
     "mux2_y": 920.0,
     "io_out": 1120.0,
 }
+COL["a_bus"] = (COL["mux4_bit"] + NODE_W + COL["adder4"]) / 2
 
 # 74HC153 data inputs: netlist uses C0..C3 or 1C0..2C3; display as D0..D3
 _HC153_DATA_PIN = {"C0": "D0", "C1": "D1", "C2": "D2", "C3": "D3"}
@@ -51,7 +52,7 @@ for _mux in ("1", "2"):
         _HC153_DATA_PIN[f"{_mux}C{_i}"] = f"D{_i}"
 
 _MUX4_BIT_LEFT_ORDER = ("1C0", "1C1", "1C2", "1C3", "2C0", "2C1", "2C2", "2C3")
-_MUX4_BIT_BOTTOM_ORDER = ("A", "1G", "2G")
+_MUX4_BIT_BOTTOM_ORDER = ("A", "B", "1G", "2G")
 
 
 @dataclass
@@ -405,11 +406,7 @@ def _render_fixed_left_port(
 
 def _is_153_left_data_net(net: str) -> bool:
     """153 mux1/mux2 data (C*): approach from X-axis left."""
-    return (
-        net.startswith("net_lgc")
-        or net.startswith("net_bctrl")
-        or net.startswith("net_153_2c2")
-    )
+    return net.startswith("net_lgc") or net.startswith("net_bctrl")
 
 
 def _is_bottom_ctrl_net(net: str) -> bool:
@@ -453,8 +450,7 @@ def _split_inputs_for_unit(ex: UnitExtract, in_nets: list[str]) -> tuple[list[st
         in_set = set(in_nets)
         net_by = _in_by_logical(ex)
         left = [net_by[p] for p in _MUX4_BIT_LEFT_ORDER if p in net_by and net_by[p] in in_set]
-        # Operand A select only on bottom (Y); B is internal (net_b153_sel).
-        bottom = [net_by["A"]] if "A" in net_by and net_by["A"] in in_set else []
+        bottom = [net_by[p] for p in ("A", "B") if p in net_by and net_by[p] in in_set]
         return left, bottom
     if ex.unit.kind == "adder4":
         in_set = set(in_nets)
@@ -502,15 +498,15 @@ def _io_stubs_for_net(
 
     bit = _a_bit_index(net)
     if bit is not None:
-        if bottom_pts:
-            node = node_by_id.get(f"mux4_bit_{bit}")
-            gx = node.x + node.w / 2 if node else COL["mux4_bit"] + NODE_W / 2
-            stubs.append(_IoStub(gx, operand_io_y, "middle", gx, operand_io_y + 12.0, "operand-y"))
-        if left_pts:
-            ly = sum(p[1] for p in left_pts) / len(left_pts)
-            stubs.append(_IoStub(COL["io_in"], ly, "start", COL["io_in"] + 8.0, ly + 3.0, "operand-x"))
-        if stubs:
-            return stubs
+        gx = COL["a_bus"] + (bit - 3.5) * CHANNEL_STEP
+        stubs.append(_IoStub(gx, operand_io_y, "middle", gx, operand_io_y + 12.0, "operand-y"))
+        return stubs
+
+    if is_b_operand_bit_net(net):
+        bit = int(net[5:])
+        gy = _153_row_y(bit)
+        stubs.append(_IoStub(COL["io_in"], gy, "start", COL["io_in"] + 8.0, gy + 3.0, "operand-x"))
+        return stubs
 
     if bottom_pts and not left_pts:
         gx = sum(p[0] for p in bottom_pts) / len(bottom_pts)
@@ -615,6 +611,7 @@ def export_gate_graph_svg(nl: Netlist, units: list[ViewUnit] | None = None) -> s
 
         ex = extract_unit(nl, unit)
         logical_map = _logical_by_net(ex)
+
         left_ins, bottom_ins = _split_inputs_for_unit(ex, node.in_nets)
         left_slots = _left_port_slots(ex, left_ins)
         bottom_slots = _bottom_port_slots(ex, bottom_ins)
@@ -668,26 +665,6 @@ def export_gate_graph_svg(nl: Netlist, units: list[ViewUnit] | None = None) -> s
                 gate_elems.append(
                     _render_fixed_bottom_port(node, i, bottom_count, slot.logical, slot.value)
                 )
-
-        if unit.kind == "mux4_bit":
-            net_by = _in_by_logical(ex)
-            b_net = net_by.get("B")
-            wired_bottom = {s.net for s in bottom_slots if s.kind == "net"}
-            if b_net and b_net in set(node.in_nets) and b_net not in wired_bottom:
-                px = node.x + node.w - 10.0
-                py = node.y + node.h
-                rx = px + SIDE_STUB
-                stub_y = _bottom_stub_y(py, bottom_count)
-                gate_elems.append(
-                    f'<g class="port-group internal" data-net="{_esc(b_net)}">'
-                    f'{_render_pin_label("bottom", px, py, "B")}'
-                    f'<circle class="port in bottom internal" data-port-side="bottom" data-net="{_esc(b_net)}" '
-                    f'data-unit="{_esc(node.unit_id)}" data-logical="B" data-pin-desc="B" '
-                    f'data-route-x="{rx:.1f}" data-stub-y="{stub_y:.1f}" '
-                    f'cx="{px:.1f}" cy="{py:.1f}" r="{PORT_R:.1f}" fill="{_wire_color(b_net)}"/>'
-                    f"</g>"
-                )
-                anchors.setdefault(b_net, []).append((px, py, node.unit_id, "bottom", rx, stub_y))
 
         for i, net in enumerate(node.out_nets):
             py = _port_y(node, i, len(node.out_nets))
@@ -759,17 +736,19 @@ def export_gate_graph_svg(nl: Netlist, units: list[ViewUnit] | None = None) -> s
 
     col_labels = [
         (COL["mux4_bit"], "153"),
+        (COL["a_bus"] - 14.0, "A"),
         (COL["adder4"], "283"),
         (COL["mux2_y"], "157"),
     ]
     header_elems = [
         f'<text x="{MARGIN:.1f}" y="{MARGIN - 8:.1f}" class="title">ALU8 gate connectivity</text>',
         f'<text x="{MARGIN:.1f}" y="{MARGIN + 6:.1f}" class="subtitle">'
-        f'{len(units)} gates · 153 C*←X · A select↑Y · 283←X</text>',
-        f'<text x="{COL["io_in"]:.1f}" y="{operand_io_y + 28:.1f}" class="strip-label">A select (Y)</text>',
+        f'{len(units)} gates · A bus 153|283 · INC=cin+B₀ · C*←X</text>',
+        f'<text x="{COL["a_bus"]:.1f}" y="{operand_io_y + 28:.1f}" text-anchor="middle" '
+        f'class="strip-label">A0-7 bus (Y)</text>',
         f'<text x="{COL["io_in"]:.1f}" y="{ctrl_io_y + 28:.1f}" class="strip-label">FSM ctrl (Y)</text>',
         f'<text x="{COL["io_in"] - 12:.1f}" y="{ROW0 + 2 * ROW:.1f}" text-anchor="end" '
-        f'class="strip-label">153 C* / 283 A (X)</text>',
+        f'class="strip-label">b0-7 / C* (X)</text>',
     ]
     for cx, title in col_labels:
         header_elems.append(

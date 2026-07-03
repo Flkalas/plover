@@ -41,30 +41,30 @@ def main() -> None:
         "**Netlist has no `alu_sel` bus** — set each control net manually (DIP/tie) or use "
         "[`alu_decode.yaml`](../hw/netlist/blocks/alu_decode.yaml) decode block when installed.",
         "",
-        "INC/DEC: do **not** drive `net_b0..7` for INC/DEC; use `net_inc_en` / `net_bctrl*` — see [alu8.md](../hw/netlist/blocks/alu8.md).",
+        "INC: `cin=1` and `bctrl=0000` (B_add=0) — A+0+1. DEC: `bctrl=1111` (B=0xFF). "
+        "Do not repurpose `net_b0..7` for INC/DEC — see [alu8.md](../hw/netlist/blocks/alu8.md).",
         "",
         "## Control nets (quick ref)",
         "",
         "| Net | Role |",
         "|-----|------|",
-        "| `net_cin` | 283 carry in (1 for SUB/CMP) |",
+        "| `net_cin` | 283 carry in (1 for SUB/CMP/**INC**) |",
         "| `net_bctrl0..3` | 153 mux2 data (2C0..2C3); Gigatron B_CTRL pattern |",
-        "| `net_inc_en` | INC: force 153 B-select=1 + per-bit 2C2 glue |",
         "| `net_cmp_z`, `net_cmp_c_ge` | SUB-derived CMP flags (`Y==0`, `net_c_hi`) |",
         "| `net_153_s0/s1` | Logic enable → `157_YBP` selects `net_y_logic` |",
         "| `net_lgc0..3` | Gigatron 153 mux1 data (1C0..1C3) |",
         "",
         "## 12 opcodes",
         "",
-        "| sel | `alu_op` | Op | A | B | cin | bctrl | inc | s1 | s0 | lgc | Y | Y LEDs y7..y0 | Fixed ties |",
-        "|-----|----------|-----|---|---|-----|-------|-----|----|----|-----|---|---------------|------------|",
+        "| sel | `alu_op` | Op | A | B | cin | bctrl | s1 | s0 | lgc | Y | Y LEDs y7..y0 | Fixed ties |",
+        "|-----|----------|-----|---|---|-----|-------|----|----|-----|---|---------------|------------|",
     ]
 
     for sel, (name, a, b, exp, c) in enumerate(CASES):
         lgc = f"{c['net_lgc3']}{c['net_lgc2']}{c['net_lgc1']}{c['net_lgc0']}"
         lines.append(
             f"| {sel} | `{sel:X}` | **{name}** | `{a:02X}` | `{b:02X}` | "
-            f"{c['net_cin']} | `{bctrl_str(c)}` | {c['net_inc_en']} | "
+            f"{c['net_cin']} | `{bctrl_str(c)}` | "
             f"{c['net_153_s1']} | {c['net_153_s0']} | `{lgc}` | "
             f"`{exp:02X}` | `{y_bits(exp)[::-1]}` | {fixed_ties(c)} |"
         )

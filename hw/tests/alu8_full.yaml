@@ -31,7 +31,6 @@ stimulus:
       net_bctrl1: 0
       net_bctrl2: 0
       net_bctrl3: 0
-      net_inc_en: 0
   - at_ns: 600
     set:
       net_a0: 0
@@ -61,7 +60,6 @@ stimulus:
       net_bctrl1: 0
       net_bctrl2: 1
       net_bctrl3: 1
-      net_inc_en: 0
   - at_ns: 1200
     set:
       net_a0: 0
@@ -91,7 +89,6 @@ stimulus:
       net_bctrl1: 1
       net_bctrl2: 0
       net_bctrl3: 0
-      net_inc_en: 0
   - at_ns: 1800
     set:
       net_a0: 0
@@ -121,7 +118,6 @@ stimulus:
       net_bctrl1: 0
       net_bctrl2: 0
       net_bctrl3: 0
-      net_inc_en: 0
   - at_ns: 2400
     set:
       net_a0: 0
@@ -151,7 +147,6 @@ stimulus:
       net_bctrl1: 0
       net_bctrl2: 0
       net_bctrl3: 0
-      net_inc_en: 0
   - at_ns: 3000
     set:
       net_a0: 0
@@ -181,7 +176,6 @@ stimulus:
       net_bctrl1: 0
       net_bctrl2: 0
       net_bctrl3: 0
-      net_inc_en: 0
   - at_ns: 3600
     set:
       net_a0: 0
@@ -211,7 +205,6 @@ stimulus:
       net_bctrl1: 0
       net_bctrl2: 0
       net_bctrl3: 0
-      net_inc_en: 0
   - at_ns: 4200
     set:
       net_a0: 0
@@ -241,7 +234,6 @@ stimulus:
       net_bctrl1: 0
       net_bctrl2: 0
       net_bctrl3: 0
-      net_inc_en: 0
   - at_ns: 4800
     set:
       net_a0: 1
@@ -271,7 +263,6 @@ stimulus:
       net_bctrl1: 0
       net_bctrl2: 0
       net_bctrl3: 0
-      net_inc_en: 0
   - at_ns: 5400
     set:
       net_a0: 0
@@ -290,7 +281,7 @@ stimulus:
       net_b5: 0
       net_b6: 0
       net_b7: 0
-      net_cin: 0
+      net_cin: 1
       net_lgc0: 0
       net_lgc1: 0
       net_lgc2: 0
@@ -301,7 +292,6 @@ stimulus:
       net_bctrl1: 0
       net_bctrl2: 0
       net_bctrl3: 0
-      net_inc_en: 1
   - at_ns: 6000
     set:
       net_a0: 0
@@ -331,7 +321,6 @@ stimulus:
       net_bctrl1: 1
       net_bctrl2: 1
       net_bctrl3: 1
-      net_inc_en: 0
   - at_ns: 6600
     set:
       net_a0: 0
@@ -361,7 +350,6 @@ stimulus:
       net_bctrl1: 1
       net_bctrl2: 0
       net_bctrl3: 0
-      net_inc_en: 0
 expect:
   - at_ns: 400
     net_y0: 0

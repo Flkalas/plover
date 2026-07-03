@@ -14,7 +14,7 @@ def test_mux4_bit_gate_symbol():
     svg = export_gate_schematic_svg(nl, unit)
     assert 'data-gate-view="1"' in svg
     assert "net_bctrl0" in svg
-    assert "net_b153_sel0" in svg
+    assert "net_b0" in svg
     assert 'class="chip"' not in svg
 
 

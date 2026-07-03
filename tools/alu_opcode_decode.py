@@ -11,7 +11,6 @@ CTRL_NETS = [
     "net_bctrl1",
     "net_bctrl2",
     "net_bctrl3",
-    "net_inc_en",
 ]
 
 LGC_NETS = ["net_lgc0", "net_lgc1", "net_lgc2", "net_lgc3"]

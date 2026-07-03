@@ -30,13 +30,10 @@ def _arith_path(name: str, c: dict[str, int]) -> list[str]:
             "U_ALU_157_YBP_0.1A",
             "U_ALU_157_YBP_0.1Y",
         ]
-    if name == "INC" or c.get("net_inc_en"):
+    if name == "INC" or (name == "ADD" and c.get("net_cin")):
         return [
-            "net_inc_en",
-            "U_ALU_INC_B_SEL.B_OUT0",
-            "U_ALU_153_0.B",
-            "U_ALU_153_0.2Y",
-            "U_ALU_283_LO.B0",
+            "net_cin",
+            "U_ALU_283_LO.C0",
             "U_ALU_283_LO.C4",
             "U_ALU_283_HI.C4",
             "U_ALU_157_YBP_0.1A",

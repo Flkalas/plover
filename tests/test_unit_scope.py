@@ -16,7 +16,7 @@ def test_mux4_bit_scope_pins():
     nl = load_netlist(root / "hw/netlist/blocks/alu8.yaml")
     scope = unit_scope(nl, _unit("mux4_bit_0"))
     assert "net_a0" in scope.nets
-    assert "net_b153_sel0" in scope.nets
+    assert "net_b0" in scope.nets
     assert len(scope.gate_pins) >= 10
 
 

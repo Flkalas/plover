@@ -135,7 +135,7 @@ def test_hc154_lgc_direct_default():
     rows, cmp_op = build_table(assign, PROFILE_LGC_DIRECT)
     hc = score_hc154(rows, PROFILE_LGC_DIRECT, cmp_op=cmp_op)
     assert hc.parts["74HC154"] == 1
-    assert hc.parts.get("74HC00", 0) == 7
+    assert hc.parts.get("74HC00", 0) == 8
     decode_dips = pack_dips({"74HC154": 1, "74HC00": hc.parts.get("74HC00", 0)})
     assert decode_dips <= 4
     assert hc.advanced_blocks == 1
@@ -148,11 +148,10 @@ def test_hc154_glue_semantics():
     assert by_op[0x0B]["net_cin"] == 1
     assert by_op[0x0F]["net_cin"] == 1
     assert by_op[0x0B]["net_bctrl0"] == by_op[0x0E]["net_bctrl0"] == by_op[0x0F]["net_bctrl0"] == 1
-    assert by_op[0x0D]["net_inc_en"] == 1
-    assert by_op[0x0E]["net_inc_en"] == 0
+    assert by_op[0x0D]["net_cin"] == 1
     assert by_op[0x0E]["net_bctrl3"] == 1
     hc = score_hc154(rows, PROFILE_LGC_DIRECT, cmp_op=cmp_op)
-    assert hc.parts.get("74HC00", 0) == 7
+    assert hc.parts.get("74HC00", 0) == 8
 
 
 def test_cw_direct_zero_cost():

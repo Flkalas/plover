@@ -19,8 +19,6 @@ KNOWN_PARTS = frozenset(
         "74HC86",
         "74HC151",
         "74HC153",
-        "ALU_INC_B_SEL",
-        "ALU_INC_2C2",
         "74HC157",
         "ALU_CMP_SUB",
         "Y_BUS_BUF",

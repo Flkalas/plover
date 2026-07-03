@@ -107,11 +107,14 @@ class CtrlRow:
 
 def _alu_from_op(alu_op: int) -> dict[str, int]:
     name = _ALU_OP_TO_NAME.get(alu_op, "NOP")
-    cin, b_sel, b_cst, l0, l1, l2, l3, y_mux = signature(name)
+    cin, b0, b1, b2, b3, l0, l1, l2, l3, y_mux = signature(name)
+    from alu8_cases import BCTRL_ADD
+
+    bpat = (b0, b1, b2, b3)
     return {
         "cin": cin,
-        "b_sel": b_sel,
-        "b_const_sel": b_cst,
+        "b_sel": 1 if bpat == BCTRL_ADD else 0,
+        "b_const_sel": 0,
         "lgc0": l0,
         "lgc1": l1,
         "lgc2": l2,

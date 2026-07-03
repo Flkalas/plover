@@ -19,25 +19,22 @@ def test_mux4_bit_slice_pins():
     nets = {p.net for p in ex.boundary_ports}
     assert "net_y_logic0" in nets
     assert "net_b_add0" in nets
+    assert "net_a0" in nets
     assert "net_b0" in nets
-    assert "net_b_inv0" in nets
-    assert "net_153_a0" in nets
-    assert "net_153_b0" in nets
     assert "net_lgc0" in nets
+    assert "net_bctrl0" in nets
+    assert "net_bctrl2" in nets
     fixed = {fp.logical_pin: fp.value for fp in ex.fixed_ports}
-    assert fixed["1G"] == "0"
-    assert fixed["2G"] == "0"
-    assert fixed["2C2"] == "1"
-    assert fixed["2C3"] == "1"
+    assert fixed == {"1G": "0", "2G": "0"}
 
 
-def test_mux4_bit_bit1_inc_lsb_zero():
+def test_mux4_bit_bit1_shares_bctrl():
     root = Path(__file__).resolve().parents[1]
     nl = load_netlist(root / "hw/netlist/blocks/alu8.yaml")
     ex = extract_unit(nl, _unit("mux4_bit_1"))
-    fixed = {fp.logical_pin: fp.value for fp in ex.fixed_ports}
-    assert fixed["2C2"] == "0"
-    assert fixed["2C3"] == "1"
+    nets = {p.net for p in ex.boundary_ports}
+    assert "net_bctrl2" in nets
+    assert "net_b1" in nets
 
 
 def test_mux2_y_output_enable_tied_low():

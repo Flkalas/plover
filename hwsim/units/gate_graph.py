@@ -20,7 +20,6 @@ IO_CONTROL = frozenset(
         "net_bctrl1",
         "net_bctrl2",
         "net_bctrl3",
-        "net_inc_en",
         "net_lgc0",
         "net_lgc1",
         "net_lgc2",
@@ -35,8 +34,6 @@ IO_CONTROL = frozenset(
 
 # Nets that exist in netlist but stay inside the ALU block (no IO stub).
 INTERNAL_NET_PREFIXES = (
-    "net_b153_sel",
-    "net_153_2c2",
     "net_b_add",
     "net_sum",
     "net_y_logic",

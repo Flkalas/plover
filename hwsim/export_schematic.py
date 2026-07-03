@@ -28,7 +28,7 @@ PART_LAYOUT_ORDER: dict[str, int] = {
 
 # Behavioral-only — omitted from assembly schematic (12 physical DIP).
 ALU8_ASSEMBLY_SKIP_REFS = frozenset(
-    {"U_ALU_Y_MUX_SEL", "U_ALU_CMP_SUB", "U_ALU_INC_B_SEL", "U_ALU_INC_2C2"}
+    {"U_ALU_Y_MUX_SEL", "U_ALU_CMP_SUB"}
 )
 
 CONTROL_NET_PREFIXES = (
@@ -36,14 +36,13 @@ CONTROL_NET_PREFIXES = (
     "net_153_s",
     "net_y_mux_sel",
     "net_bctrl",
-    "net_inc_en",
     "net_cin",
     "net_cmp_z",
     "net_cmp_c_ge",
 )
 
 _ASSEMBLY_NOTE_ORPHAN = (
-    "glue: INC_B_SEL + INC_2C2 + y_mux_sel + cmp from SUB — no extra DIP"
+    "glue: y_mux_sel + cmp from SUB — no extra DIP"
 )
 
 POWER_PINS = frozenset({"VCC", "VDD", "GND", "VSS"})
@@ -97,7 +96,6 @@ _IO_SECTIONS: list[tuple[str, list[str]]] = [
             "net_bctrl2",
             "net_bctrl1",
             "net_bctrl0",
-            "net_inc_en",
             "net_cin",
             "net_y_mux_sel",
         ],

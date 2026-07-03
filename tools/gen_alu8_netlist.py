@@ -17,7 +17,7 @@ def _emit_283(lines: list[str], tag: str, a_lo: int, cin: str, cout: str) -> Non
 
 
 def _emit_153_bit(lines: list[str], bit: int) -> None:
-    """Gigatron bit-slice: mux1=lgc on 1C*, mux2=bctrl on 2C*; A/B = operands (+ INC B override)."""
+    """Gigatron bit-slice: mux1=lgc on 1C*, mux2=bctrl on 2C*; A/B = operand select."""
     lines += [
         f"  - ref: U_ALU_153_{bit}",
         "    part: 74HC153",
@@ -30,35 +30,15 @@ def _emit_153_bit(lines: list[str], bit: int) -> None:
         f"      1Y: net_y_logic{bit}",
         "      2C0: net_bctrl0",
         "      2C1: net_bctrl1",
-        f"      2C2: net_153_2c2{bit}",
+        "      2C2: net_bctrl2",
         "      2C3: net_bctrl3",
         "      2G: pwr_gnd",
         f"      2Y: net_b_add{bit}",
         f"      A: net_a{bit}",
-        f"      B: net_b153_sel{bit}",
+        f"      B: net_b{bit}",
         "      VCC: pwr_vcc",
         "      GND: pwr_gnd",
     ]
-
-
-def _emit_inc_2c2(lines: list[str]) -> None:
-    """INC: per-bit 2C2 override; else pass global net_bctrl2."""
-    lines += [
-        "  - ref: U_ALU_INC_2C2",
-        "    part: ALU_INC_2C2",
-        "    pins:",
-        "      EN: net_inc_en",
-        "      BCTRL2: net_bctrl2",
-    ]
-    for i in range(8):
-        lines += [f"      OUT{i}: net_153_2c2{i}"]
-
-
-def _emit_inc_b_sel(lines: list[str]) -> None:
-    """INC: force 153 B select MSB=1 while operand net_b bus unchanged."""
-    lines += ["  - ref: U_ALU_INC_B_SEL", "    part: ALU_INC_B_SEL", "    pins:", "      EN: net_inc_en"]
-    for i in range(8):
-        lines += [f"      B_IN{i}: net_b{i}", f"      B_OUT{i}: net_b153_sel{i}"]
 
 
 def _emit_157_ybp(lines: list[str], chip: int) -> None:
@@ -98,9 +78,6 @@ def main() -> None:
     for bit in range(8):
         _emit_153_bit(lines, bit)
 
-    _emit_inc_b_sel(lines)
-    _emit_inc_2c2(lines)
-
     for chip in range(2):
         _emit_157_ybp(lines, chip)
 
@@ -126,7 +103,6 @@ def main() -> None:
         "net_bctrl1",
         "net_bctrl2",
         "net_bctrl3",
-        "net_inc_en",
         "net_lgc0",
         "net_lgc1",
         "net_lgc2",
@@ -144,7 +120,7 @@ def main() -> None:
     ]
 
     for i in range(8):
-        for prefix in ("net_b153_sel", "net_b_add", "net_sum", "net_y_logic", "net_153_2c2"):
+        for prefix in ("net_b_add", "net_sum", "net_y_logic"):
             lines += [f"  - name: {prefix}{i}", "    width: 1"]
     for i in range(8):
         lines += [f"  - name: net_y{i}", "    width: 1"]

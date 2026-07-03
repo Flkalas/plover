@@ -29,14 +29,6 @@ ALU_CMP_SUB:
   t_pd: {typ_ns: 95, max_ns: 151}
   source: "CMP flags from SUB Y and net_c_hi (same order as SUB critical path)"
 
-ALU_INC_B_SEL:
-  t_pd: {typ_ns: 2, max_ns: 5}
-  source: "INC opcode 153 B-select override (glue)"
-
-ALU_INC_2C2:
-  t_pd: {typ_ns: 2, max_ns: 5}
-  source: "INC opcode per-bit 153 2C2 override (glue)"
-
 ALU_Y_MUX_SEL:
   t_pd: {typ_ns: 2, max_ns: 5}
   source: "Combinational OR of 153_s0|153_s1 for 157 Y bypass (glue or 32 in hardware)"

@@ -20,6 +20,26 @@ def test_operand_bus_has_trunk_and_spokes():
     assert sum(1 for s in branch.segments if s.role == "spoke") == 3
 
 
+def test_operand_a_rises_on_y_before_x():
+    """net_a*: vertical trunk in 153|283 corridor, then row taps left/right."""
+    bus_x = 529.0
+    io = (bus_x, 1416.0, "io", "io", bus_x, 1416.0)
+    gates = [
+        (640.0, 280.0, "283_lo", "left", 622.0, 280.0),
+        (389.0, 176.0, "mux4_bit_0", "bottom", 389.0, 198.0),
+    ]
+    branch = layout_branch_net([io, *gates], "net_a0")
+    assert branch.topology == "operand_a"
+    feeder = next(s for s in branch.segments if s.role == "trunk" and s.endpoint == "io")
+    assert feeder.points[0] == (bus_x, 1416.0)
+    assert feeder.points[1][0] == bus_x
+    assert feeder.points[1][1] < 1416.0
+    mux_spoke = next(s for s in branch.segments if s.endpoint == "mux4_bit_0")
+    assert mux_spoke.points[0][0] == bus_x
+    add_spoke = next(s for s in branch.segments if s.endpoint == "283_lo")
+    assert add_spoke.points[0][0] == bus_x
+
+
 def test_operand_bus_mixed_left_and_bottom():
     """Operand net with left ports + bottom select (MUX L A/B after pin layout fix)."""
     io = (80.0, 128.0, "io", "io", 80.0, 128.0)

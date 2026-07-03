@@ -62,11 +62,7 @@ def _split_io_gate(pts: list[Anchor]) -> tuple[list[Anchor], list[Anchor]]:
 
 
 def _is_153_left_data_net(net: str) -> bool:
-    return (
-        net.startswith("net_lgc")
-        or net.startswith("net_bctrl")
-        or net.startswith("net_153_2c2")
-    )
+    return net.startswith("net_lgc") or net.startswith("net_bctrl")
 
 
 def _partition_sides(gates: list[Anchor]) -> tuple[list[Anchor], list[Anchor], list[Anchor]]:
@@ -178,6 +174,40 @@ def _layout_link(pts: list[Anchor], net: str) -> BranchNet:
             if abs(px - rx) > 0.01:
                 path.append((px, py))
     return BranchNet("link", None, [], [WireSeg("link", "", _dedupe_xy(path))])
+
+
+def _layout_operand_a(
+    io: Anchor, left: list[Anchor], bottom: list[Anchor]
+) -> BranchNet:
+    """A bus: vertical trunk in 153|283 corridor, row taps to 283 (right) and 153 A (left)."""
+    io_x, io_y, _, _, _, _ = _unpack(io)
+    junctions: list[tuple[float, float, str]] = []
+    segments: list[WireSeg] = []
+
+    row_ys = [_unpack(g)[1] for g in left]
+    stub_ys = [_unpack(g)[5] for g in bottom]
+    tap_ys = row_ys + stub_ys
+    top_y = min(tap_ys) if tap_ys else io_y
+
+    segments.append(WireSeg("trunk", "io", [(io_x, io_y), (io_x, top_y)]))
+
+    for anchor in sorted(bottom, key=lambda p: (_unpack(p)[5], _unpack(p)[4])):
+        px, py, uid, _, rx, stub_y = _unpack(anchor)
+        junctions.append((io_x, stub_y, uid))
+        segments.append(
+            WireSeg(
+                "spoke",
+                uid,
+                _dedupe_xy([(io_x, stub_y), (rx, stub_y), (rx, py), (px, py)]),
+            )
+        )
+
+    for anchor in sorted(left, key=lambda p: _unpack(p)[1]):
+        px, py, uid, _, rx, _ = _unpack(anchor)
+        junctions.append((io_x, py, uid))
+        segments.append(WireSeg("spoke", uid, _dedupe_xy([(io_x, py), (rx, py), (px, py)])))
+
+    return BranchNet("operand_a", None, junctions, segments)
 
 
 def _layout_bus_mixed(io: Anchor, left: list[Anchor], bottom: list[Anchor], net: str) -> BranchNet:
@@ -353,6 +383,8 @@ def layout_branch_net(pts: list[Anchor], net: str) -> BranchNet:
     control = _is_control_net(net)
 
     if io and operand:
+        if is_a_operand_bit_net(net) and left and bottom:
+            return _layout_operand_a(io, left, bottom)
         return _layout_bus(io, gates, net)
 
     if io and control:

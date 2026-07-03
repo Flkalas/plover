@@ -48,19 +48,26 @@ def test_b_operand_io_labels_and_internal_inv():
     assert 'class="io-bus"' not in svg
     assert 'class="io-net" data-net="net_b153_sel0"' not in svg
     assert 'wire-seg" data-net="net_b_add0"' in svg
+    assert 'data-logical="B"' in svg
 
     assert is_external_net("net_a0")
-    assert not is_external_net("net_b153_sel0")
+    assert is_external_net("net_b0")
     assert not is_external_net("net_b_add0")
 
     assert 'class="net" data-net="net_a0"' in svg
-    assert 'data-topology="column_vertical"' in svg
+    assert 'data-topology="operand_a"' in svg
+    import re
+
+    a0_io = re.search(r'class="io-net operand" data-net="net_a0"[^>]*><circle cx="([\d.]+)"', svg)
+    assert a0_io
+    ax = float(a0_io.group(1))
+    assert 418.0 < ax < 640.0
     assert 'data-route-x="' in svg
     assert svg.count('data-route-x="') >= 60
 
 
 def test_mux_bit_matches_153_data_select_layout():
-    """Bit-slice MUX: logic C* left, A select bottom (B internal)."""
+    """Bit-slice MUX: logic C* left, A/B select bottom."""
     root = Path(__file__).resolve().parents[1]
     nl = load_netlist(root / "hw/netlist/blocks/alu8.yaml")
     svg = export_gate_graph_svg(nl)
@@ -77,7 +84,8 @@ def test_mux_bit_matches_153_data_select_layout():
         r'<circle[^>]*data-unit="mux4_bit_0"[^>]*data-logical="B"[^>]*/>',
         svg,
     )
-    assert b_sel and 'data-port-side="bottom"' in b_sel.group() and "internal" in b_sel.group()
+    assert b_sel and 'data-port-side="bottom"' in b_sel.group()
+    assert "internal" not in b_sel.group()
 
 
 def test_mux_bit_shows_bctrl_inputs():
@@ -97,7 +105,8 @@ def test_bottom_ports_have_distinct_stub_y():
     import re
 
     bottom_wired = re.findall(
-        r'class="port in bottom"[^>]*data-unit="mux4_bit_0"[^>]*data-logical="A"[^>]*data-stub-y="([\d.]+)"',
+        r'class="port in bottom"[^>]*data-unit="mux4_bit_0"[^>]*data-logical="(A|B)"[^>]*data-stub-y="([\d.]+)"',
         svg,
     )
-    assert len(bottom_wired) == 1
+    assert len(bottom_wired) == 2
+    assert float(bottom_wired[0][1]) != float(bottom_wired[1][1])

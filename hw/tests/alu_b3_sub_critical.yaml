@@ -27,7 +27,6 @@ stimulus:
       net_bctrl1: 1
       net_bctrl2: 0
       net_bctrl3: 0
-      net_inc_en: 0
       net_lgc0: 0
       net_lgc1: 0
       net_lgc2: 0

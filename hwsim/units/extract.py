@@ -48,6 +48,10 @@ def _inst_by_ref(nl: Netlist) -> dict[str, Instance]:
 
 
 def _port_direction(logical: str) -> str:
+    if logical.startswith("B_OUT") or logical.startswith("OUT"):
+        return "out"
+    if logical.startswith("B_IN"):
+        return "in"
     if logical in OUTPUT_LOGICAL:
         return "out"
     if logical.endswith("Y") or logical in OUTPUT_PREFIXES:

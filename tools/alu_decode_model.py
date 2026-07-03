@@ -48,24 +48,24 @@ ARITH_GROUPS: dict[str, list[str]] = {
 }
 
 # Canonical control signature per operation (before opcode assignment).
-# Tuple: (cin, bctrl0..3, inc_en, lgc0..3, y_mux)
+# Tuple: (cin, bctrl0..3, lgc0..3, y_mux)
 def _bctrl_sig(pat: tuple[int, int, int, int]) -> tuple[int, int, int, int]:
     return pat
 
 
 _SIGNATURES: dict[str, tuple[int, ...]] = {
-    "NOP": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 0, 0, 0, 0),
-    "ADD": (0, *_bctrl_sig(BCTRL_ADD), 0, 0, 0, 0, 0, 0),
-    "SUB": (1, *_bctrl_sig(BCTRL_SUB), 0, 0, 0, 0, 0, 0),
-    "AND": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 0, 0, 1, 1),
-    "OR": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 1, 1, 1, 1),
-    "XOR": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 1, 1, 0, 1),
-    "NOT": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 1, 0, 0, 0, 1),
-    "PASS_A": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 0, 0, 1, 1),
-    "PASS_B": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 0, 0, 1, 1),
-    "INC": (0, *_bctrl_sig((0, 0, 0, 0)), 1, 0, 0, 0, 0, 0),
-    "DEC": (0, *_bctrl_sig(BCTRL_DEC), 0, 0, 0, 0, 0, 0),
-    "CMP": (1, *_bctrl_sig(BCTRL_SUB), 0, 0, 0, 0, 0, 0),
+    "NOP": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 0, 0, 0),
+    "ADD": (0, *_bctrl_sig(BCTRL_ADD), 0, 0, 0, 0, 0),
+    "SUB": (1, *_bctrl_sig(BCTRL_SUB), 0, 0, 0, 0, 0),
+    "AND": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 0, 1, 1),
+    "OR": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 1, 1, 1, 1),
+    "XOR": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 1, 1, 0, 1),
+    "NOT": (0, *_bctrl_sig((0, 0, 0, 0)), 1, 0, 0, 0, 1),
+    "PASS_A": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 0, 1, 1),
+    "PASS_B": (0, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 0, 1, 1),
+    "INC": (1, *_bctrl_sig((0, 0, 0, 0)), 0, 0, 0, 0, 0),
+    "DEC": (0, *_bctrl_sig(BCTRL_DEC), 0, 0, 0, 0, 0),
+    "CMP": (1, *_bctrl_sig(BCTRL_SUB), 0, 0, 0, 0, 0),
 }
 
 
@@ -104,14 +104,13 @@ def build_assignment_from_codes(codes_by_sig: dict[tuple[int, ...], int]) -> dic
 
 
 def _control_row(name: str, profile: str) -> dict[str, int]:
-    cin, b0, b1, b2, b3, inc_en, l0, l1, l2, l3, y_mux = signature(name)
+    cin, b0, b1, b2, b3, l0, l1, l2, l3, y_mux = signature(name)
     row: dict[str, int] = {
         "net_cin": cin,
         "net_bctrl0": b0,
         "net_bctrl1": b1,
         "net_bctrl2": b2,
         "net_bctrl3": b3,
-        "net_inc_en": inc_en,
         "net_lgc0": l0,
         "net_lgc1": l1,
         "net_lgc2": l2,
@@ -180,7 +179,6 @@ def profile_outputs(profile: str) -> list[str]:
         "net_bctrl1",
         "net_bctrl2",
         "net_bctrl3",
-        "net_inc_en",
     ]
     lgc = ["net_lgc0", "net_lgc1", "net_lgc2", "net_lgc3"]
     if profile == PROFILE_LEGACY:
@@ -237,13 +235,12 @@ def assignment_notes(assignment: dict[str, int]) -> list[str]:
 def verify_signatures_match_cases() -> None:
     """Ensure canonical signatures agree with LOGIC_C / ctrl for each op index."""
     for idx, (name, _a, _b, _y, c) in enumerate(CASES):
-        cin, b0, b1, b2, b3, inc_en, l0, l1, l2, l3, y_mux = signature(name)
+        cin, b0, b1, b2, b3, l0, l1, l2, l3, y_mux = signature(name)
         assert int(c.get("net_cin", 0)) == cin
         assert int(c.get("net_bctrl0", 0)) == b0
         assert int(c.get("net_bctrl1", 0)) == b1
         assert int(c.get("net_bctrl2", 0)) == b2
         assert int(c.get("net_bctrl3", 0)) == b3
-        assert int(c.get("net_inc_en", 0)) == inc_en
         lgc = LOGIC_C.get(idx, (0, 0, 0, 0))
         assert (l0, l1, l2, l3) == lgc
         if y_mux:
