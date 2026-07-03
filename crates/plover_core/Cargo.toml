@@ -1,8 +1,0 @@
-[package]
-name = "plover_core"
-version.workspace = true
-edition.workspace = true
-
-[dependencies]
-plover_mmu = { path = "../plover_mmu" }
-serde_json = "1"

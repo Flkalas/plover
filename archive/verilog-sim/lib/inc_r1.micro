@@ -1,4 +1,0 @@
-; Increment R1 and halt (matches sim/rom_*.hex reference)
-@0000
-alu INC | reg R1<=ALU | bus ALU_TO_REG | branch INC
-alu NOP | branch HALT

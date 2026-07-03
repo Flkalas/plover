@@ -1,9 +1,0 @@
-part: 74HC153
-pinout_dip: ../pinout/dip/74hc153.dip16.yaml
-kind: combinational
-description: Dual 4-to-1 data selector; shared A/B select, active-low enables
-pins:
-  inputs: [1C0, 1C1, 1C2, 1C3, 2C0, 2C1, 2C2, 2C3, A, B, 1G, 2G]
-  outputs: [1Y, 2Y]
-behavior: dual_mux4
-timing_ref: 74HC153

@@ -1,7 +1,0 @@
-part: OSC_4M
-kind: source
-description: 4 MHz can oscillator
-pins:
-  outputs: [OUT]
-behavior: square_clock
-timing_ref: OSC_4M

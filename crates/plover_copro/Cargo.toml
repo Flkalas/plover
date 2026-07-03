@@ -1,4 +1,0 @@
-[package]
-name = "plover_copro"
-version.workspace = true
-edition.workspace = true

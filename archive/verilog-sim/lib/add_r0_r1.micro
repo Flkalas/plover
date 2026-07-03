@@ -1,5 +1,0 @@
-; R1 <- R1 + R1 (two cycles; cross-register moves need extra micro-ops)
-@0000
-alu INC | reg R1<=ALU | bus ALU_TO_REG | branch INC
-alu ADD | reg R1<=ALU | bus REG_TO_ALU_B | branch INC
-alu NOP | branch HALT

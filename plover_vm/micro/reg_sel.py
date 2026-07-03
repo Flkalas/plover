@@ -1,5 +1,0 @@
-"""Re-export canonical Reg_Sel table from hw.micro (hwsim truth source)."""
-
-from hw.micro.reg_sel import REG_SEL_TABLE, reg_sel
-
-__all__ = ["REG_SEL_TABLE", "reg_sel"]

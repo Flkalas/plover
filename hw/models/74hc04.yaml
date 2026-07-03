@@ -1,9 +1,0 @@
-part: 74HC04
-pinout_dip: ../pinout/dip/74hc04.dip14.yaml
-kind: combinational
-description: Hex inverter; one gate per hwsim instance (A/Y)
-pins:
-  inputs: [A]
-  outputs: [Y]
-behavior: invert
-timing_ref: 74HC04

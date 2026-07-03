@@ -1,7 +1,0 @@
-[package]
-name = "plover_mmu"
-version.workspace = true
-edition.workspace = true
-
-[dependencies]
-plover_copro = { path = "../plover_copro" }

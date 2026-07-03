@@ -1,9 +1,0 @@
-part: 74HC574
-kind: sequential
-description: Octal D-type flip-flop, positive-edge triggered
-pins:
-  inputs: [D0, D1, D2, D3, D4, D5, D6, D7, CP, OE]
-  outputs: [Q0, Q1, Q2, Q3, Q4, Q5, Q6, Q7]
-behavior: latch8
-timing_ref: 74HC574
-oe_active_low: true
