@@ -1,4 +1,4 @@
-name: Normative governance
+name: Reference governance
 
 on:
   push:
@@ -7,12 +7,19 @@ on:
     branches: [master, main]
 
 jobs:
-  normative:
+  reference:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Forbidden patterns in normative docs
+      - name: No docs/ directory in active tree
+        run: |
+          if [ -d docs ]; then
+            echo "::error::docs/ must not exist — use reference/ at repository root"
+            exit 1
+          fi
+
+      - name: Forbidden patterns in reference docs and whitepaper
         run: |
           set -euo pipefail
           patterns=(
@@ -30,12 +37,12 @@ jobs:
           )
           failed=0
           for pat in "${patterns[@]}"; do
-            if rg -n --glob '*.md' "$pat" docs/normative/; then
-              echo "::error::Forbidden pattern in normative docs: $pat"
+            if rg -n --glob '*.md' "$pat" reference/ plover-whitepaper.md; then
+              echo "::error::Forbidden pattern in reference docs: $pat"
               failed=1
             fi
           done
           if [ "$failed" -ne 0 ]; then
             exit 1
           fi
-          echo "normative scrub OK"
+          echo "reference scrub OK"
