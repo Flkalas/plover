@@ -60,7 +60,7 @@ def test_b_operand_io_labels_and_internal_inv():
 
 
 def test_mux_bit_matches_153_data_select_layout():
-    """Bit-slice MUX: logic C* left, shared A/B select bottom."""
+    """Bit-slice MUX: logic C* left, A select bottom (B internal)."""
     root = Path(__file__).resolve().parents[1]
     nl = load_netlist(root / "hw/netlist/blocks/alu8.yaml")
     svg = export_gate_graph_svg(nl)
@@ -74,10 +74,10 @@ def test_mux_bit_matches_153_data_select_layout():
     assert 'data-unit="mux4_bit_0" data-logical="2G" data-value="0"' in svg
     assert svg.count('data-unit="mux4_bit_0" data-logical="1C') == 4
     b_sel = re.search(
-        r'<circle[^>]*data-unit="mux4_bit_0"[^>]*data-logical="B"[^>]*data-port-side="bottom"',
+        r'<circle[^>]*data-unit="mux4_bit_0"[^>]*data-logical="B"[^>]*/>',
         svg,
     )
-    assert b_sel and "internal" in b_sel.group()
+    assert b_sel and 'data-port-side="bottom"' in b_sel.group() and "internal" in b_sel.group()
 
 
 def test_mux_bit_shows_bctrl_inputs():
