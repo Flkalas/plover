@@ -9,7 +9,6 @@
 |-------|--------|------|
 | **B-path** | `U_ALU_153_i` mux2, `283×2`, `157_YBP×2` | SUB/ADD/INC/DEC/CMP **Y** |
 | **Logic** | `U_ALU_153_i` mux1 (Gigatron) | AND/OR/XOR/NOT/PASS via operand select |
-| **INC glue** | `ALU_INC_B_SEL`, `ALU_INC_2C2` | INC only — B-select + per-bit `2C2` |
 | **CMP** | `ALU_CMP_SUB` | Z/C_GE from SUB (`Y==0`, `net_c_hi`) — no 7485 |
 | **Glue** | `ALU_Y_MUX_SEL` | `net_y_mux_sel = s0 \| s1` → 157 picks sum vs logic |
 
@@ -19,14 +18,12 @@ Each bit `i` uses one **74HC153** (`U_ALU_153_i`):
 |-----|------|------|
 | **mux1** | `1C0..3` = `net_lgc*`, `1Y` = `net_y_logic[i]` | Gigatron logic |
 | **mux2** | `2C0..3` = `net_bctrl*`, `2Y` = `net_b_add[i]` | B_CTRL data inputs |
-| **A/B** | `net_a[i]`, `net_b153_sel[i]` | Operand select (+ INC B override) |
+| **A/B** | `net_a[i]`, `net_b[i]` | Operand select |
 
 ```mermaid
 flowchart LR
   subgraph perbit [Per bit i]
-    INC[INC_B_SEL]
     BIT[U_ALU_153_i]
-    INC --> BIT
     BIT -->|1Y| Ylogic[net_y_logic]
     BIT -->|2Y| Badd[net_b_add]
   end
@@ -38,7 +35,7 @@ flowchart LR
 
 ## Operand select (shared 153 A/B pins)
 
-All opcodes: `A = net_a[i]`, `B = net_b153_sel[i]` (INC forces B=1 via glue).  
+All opcodes: `A = net_a[i]`, `B = net_b[i]`.  
 `sel = A | (B<<1)` drives both mux1 and mux2.
 
 ## Gigatron mux1 (per bit)
@@ -72,7 +69,7 @@ Golden vectors: [`tools/alu8_cases.py`](../../../tools/alu8_cases.py) — all 12
 | ADD | `1100` | B[i] pass |
 | SUB/CMP | `0011` | ~B[i] (no 74HC04) |
 | DEC | `1111` | constant 1 |
-| INC | — | `net_inc_en=1` + `ALU_INC_2C2` per-bit tie |
+| INC | `0000` | B_add=0; **`net_cin=1`** → A+0+1 |
 
 ## Critical path
 
@@ -90,7 +87,7 @@ Golden vectors: [`tools/alu8_cases.py`](../../../tools/alu8_cases.py) — all 12
 | 74HC157 (YBP) | 2 |
 | **ALU total** | **12** |
 
-(Plus behavioral glue: `INC_B_SEL`, `INC_2C2`, `Y_MUX_SEL`, `CMP_SUB`.)
+(Plus behavioral glue: `Y_MUX_SEL`, `CMP_SUB`.)
 
 ## Regen
 

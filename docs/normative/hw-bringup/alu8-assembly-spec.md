@@ -22,7 +22,7 @@
 
 **도구 (배선 전)**
 
-인터랙티브 배선도: `build/alu8-schematic.html` — **12 DIP** (`U_ALU_153_0..7` 1:1). glue: `INC_B_SEL`, `INC_2C2`, `Y_MUX_SEL`; **CMP** = `net_y` + `net_c_hi` (no 7485). 제어 넷 주황색.
+인터랙티브 배선도: `build/alu8-schematic.html` — **12 DIP** (`U_ALU_153_0..7` 1:1). glue: `Y_MUX_SEL`; **CMP** = `net_y` + `net_c_hi` (no 7485). 제어 넷 주황색.
 
 ---
 
@@ -94,7 +94,7 @@ flowchart LR
 
 타이 하지 않은 제어 입력은 **GND**. 예외는 치트시트에 **VCC** 로 적힌 핀만 5 V.
 
-**INC/DEC 주의:** `net_b0..7` 을 INC/DEC용으로 바꾸지 말 것. INC=`net_inc_en=1`; DEC=`net_bctrl=1111` ([opcode 치트시트](b3-opcode.md)).
+**INC/DEC 주의:** `net_b0..7` 을 INC/DEC용으로 바꾸지 말 것. INC=`cin=1` + `bctrl=0000` (A+0+1); DEC=`net_bctrl=1111` ([opcode 치트시트](b3-opcode.md)).
 
 ### 2.4 배선 습관
 
@@ -172,19 +172,18 @@ flowchart LR
 |----------------------------|----------------|----------------|
 | 1 (논리) | `net_a[i]` | `net_b[i]` |
 | `net_bctrl0` … `net_bctrl3` | 153 mux2 data (B_CTRL) |
-| `net_inc_en` | INC glue |
 
 브링업 Phase 1: opcode 클래스별로 위 표대로 **8비트 버스 점퍼** (산술 스모크 vs 논리 스모크 전환).  
 선택 Phase 2: `U_ALU_157_AB_0/1` ×2 — 4비트씩 2:1 MUX, SEL=`net_y_mux_sel` ([alu8-phase-b.md](../hardware/alu8-phase-b.md)).
 
 **검증 (B-path)**
 
-| Op | cin | bctrl3:0 | inc | A | B | 기대 Y (sum 경로) |
-|----|-----|-------|-------------|---|---|-------------------|
-| ADD | 0 | 0 | 0 | 12 | 34 | 46 |
-| SUB | 1 | 1 | 0 | 12 | 34 | DE |
-| INC | 0 | 0 | 1 | 12 | × | 13 |
-| DEC | 0 | 1 | 1 | 12 | × | 11 |
+| Op | cin | bctrl3:0 | A | B | 기대 Y (sum 경로) |
+|----|-----|----------|---|---|-------------------|
+| ADD | 0 | 1100 | 12 | 34 | 46 |
+| SUB | 1 | 0011 | 12 | 34 | DE |
+| INC | 1 | 0000 | 12 | × | 13 |
+| DEC | 0 | 1111 | 12 | × | 11 |
 
 **검증 (logic, AB 버스 논리 모드 + YBP 미장착 시 `net_y_logic` LED)**
 
@@ -295,7 +294,7 @@ ALU 단독 Pass 후 [M1-b3-procedure.md](M1-b3-procedure.md) § B3b/B3c 진행:
 | 전원만 이상 | 단계 0, 핫 IC, 반대 삽입 |
 | ADD만 틀림 | 283 캐리, B가 `net_b_add`에 연결됐는지 |
 | SUB만 틀림 | `cin`, `net_bctrl*`, `U_ALU_153_*` mux2 |
-| INC/DEC만 틀림 | `net_inc_en` / `net_bctrl` (**B DIP 건드리지 말 것**) |
+| INC/DEC만 틀림 | `net_cin` + `net_bctrl` (**B DIP 건드리지 말 것**) |
 | AND/OR/XOR/NOT만 | `net_lgc0..3`, `153_s0/s1` |
 | Logic | `net_lgc0..3`, `153_s0/s1` |
 | 전부 틀림 | 153 전원, Y LED 순서(y7..y0), GND 플로팅 |

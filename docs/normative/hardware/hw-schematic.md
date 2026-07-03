@@ -12,7 +12,7 @@ Format: `{BLOCK}_{PART}_{IDX}`
 | Block | Example |
 |-------|---------|
 | Clock | `U_CLK_74`, `U_CLK_OSC` |
-| ALU | `U_ALU_283_LO/HI`, `U_ALU_153_0`…`7`, `U_ALU_157_YBP_*`, `U_ALU_CMP_SUB` (behavioral), `U_ALU_INC_B_SEL` / `U_ALU_INC_2C2` (glue) |
+| ALU | `U_ALU_283_LO/HI`, `U_ALU_153_0`…`7`, `U_ALU_157_YBP_*`, `U_ALU_CMP_SUB` (behavioral) |
 | Register | `U_REG_574_0`, `U_REG_574_ACC` (B3 accumulator) |
 | PC | `U_PC_161_0` … `U_PC_161_3` |
 
@@ -26,7 +26,7 @@ Examples:
 - `net_clk2` — 2 MHz divided clock
 - `net_a0` … `net_a7`, `net_b0` … `net_b7` — ALU operands
 - `net_y0` … `net_y7` — ALU result
-- `net_cin`, `net_153_s0`, `net_153_s1`, `net_bctrl0`…`3`, `net_inc_en`, `net_lgc0`…`3` — ALU control (VLIW or test)
+- `net_cin`, `net_153_s0`, `net_153_s1`, `net_bctrl0`…`3`, `net_lgc0`…`3` — ALU control (VLIW or test)
 - `net_cmp_z`, `net_cmp_c_ge` — CMP flags from SUB (`net_y`, `net_c_hi`; no 7485)
 - `net_d0` … `net_d7` — 574 D inputs (B3: tied to `net_y*`)
 - `net_q0` … `net_q7` — 574 Q outputs

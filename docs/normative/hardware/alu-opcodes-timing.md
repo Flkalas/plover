@@ -29,7 +29,7 @@
 | 12–15 | — | *(예약)* | NOP 취급 | — |
 
 - **A** · **B**: `net_a0..7`, `net_b0..7` (CPU: ACC.Q → A 직결, B ← CPLD `q_b` 또는 SRAM).
-- **INC/DEC**: `net_b0..7` 구동 금지 — INC=`net_inc_en=1`; DEC=`bctrl=1111` ([bringup §INC/DEC](../hw-bringup/b3-opcode.md)).
+- **INC/DEC**: `net_b0..7` 구동 금지 — INC=`cin=1` + `bctrl=0000`; DEC=`bctrl=1111` ([bringup §INC/DEC](../hw-bringup/b3-opcode.md)).
 
 ---
 
