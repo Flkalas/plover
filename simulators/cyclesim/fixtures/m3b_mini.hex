@@ -1,0 +1,4 @@
+# M3b mini program — LDA $42, ADD $00, HALT
+02 42
+01 00
+0A
