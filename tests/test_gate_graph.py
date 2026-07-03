@@ -43,7 +43,7 @@ def test_b_operand_io_labels_and_internal_inv():
 
     for i in range(8):
         assert f'class="io-label">a{i}</text>' in svg
-    assert 'class="io-net operand"' in svg or 'operand (Y)' in svg
+    assert 'class="io-net ctrl-x"' in svg or 'ctrl-x' in svg
     assert 'class="io-label">B</text>' not in svg
     assert 'class="io-bus"' not in svg
     assert 'class="io-net" data-net="net_b153_sel0"' not in svg
@@ -73,8 +73,11 @@ def test_mux_bit_matches_153_data_select_layout():
     assert 'data-unit="mux4_bit_0" data-logical="1G" data-value="0"' in svg
     assert 'data-unit="mux4_bit_0" data-logical="2G" data-value="0"' in svg
     assert svg.count('data-unit="mux4_bit_0" data-logical="1C') == 4
-    b_sel = re.search(r'<circle[^>]*data-unit="mux4_bit_0"[^>]*data-logical="B"[^>]*/>', svg)
-    assert b_sel and 'data-port-side="bottom"' in b_sel.group()
+    b_sel = re.search(
+        r'<circle[^>]*data-unit="mux4_bit_0"[^>]*data-logical="B"[^>]*data-port-side="bottom"',
+        svg,
+    )
+    assert b_sel and "internal" in b_sel.group()
 
 
 def test_mux_bit_shows_bctrl_inputs():
@@ -94,9 +97,7 @@ def test_bottom_ports_have_distinct_stub_y():
     import re
 
     bottom_wired = re.findall(
-        r'class="port in bottom"[^>]*data-unit="mux4_bit_0"[^>]*data-stub-y="([\d.]+)"',
+        r'class="port in bottom"[^>]*data-unit="mux4_bit_0"[^>]*data-logical="A"[^>]*data-stub-y="([\d.]+)"',
         svg,
     )
-    assert len(bottom_wired) == 2
-    assert float(bottom_wired[0]) != float(bottom_wired[1])
-    assert float(bottom_wired[0]) < float(bottom_wired[1])
+    assert len(bottom_wired) == 1

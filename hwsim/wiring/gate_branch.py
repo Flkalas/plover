@@ -55,10 +55,18 @@ def _unpack(anchor: Anchor) -> tuple[float, float, str, str, float, float]:
     return px, py, uid, side, rx, stub_y
 
 
-def _split_io_gate(pts: list[Anchor]) -> tuple[Anchor | None, list[Anchor]]:
-    io = next((p for p in pts if p[3] == "io"), None)
-    gates = [p for p in pts if p[3] != "io"]
-    return io, gates
+def _split_io_gate(pts: list[Anchor]) -> tuple[list[Anchor], list[Anchor]]:
+    ios = [p for p in pts if p[2] == "io"]
+    gates = [p for p in pts if p[2] != "io"]
+    return ios, gates
+
+
+def _is_153_left_data_net(net: str) -> bool:
+    return (
+        net.startswith("net_lgc")
+        or net.startswith("net_bctrl")
+        or net.startswith("net_153_2c2")
+    )
 
 
 def _partition_sides(gates: list[Anchor]) -> tuple[list[Anchor], list[Anchor], list[Anchor]]:
@@ -139,7 +147,8 @@ def _route_to_hub(anchor: Anchor, hx: float, hy: float) -> list[tuple[float, flo
 
 
 def _layout_link(pts: list[Anchor], net: str) -> BranchNet:
-    io, gates = _split_io_gate(pts)
+    ios, gates = _split_io_gate(pts)
+    io = ios[0] if ios else None
     if net.startswith("net_b_inv"):
         path = _layout_inv_link(gates)
         return BranchNet("link", None, [], [WireSeg("link", "", path)])
@@ -328,7 +337,10 @@ def layout_branch_net(pts: list[Anchor], net: str) -> BranchNet:
     if len(pts) < 2:
         return BranchNet("link", None, [], [])
 
-    io, gates = _split_io_gate(pts)
+    ios, gates = _split_io_gate(pts)
+    if len(ios) >= 2:
+        return _layout_star(None, ios + gates, net)
+    io = ios[0] if ios else None
     left, _, bottom = _partition_sides(gates)
 
     if net.startswith("net_b_inv"):
@@ -344,6 +356,8 @@ def layout_branch_net(pts: list[Anchor], net: str) -> BranchNet:
         return _layout_bus(io, gates, net)
 
     if io and control:
+        if _is_153_left_data_net(net) and left and _is_column_fanout(left):
+            return _layout_column_vertical(left, io, net)
         if bottom and left:
             return _layout_bus_mixed(io, left, bottom, net)
         if bottom:

@@ -20,16 +20,16 @@ from hwsim.wiring.gate_branch import Anchor, BranchNet, fmt_path, layout_branch_
 MARGIN = 48.0
 NODE_W = 58.0
 NODE_H = 104.0
-GATE_GAP = 48.0  # vertical space between gate boxes (ROW must exceed NODE_H)
+GATE_GAP = 56.0
 ROW = NODE_H + GATE_GAP
 ROW0 = 72.0
 ADD_H = 168.0
-CTRL_IO_MARGIN = 44.0
-OPERAND_IO_MARGIN = 72.0
-SIDE_STUB = 14.0
-CHANNEL_STEP = 10.0
-BOTTOM_STUB = 20.0
-BOTTOM_STUB_STEP = 10.0
+CTRL_IO_MARGIN = 48.0
+OPERAND_IO_MARGIN = 80.0
+SIDE_STUB = 18.0
+CHANNEL_STEP = 14.0
+BOTTOM_STUB = 22.0
+BOTTOM_STUB_STEP = 14.0
 CONST_STUB = 20.0
 PORT_R = 3.0
 FIXED_PORT_COLOR = "#484f58"
@@ -51,7 +51,7 @@ for _mux in ("1", "2"):
         _HC153_DATA_PIN[f"{_mux}C{_i}"] = f"D{_i}"
 
 _MUX4_BIT_LEFT_ORDER = ("1C0", "1C1", "1C2", "1C3", "2C0", "2C1", "2C2", "2C3")
-_MUX4_BIT_BOTTOM_ORDER = ("A", "B", "1G", "2G")
+_MUX4_BIT_BOTTOM_ORDER = ("A", "1G", "2G")
 
 
 @dataclass
@@ -403,6 +403,32 @@ def _render_fixed_left_port(
     )
 
 
+def _is_153_left_data_net(net: str) -> bool:
+    """153 mux1/mux2 data (C*): approach from X-axis left."""
+    return (
+        net.startswith("net_lgc")
+        or net.startswith("net_bctrl")
+        or net.startswith("net_153_2c2")
+    )
+
+
+def _is_bottom_ctrl_net(net: str) -> bool:
+    """FSM/decode controls on bottom ports (cin, inc, y_mux, 153_s)."""
+    if not _is_control_net(net):
+        return False
+    return not _is_153_left_data_net(net)
+
+
+def _a_bit_index(net: str) -> int | None:
+    if is_a_operand_bit_net(net):
+        return int(net[5:])
+    return None
+
+
+def _153_row_y(bit: int) -> float:
+    return ROW0 + bit * ROW + NODE_H / 2
+
+
 def _split_inputs(in_nets: list[str]) -> tuple[list[str], list[str]]:
     """Data-path inputs on the left; decode/control selects on the bottom."""
     left: list[str] = []
@@ -427,7 +453,8 @@ def _split_inputs_for_unit(ex: UnitExtract, in_nets: list[str]) -> tuple[list[st
         in_set = set(in_nets)
         net_by = _in_by_logical(ex)
         left = [net_by[p] for p in _MUX4_BIT_LEFT_ORDER if p in net_by and net_by[p] in in_set]
-        bottom = [net_by[p] for p in ("A", "B") if p in net_by and net_by[p] in in_set]
+        # Operand A select only on bottom (Y); B is internal (net_b153_sel).
+        bottom = [net_by["A"]] if "A" in net_by and net_by["A"] in in_set else []
         return left, bottom
     if ex.unit.kind == "adder4":
         in_set = set(in_nets)
@@ -439,46 +466,76 @@ def _split_inputs_for_unit(ex: UnitExtract, in_nets: list[str]) -> tuple[list[st
     return _split_inputs(in_nets)
 
 
-def _gate_anchor_sides(pts: list) -> set[str]:
-    return {p[3] for p in pts if len(p) >= 4 and p[2] != "io"}
+@dataclass(frozen=True)
+class _IoStub:
+    gx: float
+    gy: float
+    text_anchor: str
+    tx: float
+    ty: float
+    css: str
 
 
-def _io_placement(
+def _io_stubs_for_net(
     net: str,
     pts: list,
     *,
     ctrl_io_y: float,
     operand_io_y: float,
-    ins: list,
-    outs: list,
-) -> tuple[float, float, str, float, float]:
-    """Place external IO stub: X-axis (left) vs Y-axis (bottom strips)."""
+    node_by_id: dict[str, NodeLayout],
+) -> list[_IoStub]:
+    """External IO taps: 153 C* from X; A select from Y; split net_a for 283 vs 153."""
     gate_pts = [p for p in pts if len(p) >= 3 and p[2] != "io"]
-    sides = _gate_anchor_sides(pts)
-    color_gx = sum(p[0] for p in gate_pts) / len(gate_pts) if gate_pts else COL["mux4_bit"]
+    left_pts = [p for p in gate_pts if p[3] == "left"]
+    bottom_pts = [p for p in gate_pts if p[3] == "bottom"]
+    stubs: list[_IoStub] = []
 
-    if _is_control_net(net):
-        return color_gx, ctrl_io_y, "middle", color_gx, ctrl_io_y + 12.0
+    if _is_153_left_data_net(net):
+        gy = sum(p[1] for p in left_pts) / len(left_pts) if left_pts else _153_row_y(3)
+        stubs.append(_IoStub(COL["io_in"], gy, "start", COL["io_in"] + 8.0, gy + 3.0, "ctrl-x"))
+        return stubs
 
-    if (is_a_operand_bit_net(net) or is_b_operand_bit_net(net)) and "bottom" in sides:
-        return color_gx, operand_io_y, "middle", color_gx, operand_io_y + 12.0
+    if _is_bottom_ctrl_net(net):
+        gx = sum(p[0] for p in gate_pts) / len(gate_pts) if gate_pts else COL["mux4_bit"]
+        stubs.append(_IoStub(gx, ctrl_io_y, "middle", gx, ctrl_io_y + 12.0, "ctrl"))
+        return stubs
 
-    if sides == {"bottom"} or (sides <= {"bottom"} and not outs):
-        return color_gx, operand_io_y, "middle", color_gx, operand_io_y + 12.0
+    bit = _a_bit_index(net)
+    if bit is not None:
+        if bottom_pts:
+            node = node_by_id.get(f"mux4_bit_{bit}")
+            gx = node.x + node.w / 2 if node else COL["mux4_bit"] + NODE_W / 2
+            stubs.append(_IoStub(gx, operand_io_y, "middle", gx, operand_io_y + 12.0, "operand-y"))
+        if left_pts:
+            ly = sum(p[1] for p in left_pts) / len(left_pts)
+            stubs.append(_IoStub(COL["io_in"], ly, "start", COL["io_in"] + 8.0, ly + 3.0, "operand-x"))
+        if stubs:
+            return stubs
 
+    if bottom_pts and not left_pts:
+        gx = sum(p[0] for p in bottom_pts) / len(bottom_pts)
+        stubs.append(_IoStub(gx, operand_io_y, "middle", gx, operand_io_y + 12.0, "operand-y"))
+        return stubs
+
+    ins = [p for p in pts if len(p) >= 3 and p[2] != "io" and p[3] in ("left", "bottom")]
+    outs = [p for p in pts if len(p) >= 3 and p[2] != "io" and p[3] == "right"]
     if ins and not outs:
-        gy = sum(p[1] for p in pts) / len(pts)
-        return COL["io_in"], gy, "start", COL["io_in"] + 8.0, gy + 3.0
+        gy = sum(p[1] for p in gate_pts) / len(gate_pts) if gate_pts else ROW0
+        stubs.append(_IoStub(COL["io_in"], gy, "start", COL["io_in"] + 8.0, gy + 3.0, ""))
+    elif outs and not ins:
+        gy = sum(p[1] for p in gate_pts) / len(gate_pts) if gate_pts else ROW0
+        stubs.append(_IoStub(COL["io_out"], gy, "end", COL["io_out"] - 8.0, gy + 3.0, ""))
+    else:
+        gy = sum(p[1] for p in gate_pts) / len(gate_pts) if gate_pts else ROW0
+        gx = COL["io_in"] if net.startswith("net_a") or net.startswith("net_b") else COL["io_out"]
+        anchor = "start" if gx < 500 else "end"
+        tx = gx + (8.0 if anchor == "start" else -8.0)
+        stubs.append(_IoStub(gx, gy, anchor, tx, gy + 3.0, ""))
+    return stubs
 
-    if outs and not ins:
-        gy = sum(p[1] for p in pts) / len(pts)
-        return COL["io_out"], gy, "end", COL["io_out"] - 8.0, gy + 3.0
 
-    gy = sum(p[1] for p in pts) / len(pts)
-    gx = COL["io_in"] if net.startswith("net_a") or net.startswith("net_b") else COL["io_out"]
-    anchor = "start" if gx < 500 else "end"
-    tx = gx + (8.0 if anchor == "start" else -8.0)
-    return gx, gy, anchor, tx, gy + 3.0
+def _gate_anchor_sides(pts: list) -> set[str]:
+    return {p[3] for p in pts if len(p) >= 4 and p[2] != "io"}
 
 
 def _sort_left_ins(nets: list[str]) -> list[str]:
@@ -612,6 +669,26 @@ def export_gate_graph_svg(nl: Netlist, units: list[ViewUnit] | None = None) -> s
                     _render_fixed_bottom_port(node, i, bottom_count, slot.logical, slot.value)
                 )
 
+        if unit.kind == "mux4_bit":
+            net_by = _in_by_logical(ex)
+            b_net = net_by.get("B")
+            wired_bottom = {s.net for s in bottom_slots if s.kind == "net"}
+            if b_net and b_net in set(node.in_nets) and b_net not in wired_bottom:
+                px = node.x + node.w - 10.0
+                py = node.y + node.h
+                rx = px + SIDE_STUB
+                stub_y = _bottom_stub_y(py, bottom_count)
+                gate_elems.append(
+                    f'<g class="port-group internal" data-net="{_esc(b_net)}">'
+                    f'{_render_pin_label("bottom", px, py, "B")}'
+                    f'<circle class="port in bottom internal" data-port-side="bottom" data-net="{_esc(b_net)}" '
+                    f'data-unit="{_esc(node.unit_id)}" data-logical="B" data-pin-desc="B" '
+                    f'data-route-x="{rx:.1f}" data-stub-y="{stub_y:.1f}" '
+                    f'cx="{px:.1f}" cy="{py:.1f}" r="{PORT_R:.1f}" fill="{_wire_color(b_net)}"/>'
+                    f"</g>"
+                )
+                anchors.setdefault(b_net, []).append((px, py, node.unit_id, "bottom", rx, stub_y))
+
         for i, net in enumerate(node.out_nets):
             py = _port_y(node, i, len(node.out_nets))
             px = node.x + node.w
@@ -643,22 +720,29 @@ def export_gate_graph_svg(nl: Netlist, units: list[ViewUnit] | None = None) -> s
         ins = [p for p in plist if p.direction == "in"]
         color = _wire_color(net)
         short = net.removeprefix("net_")
-        gx, gy, text_anchor, tx, ty = _io_placement(
+        for stub in _io_stubs_for_net(
             net,
             pts,
             ctrl_io_y=ctrl_io_y,
             operand_io_y=operand_io_y,
-            ins=ins,
-            outs=outs,
-        )
-        io_elems.append(
-            f'<g class="io-net{" ctrl" if _is_control_net(net) else ""}{" operand" if (is_a_operand_bit_net(net) or is_b_operand_bit_net(net)) else ""}" data-net="{_esc(net)}">'
-            f'<circle cx="{gx:.1f}" cy="{gy:.1f}" r="3" fill="{color}"/>'
-            f'<text x="{tx:.1f}" y="{ty:.1f}" text-anchor="{text_anchor}" class="io-label">'
-            f'{_esc(short)}</text>'
-            f"</g>"
-        )
-        anchors.setdefault(net, []).append((gx, gy, "io", "io", gx, gy))
+            node_by_id=node_by_id,
+        ):
+            css = stub.css
+            cls = "io-net"
+            if css == "ctrl":
+                cls += " ctrl"
+            elif css == "ctrl-x":
+                cls += " ctrl-x"
+            elif css.startswith("operand"):
+                cls += " operand"
+            io_elems.append(
+                f'<g class="{cls}" data-net="{_esc(net)}">'
+                f'<circle cx="{stub.gx:.1f}" cy="{stub.gy:.1f}" r="3" fill="{color}"/>'
+                f'<text x="{stub.tx:.1f}" y="{stub.ty:.1f}" text-anchor="{stub.text_anchor}" '
+                f'class="io-label">{_esc(short)}</text>'
+                f"</g>"
+            )
+            anchors.setdefault(net, []).append((stub.gx, stub.gy, "io", "io", stub.gx, stub.gy))
 
     wire_elems: list[str] = []
     for net, pts in anchors.items():
@@ -681,11 +765,11 @@ def export_gate_graph_svg(nl: Netlist, units: list[ViewUnit] | None = None) -> s
     header_elems = [
         f'<text x="{MARGIN:.1f}" y="{MARGIN - 8:.1f}" class="title">ALU8 gate connectivity</text>',
         f'<text x="{MARGIN:.1f}" y="{MARGIN + 6:.1f}" class="subtitle">'
-        f'{len(units)} gates · 153→283→157 columns · operand Y / control bottom</text>',
-        f'<text x="{COL["io_in"]:.1f}" y="{operand_io_y + 28:.1f}" class="strip-label">operand (Y)</text>',
-        f'<text x="{COL["io_in"]:.1f}" y="{ctrl_io_y + 28:.1f}" class="strip-label">control (Y)</text>',
-        f'<text x="{COL["io_in"] - 12:.1f}" y="{ROW0 + 3.5 * ROW:.1f}" text-anchor="end" '
-        f'class="strip-label">data (X)</text>',
+        f'{len(units)} gates · 153 C*←X · A select↑Y · 283←X</text>',
+        f'<text x="{COL["io_in"]:.1f}" y="{operand_io_y + 28:.1f}" class="strip-label">A select (Y)</text>',
+        f'<text x="{COL["io_in"]:.1f}" y="{ctrl_io_y + 28:.1f}" class="strip-label">FSM ctrl (Y)</text>',
+        f'<text x="{COL["io_in"] - 12:.1f}" y="{ROW0 + 2 * ROW:.1f}" text-anchor="end" '
+        f'class="strip-label">153 C* / 283 A (X)</text>',
     ]
     for cx, title in col_labels:
         header_elems.append(
@@ -713,7 +797,9 @@ def export_gate_graph_svg(nl: Netlist, units: list[ViewUnit] | None = None) -> s
     .gate-symbol,.node-label,.node-kind{pointer-events:none}
     .io-net{cursor:move}
     .io-net.ctrl circle{stroke:#d29922;stroke-width:1}
+    .io-net.ctrl-x circle{stroke:#a371f7;stroke-width:1}
     .io-net.operand circle{stroke:#58a6ff;stroke-width:1}
+    .port.in.internal{opacity:0.55}
     .strip-label{font-size:8px;fill:#484f58;font-weight:600}
     .port.in.fixed{stroke:#0d1117;stroke-width:0.5}
     .const-label{font-size:9px;fill:#8b949e;font-weight:600}
