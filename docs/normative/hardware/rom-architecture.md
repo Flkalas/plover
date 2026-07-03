@@ -43,7 +43,9 @@ Normative v1.0: Flash **`$4000–$4FFF` is unused** — control is entirely in t
 
 Micro-phase strobes come from the **ATF1504 phase FSM** keyed by `(opcode[4:0]<<2)|phase` — see [cpld-system-controller.md](cpld-system-controller.md).
 
-Verify opcode table: `python tools/verify_control_store.py --v1.0`
+Verify opcode table: [M3a-control-store.md](../hw-bringup/M3a-control-store.md) §2.
+
+Archive prototype Flash CW: [prototype-flash-cw](../archive/prototype-flash-cw/README.md) (not v1.0 breadboard).
 
 ### Archived Flash CW (prototype-flash-cw only)
 
@@ -65,7 +67,7 @@ The 4096-byte region is a **sparse physical container**: the macro ISA (`0x01–
 - Latch: **574 CW_L** + **574 CW_H** at execute edge.
 - Not fetched via PC; **execute-phase** address mux drives Flash.
 
-Pack / verify (archive): `python tools/pack_control_store.py --build-fixtures` · `python tools/verify_control_store.py --archive-flash-cw`
+Pack / verify (archive prototype only): [prototype-flash-cw](../archive/prototype-flash-cw/README.md).
 
 ---
 
@@ -73,8 +75,8 @@ Pack / verify (archive): `python tools/pack_control_store.py --build-fixtures` �
 
 - Reset comb forces **`$FFFC`**; vector points to entry in **`$0000–$07FF`**.
 - Bootloader: Mailbox READ → **LDIO + STA16** block-copy to **RAM `$0800+`** ([boot-jmp-handoff.md](../boot/boot-jmp-handoff.md)).
-- Product path: **`JMP $0800`** after SP/RP/GPR pre-init (`boot_rom.hex`).
-- Recovery path: RAM vector @ `$FFFC` + **HALT** (`boot_rom_manual.hex`) → operator Run + RESET.
+- Product path: **`JMP $0800`** after SP/RP/GPR pre-init ([boot-rom.md](../fixtures/boot-rom.md)).
+- Recovery path: RAM vector @ `$FFFC` + **HALT** (same boot image) → operator Run + RESET.
 
 ### 4.1 ROM layout (product image)
 

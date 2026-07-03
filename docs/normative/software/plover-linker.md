@@ -44,13 +44,9 @@ Each relocation record:
 - linked bytes (`text` + `data`)
 - symbol map
 - relocation stats
-- executable `.plr` via existing `kern/plr.py`
+- Executable `.plr` format (archived `kern/` package)
 
-## CLI examples
+## CLI (archived)
 
-```bash
-python -m plover_cc foo.c -c -o build/foo.plx
-python -m plover_asm obj hw/fixtures/sw/add_imm.pls -o build/
-python -m plover_ld build/a.plx build/b.plx -o build/app.plr --map build/app.map
-```
+Compiler, assembler, and linker live in `host_toolchain.tar.gz`. See [archived-code-guide.md](../../developer/archived-code-guide.md).
 

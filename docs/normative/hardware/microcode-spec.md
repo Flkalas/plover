@@ -104,7 +104,7 @@ Opcode field: **bits `[4:0]`** of the first instruction byte. Bits `[7:5]` are *
 | Operand address | **MBR** from fetch (no PARAM) |
 | ALU / bus strobes | FSM registered outputs per §4 |
 
-Verify: `python tools/verify_control_store.py --v1.0`
+Verify: frozen FSM table in [M3a-control-store.md](../hw-bringup/M3a-control-store.md) §2 (2026-07-04 PASS).
 
 ---
 

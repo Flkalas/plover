@@ -167,7 +167,7 @@ Normative per-phase outputs (registered @ CLK). `—` = 0.
 | 0 | — | — | — | — | SUB | — |
 | 1 | — | — | — | — | NOP | FLG_Z @ end |
 
-Verify: `python tools/verify_control_store.py --v1.0`
+Verify: frozen FSM table in [M3a-control-store.md](../hw-bringup/M3a-control-store.md) §2.
 
 ---
 

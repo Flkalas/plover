@@ -23,5 +23,5 @@ Remaining bytes are reserved/padding.
 ## Host reference implementation
 
 - `kern/plfs.py`
-- `tools/mk_vfdd_img.py`
+- Virtual FDD image tooling archived (`tools.tar.gz`)
 

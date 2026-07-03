@@ -1,7 +1,7 @@
 # ALU Phase B — Gigatron 153 bit-slice (logic + B_CTRL)
 
 **Status:** **implemented** (2026-07)  
-**Netlist:** [`tools/gen_alu8_netlist.py`](../../../tools/gen_alu8_netlist.py) pure B_CTRL bit-slice
+**Netlist:** frozen `alu8` block (12 DIP, B_CTRL bit-slice) — archived `hw.tar.gz`
 
 ## Architecture
 
@@ -60,7 +60,7 @@ All opcodes: `A = net_a[i]`, `B = net_b[i]`.
 | PASS_B | 0 | 0 | 0 | 1 | FF&B → use A=all 1 in stimulus |
 | ADD/SUB/INC/DEC/CMP | * | * | * | * | Unused; `157_YBP` selects **sum** |
 
-Golden vectors: [`tools/alu8_cases.py`](../../../tools/alu8_cases.py) — all 12 opcodes bit-exact in pre-flight sim.
+Golden vectors: [b3-opcode.md](../hw-bringup/b3-opcode.md) — all 12 opcodes frozen 2026-07-04.
 
 ## B_CTRL mux2 (`net_bctrl3..0` → `2C3..2C0`)
 
@@ -93,12 +93,4 @@ Golden vectors: [`tools/alu8_cases.py`](../../../tools/alu8_cases.py) — all 12
 
 ## Regen
 
-```bash
-python tools/gen_alu_decode_netlist.py
-python tools/gen_alu8_netlist.py
-python tools/gen_alu_b3_netlist.py
-python tools/gen_alu_b3_clock_netlist.py
-python tools/gen_alu8_full_test.py
-python tools/gen_alu8_opcode_timing.py
-python tools/gen_opcode_cheatsheet.py
-```
+Netlists and timing gates are **frozen** in normative docs (2026-07-04). Historical generators: [archived-code-guide.md](../../developer/archived-code-guide.md) → `tools.tar.gz`.

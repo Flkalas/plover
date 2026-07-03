@@ -1,8 +1,6 @@
 # B3 — opcode → control line cheat sheet
 
-Breadboard **DIP / tie** settings for 12 `alu_op[3:0]` operations (v0.2 CW `[15:12]`). Generated from the same vectors as [`alu8_full.yaml`](../hw/tests/alu8_full.yaml).
-
-Regenerate: `python tools/gen_opcode_cheatsheet.py`
+Breadboard **DIP / tie** settings for 12 `alu_op[3:0]` operations (v0.2 CW `[15:12]`). **Frozen table** — vectors match archived `alu8_full` gate (2026-07-04).
 
 **Netlist has no `alu_sel` bus** — set each control net manually (DIP/tie) or use [`alu_decode.yaml`](../hw/netlist/blocks/alu_decode.yaml) decode block when installed.
 

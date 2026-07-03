@@ -145,8 +145,6 @@ v1.0 CPU는 **FSM-only idx5** — Flash **`$4000` CW 미사용** ([control-and-d
 | [`alu_b3_latch`](../../hw/tests/alu_b3_latch.yaml) | ACC setup | **51** ns (153→574 CP) |
 | [`alu283_carry`](../../hw/tests/alu283_carry.yaml) | 283 only | ripple **90** ns |
 
-Regenerate §3.1 table: `python tools/gen_alu_opcodes_timing_doc.py` (developer — see [verification-gates.md](../../developer/verification-gates.md)).
-
 ---
 
 ## 5. CPU 맥락 — 명령 “지연” (macro-cycle)

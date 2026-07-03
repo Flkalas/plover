@@ -1,106 +1,33 @@
-# M5 — Integrated CPU netlist E2E (상세)
+# M5 — Integrated CPU E2E (breadboard regression)
 
 | Field | Value |
 |-------|-------|
 | **Milestone** | M5 |
-| **Goal** | 빵판 배선을 `cpu.yaml` + hwsim으로 **재현 가능**하게 고정 |
-| **Status** | Stub |
+| **Goal** | Breadboard wiring captured as a **frozen checklist** + optional archived netlist |
+| **Status** | Deferred — active repo is **document-only** |
 | **선행** | M2b–M4b breadboard smoke |
 
 ---
 
-## 1. 왜 M5인가
+## 1. Scope (v1.0)
 
-M1–M4b는 **수동 단계**로 CPU를 올립니다. M5는 그 결과를:
+M5 is **not** a new solder step. After M1–M4b pass on hardware:
 
-- netlist 블록 병합
-- pre-flight sim/cycle sim E2E 테스트
+1. Photograph / netlist log matches [breadboard-wiring.md](breadboard-wiring.md)
+2. F6 trace from [M3b-fetch-execute.md](M3b-fetch-execute.md) matches frozen FSM ([M3a](M3a-control-store.md) §2)
 
-로 **회귀 가능**하게 만듭니다. 이후 netlist/배선 변경 시 자동 gate.
-
----
-
-## 2. 현재 stub
-
-```1:9:hw/netlist/blocks/cpu.yaml
-version: 1
-block: cpu
-description: "v1.0 CPU datapath — CPLD GPR + 138×2 breadboard (composite stub)"
-includes:
-  - regfile_574.yaml
-  - cpld_system_ctrl.yaml
-notes: |
-  Full SoC netlist merges ALU8, addr_mux, sram256_dual, nor_flash.
-  Generate with: python tools/gen_cpu_netlist.py
-```
+Historical automated E2E (`cpu.yaml`) lives in archived `hw.tar.gz` — see [archived-code-guide.md](../../developer/archived-code-guide.md).
 
 ---
 
-## 3. 작업 패키지 (순서대로)
+## 2. M5 sign-off
 
-### M5.1 — `pc_phase.yaml`
-
-| 넷 | 설명 |
-|----|------|
-| `net_pc0..15` | program counter |
-| `net_ph0..1` | micro phase |
-| `net_ir0..7` | instruction register |
-
-**Pass:** hwsim에서 RESET 후 PC=`0` stimulus 반영.
-
-### M5.2 — `addr_mux.yaml`
-
-| 입력 | 출력 |
-|------|------|
-| PC | instruction fetch |
-| `{opcode,phase}` + `$4000` | CW fetch |
-| effective addr | LDA/STA |
-
-**Pass:** mux select 벡터 3종 시뮬.
-
-### M5.3 — `sram256_dual.yaml` / `nor_flash.yaml`
-
-[M2b-memory.md](M2b-memory.md) 배선을 YAML화. CS를 CPLD stub에 연결.
-
-**Pass:** `mem_decode` 유지 PASS.
-
-### M5.4 — `gen_cpu_netlist.py`
-
-```bash
-python tools/gen_cpu_netlist.py   # TBD — 스크립트 추가 시
-```
-
-출력: 갱신된 `hw/netlist/blocks/cpu.yaml`.
-
-### M5.5 — `hw/tests/cpu_e2e.yaml`
-
-ROM 이미지 ([M3b §F1](M3b-fetch-execute.md#f1--instruction-fetch)):
-
-```
-02 42   ; LDA $42
-01 00   ; ADD $00
-0A      ; HALT
-```
-
-**expect:** HALT 시점 GPR 스냅샷 = M3b F6 기대값.
-
-### M5.6 — cycle sim parity
-
-```bash
-```
+- [ ] Composite breadboard matches normative block diagram
+- [ ] M3b F6 GPR snapshot documented (lab log)
+- [ ] No Flash `$4000` CW programmed
 
 ---
 
-## 4. M5 sign-off
+## 3. Note
 
-- [ ] `cpu.yaml`에 §3 블록 전부 include
-- [ ] `cpu_e2e.yaml` pre-flight sim PASS
-- [ ] M3b 빵판 F6 trace와 pre-flight sim GPR 일치 (스크린샷/로그 보관)
-- [ ] [verification-gates.md](../../developer/verification-gates.md)에 regen 명령 문서화
-- [ ] `implementation-plan-v1.0.md` §2 M5 행 갱신
-
----
-
-## 5. 작업자 노트
-
-M5는 **새 납땜 단계가 아님** — M1–M4b에서 이미 동작하는 보드를 기준으로 netlist를 **역작성**합니다. 배선 변경 시 M5 gate를 먼저 깨뜨리고 수정하는 워크플로를 씁니다.
+v1.0 SoC uses **CPLD FSM only** — no `$4000` CW addr mux in M5 target path.

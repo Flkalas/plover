@@ -14,15 +14,9 @@ v1.0 breadboard has no hardware stack or frame pointer. **S5 Subset C** therefor
 
 ## Output
 
-- Subset C → Plover asm text → `plover_asm` → `.sram.hex`
+- Subset C → Plover asm text → `.sram.hex` (toolchain archived — see [archived-code-guide.md](../../developer/archived-code-guide.md))
 
-## CLI
+## Frozen smoke image
 
-```bash
-python -m plover_cc hw/fixtures/sw/cc_smoke.c -o hw/fixtures/sram/cc_smoke.sram.hex
-```
-
-## Tests
-
-- `tests/test_plover_cc.py`
+[add_imm-sram.md](../fixtures/add_imm-sram.md) — pre-built program for breadboard.
 

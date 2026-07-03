@@ -146,7 +146,7 @@ Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있
 | 단계 | 내용 |
 |------|------|
 | 1 | ALU + GPR + phase FSM (LED/스위치) |
-| 2 | CW 테이블 in **BRAM** — `cw.hex` / [pack_control_store.py](../tools/pack_control_store.py) |
+| 2 | CW 테이블 in **BRAM** — archived prototype `cw.hex` (not v1.0 breadboard) |
 | 3 | **SDRAM 컨트롤러**로 64 KB 논리 맵 + 프로그램 로드 |
 | 4 | (선택) GPIO Mailbox + **RP2350** — LDIO/STIO |
 
@@ -208,7 +208,7 @@ Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있
 |------|------|
 | **행위 우선** | 게이트 단위 74HC 복제는 **교육/타이밍 실험**용 옵션; 기본 산출물은 **compact CPU** |
 | **명세 동기** | ISA·phase count — [microcode-spec.md](microcode-spec.md) |
-| **CW** | `tools/pack_control_store.py` / `hw/fixtures/control/cw.hex` **단일 소스** |
+| **CW** | Archived prototype only — v1.0 breadboard uses CPLD FSM ([control-and-decode.md](control-and-decode.md)) |
 | **Reset** | `$FFFC` 벡터, `MAP_MODE` — [bootloader.md](../boot/bootloader.md) |
 | **No IRQ** | 폴링만 — [mailbox-protocol.md](../copro/mailbox-protocol.md) |
 
