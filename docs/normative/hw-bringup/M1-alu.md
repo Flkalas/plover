@@ -12,7 +12,7 @@
 
 | 순서 | 문서 | 하는 일 |
 |------|------|---------|
-| 1 | [alu8-assembly-spec.md](alu8-assembly-spec.md) | ALU 14 IC를 **단계별로** 납땜·배선 (0→4단계, 매단계 LED 확인) |
+| 1 | [alu8-assembly-spec.md](alu8-assembly-spec.md) | ALU **12 DIP**를 **단계별로** 납땜·배선 (0→3단계, 매단계 LED 확인) |
 | 2 | **[M1-b3-procedure.md](M1-b3-procedure.md)** | B3a → B3b → B3c 검증 (Y LED, 574 래치, 2 MHz) |
 | 3 | [b3-opcode.md](b3-opcode.md) | 12 opcode마다 **어느 DIP를 ON/OFF** 할지 표 |
 

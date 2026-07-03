@@ -15,7 +15,7 @@
 | GPR | **ATF1504 내부** R0, R1, R2 |
 | Read | **고정:** R0→`q_a`, R1→`q_b` |
 | Write | `REG_WE` + `REG_WSEL[1:0]` (default R2) |
-| ALU ctrl | CPLD FSM → `cin`/`b_sel`/`lgc*`/`y_mux` **직접** |
+| ALU ctrl | CPLD FSM → `cin`/`bctrl0..3`/`lgc*`/`y_mux` **직접** |
 | Decode | **없음** — `alu8_decode` SoC 미장착 |
 
 공유 버스: `net_d0..7` — [breadboard-wiring.md](breadboard-wiring.md).
@@ -28,7 +28,7 @@
 |-----------|----------|
 | `q_a0..7` | `net_a0..7` |
 | `q_b0..7` | `net_b0..7` |
-| `cin`, `b_sel`, `b_const_sel` | 283 / 153 mux2 |
+| `cin`, `bctrl0..3` | 283 / 153 mux2 |
 | `lgc3..0` | 153 mux1 |
 | `y_mux_sel` | 157_YBP select |
 
@@ -124,7 +124,7 @@ REG_WE=1 @ CLK↑ → regs(REG_WSEL) <= d_in
 | 증상 | 조치 |
 |------|------|
 | q_a ≠ R0 | 고정 read VHDL; R0 미래치 |
-| ADD 틀림 | `cin`/`b_sel` FSM 테이블 |
+| ADD 틀림 | `cin`/`bctrl*` FSM 테이블 |
 | 버스 충돌 | `Y_OE`와 `MEM_RD` 동시 1 금지 |
 
 ---

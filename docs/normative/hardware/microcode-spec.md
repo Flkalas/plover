@@ -161,9 +161,9 @@ Operand (abs16) latched in MBR during fetch — see [M3b-fetch-execute.md](../hw
 
 ## 7. ALU controls
 
-CPLD drives `cin`, `b_sel`, `b_const_sel`, `lgc3:0`, `y_mux_sel` — no `alu8_decode`.
+CPLD drives `cin`, `bctrl0..3`, `lgc3:0`, `y_mux_sel` — no `alu8_decode` on SoC ([control-and-decode.md](control-and-decode.md)).
 
-**2 MHz budget:** worst-case **136 ns** ([alu-opcodes-timing.md](alu-opcodes-timing.md)).
+**2 MHz budget:** worst-case **INC 153 ns**, SUB **136 ns** ([alu-opcodes-timing.md](alu-opcodes-timing.md)).
 
 ---
 

@@ -58,7 +58,7 @@
 - [ ] **3fixed read:** `q_a` ← R0, `q_b` ← R1 (async)
 - [ ] **Write:** `REG_WE` + `REG_WSEL[1:0]` → R0–R2 only (no R3)
 - [ ] **Phase FSM:** ADD template 3 phases; `OPC[3:0]` from IR
-- [ ] **ALU ctrl:** registered `cin`, `b_sel`, `b_const_sel`, `lgc3:0`, `y_mux_sel`
+- [ ] **ALU ctrl:** registered `cin`, `bctrl0..3`, `lgc3:0`, `y_mux_sel`
 - [ ] **Bus:** `Y_OE`, `MEM_RD`, `MEM_WR` registered per phase
 - [ ] **Branch:** `PC_LOAD_EN` @ macro_end from `FLG_Z`/`FLG_C`
 - [ ] **MC fit:** ≤ **64** macrocells (target ~32)
@@ -100,7 +100,7 @@ q_b <= regs(1);
 | CPLD 출력 (LED/프로브) | 관측 |
 |------------------------|------|
 | `net_q_a0..7`, `net_q_b0..7` | R0/R1 async read |
-| `net_cin`, `net_b_sel`, `net_lgc*` | ALU ctrl (→ alu8 직결) |
+| `net_cin`, `net_bctrl0..3`, `net_lgc*` | ALU ctrl (→ alu8 직결) |
 | `net_y_oe`, `net_mem_rd`, `net_mem_wr` | Bus strobes |
 | `net_reg_we`, `net_reg_wsel0..1` | GPR write |
 | `net_pc_load_en` | Branch completion |

@@ -3,7 +3,7 @@
 | 항목 | 내용 |
 |------|------|
 | **대상** | Plover v1.0 breadboard — 8비트 ALU 코어 (`alu8.yaml`) |
-| **규모** | 74HC DIP **14개** (`U_ALU_153_0..7`×8, `157_YBP`×2, `283`×2, `04`×2; CMP via SUB) |
+| **규모** | 74HC DIP **12개** (`U_ALU_153_0..7`×8, `157_YBP`×2, `283`×2; CMP via SUB) |
 | **전원** | **5 V** 단일 레일 (본 문서는 5 V 빵판 ALU만) |
 | **목표** | 신호 흐름 순으로 IC를 **한 덩어리씩** 올려, 매 단계에서 **LED로 검증** |
 | **후속** | [M1-b3-procedure](M1-b3-procedure.md) → [M2a](M2a-cpld-decode.md) → [M2b-gpr-datapath](M2b-gpr-datapath.md) |
@@ -28,7 +28,7 @@
 
 ## 1. 원칙 — 왜 순서가 중요한가
 
-ALU는 **한 번에 14개를 꽂으면** 어느 구간에서 깨졌는지 찾기 어렵습니다. 아래 순서는:
+ALU는 **한 번에 12개를 꽂으면** 어느 구간에서 깨졌는지 찾기 어렵습니다. 아래 순서는:
 
 1. **데이터가 흐르는 방향** (피연산자 → 가산기/논리 → 출력 MUX) 과 같고  
 2. **이전 단계 출력을 다음 단계 입력으로 재사용** 하며  
@@ -42,8 +42,7 @@ flowchart LR
     CTL[제어 DIP lgc0..3]
   end
   subgraph bpath [B 경로]
-    BINV[04 ~B]
-    MUX[153 mux2]
+    MUX[153 mux2 B_CTRL]
   end
   subgraph core [연산]
     ADD[283 x2]
@@ -154,16 +153,16 @@ flowchart LR
 
 ---
 
-### 단계 2 — ~B + 153 bit-slice (IC +10: 04 BINV + 153×8)
+### 단계 2 — 153 bit-slice (IC +8: 153×8)
 
 | Ref | Part |
 |-----|------|
-| `U_ALU_153_0..7` | 74HC153 ×8 — mux1=logic, mux2=B-path |
+| `U_ALU_153_0..7` | 74HC153 ×8 — mux1=logic, mux2=B-path (B_CTRL) |
 
 **배선**
 
-- `net_b*` → 04 BINV → `net_b_inv*`  
-- Per bit `i`: **mux2** `2C0`=`net_b[i]`, `2C1`=`net_b_inv[i]`, `2C2/2C3`=INC/DEC (netlist 하드와이어), `2Y`→`net_b_add[i]`; **mux1** `1C0..3`=`net_lgc0..3`, `1Y`→`net_y_logic[i]`; `1G`/`2G`→GND  
+- Per bit `i`: **mux2** `2C0..3`=`net_bctrl0..3` (Gigatron B_CTRL), `2Y`→`net_b_add[i]`; **mux1** `1C0..3`=`net_lgc0..3`, `1Y`→`net_y_logic[i]`; `1G`/`2G`→GND  
+- SUB/CMP: `bctrl=0011` → mux2 selects inverted B (no 74HC04)  
 - `net_b_add*` → **283 B** (**단계 1 B 직결 제거**)
 
 **A/B 버스 (153 공통 A/B 핀)** — 산술/논리 opcode마다 소스가 달라 **점퍼 또는 선택 157×2** 로 전환:
@@ -229,10 +228,12 @@ flowchart LR
 
 ---
 
-### 단계 5 — (선택) CW 디코드 블록
+### 단계 5 — (M1 벤치 전용) `alu8_decode` 블록
 
-마이크로코드 CW에서 제어선을 자동 생성하려면 [`alu8_decode.yaml`](../../hw/netlist/blocks/alu8_decode.yaml) 블록 추가.  
-**권장:** 단계 4까지 **수동 DIP** 로 안정화한 뒤 디코드 IC/타이를 붙임.
+**SoC(M2+)에는 `alu8_decode` 없음** — CPLD FSM이 `net_bctrl*`/`cin`/`lgc*`를 직접 구동 ([control-and-decode.md](../hardware/control-and-decode.md)).
+
+M1에서 CW 스타일 자동 제어를 시험하려면 [`alu8_decode.yaml`](../../hw/netlist/blocks/alu8_decode.yaml) 블록 추가.  
+**권장:** 단계 3까지 **수동 DIP** ([b3-opcode.md](b3-opcode.md)) 로 안정화한 뒤 디코드 블록을 붙임.
 
 ---
 
@@ -253,9 +254,9 @@ ALU 단독 Pass 후 [M1-b3-procedure.md](M1-b3-procedure.md) § B3b/B3c 진행:
 |------|---------|------|-----------|
 | 0 | — | 0 | 전원 |
 | 1 | 283×2 | 2 | ADD / 캐리 |
-| 2 | 04 BINV + 153×8 | 12 | B-path + Gigatron logic, AB bus jumpers |
-| 3 | 157 YBP×2 | **14** | sum bypass → Y, 12 opcode |
-| 4 | (디코드) | +α | CW 자동 |
+| 2 | 153×8 | 10 | B_CTRL + Gigatron logic, AB bus jumpers |
+| 3 | 157 YBP×2 | **12** | sum bypass → Y, 12 opcode |
+| 4 | (M1 `alu8_decode`) | +α | M1 bench only — not SoC BOM |
 | 5 | 574·클록 | 시스템 | B3b/c |
 
 ---
@@ -304,7 +305,7 @@ ALU 단독 Pass 후 [M1-b3-procedure.md](M1-b3-procedure.md) § B3b/B3c 진행:
 
 ## 8. 완료 체크리스트 (ALU8 단독)
 
-- [ ] 14 IC ALU 전원·0.1 µF 완료 ([BOM.md](../../BOM.md))  
+- [ ] 12 DIP ALU 전원·0.1 µF 완료 ([BOM.md](../../BOM.md))  
 - [ ] `alu8_full` pre-flight sim PASS  
 - [ ] 스모크 SUB / XOR / INC LED 일치  
 - [ ] (권장) opcode 치트시트 12종 전부  
@@ -319,9 +320,8 @@ ALU 단독 Pass 후 [M1-b3-procedure.md](M1-b3-procedure.md) § B3b/B3c 진행:
 
 | 날짜 | 변경 |
 |------|------|
-| 2026-06-11 | v1.0 정합: 14 IC, 링크·단계 번호, INC/DEC 하드와이어 명시 |
+| 2026-07-04 | 12 DIP, B_CTRL mux2, INC=`cin`+`bctrl=0`, M1-only `alu8_decode` |
 | 2026-07-03 | Bit-slice `U_ALU_153_0..7` + AB bus; steps 2–3 merged |
-| 2026-06-02 | Phase B2: Gigatron logic, **14** IC, logic **46 ns** @ max |
-| 2026-06-02 | Phase B1: `157_B2` 제거, `157_YBP` sum bypass, SUB **151 ns** @ max |
-| 2026-06-02 | Phase A: 24 IC, 153_B, 7485 CMP, `net_sub_en` 제거 |
-| 2026-06-02 | 초판 — 8단계 실장 시방, B3 연계 |
+| 2026-06-11 | v1.0 정합: 링크·단계 번호, INC/DEC 하드와이어 명시 |
+| 2026-06-02 | Phase B2: Gigatron logic, logic **46 ns** @ max |
+| 2026-06-02 | Phase B1: `157_B2` 제거, `157_YBP` sum bypass, SUB **136 ns** @ max |

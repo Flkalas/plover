@@ -27,7 +27,7 @@
 | Metric | [prototype-flash-cw](../archive/prototype-flash-cw/README.md) | **v1.0** |
 |--------|----------------------------------------------------------------|----------|
 | DIP (control path) | 31 | **20** (−11) |
-| Critical delay | 151 ns | **136 ns** (−15) |
+| Critical delay | 151 ns | **153 ns** (INC Y) |
 | Flash CW rows | 23 per-phase | **0** (FSM-only) |
 | CPLD MC | ~40 | **~38** |
 
@@ -46,7 +46,7 @@
 ## 3. Block diagram
 
 ```text
-  IR OPC[4:0] ──► CPLD idx5 FSM ──┬──► cin/b_sel/lgc/y_mux
+  IR OPC[4:0] ──► CPLD idx5 FSM ──┬──► cin/bctrl0..3/lgc/y_mux
                                   ├──► REG_WE (internal w_sel)
                                   ├──► MEM_RD/WR, Y_OE
                                   └──► PC_LOAD_EN

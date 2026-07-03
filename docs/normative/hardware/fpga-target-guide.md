@@ -2,6 +2,8 @@
 
 **Version:** 0.1 · **Date:** 2026-06-02  
 **Status:** Planning — normative for **future FPGA / Verilog** work; **not** the active breadboard/PCB build path  
+
+> **Breadboard v1.0 = FSM-only** (no Flash `$4000` CW, no `alu8_decode` on SoC). This guide includes **legacy CW-BRAM / Flash CW** paths for FPGA migration study — see [control-and-decode.md](control-and-decode.md) for v1.0 TTL truth.
 **Audience:** 교육용 FPGA 보드 사용자, 원칙·외부 ROM/RAM·주변 분리 구현자, 향후 RTL 제공·프로젝트 확장 담당자
 
 **Related (TTL 실기):** [system-architecture.md](system-architecture.md) · [BOM.md](../../../BOM.md) (5 V) · [BOM-3v3.md](../../../BOM-3v3.md) (3.3 V PCB)  
@@ -194,7 +196,7 @@ Mailbox **252 B**를 RP2350 SRAM에 두면 FPGA BRAM을 추가 절약할 수 있
 
 ### 6.2 ALU 타이밍
 
-조합 ALU worst **151 ns @ max** (SUB Y; arith path, [alu-opcodes-timing.md](alu-opcodes-timing.md)) — **2 MHz** (250 ns 반주기) **충분** (slack ~99 ns). Logic opcodes **46 ns** (153 mux1). CMP flags via **comparator** (~65 ns). **50 MHz** (20 ns)에서는 **행위적 단일 사이클 ALU** 가 일반적.
+조합 ALU worst **INC 153 ns @ max** (arith path, [alu-opcodes-timing.md](alu-opcodes-timing.md)) — **2 MHz** (250 ns 반주기) **충분** (slack **97 ns**). SUB **136 ns**; logic **46 ns** (153 mux1). CMP flags via **comparator** (~65 ns). **50 MHz** (20 ns)에서는 **행위적 단일 사이클 ALU** 가 일반적.
 
 ---
 

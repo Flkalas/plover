@@ -42,7 +42,7 @@
 | `REG_WE` | GPR write strobe |
 | `MEM_RD`, `MEM_WR` | Memory strobes |
 | `Y_OE` | Bus drive (STA path) |
-| `cin`, `b_sel`, `b_const_sel`, `lgc3:0`, `y_mux_sel` | ALU controls |
+| `cin`, `bctrl0..3`, `lgc3:0`, `y_mux_sel` | ALU controls |
 | `PC_LOAD_EN` | Branch commit (loads PC from MBR/abs16 latch) |
 
 ### Off-chip (glue, not CPLD)

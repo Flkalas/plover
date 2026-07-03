@@ -41,7 +41,7 @@ flowchart LR
 | 문서 | 내용 |
 |------|------|
 | [M1-alu.md](M1-alu.md) | 마일스톤 개요 |
-| [alu8-assembly-spec.md](alu8-assembly-spec.md) | ALU 14 IC 단계별 조립 |
+| [alu8-assembly-spec.md](alu8-assembly-spec.md) | ALU 12 DIP 단계별 조립 |
 | [M1-b3-procedure.md](M1-b3-procedure.md) | B3a/b/c 상세 |
 | [b3-opcode.md](b3-opcode.md) | 12 opcode DIP (M1 벤치 전용) |
 

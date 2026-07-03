@@ -57,7 +57,7 @@ No CW_L / CW_H latches in v1.0 SoC.
 | CPLD | ALU / bus |
 |------|-----------|
 | `q_a`, `q_b` | A, B (R0, R1 fixed read) |
-| `cin`, `b_sel`, `lgc*`, `y_mux` | Registered ALU controls |
+| `cin`, `bctrl0..3`, `lgc*`, `y_mux` | Registered ALU controls |
 | `MEM_RD`, `MEM_WR`, `Y_OE`, `REG_WE` | Bus strobes |
 
 ---
