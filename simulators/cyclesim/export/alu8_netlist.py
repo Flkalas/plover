@@ -97,6 +97,52 @@ def build_alu8_func_netlist() -> dict[str, Any]:
         "description": DESCRIPTION,
         "instances": instances,
         "nets": nets,
+        "layout": {
+            "kind": "alu8_row_grid",
+            "rows": 8,
+            "port_groups": {
+                "a": {
+                    "nets": [f"net_a{i}" for i in range(8)],
+                    "edge": "left",
+                    "align": "row",
+                },
+                "b": {
+                    "nets": [f"net_b{i}" for i in range(8)],
+                    "edge": "left",
+                    "align": "row",
+                },
+                "lgc": {
+                    "nets": [f"net_lgc{i}" for i in range(4)],
+                    "edge": "left",
+                    "corridor": "above_153",
+                },
+                "bctrl": {
+                    "nets": [f"net_bctrl{i}" for i in range(4)],
+                    "edge": "left",
+                    "corridor": "below_153",
+                },
+                "ctrl": {
+                    "nets": ["net_cin", "net_153_s0", "net_153_s1"],
+                    "edge": "left",
+                },
+                "y_mux": {"nets": ["net_y_mux_sel"], "edge": "left", "corridor": "below_stack"},
+                "y": {
+                    "nets": [f"net_y{i}" for i in range(8)],
+                    "edge": "right",
+                    "align": "row",
+                },
+                "flags": {
+                    "nets": ["net_cmp_z", "net_cmp_c_ge", "net_c_hi"],
+                    "edge": "right",
+                },
+            },
+            "orphan_ports": [
+                "net_153_s0",
+                "net_153_s1",
+                "net_cmp_z",
+                "net_cmp_c_ge",
+            ],
+        },
     }
 
 

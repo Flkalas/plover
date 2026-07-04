@@ -118,6 +118,8 @@ def build_block_manifest(
     }
     if schematic_size is not None:
         manifest["schematic"] = {"width": schematic_size[0], "height": schematic_size[1]}
+    if "layout" in netlist:
+        manifest["layout"] = netlist["layout"]
     return manifest
 
 
