@@ -2,226 +2,42 @@
 
 from __future__ import annotations
 
-import hashlib
-import html
-import re
-from dataclasses import dataclass
 from typing import Any
+
+from simulators.cyclesim.export.schematic.alu8_template import (
+    ORPHAN_PORTS,
+    Alu8Template,
+    build_alu8_template,
+    chip_obstacles,
+    port_anchor_x,
+    port_label_positions,
+)
+from simulators.cyclesim.export.schematic.render import (
+    render_global_label,
+    render_grid,
+    render_symbol,
+    render_wires,
+    svg_styles,
+)
+from simulators.cyclesim.export.schematic.router import (
+    build_route_assignments,
+    paths_hit_obstacles,
+    route_all,
+)
+from simulators.cyclesim.export.schematic.symbols import place_instances
+from simulators.cyclesim.export.schematic.types import PinAnchor, SchematicLayout
 
 PWR_VCC = "pwr_vcc"
 PWR_GND = "pwr_gnd"
-ROUTE_STUB = 14.0
-PIN_PITCH = 13.0
-PIN_LEN = 16.0
-BODY_W_DEFAULT = 88.0
-MARGIN = 48.0
-PITCH_X = 168.0
-PITCH_Y = 92.0
+MARGIN = 100.0
 
-_CONTROL_NET = re.compile(
-    r"net_(cin|153_s[01]|bctrl[0-3]|lgc[0-3]|y_mux_sel)$",
-)
+# Re-export for tests and backward compatibility.
+PinAnchor = PinAnchor
+SchematicLayout = SchematicLayout
 
 
-@dataclass(frozen=True)
-class PinSpec:
-    name: str
-    side: str  # left, right, top, bottom
-    order: float
-
-
-@dataclass
-class PinAnchor:
-    ref: str
-    pin: str
-    net: str
-    x: float
-    y: float
-    side: str
-
-
-@dataclass
-class SchematicLayout:
-    width: float
-    height: float
-    anchors: list[PinAnchor]
-    instances: list[dict[str, Any]]
-
-
-PART_PINS: dict[str, list[PinSpec]] = {
-    "74HC153": [
-        PinSpec("A", "left", 0),
-        PinSpec("B", "left", 1),
-        PinSpec("1Y", "right", 0),
-        PinSpec("2Y", "right", 1),
-        PinSpec("1C0", "top", 0),
-        PinSpec("1C1", "top", 1),
-        PinSpec("1C2", "top", 2),
-        PinSpec("1C3", "top", 3),
-        PinSpec("2C0", "bottom", 0),
-        PinSpec("2C1", "bottom", 1),
-        PinSpec("2C2", "bottom", 2),
-        PinSpec("2C3", "bottom", 3),
-    ],
-    "74HC283": [
-        PinSpec("A0", "left", 0),
-        PinSpec("A1", "left", 1),
-        PinSpec("A2", "left", 2),
-        PinSpec("A3", "left", 3),
-        PinSpec("B0", "left", 4),
-        PinSpec("B1", "left", 5),
-        PinSpec("B2", "left", 6),
-        PinSpec("B3", "left", 7),
-        PinSpec("CIN", "left", 8),
-        PinSpec("S0", "right", 0),
-        PinSpec("S1", "right", 1),
-        PinSpec("S2", "right", 2),
-        PinSpec("S3", "right", 3),
-        PinSpec("COUT", "right", 4),
-    ],
-    "74HC157": [
-        PinSpec("1A", "left", 0),
-        PinSpec("2A", "left", 1),
-        PinSpec("3A", "left", 2),
-        PinSpec("4A", "left", 3),
-        PinSpec("1B", "left", 4),
-        PinSpec("2B", "left", 5),
-        PinSpec("3B", "left", 6),
-        PinSpec("4B", "left", 7),
-        PinSpec("S", "top", 1),
-        PinSpec("1Y", "right", 0),
-        PinSpec("2Y", "right", 1),
-        PinSpec("3Y", "right", 2),
-        PinSpec("4Y", "right", 3),
-    ],
-}
-
-
-def _esc(text: str) -> str:
-    return html.escape(text, quote=True)
-
-
-def _is_control_net(net: str) -> bool:
-    return bool(_CONTROL_NET.match(net))
-
-
-def _net_color(net: str) -> str:
-    h = hashlib.md5(net.encode()).hexdigest()[:6]
-    r = 80 + (int(h[0:2], 16) * 175) // 255
-    g = 100 + (int(h[2:4], 16) * 155) // 255
-    b = 120 + (int(h[4:6], 16) * 135) // 255
-    return f"#{r:02x}{g:02x}{b:02x}"
-
-
-def _symbol_body_size(part: str) -> tuple[float, float]:
-    specs = PART_PINS[part]
-    left = max((s.order for s in specs if s.side == "left"), default=0) + 1
-    right = max((s.order for s in specs if s.side == "right"), default=0) + 1
-    top = max((s.order for s in specs if s.side == "top"), default=0) + 1
-    bottom = max((s.order for s in specs if s.side == "bottom"), default=0) + 1
-    vert = max(left, right, 2)
-    horiz = max(top, bottom, 2)
-    w = max(BODY_W_DEFAULT, horiz * PIN_PITCH + 24)
-    h = max(48.0, vert * PIN_PITCH + 28)
-    return w, h
-
-
-def _pin_position(
-    ox: float,
-    oy: float,
-    body_w: float,
-    body_h: float,
-    spec: PinSpec,
-) -> tuple[float, float, str]:
-    if spec.side == "left":
-        y = oy + 18 + spec.order * PIN_PITCH
-        return ox, y, "left"
-    if spec.side == "right":
-        y = oy + 18 + spec.order * PIN_PITCH
-        return ox + body_w, y, "right"
-    if spec.side == "top":
-        x = ox + 18 + spec.order * PIN_PITCH
-        return x, oy, "top"
-    x = ox + 18 + spec.order * PIN_PITCH
-    return x, oy + body_h, "bottom"
-
-
-def _route_polyline(x1: float, y1: float, x2: float, y2: float, side: str) -> str:
-    stub = ROUTE_STUB
-    if side == "left":
-        ex = x1 - stub
-    elif side == "right":
-        ex = x1 + stub
-    elif side == "top":
-        ey = y1 - stub
-        return f"{x1:.1f},{y1:.1f} {x1:.1f},{ey:.1f} {x2:.1f},{y2:.1f}"
-    else:
-        ey = y1 + stub
-        return f"{x1:.1f},{y1:.1f} {x1:.1f},{ey:.1f} {x2:.1f},{y2:.1f}"
-    return f"{x1:.1f},{y1:.1f} {ex:.1f},{y1:.1f} {ex:.1f},{y2:.1f} {x2:.1f},{y2:.1f}"
-
-
-def _bit_y(bit: int) -> float:
-    return MARGIN + 36 + bit * PITCH_Y
-
-
-def _layout_alu8_positions() -> dict[str, tuple[float, float]]:
-    col_153 = MARGIN + 100
-    col_283 = col_153 + PITCH_X + 40
-    col_157 = col_283 + PITCH_X + 40
-
-    pos: dict[str, tuple[float, float]] = {}
-    for i in range(8):
-        pos[f"U_ALU_153_{i}"] = (col_153, _bit_y(i))
-    pos["U_ALU_283_LO"] = (col_283, _bit_y(1))
-    pos["U_ALU_283_HI"] = (col_283, _bit_y(5))
-    pos["U_ALU_157_YBP_0"] = (col_157, (_bit_y(0) + _bit_y(3)) / 2)
-    pos["U_ALU_157_YBP_1"] = (col_157, (_bit_y(4) + _bit_y(7)) / 2)
-    return pos
-
-
-def _port_label_positions(port_names: set[str]) -> dict[str, tuple[float, float, str]]:
-    """Global label positions: (x, y, side)."""
-    labels: dict[str, tuple[float, float, str]] = {}
-    left_x = MARGIN - 8
-    right_x = MARGIN + 100 + PITCH_X * 2 + 160
-
-    for i in range(8):
-        if f"net_a{i}" in port_names:
-            labels[f"net_a{i}"] = (left_x, _bit_y(i) + 18, "left")
-        if f"net_b{i}" in port_names:
-            labels[f"net_b{i}"] = (left_x - 52, _bit_y(i) + 34, "left")
-        if f"net_y{i}" in port_names:
-            labels[f"net_y{i}"] = (right_x + 80, _bit_y(i) + 18, "right")
-
-    ctrl_left = [
-        ("net_cin", _bit_y(0) - 20),
-        ("net_153_s0", _bit_y(0) - 34),
-        ("net_153_s1", _bit_y(0) - 48),
-    ]
-    for net, y in ctrl_left:
-        if net in port_names:
-            labels[net] = (left_x, y, "left")
-
-    for i in range(4):
-        if f"net_bctrl{i}" in port_names:
-            labels[f"net_bctrl{i}"] = (left_x - 26, MARGIN + 8 + i * 14, "left")
-        if f"net_lgc{i}" in port_names:
-            labels[f"net_lgc{i}"] = (left_x - 26, MARGIN + 64 + i * 14, "left")
-
-    if "net_y_mux_sel" in port_names:
-        labels["net_y_mux_sel"] = (left_x, _bit_y(7) + 52, "left")
-
-    right_flags = [
-        ("net_cmp_z", _bit_y(7) + 20),
-        ("net_cmp_c_ge", _bit_y(7) + 36),
-        ("net_c_hi", _bit_y(7) + 52),
-    ]
-    for net, y in right_flags:
-        if net in port_names:
-            labels[net] = (right_x + 80, y, "right")
-
-    return labels
+def _get_tmpl() -> Alu8Template:
+    return build_alu8_template()
 
 
 def layout_alu8_schematic(
@@ -229,163 +45,60 @@ def layout_alu8_schematic(
     *,
     port_names: set[str] | None = None,
 ) -> SchematicLayout:
-    positions = _layout_alu8_positions()
-    anchors: list[PinAnchor] = []
-    placed: list[dict[str, Any]] = []
-    max_x = 0.0
-    max_y = 0.0
-
-    for inst in netlist["instances"]:
-        ref = inst["ref"]
-        part = inst["part"]
-        ox, oy = positions[ref]
-        body_w, body_h = _symbol_body_size(part)
-        max_x = max(max_x, ox + body_w + 120)
-        max_y = max(max_y, oy + body_h + 40)
-        placed.append(
-            {
-                "ref": ref,
-                "part": part,
-                "x": ox,
-                "y": oy,
-                "w": body_w,
-                "h": body_h,
-                "pins": inst["pins"],
-            }
-        )
-        specs = PART_PINS[part]
-        for spec in specs:
-            net = inst["pins"].get(spec.name)
-            if not net:
-                continue
-            px, py, side = _pin_position(ox, oy, body_w, body_h, spec)
-            anchors.append(PinAnchor(ref=ref, pin=spec.name, net=net, x=px, y=py, side=side))
-
+    tmpl = _get_tmpl()
+    placed, anchors = place_instances(netlist, tmpl)
     ports = port_names or set()
-    port_labels = _port_label_positions(ports)
-    for net, (lx, ly, side) in port_labels.items():
-        ax = lx + (36 if side == "left" else -36)
+
+    labels = port_label_positions(tmpl, ports)
+    for net, (lx, ly, side) in labels.items():
+        ax = port_anchor_x(side, tmpl)
         anchors.append(PinAnchor(ref="__port__", pin="", net=net, x=ax, y=ly, side=side))
 
-    width = max_x + MARGIN
-    height = max(max_y + MARGIN, _bit_y(7) + 120)
-    return SchematicLayout(width=width, height=height, anchors=anchors, instances=placed)
+    max_x = tmpl.right_io + MARGIN
+    max_y = tmpl.height
+    for inst in placed:
+        max_x = max(max_x, inst["x"] + inst["w"] + MARGIN)
+        max_y = max(max_y, inst["y"] + inst["h"] + MARGIN)
 
-
-def _render_global_label(net: str, x: float, y: float, side: str) -> str:
-    color = "#d29922" if _is_control_net(net) else _net_color(net)
-    if side == "left":
-        pts = f"{x:.1f},{y:.1f} {x + 28:.1f},{y:.1f} {x + 28:.1f},{y - 10:.1f} {x + 36:.1f},{y:.1f} {x + 28:.1f},{y + 10:.1f} {x + 28:.1f},{y:.1f}"
-        tx, anchor = x - 4, "end"
-    else:
-        pts = f"{x:.1f},{y:.1f} {x - 28:.1f},{y:.1f} {x - 28:.1f},{y - 10:.1f} {x - 36:.1f},{y:.1f} {x - 28:.1f},{y + 10:.1f} {x - 28:.1f},{y:.1f}"
-        tx, anchor = x + 4, "start"
-    return (
-        f'<g class="global-label" data-net="{_esc(net)}">'
-        f'<polyline class="lbl-flag" points="{pts}" fill="{color}" opacity="0.35" stroke="{color}" stroke-width="1"/>'
-        f'<text class="net-label lbl-global" data-net="{_esc(net)}" x="{tx:.1f}" y="{y + 4:.1f}" '
-        f'text-anchor="{anchor}" fill="{color}">{_esc(net)}</text>'
-        f"</g>"
+    return SchematicLayout(
+        width=max_x,
+        height=max_y,
+        anchors=anchors,
+        instances=placed,
+        template=tmpl,
     )
 
 
-def _render_symbol(inst: dict[str, Any]) -> str:
-    ref = inst["ref"]
-    part = inst["part"]
-    ox, oy = inst["x"], inst["y"]
-    body_w, body_h = inst["w"], inst["h"]
-    specs = PART_PINS[part]
-    lines = [
-        f'<g class="symbol" data-ref="{_esc(ref)}">',
-        f'<rect class="sym-body" x="{ox:.1f}" y="{oy:.1f}" width="{body_w:.1f}" height="{body_h:.1f}" '
-        f'rx="2" fill="#161b22" stroke="#58a6ff" stroke-width="1.4"/>',
-        f'<text class="lbl-ref" x="{ox + body_w / 2:.1f}" y="{oy + 12:.1f}" '
-        f'text-anchor="middle">{_esc(ref)}</text>',
-        f'<text class="lbl-part" x="{ox + body_w / 2:.1f}" y="{oy + body_h - 6:.1f}" '
-        f'text-anchor="middle">{_esc(part)}</text>',
-    ]
-    for spec in specs:
-        px, py, side = _pin_position(ox, oy, body_w, body_h, spec)
-        if side == "left":
-            x2 = px - PIN_LEN
-            lx, anchor = px - PIN_LEN - 3, "end"
-        elif side == "right":
-            x2 = px + PIN_LEN
-            lx, anchor = px + PIN_LEN + 3, "start"
-        elif side == "top":
-            y2 = py - PIN_LEN
-            lx, ly, anchor = px, py - PIN_LEN - 3, "middle"
-            lines.append(
-                f'<line class="pin-stub" x1="{px:.1f}" y1="{py:.1f}" x2="{px:.1f}" y2="{y2:.1f}" '
-                f'stroke="#8b949e" stroke-width="1"/>'
-            )
-            lines.append(
-                f'<text class="lbl-pin" x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}">{_esc(spec.name)}</text>'
-            )
-            continue
-        else:
-            y2 = py + PIN_LEN
-            lx, ly, anchor = px, py + PIN_LEN + 10, "middle"
-            lines.append(
-                f'<line class="pin-stub" x1="{px:.1f}" y1="{py:.1f}" x2="{px:.1f}" y2="{y2:.1f}" '
-                f'stroke="#8b949e" stroke-width="1"/>'
-            )
-            lines.append(
-                f'<text class="lbl-pin" x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}">{_esc(spec.name)}</text>'
-            )
-            continue
-        lines.append(
-            f'<line class="pin-stub" x1="{px:.1f}" y1="{py:.1f}" x2="{x2:.1f}" y2="{py:.1f}" '
-            f'stroke="#8b949e" stroke-width="1"/>'
-        )
-        lines.append(
-            f'<text class="lbl-pin" x="{lx:.1f}" y="{py + 4:.1f}" text-anchor="{anchor}">{_esc(spec.name)}</text>'
-        )
-    lines.append("</g>")
-    return "\n".join(lines)
+def _route_bounds(
+    layout: SchematicLayout,
+    routes: dict[str, list[list[tuple[float, float]]]],
+    port_labels: dict[str, tuple[float, float, str]],
+) -> tuple[float, float, float, float]:
+    min_x = min_y = float("inf")
+    max_x = max_y = float("-inf")
 
+    def grow(x: float, y: float) -> None:
+        nonlocal min_x, min_y, max_x, max_y
+        min_x = min(min_x, x)
+        min_y = min(min_y, y)
+        max_x = max(max_x, x)
+        max_y = max(max_y, y)
 
-def _render_wires(anchors: list[PinAnchor], port_labels: dict[str, tuple[float, float, str]]) -> str:
-    by_net: dict[str, list[PinAnchor]] = {}
-    for a in anchors:
-        by_net.setdefault(a.net, []).append(a)
+    for inst in layout.instances:
+        grow(inst["x"], inst["y"])
+        grow(inst["x"] + inst["w"], inst["y"] + inst["h"])
 
-    elems: list[str] = []
-    for net, pts in sorted(by_net.items()):
-        if net in (PWR_VCC, PWR_GND):
-            continue
-        color = "#d29922" if _is_control_net(net) else _net_color(net)
-        if len(pts) == 1:
-            p = pts[0]
-            elems.append(
-                f'<g class="net orphan" data-net="{_esc(net)}">'
-                f'<circle class="net-hub" data-net="{_esc(net)}" cx="{p.x:.1f}" cy="{p.y:.1f}" r="3" fill="{color}"/>'
-                f'<text class="net-label lbl-net" data-net="{_esc(net)}" x="{p.x:.1f}" y="{p.y - 6:.1f}" '
-                f'text-anchor="middle">{_esc(net)}</text></g>'
-            )
-            continue
-        cx = sum(p.x for p in pts) / len(pts)
-        cy = sum(p.y for p in pts) / len(pts)
-        elems.append(f'<g class="net" data-net="{_esc(net)}">')
-        elems.append(
-            f'<circle class="net-hub" data-net="{_esc(net)}" cx="{cx:.1f}" cy="{cy:.1f}" r="3" fill="{color}" opacity="0.9"/>'
-        )
-        for p in pts:
-            poly = _route_polyline(p.x, p.y, cx, cy, p.side)
-            elems.append(
-                f'<polyline class="wire-hit" data-net="{_esc(net)}" data-ref="{_esc(p.ref)}" '
-                f'points="{poly}"/>'
-            )
-            elems.append(
-                f'<polyline class="wire-seg" data-net="{_esc(net)}" data-ref="{_esc(p.ref)}" '
-                f'points="{poly}" fill="none" stroke="{color}" stroke-width="1.2" opacity="0.55"/>'
-            )
-        elems.append(
-            f'<text class="net-label lbl-net" data-net="{_esc(net)}" x="{cx:.1f}" y="{cy - 6:.1f}" '
-            f'text-anchor="middle">{_esc(net)}</text>'
-        )
-        elems.append("</g>")
-    return "\n".join(elems)
+    for x, y, _side in port_labels.values():
+        grow(x - 40, y - 20)
+        grow(x + 40, y + 20)
+
+    for paths in routes.values():
+        for path in paths:
+            for x, y in path:
+                grow(x, y)
+
+    pad = MARGIN
+    return min_x - pad, min_y - pad, max_x + pad, max_y + pad
 
 
 def render_alu8_schematic_svg(
@@ -394,52 +107,84 @@ def render_alu8_schematic_svg(
     port_names: set[str] | None = None,
 ) -> tuple[str, float, float]:
     layout = layout_alu8_schematic(netlist, port_names=port_names)
+    tmpl: Alu8Template = layout.template or _get_tmpl()
     ports = port_names or set()
-    port_labels = _port_label_positions(ports)
+    port_labels = port_label_positions(tmpl, ports)
 
-    wire_svg = _render_wires(layout.anchors, port_labels)
-    sym_svg = "\n".join(_render_symbol(inst) for inst in layout.instances)
+    by_net: dict[str, list[PinAnchor]] = {}
+    for anchor in layout.anchors:
+        by_net.setdefault(anchor.net, []).append(anchor)
+
+    routes = route_all(by_net, tmpl, layout.instances, ports)
+    _, bus_rails, _, _ = build_route_assignments(by_net, tmpl, ports)
+
+    wire_svg = render_wires(routes, bus_rails)
+    sym_svg = "\n".join(render_symbol(inst, tmpl) for inst in layout.instances)
     label_svg = "\n".join(
-        _render_global_label(net, x, y, side) for net, (x, y, side) in port_labels.items()
+        render_global_label(net, x, y, side, dashed=(net in ORPHAN_PORTS))
+        for net, (x, y, side) in port_labels.items()
     )
+
+    min_x, min_y, max_x, max_y = _route_bounds(layout, routes, port_labels)
+    width = max_x - min_x
+    height = max_y - min_y
 
     power_svg = ""
     if any(n["name"] in (PWR_VCC, PWR_GND) for n in netlist.get("nets", [])):
         power_svg = (
-            f'<line class="pwr-rail" x1="{MARGIN:.1f}" y1="{MARGIN - 12:.1f}" '
-            f'x2="{layout.width - MARGIN:.1f}" y2="{MARGIN - 12:.1f}" stroke="#f85149" stroke-width="1" opacity="0.4"/>'
-            f'<text class="lbl-pwr" x="{MARGIN:.1f}" y="{MARGIN - 16:.1f}" fill="#f85149">VCC</text>'
-            f'<line class="pwr-rail" x1="{MARGIN:.1f}" y1="{layout.height - MARGIN + 12:.1f}" '
-            f'x2="{layout.width - MARGIN:.1f}" y2="{layout.height - MARGIN + 12:.1f}" stroke="#8b949e" stroke-width="1" opacity="0.4"/>'
-            f'<text class="lbl-pwr" x="{MARGIN:.1f}" y="{layout.height - MARGIN + 24:.1f}" fill="#8b949e">GND</text>'
+            f'<line class="pwr-rail" x1="{min_x + MARGIN:.1f}" y1="{min_y + MARGIN - 12:.1f}" '
+            f'x2="{max_x - MARGIN:.1f}" y2="{min_y + MARGIN - 12:.1f}" '
+            f'stroke="#f85149" stroke-width="1" opacity="0.4"/>'
+            f'<text class="lbl-pwr" x="{min_x + MARGIN:.1f}" y="{min_y + MARGIN - 16:.1f}" fill="#f85149">VCC</text>'
+            f'<line class="pwr-rail" x1="{min_x + MARGIN:.1f}" y1="{max_y - MARGIN + 12:.1f}" '
+            f'x2="{max_x - MARGIN:.1f}" y2="{max_y - MARGIN + 12:.1f}" '
+            f'stroke="#8b949e" stroke-width="1" opacity="0.4"/>'
+            f'<text class="lbl-pwr" x="{min_x + MARGIN:.1f}" y="{max_y - MARGIN + 24:.1f}" fill="#8b949e">GND</text>'
         )
 
-    style = """
-    svg{-webkit-user-select:none;user-select:none}
-    text{font-family:system-ui,sans-serif;pointer-events:none;user-select:none}
-    .lbl-ref{font-size:9px;font-weight:600;fill:#e6edf3}
-    .lbl-part{font-size:7px;fill:#8b949e}
-    .lbl-pin{font-size:7px;fill:#c9d1d9}
-    .lbl-net{font-size:7px;fill:#8b949e;opacity:.85}
-    .lbl-global{font-size:8px;font-weight:600}
-    .wire-hit{fill:none;stroke:transparent;stroke-width:8;cursor:pointer}
-    .net.highlight .wire-seg{stroke-width:2.2;opacity:1}
-    .net.highlight .net-hub{r:5}
-    .symbol.highlight .sym-body{stroke:#f0883e;stroke-width:2}
-    """
+    grid_svg = render_grid(min_x, min_y, max_x, max_y)
 
     svg = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {layout.width:.0f} {layout.height:.0f}" '
-        f'width="{layout.width:.0f}" height="{layout.height:.0f}">'
-        f"<style>{style}</style>"
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{min_x:.0f} {min_y:.0f} {width:.0f} {height:.0f}" '
+        f'width="{width:.0f}" height="{height:.0f}">'
+        f"<style>{svg_styles()}</style>"
         f'<rect width="100%" height="100%" fill="#0d1117"/>'
+        f"{grid_svg}"
         f"{power_svg}"
         f"{wire_svg}"
         f"{sym_svg}"
         f"{label_svg}"
         f"</svg>"
     )
-    return svg, layout.width, layout.height
+    return svg, width, height
+
+
+def collect_routed_segments(
+    layout: SchematicLayout,
+    *,
+    port_names: set[str] | None = None,
+) -> tuple[dict[float, set[str]], dict[float, set[str]]]:
+    tmpl: Alu8Template = layout.template or _get_tmpl()
+    ports = port_names or set()
+    by_net: dict[str, list[PinAnchor]] = {}
+    for anchor in layout.anchors:
+        by_net.setdefault(anchor.net, []).append(anchor)
+
+    routes = route_all(by_net, tmpl, layout.instances, ports)
+    horiz: dict[float, set[str]] = {}
+    vert: dict[float, set[str]] = {}
+    for net, paths in routes.items():
+        for path in paths:
+            if len(path) < 2:
+                continue
+            for i in range(len(path) - 1):
+                x0, y0 = path[i]
+                x1, y1 = path[i + 1]
+                if y0 == y1:
+                    horiz.setdefault(y0, set()).add(net)
+                if x0 == x1:
+                    vert.setdefault(x0, set()).add(net)
+    return horiz, vert
 
 
 def net_anchor_map(layout: SchematicLayout) -> dict[str, list[PinAnchor]]:
@@ -447,3 +192,24 @@ def net_anchor_map(layout: SchematicLayout) -> dict[str, list[PinAnchor]]:
     for a in layout.anchors:
         out.setdefault(a.net, []).append(a)
     return out
+
+
+def collect_all_routes(
+    layout: SchematicLayout,
+    port_names: set[str] | None = None,
+) -> dict[str, list[list[tuple[float, float]]]]:
+    tmpl: Alu8Template = layout.template or _get_tmpl()
+    ports = port_names or set()
+    by_net: dict[str, list[PinAnchor]] = {}
+    for anchor in layout.anchors:
+        by_net.setdefault(anchor.net, []).append(anchor)
+    return route_all(by_net, tmpl, layout.instances, ports)
+
+
+def wires_avoid_chips(layout: SchematicLayout, port_names: set[str] | None = None) -> bool:
+    routes = collect_all_routes(layout, port_names)
+    obstacles = chip_obstacles(layout.instances)
+    for paths in routes.values():
+        if paths_hit_obstacles(paths, obstacles):
+            return False
+    return True
