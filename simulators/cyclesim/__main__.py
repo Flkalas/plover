@@ -7,14 +7,11 @@ import sys
 from pathlib import Path
 
 from simulators.cyclesim.export.alu8_netlist import export_alu8_func
-from simulators.cyclesim.export.block_viewer import export_alu8_block_viewer
 from simulators.cyclesim.program import ProgramRunner
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 CYCLESIM_ROOT = Path(__file__).resolve().parent
-REPO_ROOT = CYCLESIM_ROOT.parents[1]
 DEFAULT_BUILD = CYCLESIM_ROOT / "build"
-DEFAULT_HTML_OUT = REPO_ROOT / "viewers" / "cyclesim-block" / "alu8_func" / "index.html"
 
 
 def cmd_run(args: argparse.Namespace) -> int:
@@ -37,23 +34,26 @@ def cmd_run(args: argparse.Namespace) -> int:
 def cmd_test(_: argparse.Namespace) -> int:
     import pytest
 
-    tests = Path(__file__).resolve().parent / "tests"
-    return pytest.main([str(tests), "-q"])
+    cyclesim_tests = Path(__file__).resolve().parent / "tests"
+    return pytest.main([str(cyclesim_tests), "-q"])
 
 
 def cmd_export_alu8(args: argparse.Namespace) -> int:
     out = Path(args.output) if args.output else DEFAULT_BUILD / "alu8_func.yaml"
     units = Path(args.units) if args.units else DEFAULT_BUILD / "alu8_func.units.yaml"
+    schematic = (
+        Path(args.schematic) if args.schematic else DEFAULT_BUILD / "alu8_func.schematic.yaml"
+    )
     if args.no_units:
         units = None
-    nl, up = export_alu8_func(out, units)
+    if args.no_schematic:
+        schematic = None
+    nl, up, sc = export_alu8_func(out, units, schematic)
     print(f"wrote {nl}")
     if up:
         print(f"wrote {up}")
-    if args.html:
-        html_path = Path(args.html_out) if args.html_out else DEFAULT_HTML_OUT
-        viewer = export_alu8_block_viewer(html_path)
-        print(f"wrote {viewer}")
+    if sc:
+        print(f"wrote {sc}")
     return 0
 
 
@@ -78,8 +78,11 @@ def main(argv: list[str] | None = None) -> int:
     alu_p.add_argument("-o", "--output", help="Netlist YAML path")
     alu_p.add_argument("--units", help="Units catalog YAML path")
     alu_p.add_argument("--no-units", action="store_true", help="Skip units file")
-    alu_p.add_argument("--html", action="store_true", help="Also write block viewer HTML")
-    alu_p.add_argument("--html-out", help="Block viewer HTML path (default: viewers/cyclesim-block/alu8_func/index.html)")
+    alu_p.add_argument(
+        "--schematic",
+        help="Schematic layout YAML path (default: build/alu8_func.schematic.yaml)",
+    )
+    alu_p.add_argument("--no-schematic", action="store_true", help="Skip schematic file")
     alu_p.set_defaults(func=cmd_export_alu8)
 
     args = parser.parse_args(argv)
