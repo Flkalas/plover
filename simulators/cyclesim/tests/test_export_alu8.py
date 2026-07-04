@@ -62,13 +62,16 @@ def test_units_catalog() -> None:
 def test_dump_and_export_files(tmp_path: Path) -> None:
     nl_path = tmp_path / "alu8_func.yaml"
     units_path = tmp_path / "alu8_func.units.yaml"
-    export_alu8_func(nl_path, units_path)
+    sc_path = tmp_path / "alu8_func.schematic.yaml"
+    export_alu8_func(nl_path, units_path, sc_path)
     text = nl_path.read_text(encoding="utf-8")
     assert "74HC153" in text
     assert "1C0" in text
     assert "net_bctrl0" in text
     assert "block: alu8_func" in text
+    assert "port_groups:" not in text
     assert units_path.read_text(encoding="utf-8").count("package_ref:") == 12
+    assert "template: alu8_row_grid" in sc_path.read_text(encoding="utf-8")
 
 
 def test_write_roundtrip_keys(tmp_path: Path) -> None:
