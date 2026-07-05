@@ -18,13 +18,46 @@ $Fitter = Join-Path $DestDir "Fitters\fit1504.exe"
 $InnounpZipUrl = "https://rathlev-home.de/tools/download/innounp-2.zip"
 $InnounpDir = Join-Path $Root "innounp-2"
 
+$BundleZipUrl = "https://ww1.microchip.com/downloads/aemDocuments/documents/MPD/SoftwareLibrary/WinCUPL_II_v1_1_0.zip"
+$BundleZipFile = "WinCUPL_II_v1_1_0.zip"
+
 $BundleZipNames = @(
-    "WinCUPL_II_v1_1_0.zip",
+    $BundleZipFile,
     "WinCUPL_II_v1.1.0.zip",
     "wincupl.zip"
 )
 
 $DownloadPage = "https://www.microchip.com/en-us/development-tool/WINCUPL"
+
+function Remove-WincuplSetupTemp {
+    param([string]$Root)
+    $paths = @(
+        "innounp-2",
+        "innounp-2.zip",
+        "innounp050.rar",
+        "innoextract-1.9",
+        "innoextract-1.9-windows.zip",
+        "7zr.exe"
+    )
+    foreach ($name in $paths) {
+        $p = Join-Path $Root $name
+        if (Test-Path $p) {
+            Remove-Item $p -Recurse -Force -ErrorAction SilentlyContinue
+            Write-Host "Removed setup temp: $name"
+        }
+    }
+    foreach ($name in $BundleZipNames) {
+        $p = Join-Path $Root $name
+        if (Test-Path $p) {
+            Remove-Item $p -Force -ErrorAction SilentlyContinue
+            Write-Host "Removed setup temp: $name"
+        }
+    }
+    Get-ChildItem -Path $Root -Directory -Filter "_wincupl_*" -ErrorAction SilentlyContinue | ForEach-Object {
+        Remove-Item $_.FullName -Recurse -Force
+        Write-Host "Removed setup temp: $($_.Name)"
+    }
+}
 
 function Find-WincuplRoot {
     param([string]$Base)
@@ -60,6 +93,25 @@ function Resolve-BundleZip {
         if (Test-Path $candidate) { return $candidate }
     }
     return $null
+}
+
+function Ensure-BundleZip {
+    $existing = Resolve-BundleZip
+    if ($existing) { return $existing }
+
+    $dest = Join-Path $Root $BundleZipFile
+    Write-Host "Downloading WinCUPL II v1.1.0 from Microchip ..."
+    Write-Host "  $BundleZipUrl"
+    try {
+        Invoke-WebRequest -Uri $BundleZipUrl -OutFile $dest -UseBasicParsing
+    } catch {
+        throw "WinCUPL download failed: $($_.Exception.Message)`nManual: $DownloadPage"
+    }
+    if (-not (Test-Path $dest)) { throw "WinCUPL download produced no file: $dest" }
+    $size = (Get-Item $dest).Length
+    if ($size -lt 1MB) { throw "WinCUPL download looks too small ($size bytes): $dest" }
+    Write-Host "Saved $BundleZipFile ($([math]::Round($size / 1MB, 1)) MB)"
+    return $dest
 }
 
 function Unpack-FromBundleZip {
@@ -111,6 +163,7 @@ function Publish-WincuplTree {
 }
 
 if ((Test-Path $Cupl) -and (Test-Path $Fitter) -and -not $Force) {
+    Remove-WincuplSetupTemp -Root $Root
     Write-Host "WinCUPL already ready: $DestDir"
     Write-Host "  cupl.exe    -> $Cupl"
     Write-Host "  fit1504.exe -> $Fitter"
@@ -121,27 +174,13 @@ if ($DestDir -match " ") {
     throw "WinCUPL path must not contain spaces: $DestDir"
 }
 
-$bundle = Resolve-BundleZip
-if (-not $bundle) {
-    Write-Host ""
-    Write-Host "WinCUPL bundle ZIP not found."
-    Write-Host ""
-    Write-Host "1. Download WinCUPL II v1.1.0 from:"
-    Write-Host "   $DownloadPage"
-    Write-Host "2. Copy WinCUPL_II_v1_1_0.zip to:"
-    Write-Host "     $Root"
-    Write-Host "     or $env:USERPROFILE\Downloads"
-    Write-Host "3. Re-run: ./install-wincupl.ps1"
-    Write-Host ""
-    Write-Host "The ZIP contains Setup.exe. This script unpacks it with innounp only."
-    Write-Host "Do NOT run Setup.exe or awincupl.exe (installers may reboot)."
-    exit 1
-}
-
+$bundle = Ensure-BundleZip
 Unpack-FromBundleZip -Archive $bundle
 
 if (-not (Test-Path $Cupl)) { throw "Missing $Cupl after unpack" }
 if (-not (Test-Path $Fitter)) { throw "Missing $Fitter after unpack" }
+
+Remove-WincuplSetupTemp -Root $Root
 
 Write-Host ""
 Write-Host "OK: WinCUPL unpacked to $DestDir (no installer run)"

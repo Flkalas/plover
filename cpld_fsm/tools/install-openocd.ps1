@@ -11,7 +11,16 @@ $DestDir = Join-Path $Root $DirName
 $Ocd = Join-Path $DestDir "bin\openocd.exe"
 $ZipPath = Join-Path $Root $ZipName
 
+function Remove-OpenocdSetupTemp {
+    param([string]$Root, [string]$ZipPath)
+    if (Test-Path $ZipPath) {
+        Remove-Item $ZipPath -Force -ErrorAction SilentlyContinue
+        Write-Host "Removed setup temp: $(Split-Path -Leaf $ZipPath)"
+    }
+}
+
 if (Test-Path $Ocd) {
+    Remove-OpenocdSetupTemp -Root $Root -ZipPath $ZipPath
     Write-Host "OpenOCD already installed: $Ocd"
     exit 0
 }
@@ -27,5 +36,7 @@ Expand-Archive -Path $ZipPath -DestinationPath $Root -Force
 if (-not (Test-Path $Ocd)) {
     Write-Error "openocd.exe not found after extract (expected $Ocd)"
 }
+
+Remove-OpenocdSetupTemp -Root $Root -ZipPath $ZipPath
 
 Write-Host "OK: $Ocd"

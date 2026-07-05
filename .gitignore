@@ -28,6 +28,7 @@ archive/verilog-sim/web/dist/
 /cpld_fsm/tools/innoextract-1.9-windows.zip
 /cpld_fsm/tools/7zr.exe
 /cpld_fsm/tools/_wincupl_*/
+/cpld_fsm/tools/fit5_*/
 
 # cpld_fsm WinCUPL build artifacts
 /cpld_fsm/hdl/system_ctrl_gen.pld

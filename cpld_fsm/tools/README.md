@@ -15,12 +15,17 @@ cd cpld_fsm/tools
 
 Microchip's `WinCUPL_II_v1_1_0.zip` contains **Setup.exe** (Inno Setup), not a ready `Shared\` tree.
 
-`install-wincupl.ps1` unpacks `Setup.exe` with **innounp** (file extract only).  
+`install-wincupl.ps1` **downloads the bundle from Microchip** when it is not already in `tools/` or `Downloads/`, then unpacks `Setup.exe` with **innounp** (file extract only).  
 **Do not run Setup.exe** — installers may reboot the PC.
 
-1. Download [WinCUPL II v1.1.0](https://www.microchip.com/en-us/development-tool/WINCUPL) ZIP (browser).
-2. Copy `WinCUPL_II_v1_1_0.zip` to this folder or `Downloads`.
-3. Run `./install-wincupl.ps1` — files land in `wincupl-ii/` (gitignored).
+```powershell
+cd cpld_fsm/tools
+./install-wincupl.ps1   # auto-download + unpack → wincupl-ii/
+```
+
+Manual fallback (if download fails): [WinCUPL II v1.1.0](https://www.microchip.com/en-us/development-tool/WINCUPL) → copy ZIP to this folder or `Downloads`, re-run.
+
+Setup-only files (innounp, bundle ZIP under this folder, `_wincupl_*` staging) are **removed automatically** after a successful unpack.
 
 Requirements: **Windows**, path **without spaces**.
 
@@ -34,7 +39,7 @@ cd cpld_fsm/hdl
 ## OpenOCD install
 
 `install-openocd.ps1` downloads **xPack OpenOCD v0.12.0-7** (Windows x64) into this folder.  
-Extracted tree and zip are **gitignored** — run the script on each clone.
+Extracted tree is **gitignored** — run the script on each clone. The download ZIP is deleted after extract.
 
 Success: `Info : JTAG tap: ATF1504AS.tap tap/device found: 0x0150403f`
 
