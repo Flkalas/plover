@@ -33,6 +33,9 @@ archive/verilog-sim/web/dist/
 # cpld_fsm WinCUPL build artifacts
 /cpld_fsm/hdl/system_ctrl_gen.pld
 /cpld_fsm/hdl/system_ctrl_gen.*
+/cpld_fsm/hdl/ctrl_lut_csim.*
+/cpld_fsm/hdl/fit_last.log
+/cpld_fsm/hdl/csim_run.log
 /cpld_fsm/hdl/*.tt2
 /cpld_fsm/hdl/*.fit
 /cpld_fsm/hdl/*.doc

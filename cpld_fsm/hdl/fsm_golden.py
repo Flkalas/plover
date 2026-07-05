@@ -206,10 +206,17 @@ def csim_output_chars(expected: dict[str, bool]) -> list[str]:
     return ["H" if expected[sig] else "L" for sig in FSM_OUTPUT_SIGNALS]
 
 
-def format_csim_vector(opcode: int, phase: int, comment: str = "") -> str:
-    ins = " ".join(str(b) for b in csim_input_bits(opcode, phase))
+def format_csim_vector(
+    opcode: int,
+    phase: int,
+    comment: str = "",
+    *,
+    input_order: tuple[str, ...] = CSIM_INPUT_ORDER,
+) -> str:
+    env = sim_env(opcode, phase)
+    ins = " ".join(str(env[name]) for name in input_order)
     outs = " ".join(csim_output_chars(golden_for_opcode_phase(opcode, phase)))
-    line = f"{ins}  {outs};"
+    line = f"{ins}  {outs}"
     if comment:
         line += f"  /* {comment} */"
     return line

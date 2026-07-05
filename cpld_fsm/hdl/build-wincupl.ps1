@@ -61,8 +61,14 @@ Write-Host "CUPL compile $GenPld ..."
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host "FIT1504 $tt2 ..."
-& $Fitter $tt2 -CUPL -device PLCC44 -tech ATF1504AS -JTAG ON
+$fitLog = Join-Path $Root "fit_last.log"
+& $Fitter $tt2 -CUPL -device PLCC44 -tech ATF1504AS -JTAG ON 2>&1 | Tee-Object -FilePath $fitLog
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+$fitText = Get-Content $fitLog -Raw -ErrorAction SilentlyContinue
+if ($fitText -notmatch "Design fits") {
+    Write-Error "Fitter did not report Design fits — see $fitLog"
+}
 
 if (Test-Path $jed) {
     Copy-Item $jed $OutJed -Force
