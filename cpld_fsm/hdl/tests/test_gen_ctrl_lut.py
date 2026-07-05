@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 import subprocess
 import sys
 from pathlib import Path
@@ -12,6 +11,15 @@ import pytest
 from simulators.cyclesim.data.fsm_table import FSM_ROWS, active_idx5_slots
 
 HDL = Path(__file__).resolve().parents[1]
+REPO = HDL.parents[1]
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
+if str(HDL) not in sys.path:
+    sys.path.insert(0, str(HDL))
+
+from gen_ctrl_lut import idx5_minterm  # noqa: E402
+from sim_fsm_eval import load_ctrl_lut_equations  # noqa: E402
+
 GEN = HDL / "gen_ctrl_lut.py"
 LUT = HDL / "ctrl_lut.inc"
 
@@ -74,16 +82,18 @@ def test_codegen_idempotent() -> None:
 @pytest.mark.parametrize("row", FSM_ROWS, ids=lambda r: f"idx5={r.idx5}")
 def test_lut_contains_row(row) -> None:
     text = LUT.read_text(encoding="utf-8")
-    pat = format(row.idx5 & 0x7F, "07b")
+    equations = load_ctrl_lut_equations(LUT)
+    minterm = idx5_minterm(row.idx5)
     flags = _row_bools(row)
     active_any = any(flags.values())
     if active_any:
-        assert f"idx5 : 'b'{pat}" in text
+        assert minterm in text, f"missing minterm for idx5={row.idx5:02d}"
+    assert "FIELD idx5" not in text
+    assert "idx5 :" not in text
     for sig in BOOL_SIGNALS:
-        block = re.search(rf"{sig} = (.+);", text)
-        assert block, f"missing {sig} equation"
-        rhs = block.group(1)
+        assert sig in equations, f"missing {sig} equation"
+        rhs = equations[sig]
         if flags[sig]:
-            assert pat in rhs, f"{sig} missing idx5 {pat}"
-        elif rhs.strip() != "0":
-            assert pat not in rhs, f"{sig} should not include inactive idx5 {pat}"
+            assert minterm in rhs, f"{sig} missing minterm for idx5={row.idx5:02d}"
+        elif rhs.strip() not in ("0", "'b'0"):
+            assert minterm not in rhs, f"{sig} should not include inactive idx5={row.idx5:02d}"

@@ -30,8 +30,14 @@ def _eval_term(term: str, env: dict[str, int]) -> bool:
     return True
 
 
+def _normalize_rhs(rhs: str) -> str:
+    """Flatten CUPL .sim multi-line # continuations."""
+    flat = re.sub(r"\s+", " ", rhs.replace("\n", " ")).strip()
+    return re.sub(r"\s+#\s+", " # ", flat)
+
+
 def eval_rhs(rhs: str, env: dict[str, int]) -> bool:
-    rhs = rhs.strip()
+    rhs = _normalize_rhs(rhs)
     if rhs == "0":
         return False
     if rhs == "1":
@@ -74,8 +80,10 @@ def eval_signal(equations: dict[str, str], signal: str, env: dict[str, int]) -> 
 
 
 def parse_ctrl_lut(inc_text: str) -> dict[str, str]:
+    # Only join CUPL line-wrap continuations (4-space indent), not blank lines.
+    flat = re.sub(r"\n    ", " ", inc_text)
     equations: dict[str, str] = {}
-    for line in inc_text.splitlines():
+    for line in flat.splitlines():
         line = line.strip()
         if not line or line.startswith("/*") or line.startswith("FIELD"):
             continue
@@ -91,6 +99,15 @@ def load_ctrl_lut_equations(lut_path: Path) -> dict[str, str]:
 
 def idx5_from_opcode_phase(opcode: int, phase: int) -> int:
     return ((opcode & 0x1F) << 2) | (phase & 3)
+
+
+def opcode_phase_env(opcode: int, phase: int) -> dict[str, int]:
+    op = opcode & 0x1F
+    ph = phase & 3
+    env: dict[str, int] = {f"opc{i}": (op >> i) & 1 for i in range(5)}
+    env["ph0"] = ph & 1
+    env["ph1"] = (ph >> 1) & 1
+    return env
 
 
 def eval_ctrl_lut_rhs(rhs: str, idx5: int) -> bool:
@@ -112,4 +129,7 @@ def eval_ctrl_lut_signal(
 ) -> bool:
     if signal not in equations:
         raise KeyError(f"signal {signal} not in ctrl_lut")
-    return eval_ctrl_lut_rhs(equations[signal], idx5_from_opcode_phase(opcode, phase))
+    rhs = equations[signal]
+    if _IDX5_TERM.search(rhs):
+        return eval_ctrl_lut_rhs(rhs, idx5_from_opcode_phase(opcode, phase))
+    return eval_rhs(rhs, opcode_phase_env(opcode, phase))
