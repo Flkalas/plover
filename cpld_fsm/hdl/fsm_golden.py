@@ -95,6 +95,55 @@ def row_bools(row) -> dict[str, bool]:
     }
 
 
+def tfr_valid(opcode: int) -> bool:
+    return is_tfr_valid(opcode)
+
+
+def merge_lut_strobes(lut: dict[str, bool], opcode: int) -> dict[str, bool]:
+    """Apply system_ctrl.pld merge: reg_we_lut|TFR, w_sel mux, bctrl fanout."""
+    op = opcode & 0x1F
+    tfr = is_tfr_valid(opcode)
+    b0 = lut["bctrl0"]
+    b2 = lut["bctrl2"]
+    merged = {
+        "reg_we": lut["reg_we_lut"] or tfr,
+        "mem_rd": lut["mem_rd"],
+        "mem_wr": lut["mem_wr"],
+        "y_oe": lut["y_oe"],
+        "w_sel0": bool(tfr and ((op >> 2) & 1)) or (not tfr and lut["w_sel0_lut"]),
+        "w_sel1": bool(tfr and ((op >> 3) & 1)) or (not tfr and lut["w_sel1_lut"]),
+        "cin": lut["cin"],
+        "bctrl0": b0,
+        "bctrl1": b0,
+        "bctrl2": b2,
+        "bctrl3": b2,
+        "lgc0": lut["lgc0"],
+        "lgc1": lut["lgc1"],
+        "lgc2": lut["lgc2"],
+        "lgc3": lut["lgc3"],
+        "s0": lut["s0"],
+        "s1": lut["s1"],
+        "lut_pc_load": lut["lut_pc_load"],
+        "lut_pc_flg_z": lut["lut_pc_flg_z"],
+        "flg_we": lut["flg_we"],
+    }
+    return merged
+
+
+def merged_bools(opcode: int, phase: int) -> dict[str, bool]:
+    """LUT golden → PLD merge → merged pin strobes."""
+    return merge_lut_strobes(golden_for_opcode_phase(opcode, phase), opcode)
+
+
+def pc_load_at_macro_end(lut: dict[str, bool], flg_z: bool, macro_end: bool = True) -> bool:
+    """system_ctrl.pld: pc_load_en = macro_end & lut_pc_load & (!lut_pc_flg_z | flg_z)."""
+    if not macro_end or not lut["lut_pc_load"]:
+        return False
+    if lut["lut_pc_flg_z"]:
+        return flg_z
+    return True
+
+
 def cyclesim_bools(opcode: int, phase: int) -> dict[str, bool]:
     """Merged strobes as cyclesim CtrlLookup drives them."""
     from simulators.cyclesim.data.fsm_table import lookup_row

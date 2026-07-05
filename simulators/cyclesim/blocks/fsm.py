@@ -55,6 +55,25 @@ class CtrlLookup(Block):
         self.row = lookup_row(opcode, phase)
         return self.row
 
+    def _drive_all_low(self, ctx: SimContext) -> bool:
+        changed = False
+        changed |= ctx.drive("net_reg_we", L, self.name)
+        changed |= ctx.drive("net_mem_rd", L, self.name)
+        changed |= ctx.drive("net_mem_wr", L, self.name)
+        changed |= ctx.drive("net_y_oe", L, self.name)
+        changed |= ctx.drive("net_w_sel0", L, self.name)
+        changed |= ctx.drive("net_w_sel1", L, self.name)
+        changed |= ctx.drive("net_cin", L, self.name)
+        for i in range(4):
+            changed |= ctx.drive(f"net_bctrl{i}", L, self.name)
+            changed |= ctx.drive(f"net_lgc{i}", L, self.name)
+        changed |= ctx.drive("net_153_s0", L, self.name)
+        changed |= ctx.drive("net_153_s1", L, self.name)
+        changed |= ctx.drive("net_pc_load_en", L, self.name)
+        changed |= ctx.drive("net_pc_load_flg_z", L, self.name)
+        changed |= ctx.drive("net_flg_we", L, self.name)
+        return changed
+
     def eval_comb(self, ctx: SimContext) -> bool:
         if self.row is not None:
             r = self.row
@@ -79,7 +98,7 @@ class CtrlLookup(Block):
         op = sum((ctx.get(f"net_opc{i}") & 1) << i for i in range(5))
         ph = (ctx.get("net_ph0") & 1) | ((ctx.get("net_ph1") & 1) << 1)
         if not is_tfr_valid(op) or ph != 0:
-            return False
+            return self._drive_all_low(ctx)
         _src, dst = decode_tfr(op)
         changed = False
         changed |= ctx.drive("net_reg_we", H, self.name)
@@ -120,14 +139,15 @@ class XferMux(Block):
 
 
 class BranchAnd(Block):
-    """BEQ: PC_LOAD_EN gated by FLG_Z."""
+    """BEQ: PC_LOAD gated by FLG_Z at macro_end (system_ctrl.pld pc_load_en)."""
 
     def __init__(self, name: str = "branch_and") -> None:
         super().__init__(name)
 
     def eval_comb(self, ctx: SimContext) -> bool:
-        load = ctx.get("net_pc_load_en") & 1
-        if not load:
+        if not (ctx.get("net_macro_end") & 1):
+            return ctx.drive("net_pc_load", L, self.name)
+        if not (ctx.get("net_pc_load_en") & 1):
             return ctx.drive("net_pc_load", L, self.name)
         if ctx.get("net_pc_load_flg_z") & 1:
             z = ctx.get("net_flg_z") & 1
