@@ -52,6 +52,7 @@ Align with [cpld-system-controller.md](../hardware/cpld-system-controller.md) §
 - [ ] **No `alu8_decode`** on SoC breadboard
 - [ ] **3 GPR:** R0→`q_a`, R1→`q_b`, R2 via internal read for XFER
 - [ ] **Fitter:** WinCUPL reports **Design fits** on ATF1504AS
+- [ ] **Pre-flash gate:** local Tier 0–2 verification (codegen, pytest, CUPL `.sim`, csim LUT) complete per `cpld_fsm/hdl/README.md` — before first JTAG program
 - [ ] **Frozen table:** 20 idx5 slots match [M3a-control-store.md](M3a-control-store.md) §2 and committed `ctrl_lut.inc`
 
 ---

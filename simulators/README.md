@@ -34,23 +34,22 @@ Merge rules live in `cpld_fsm/hdl/system_ctrl.pld` (`tfr_valid`, `bctrl1=bctrl0`
 
 Golden: `simulators/cyclesim/data/{isa,fsm_table}.py`. Timing (2 MHz) is **bench-only** — not simulated.
 
-| Area | fsm_table | ctrl_lut.inc | CtrlLookup | CpuM3b e2e | Breadboard |
-|------|-----------|--------------|------------|------------|------------|
-| idx5 FSM (20 rows) | source | `test_gen_ctrl_lut` | `test_csim_fsm_table` | macro tests | M3a §4 |
-| TFR comb | — | LUT all-low vectors | `test_tfr_parity` | `test_tfr20`, `test_tfr_all_pairs` | M2a scope |
-| Merged strobes | — | LUT eval | `test_merged_strobe_parity` | — | M2a |
-| ALU macro ops | ALU rows | — | — | `test_alu8`, ADD/CMP ph1 | M1 |
-| Instruction fetch | — | — | — | `test_fetch_nets`, `test_fetch_ir_mbr` | M3b F1–F3 |
-| BEQ / JMP branch | rows | — | `test_merged_strobe_parity` | `test_beq_*`, `test_jmp_*`, fib | M3b F5 |
-| LDA / STA / CMP | rows | — | — | `test_m3b_mini`, CMP→ADD | M3b F4 |
-| LDIO / STIO | rows | — | — | `test_ldio_stio_mailbox` | M2b mailbox |
-| STA16 | rows | — | — | `test_sta16_abs16_store` | — |
-| RESET boot | — | — | — | `test_reset_boot_vector` | M3b F0 |
-| MAP_MODE / mailbox | — | — | — | `test_map_mode_*`, `test_mailbox_*` | M2b |
-| 2 MHz timing | — | — | — | — | scope |
+| Area | fsm_table | ctrl_lut.inc | CUPL .sim | csim LUT | CtrlLookup | CpuM3b e2e | Breadboard |
+|------|-----------|--------------|-----------|----------|------------|------------|------------|
+| idx5 FSM (20 rows) | source | `test_gen_ctrl_lut` | `test_sim_vs_golden` | `run_csim_lut.ps1` | `test_csim_fsm_table` | macro tests | M3a §4 |
+| TFR comb | — | LUT all-low | — | — | `test_tfr_parity` | `test_tfr20`, `test_tfr_all_pairs` | M2a scope |
+| Merged strobes | — | LUT eval | — | — | `test_merged_strobe_parity` | — | M2a |
+| ALU macro ops | ALU rows | — | — | — | — | `test_alu8`, ADD/CMP ph1 | M1 |
+| Instruction fetch | — | — | — | — | — | `test_fetch_nets`, `test_fetch_ir_mbr` | M3b F1–F3 |
+| BEQ / JMP branch | rows | — | — | — | `test_merged_strobe_parity` | `test_beq_*`, `test_jmp_*`, fib | M3b F5 |
+| LDA / STA / CMP | rows | — | — | — | — | `test_m3b_mini`, CMP→ADD | M3b F4 |
+| LDIO / STIO | rows | — | — | — | — | `test_ldio_stio_mailbox` | M2b mailbox |
+| STA16 | rows | — | — | — | — | `test_sta16_abs16_store` | — |
+| RESET boot | — | — | — | — | — | `test_reset_boot_vector` | M3b F0 |
+| MAP_MODE / mailbox | — | — | — | — | — | `test_map_mode_*`, `test_mailbox_*` | M2b |
+| 2 MHz timing | — | — | — | — | — | — | scope |
 
-Full regression:
+Full regression (local):
 
-```bash
-pytest simulators/cyclesim/tests cpld_fsm/hdl/tests -q
-```
+Pre-flash gate: [cpld_fsm/hdl/verify-cpld.ps1](../cpld_fsm/hdl/verify-cpld.ps1) (Windows + WinCUPL).  
+Python-only: `pytest simulators/cyclesim/tests cpld_fsm/hdl/tests -q`
