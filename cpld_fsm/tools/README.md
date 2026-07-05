@@ -6,16 +6,37 @@ Probe and (later) flash **ATF1504AS-10JU44** via Adafruit-style **FT232H** and x
 
 ```powershell
 cd cpld_fsm/tools
-./install-openocd.ps1
+./install-wincupl.ps1    # CUPL + FIT1504 (build JED)
+./install-openocd.ps1    # JTAG probe / flash
 ./jtag-probe.ps1
 ```
 
-Success: `Info : JTAG tap: ATF1504AS.tap tap/device found: 0x0150403f`
+## WinCUPL (unpack only — no Setup.exe)
+
+Microchip's `WinCUPL_II_v1_1_0.zip` contains **Setup.exe** (Inno Setup), not a ready `Shared\` tree.
+
+`install-wincupl.ps1` unpacks `Setup.exe` with **innounp** (file extract only).  
+**Do not run Setup.exe** — installers may reboot the PC.
+
+1. Download [WinCUPL II v1.1.0](https://www.microchip.com/en-us/development-tool/WINCUPL) ZIP (browser).
+2. Copy `WinCUPL_II_v1_1_0.zip` to this folder or `Downloads`.
+3. Run `./install-wincupl.ps1` — files land in `wincupl-ii/` (gitignored).
+
+Requirements: **Windows**, path **without spaces**.
+
+After install:
+
+```powershell
+cd cpld_fsm/hdl
+./build-wincupl.ps1
+```
 
 ## OpenOCD install
 
 `install-openocd.ps1` downloads **xPack OpenOCD v0.12.0-7** (Windows x64) into this folder.  
 Extracted tree and zip are **gitignored** — run the script on each clone.
+
+Success: `Info : JTAG tap: ATF1504AS.tap tap/device found: 0x0150403f`
 
 ## FT232H driver (Windows)
 

@@ -18,8 +18,20 @@ archive/verilog-sim/web/dist/
 /cpld_fsm/tools/xpack-openocd-*/
 /cpld_fsm/tools/xpack-openocd-*.zip
 
+# cpld_fsm WinCUPL — unpack via cpld_fsm/tools/install-wincupl.ps1
+/cpld_fsm/tools/wincupl-ii/
+/cpld_fsm/tools/WinCUPL_II_v1_1_0.zip
+/cpld_fsm/tools/innounp-2/
+/cpld_fsm/tools/innounp-2.zip
+/cpld_fsm/tools/innounp050.rar
+/cpld_fsm/tools/innoextract-1.9/
+/cpld_fsm/tools/innoextract-1.9-windows.zip
+/cpld_fsm/tools/7zr.exe
+/cpld_fsm/tools/_wincupl_*/
+
 # cpld_fsm WinCUPL build artifacts
 /cpld_fsm/hdl/system_ctrl_gen.pld
+/cpld_fsm/hdl/system_ctrl_gen.*
 /cpld_fsm/hdl/*.tt2
 /cpld_fsm/hdl/*.fit
 /cpld_fsm/hdl/*.doc
