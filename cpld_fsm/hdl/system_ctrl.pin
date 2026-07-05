@@ -1,0 +1,20 @@
+# ProChip Designer pin lock — ATF1504AS-10JU44
+# Regenerate after fit; keep JTAG + CLK fixed.
+
+DEVICE ATF1504AS-10JU44
+
+# Dedicated / global
+PIN 1  = GCLR     ; INPUT ; HIGH
+PIN 2  = OE2      ; INPUT ; HIGH
+PIN 43 = CLK      ; INPUT ; GCLK
+PIN 44 = OE1      ; INPUT ; LOW
+
+# JTAG ISP (locked — wiring-flash.md)
+PIN 7  = TDI
+PIN 13 = TMS
+PIN 32 = TCK
+PIN 38 = TDO
+
+# --- User I/O: assign remaining ports in ProChip pin planner ---
+# VHDL top entity: system_ctrl (opc, d_in, flg_z, flg_c, q_a, q_b, strobes, ALU, pc_load_en)
+# Estimated MC ~38 / 64 — see fit_report.txt

@@ -1,0 +1,41 @@
+# Plover system_ctrl — Fit report
+
+| Field | Value |
+|-------|-------|
+| Device | ATF1504AS-10JU44 (PLCC-44, -10) |
+| Top | `system_ctrl` |
+| Tool | Microchip ProChip Designer (VHDL → Fit → JED) |
+| Date | 2026-07-06 |
+| Status | **Pre-fit estimate** (ProChip not in CI PATH) |
+| `system_ctrl.jed` | **Erased-fuse stub** from `gen_jed_stub.py` — replace after ProChip fit |
+
+## Macrocell budget (reference §11)
+
+| Block | Est. MC |
+|-------|---------|
+| GPR 3×8 + async R0/R1 read | ~26 |
+| idx5 LUT + phase + xfer + branch | ~12 |
+| **Total** | **~38** |
+| **Device limit** | **64** |
+| **Gate** | **PASS (estimate)** |
+
+## Fit checklist (local ProChip)
+
+1. New project → ATF1504AS / PLCC-44 / -10, **JTAG enabled**
+2. Add VHDL: `system_ctrl.vhd`, `gpr_3fixed.vhd`, `phase_sequencer.vhd`, `ctrl_lut.vhd`, `xfer_mux.vhd`, `branch_unit.vhd`
+3. Regenerate LUT: `python cpld_fsm/hdl/gen_ctrl_lut.py`
+4. Import / apply `system_ctrl.pin` (JTAG + CLK locked)
+5. **Fit** — confirm MC ≤ 64 in fitter report
+6. **Generate JED** → `system_ctrl.jed` (overwrite this tree)
+7. Sync pin planner export → `system_ctrl.pin` + `cpld_fsm/netlist/cpld_system_ctrl.yaml`
+
+## Software gate (no silicon)
+
+```text
+pytest simulators/cyclesim/tests/test_fsm_idx5.py simulators/cyclesim/tests/test_alu8.py
+python cpld_fsm/hdl/gen_ctrl_lut.py
+```
+
+## idx5 LUT
+
+26 active rows / 128 slots — source `simulators/cyclesim/data/fsm_table.py`, codegen `gen_ctrl_lut.py`.

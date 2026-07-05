@@ -1,0 +1,46 @@
+# Plover CPLD system_ctrl — logical netlist (pads: system_ctrl.pin)
+# Normative ports: reference/hardware/cpld-system-controller.md §2
+
+device: ATF1504AS-10JU44
+package: PLCC-44
+top: system_ctrl
+
+jtag_isp:
+  TDI: 7
+  TMS: 13
+  TCK: 32
+  TDO: 38
+
+dedicated:
+  CLK: { pin: 43, net: clk, function: GCLK1 }
+  GCLR: { pin: 1, tie: high }
+  OE1: { pin: 44, tie: low }
+  OE2: { pin: 2, tie: low }
+
+entity_ports:
+  inputs:
+    - { vhdl: clk,     net: clk,     width: 1 }
+    - { vhdl: opc,     net: opc,     width: 5, nets: [opc0, opc1, opc2, opc3, opc4] }
+    - { vhdl: d_in,    net: d_in,    width: 8 }
+    - { vhdl: flg_z,   net: flg_z,   width: 1 }
+    - { vhdl: flg_c,   net: flg_c,   width: 1 }
+  outputs:
+    - { vhdl: q_a,     net: q_a,     width: 8 }
+    - { vhdl: q_b,     net: q_b,     width: 8 }
+    - { vhdl: reg_we,  net: reg_we,  width: 1 }
+    - { vhdl: mem_rd,  net: mem_rd,  width: 1 }
+    - { vhdl: mem_wr,  net: mem_wr,  width: 1 }
+    - { vhdl: y_oe,    net: y_oe,    width: 1 }
+    - { vhdl: cin,     net: cin,     width: 1 }
+    - { vhdl: bctrl,   net: bctrl,   width: 4, nets: [bctrl0, bctrl1, bctrl2, bctrl3] }
+    - { vhdl: lgc,     net: lgc,     width: 4, nets: [lgc0, lgc1, lgc2, lgc3] }
+    - { vhdl: s0,      net: s0,      width: 1 }
+    - { vhdl: s1,      net: s1,      width: 1 }
+    - { vhdl: pc_load_en, net: pc_load_en, width: 1 }
+
+internal:
+  - w_sel
+  - phase
+  - idx5
+
+pin_lock_file: cpld_fsm/hdl/system_ctrl.pin
