@@ -10,7 +10,7 @@
 
 | Axis | Choice | Rationale |
 |------|--------|-----------|
-| Opcode | **`op_legacy`** core + **Extended `0x10–0x1F`** (TFR `0x10–0x15`) | 5-bit opcode field `[4:0]` |
+| Opcode | **`op_legacy`** core + **Extended `0x10–0x1F`** (TFR bit-field §2.2) | 5-bit opcode field `[4:0]` |
 | Index | **`idx5`** | CPLD FSM key `(opcode[4:0]<<2)\|phase` — **128 logical slots** |
 | Decode | **`dec_cpld_seq`** | Phase FSM in CPLD; **no `alu8_decode`** |
 | CPLD | **`cpld_3fixed`** | R0→A, R1→B; R2 via internal read for XFER |
@@ -49,8 +49,10 @@ Opcode field: **bits `[4:0]`** of the first instruction byte. Bits `[7:5]` are *
 
 | Range | Use |
 |-------|-----|
-| `0x10–0x15` | TFR (normative) |
-| `0x16–0x1F` | Reserved |
+| `0x11`, `0x12`, `0x14`, `0x16`, `0x18`, `0x19` | TFR (bit-field, normative) |
+| `0x10`, `0x13`, `0x15`, `0x17`, `0x1A–0x1F` | Reserved / invalid TFR |
+
+**TFR bit-field** (`opc[4]=1`): `opc[3:2]` = dst (00=R0, 01=R1, 10=R2), `opc[1:0]` = src; valid when src ≠ dst and neither field is `11₂`.
 
 ### 2.1 Core (`0x01–0x0F`)
 
@@ -70,16 +72,18 @@ Opcode field: **bits `[4:0]`** of the first instruction byte. Bits `[7:5]` are *
 | `0x0D` | CMP | R0 − imm; flags only |
 | `0x0F` | STA16 | Store abs16 (boot) |
 
-### 2.2 Implied transfer (`0x10–0x15`)
+### 2.2 Implied transfer (TFR bit-field)
 
 | Op | Mnemonic | Action |
 |----|----------|--------|
-| `0x10` | TFR01 | R0 ← R1 |
-| `0x11` | TFR02 | R0 ← R2 |
-| `0x12` | TFR10 | R1 ← R0 |
-| `0x13` | TFR12 | R1 ← R2 |
-| `0x14` | TFR20 | R2 ← R0 |
-| `0x15` | TFR21 | R2 ← R1 |
+| `0x11` | TFR01 | R0 ← R1 |
+| `0x12` | TFR02 | R0 ← R2 |
+| `0x14` | TFR10 | R1 ← R0 |
+| `0x16` | TFR12 | R1 ← R2 |
+| `0x18` | TFR20 | R2 ← R0 |
+| `0x19` | TFR21 | R2 ← R1 |
+
+Encoding: `opcode = 0x10 \| (dst << 2) \| src` with dst/src ∈ {0,1,2}, src ≠ dst.
 
 ### 2.3 Phase counts (CPLD FSM)
 
@@ -89,7 +93,7 @@ Opcode field: **bits `[4:0]`** of the first instruction byte. Bits `[7:5]` are *
 | LDA, LDIO | 2 | MEM_LD |
 | STA, STIO, STA16 | 2 | MEM_ST |
 | CMP | 3 | ALU_REG (flags_only) |
-| TFR `0x10–0x15` | 1 | XFER |
+| TFR (6 opcodes §2.2) | 1 | XFER (comb decode, not idx5 LUT row) |
 | BEQ | 2 | BEQ |
 | JMP, HALT, CALL, RET | 1 | BRANCH |
 
@@ -104,7 +108,7 @@ Opcode field: **bits `[4:0]`** of the first instruction byte. Bits `[7:5]` are *
 | Operand address | **MBR** from fetch (no PARAM) |
 | ALU / bus strobes | FSM registered outputs per §4 |
 
-Verify: frozen FSM table in [M3a-control-store.md](../hw-bringup/M3a-control-store.md) §2 (2026-07-04 PASS).
+Verify: frozen FSM table in [M3a-control-store.md](../hw-bringup/M3a-control-store.md) §2 (2026-07-06, 20 rows).
 
 ---
 
@@ -116,10 +120,11 @@ Summary:
 
 | Template | Key strobes |
 |----------|-------------|
-| ALU_REG | ph0–1: Y_OE; ph2: REG_WE, w_sel=R2, FLG_WE |
+| ALU_REG (ADD) | ph0–1: Y_OE; ph1: **REG_WE**, w_sel=R1 (mandatory); ph2: REG_WE, w_sel=R2, FLG_WE |
+| ALU_REG (CMP) | ph0–1: same as ADD; ph2: **FLG_WE only** (flags_only — no REG_WE, no R2 latch) |
 | MEM_LD | ph0: MEM_RD; ph1: REG_WE, w_sel=R0 |
 | MEM_ST | ph0: Y_OE; ph1: MEM_WR |
-| XFER | ph0: REG_WE, w_sel=dst |
+| XFER | ph0: REG_WE, w_sel=dst; src via internal opcode mux |
 | BEQ | ph0: ALU SUB; end: PC_LOAD_EN<=FLG_Z |
 | JMP | end: PC_LOAD_EN<=1 |
 
@@ -129,21 +134,23 @@ Summary:
 
 | Template | Phase | `w_sel` |
 |----------|-------|---------|
-| ALU_REG | ph2 | R2 |
+| ALU_REG (ADD) | ph2 | R2 |
+| ALU_REG (ADD/CMP) | ph1 | R1 (**REG_WE mandatory** — imm8 operand latch) |
 | MEM_LD | ph1 | R0 |
-| XFER | ph0 | opcode→dst |
-| ADD imm | ph0/1 | R1 (optional) |
+| XFER | ph0 | opcode bit-field → dst (`opc[3:2]`) |
 
 ### XFER opcode → (src, dst)
 
+Bit-field: src = `opc[1:0]`, dst = `opc[3:2]`.
+
 | Opcode | src | dst |
 |--------|-----|-----|
-| TFR01 `0x10` | R1 | R0 |
-| TFR02 `0x11` | R2 | R0 |
-| TFR10 `0x12` | R0 | R1 |
-| TFR12 `0x13` | R2 | R1 |
-| TFR20 `0x14` | R0 | R2 |
-| TFR21 `0x15` | R1 | R2 |
+| TFR01 `0x11` | R1 | R0 |
+| TFR02 `0x12` | R2 | R0 |
+| TFR10 `0x14` | R0 | R1 |
+| TFR12 `0x16` | R2 | R1 |
+| TFR20 `0x18` | R0 | R2 |
+| TFR21 `0x19` | R1 | R2 |
 
 ---
 
@@ -183,6 +190,8 @@ P1 `DECODE_BYPASS` — not normative SoC path.
 
 | Date | Note |
 |------|------|
+| 2026-07-06 | ALU_REG ADD vs CMP ph2 split; mandatory ph1 REG_WE for ADD/CMP |
 | 2026-06-24 | idx5 FSM decode; ISA `[4:0]`; per-phase strobes; operand datapath |
-| 2026-06-24 | FSM-only; TFR `0x10–0x15`; `0x0C` reserved |
+| 2026-07-06 | TFR bit-field opcodes; idx5 20 rows; `tfr_valid` comb |
+| 2026-06-24 | FSM-only; TFR bit-field; `0x0C` reserved |
 | 2026-06-10 | v1.0 archived |

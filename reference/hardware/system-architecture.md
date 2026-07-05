@@ -3,7 +3,7 @@
 **Version:** 1.0 (pre-release) · **Date:** 2026-06-24  
 **Status:** Active normative specification (breadboard)
 
-**v1.0:** FSM-only **idx5** control, 3×GPR in CPLD, Extended TFR `0x10–0x15`, Flash `$4000` unused.
+**v1.0:** FSM-only **idx5** control, 3×GPR in CPLD, Extended TFR bit-field (§ [microcode-spec.md](hardware/microcode-spec.md) §2.2), Flash `$4000` unused.
 
 ---
 
@@ -13,8 +13,8 @@
 |------|---------------|
 | **CPU** | 8-bit TTL datapath: custom ALU (74HC, 12 DIP) + **3×GPR in ATF1504** (R0→A, R1→B, R2=result) |
 | **Control** | **FSM-only (idx5)** — `(opcode[4:0]<<2)\|phase` in CPLD; **no Flash CW**; **no `alu8_decode`** |
-| **ISA** | Opcode **`[4:0]`**; core `0x01–0x0F` + **Extended `0x10–0x1F`** (TFR `0x10–0x15`); `0x0C` reserved |
-| **System CPLD** | **ATF1504AS-10JU44** — GPR + idx5 sequencer (~38 MC) |
+| **ISA** | Opcode **`[4:0]`**; core `0x01–0x0F` + **Extended TFR** (`0x11`,`0x12`,`0x14`,`0x16`,`0x18`,`0x19`); `0x0C` reserved |
+| **System CPLD** | **ATF1504AS-10JU44** — GPR + idx5 sequencer (64 MC device) |
 | **CE decode** | **74HC138×2** + **74HC08/32/04** glue → RAM/ROM `/CE` (unchanged) |
 | **Flags / branch** | **574×1 FLG** (Z/C) + CPLD `PC_LOAD_EN` |
 | **RAM** | **2× IS62C256AL** — 64 KB via **A15** bank |
@@ -29,7 +29,7 @@
 | DIP (control path) | 31 | **20** (−11) |
 | Critical delay | 151 ns | **153 ns** (INC Y) |
 | Flash CW rows | 23 per-phase | **0** (FSM-only) |
-| CPLD MC | ~40 | **~38** |
+| idx5 LUT rows | — | **20 active** (+ comb TFR) |
 
 ---
 
@@ -80,7 +80,7 @@ CPLD `ATF1504AS-10JU44` + PLCC→DIP (#15); Flash `SST39SF010A-70-4C-PHE` PDIP �
 | Document | Content |
 |----------|---------|
 | [memory-map.md](memory-map.md) | Address map, 138×2 + gate decode |
-| [cpld-system-controller.md](cpld-system-controller.md) | CPLD GPR+idx5 FSM (~38 MC) |
+| [cpld-system-controller.md](cpld-system-controller.md) | CPLD GPR+idx5 FSM |
 | [microcode-spec.md](microcode-spec.md) | FSM-only ISA, idx5 |
 | [hw-bringup/README.md](../hw-bringup/README.md) | M1–M5 breadboard bring-up |
 | [hw-bringup/breadboard-wiring.md](../hw-bringup/breadboard-wiring.md) | SoC wiring (no decode block) |

@@ -21,7 +21,7 @@ This document is the **single normative reference** for who decodes what on the 
   Flash ROM          CPLD (idx5 FSM)              74HC off-CPLD
   program bytes  IR ──► macro phases ──┬──► bctrl/cin/lgc/y_mux ──► alu8 (12 DIP)
   boot, vector       GPR R0→A, R1→B    ├──► MEM_RD/WR, Y_OE
-  $4000 unused       ~38 MC             └──► PC_LOAD_EN
+  $4000 unused       CPLD FSM          └──► PC_LOAD_EN
   A[15:0] ─────────────────────────────────────► 138×2 ──► /CE
 ```
 
@@ -41,11 +41,11 @@ Flash holds **what to execute** (opcodes and immediates). It does **not** supply
 
 ### CPLD (ATF1504)
 
-| Function | Est. MC |
-|----------|---------|
-| GPR 24 FF + fixed async read (R0→`q_a`, R1→`q_b`) | ~26 |
-| idx5 FSM + ALU ctrl outputs + branch + XFER internal read | ~12 |
-| **Total** | **~38 / 64** |
+| Function | Role |
+|----------|------|
+| GPR 24 FF + fixed async read (R0→`q_a`, R1→`q_b`) | Sequenced macros |
+| idx5 FSM + ALU ctrl outputs + branch + comb TFR | Per-phase strobes |
+| **Fitter gate** | WinCUPL **Design fits** on ATF1504AS (64 MC device rating) |
 
 FSM index (internal only):
 
@@ -54,6 +54,8 @@ fsm_index[6:0] = (opcode[4:0] << 2) | phase[1:0]
 ```
 
 Each active slot drives registered strobes for that macro phase. ALU settings for ADD/SUB/CMP/NOP are **constants in the FSM row**, not a separate 12-opcode combinational decoder.
+
+**ADD vs CMP ph2:** ADD ph2 asserts REG_WE→R2; CMP ph2 is **flags_only** (FLG_WE, no REG_WE). Both require **mandatory REG_WE on ph1** (imm8→R1). See [cpld-system-controller.md](cpld-system-controller.md) §7.
 
 **Not in CPLD:** memory `/CE`, mailbox MAP, `FETCH` addr mux (off-chip glue). See [memory-map.md](memory-map.md).
 
@@ -90,7 +92,7 @@ The `alu8_decode` netlist block remains in the repository for **isolated ALU ver
 
 ## 5. What is *not* a separate CPLD “ALU decode” block
 
-A standalone **4-bit `alu_sel` → 12-opcode** combinational decoder (SOP ~70 gates or HC154 glue) would cost roughly **~24 macrocell product terms** if folded into the CPLD — on top of the ~38 MC FSM budget. v1.0 avoids this by:
+A standalone **4-bit `alu_sel` → 12-opcode** combinational decoder (SOP ~70 gates or HC154 glue) would cost significant CPLD product-term budget if folded into the SoC FSM. v1.0 avoids this by:
 
 1. FSM rows hard-code ALU controls for macro ops (ADD, SUB, CMP, NOP only).
 2. Full 12-opcode truth table stays on **74HC ALU** (M1) or in simulation fixtures.
@@ -100,6 +102,17 @@ Do not conflate **“decode in CPLD”** (macro FSM) with **`alu8_decode` comb b
 ---
 
 ## 6. Document index
+
+### Truth cascade (edit order)
+
+| Tier | Path | Role |
+|------|------|------|
+| **Root** | [plover-whitepaper.md](../../plover-whitepaper.md) §6 | ISA / FSM narrative |
+| **Reference** | [microcode-spec.md](microcode-spec.md), [M3a](../hw-bringup/M3a-control-store.md) §2 | Normative detail + frozen idx5 table |
+| **Machine** | `simulators/cyclesim/data/isa.py`, `fsm_table.py` | Executable golden |
+| **CPLD** | `gen_ctrl_lut.py` → `ctrl_lut.inc`; hand `system_ctrl.pld` (`tfr_valid`) | Bitstream source |
+
+**Strobe layers:** LUT/csim tests use `reg_we_lut`, `w_sel*_lut` (18 signals). Bench/cyclesim merged pins use `reg_we`, `w_sel*`. Reference §7 tables describe merged behavior.
 
 | Topic | Document |
 |-------|----------|
@@ -116,4 +129,5 @@ Do not conflate **“decode in CPLD”** (macro FSM) with **`alu8_decode` comb b
 
 | Date | Note |
 |------|------|
+| 2026-07-06 | Truth cascade (whitepaper root); strobe layer note |
 | 2026-07-04 | Initial anchor: FSM-only v1.0, bctrl naming, INC=cin, M1 vs SoC decode split |

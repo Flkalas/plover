@@ -34,7 +34,7 @@
 | 평가 범주 | 시스템 구현자 대상 질문 | 컴파일러 구현 시 요구 근거 | v1.0 답변 | 근거·비고 |
 |-----------|-------------------------|---------------------------|-----------|-----------|
 | 레지스터 | **16비트 포인터**를 담을 **전용 포인터 레지스터** 또는 **8비트 레지스터 쌍(Register Pair)** 이 존재합니까? | 8비트 데이터 버스에서 64 KiB 주소 공간 탐색·포인터 변수 할당 | **부분** | **PC·MBR**는 16비트(574+161)이나 **페치/버스 전용** — 프로그램이 일반 포인터로 쓸 수 없음 ([system-architecture.md](../hardware/system-architecture.md)). normative GPR **R0–R2** (3fixed); **R3 미사용**. 16비트 값은 **RAM 셀 2바이트** 또는 다중 `LDA`/`STA`/`STA16`로 처리. **비실기:** reserved opcode namespace only|
-| 레지스터 | 누산기 외 **범용 레지스터 3~4개 이상**이 확보되어 있습니까? | 레지스터 스필링·메모리 접근 감소, 최적화된 코드 생성 | **부분** | CPLD **R0–R2** 3×8비트 (3fixed read: R0→A, R1→B) ([cpld-system-controller.md](../hardware/cpld-system-controller.md)). **ADD** 고정 **R0,R1→R2**. **레지스터 간 복사**는 implied **TFR `0x10–0x15`** (1바이트, 피연산자 없음); **`0x0C` (구 MOV) reserved**. 대부분 연산·`LDA`/`STA`는 **R0 중심(ACC형)**. [calling-convention-v0.1.md](calling-convention-v0.1.md): R0=인자/반환, R1=스크래치, R2=결과. |
+| 레지스터 | 누산기 외 **범용 레지스터 3~4개 이상**이 확보되어 있습니까? | 레지스터 스필링·메모리 접근 감소, 최적화된 코드 생성 | **부분** | CPLD **R0–R2** 3×8비트 (3fixed read: R0→A, R1→B) ([cpld-system-controller.md](../hardware/cpld-system-controller.md)). **ADD** 고정 **R0,R1→R2**. **레지스터 간 복사**는 implied **TFR** (`0x11`,`0x12`,`0x14`,`0x16`,`0x18`,`0x19`; 1바이트, 피연산자 없음); **`0x0C` (구 MOV) reserved**. 대부분 연산·`LDA`/`STA`는 **R0 중심(ACC형)**. [calling-convention-v0.1.md](calling-convention-v0.1.md): R0=인자/반환, R1=스크래치, R2=결과. |
 
 ---
 

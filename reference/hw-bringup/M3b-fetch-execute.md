@@ -41,7 +41,7 @@
 | LDIO/STIO | 2-byte | imm8 → MBR | MMIO decode on high nibble |
 | BEQ/JMP | 3-byte | abs16 LE → MBR+hi | macro_end PC_LOAD_EN |
 | ADD `01 imm` | PC, PC+1 | imm8 → R1 (ph0/1) | ALU_REG |
-| TFR `14` | PC only | — | XFER 1 phase |
+| TFR `18` | PC only | — | XFER comb 1 phase |
 
 RESET: **74HC157** → `$FFFC` → PC `$0000` (Boot).
 
@@ -62,6 +62,8 @@ RESET: **74HC157** → `$FFFC` → PC `$0000` (Boot).
 
 ## 4. 매크로 타임라인 (@ 2 MHz)
 
+**idx5 key:** decimal slot index `(opcode[4:0] << 2) | phase` — same numbers as [M3a-control-store.md](M3a-control-store.md) §2 (not hex).
+
 ```
 [fetch opcode+operand] → FSM ph0..N (idx5) → [branch or PC+=len]
 ```
@@ -70,9 +72,19 @@ RESET: **74HC157** → `$FFFC` → PC `$0000` (Boot).
 
 | phase | idx5 key | 동작 |
 |-------|----------|------|
-| 0 | `0x04` | R0→A; imm→R1 optional |
-| 1 | `0x05` | R1→B |
-| 2 | `0x06` | ADD → R2 |
+| 0 | 4 | R0→A; ALU ADD |
+| 1 | 5 | imm8→R1 (**REG_WE mandatory**); R1→B |
+| 2 | 6 | ADD → R2; FLG_WE |
+
+### CMP (`0x0D`)
+
+| phase | idx5 key | 동작 |
+|-------|----------|------|
+| 0 | 52 | R0→A; ALU CMP |
+| 1 | 53 | imm8→R1 (**REG_WE mandatory**); R1→B |
+| 2 | 54 | FLG_WE only — **R2 not written** |
+
+After CMP ph1, R1 holds the imm8 operand (required for a following ADD that reuses R1).
 
 ### LDA (`0x02`)
 
@@ -81,11 +93,11 @@ RESET: **74HC157** → `$FFFC` → PC `$0000` (Boot).
 | 0 | FETCH=0; MEM_RD @ MBR |
 | 1 | REG_WE → R0 |
 
-### TFR20 (`0x14`, 1 byte)
+### TFR20 (`0x18`, 1 byte)
 
-| phase | 동작 |
-|-------|------|
-| 0 | R2 ← R0 (XFER; idx5 `0x50`) |
+| phase | idx5 key | 동작 |
+|-------|----------|------|
+| 0 | 96 (inactive LUT) | R2 ← R0 via `tfr_valid` comb (not idx5 row) |
 
 ---
 

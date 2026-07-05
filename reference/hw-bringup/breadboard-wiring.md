@@ -2,7 +2,7 @@
 
 **Normative:** [system-architecture.md](../hardware/system-architecture.md) · [memory-map.md](../hardware/memory-map.md) · [cpld-system-controller.md](../hardware/cpld-system-controller.md)
 
-Single breadboard target — **v1.0 FSM-only (idx5)**. CPLD = **GPR + phase FSM** (~38 MC); CE/mailbox = **138×2 + 08/32/04**; **no Flash CW @ `$4000`**; **no `alu8_decode` block**.
+Single breadboard target — **v1.0 FSM-only (idx5)**. CPLD = **GPR + phase FSM**; CE/mailbox = **138×2 + 08/32/04**; **no Flash CW @ `$4000`**; **no `alu8_decode` block**.
 
 ---
 

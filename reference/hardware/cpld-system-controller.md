@@ -5,7 +5,7 @@
 
 **Bring-up:** [M2a-cpld-decode.md](../hw-bringup/M2a-cpld-decode.md) · [microcode-spec.md](microcode-spec.md) · [M3b-fetch-execute.md](../hw-bringup/M3b-fetch-execute.md)
 
-**CPLD bitstream:** target **≤64 MC**; estimated **~38** (26 GPR + ~12 idx5 FSM).
+**CPLD bitstream:** WinCUPL fitter **Design fits** within ATF1504AS device limit (64 macrocell part rating).
 
 ---
 
@@ -18,7 +18,8 @@
 5. **ALU controls** from FSM registered outputs.
 6. **Branch:** `PC_LOAD_EN` from opcode + `FLG_Z`/`FLG_C` sampled at `macro_end`.
 7. **Operands:** PC/MBR fetch path only — no PARAM latch.
-8. **Mailbox, MAP, `/CE`** — outside CPLD.
+8. **ADD/CMP ph1 REG_WE:** For ALU_REG templates, **ph1 always asserts REG_WE with `w_sel=R1`** — imm8 from MBR must latch to R1 before ph2 execute (not optional).
+9. **Mailbox, MAP, `/CE`** — outside CPLD.
 
 ---
 
@@ -71,7 +72,7 @@ macro_end:      branch opcodes → PC_LOAD_EN f(FLG)
 | `(opcode[3:0]<<2)\|phase` — 64 slots | `(opcode[4:0]<<2)\|phase` — **128 slots** |
 | Flash @ `$4000` (v1.0) | **CPLD PLA only** — no Flash CW burn |
 
-**Trade-off:** IR[4] → CPLD (+1 control net vs idx4); K-map complexity → **~+4 MC** (see §8).
+**Trade-off:** IR[4] → CPLD (+1 control net vs idx4); idx5 adds K-map vs idx4 (see §11).
 
 ---
 
@@ -79,10 +80,10 @@ macro_end:      branch opcodes → PC_LOAD_EN f(FLG)
 
 | Template | Phases | Behavior |
 |----------|--------|----------|
-| ALU_REG | 3 | ph0 R0→A; ph1 R1/B←operand; ph2 execute, `w_sel=R2` |
+| ALU_REG | 3 | ph0 R0→A; ph1 R1/B←operand (**REG_WE mandatory**, `w_sel=R1`); ph2 ADD→`w_sel=R2`+REG_WE+FLG_WE; CMP ph2 **FLG_WE only** (no REG_WE) |
 | MEM_LD | 2 | ph0 MEM_RD @ MBR; ph1 `w_sel=R0`, REG_WE |
 | MEM_ST | 2 | ph0 Y_OE (R0 via q_a); ph1 MEM_WR @ MBR |
-| XFER | 1 | `d_in<=regs(src)`; `w_sel=dst`; REG_WE |
+| XFER | 1 | `w_sel=opc[3:2]`, REG_WE via `tfr_valid`; src from 3-way mux `opc[1:0]` (not idx5 LUT) |
 | BEQ | 2 | ph0 SUB flags; ph1 NOP; end `PC_LOAD_EN<=FLG_Z` |
 | JMP | 1 | end `PC_LOAD_EN<=1` |
 | HALT | 1 | stop fetch (TBD glue) |
@@ -97,9 +98,9 @@ Operands enter only via **instruction fetch** (PC → ROM/RAM → IR/MBR). CPLD 
 |-------|---------|---------------|---------|
 | LDA, STA, LDIO, STIO, CMP | imm8 @ PC+1 | Byte2 → **MBR**; addr MUX **data** mode | ph0: `eff_addr=MBR`; MEM_RD/WR |
 | BEQ, JMP, CALL | abs16 | Bytes 2–3 → **MBR** (+ high byte latch) | macro_end: `PC_LOAD_EN` → PC ← operand |
-| ADD | imm8 → R1 | Byte2 → MBR | ph0: optional `w_sel=R1`, REG_WE |
+| ADD | imm8 → R1 | Byte2 → MBR | ph1: `w_sel=R1`, REG_WE (imm8 latched to R1) |
 | STA16 | abs16 | 3-byte fetch | same as STA + 16b addr path |
-| TFR `0x10–0x15` | none | 1-byte opcode only | XFER template |
+| TFR (§2.2 opcodes) | none | 1-byte opcode only | XFER comb glue |
 | HALT | none | 1-byte | HALT template |
 
 ```text
@@ -132,13 +133,23 @@ Operands enter only via **instruction fetch** (PC → ROM/RAM → IR/MBR). CPLD 
 
 Normative per-phase outputs (registered @ CLK). `—` = 0.
 
-### ALU_REG (ADD `0x01`, CMP `0x0D`)
+### ALU_REG — ADD (`0x01`)
 
 | ph | MEM_RD | MEM_WR | Y_OE | REG_WE | w_sel | ALU | FLG_WE |
 |----|--------|--------|------|--------|-------|-----|--------|
-| 0 | — | — | 1 | — | — | ADD/CMP | — |
-| 1 | — | — | 1 | opt R1 | R1 | ADD/CMP | — |
-| 2 | — | — | 1 | 1 | R2 | ADD/CMP | 1 |
+| 0 | — | — | 1 | — | — | ADD | — |
+| 1 | — | — | 1 | 1 | R1 | ADD | — |
+| 2 | — | — | 1 | 1 | R2 | ADD | 1 |
+
+### ALU_REG — CMP (`0x0D`, flags_only)
+
+| ph | MEM_RD | MEM_WR | Y_OE | REG_WE | w_sel | ALU | FLG_WE |
+|----|--------|--------|------|--------|-------|-----|--------|
+| 0 | — | — | 1 | — | — | CMP | — |
+| 1 | — | — | 1 | 1 | R1 | CMP | — |
+| 2 | — | — | 1 | — | — | CMP | 1 |
+
+ph1 REG_WE is **mandatory** for ADD and CMP (imm8 operand latch). CMP ph2 does **not** write R2.
 
 ### MEM_LD (LDA `0x02`, LDIO `0x08`)
 
@@ -154,11 +165,13 @@ Normative per-phase outputs (registered @ CLK). `—` = 0.
 | 0 | — | — | 1 | — | — | NOP |
 | 1 | — | 1 | — | — | — | NOP |
 
-### XFER (TFR `0x10–0x15`)
+### XFER (TFR — comb decode, not idx5 row)
 
 | ph | MEM_RD | MEM_WR | Y_OE | REG_WE | w_sel | ALU |
 |----|--------|--------|------|--------|-------|-----|
-| 0 | — | — | — | 1 | dst | NOP |
+| 0 | — | — | — | 1 | dst=`opc[3:2]` | NOP |
+
+**Source routing (internal):** `tfr_valid` (six valid TFR opcodes) asserts `REG_WE` and drives `w_sel` from `opc[3:2]`. **Source** is selected by a 3-way mux on `opc[1:0]` → async GPR read (`xfer_b0..7` → `gpr_d`). TFR is **not** stored in the idx5 LUT — see [microcode-spec.md](microcode-spec.md) §2.2 / §5.
 
 ### BEQ (`0x04`)
 
@@ -207,21 +220,20 @@ Unchanged — [memory-map.md](memory-map.md).
 
 ---
 
-## 11. Macrocell budget
+## 11. Fitter gate
 
-| Function | Est. MC |
-|----------|---------|
-| GPR 24 FF + fixed read | ~26 |
-| idx5 FSM + XFER internal read + ALU ctrl + branch | ~12 |
-| **Total** | **~38** |
+| Field | Value |
+|-------|-------|
+| Device | ATF1504AS-10JU44 (64 macrocell — part rating) |
+| Gate | WinCUPL fitter reports **Design fits** (used MC count not recorded in normative docs) |
 
-idx5 (5-bit opcode decode, TFR `0x10+`) adds **~4 MC** vs archived idx4 (~34 MC).
+idx5 (5-bit opcode decode, Extended TFR `0x11+`) replaces archived idx4 four-bit decode path.
 
 ---
 
 ## 12. Bring-up checklist
 
-- [ ] MC fit ≤ 64
+- [ ] Fitter reports Design fits (ATF1504AS)
 - [ ] Scope: LDA ph0 MEM_RD @ MBR, BEQ `PC_LOAD_EN` vs FLG_Z
 - [ ] TFR20 smoke on breadboard
 - [ ] Drop `alu8_decode` from SoC (P4)
@@ -232,6 +244,8 @@ idx5 (5-bit opcode decode, TFR `0x10+`) adds **~4 MC** vs archived idx4 (~34 MC)
 
 | Date | Note |
 |------|------|
+| 2026-07-06 | TFR bit-field opcodes; `tfr_valid` comb glue (not idx5 LUT row) |
+| 2026-07-06 | CMP ph2 split (flags-only, no REG_WE); mandatory ADD/CMP ph1 REG_WE |
 | 2026-06-24 | idx5 FSM decode; operand/branch datapath; phase strobe tables |
 | 2026-06-24 | FSM-only w_sel; TFR opcodes; PARAM/REG_WSEL ports removed |
 | 2026-06-24 | v1.0 GPR+FSM |

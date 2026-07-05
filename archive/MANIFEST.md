@@ -67,7 +67,7 @@ For **architecture**, **bring-up**, **timing**, or **decode**:
 
 ### Frozen FSM snapshot (M3a)
 
-PASS — 16 FSM opcodes, 26 idx5 slots — see [reference/hw-bringup/M3a-control-store.md](../reference/hw-bringup/M3a-control-store.md) §2.
+PASS — 16 FSM opcodes, **20 active idx5 rows** (+ comb TFR) — see [reference/hw-bringup/M3a-control-store.md](../reference/hw-bringup/M3a-control-store.md) §2.
 
 ---
 

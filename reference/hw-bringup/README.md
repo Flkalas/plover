@@ -24,7 +24,7 @@ flowchart LR
 | 순서 | 할 일 | 시작 문서 |
 |------|-------|-----------|
 | 1 | ALU 납땜 + Y LED | [M1-alu.md](M1-alu.md) → [M1-b3-procedure.md](M1-b3-procedure.md) |
-| 2 | CPLD FSM 소각 | [M2a-cpld-decode.md](M2a-cpld-decode.md) |
+| 2 | CPLD FSM 소각 (WinCUPL CUPL + FIT1504 JED) | [M2a-cpld-decode.md](M2a-cpld-decode.md) |
 | 3 | 138×2 · CPLD datapath · SRAM/NOR | [M2b-gpr-memory.md](M2b-gpr-memory.md) · [breadboard-wiring.md](breadboard-wiring.md) |
 | 4 | FSM table verify | [M3a-control-store.md](M3a-control-store.md) |
 | 5 | ROM fetch + FSM execute | [M3b-fetch-execute.md](M3b-fetch-execute.md) |

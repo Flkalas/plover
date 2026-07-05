@@ -21,9 +21,9 @@ v1.0 does **not** program per-phase control words at Flash `$4000`. All sequence
 
 ---
 
-## 2. Frozen FSM table (2026-07-04)
+## 2. Frozen FSM table (2026-07-06)
 
-**Result:** PASS — 16 FSM opcodes, **26** idx5 slots (unique), TFR routing verified before code archive.
+**Result:** PASS — 14 FSM opcodes in idx5 LUT, **20** active idx5 slots (unique). **TFR** uses comb `tfr_valid` (six opcodes § [microcode-spec.md](../hardware/microcode-spec.md) §2.2) — not idx5 rows.
 
 | Opcode | Template | Phase | idx5 |
 |--------|----------|-------|------|
@@ -47,14 +47,8 @@ v1.0 does **not** program per-phase control words at Flash `$4000`. All sequence
 | 0x0D | ALU_REG | 2 | 54 |
 | 0x0F | MEM_ST | 0 | 60 |
 | 0x0F | MEM_ST | 1 | 61 |
-| 0x10 | XFER | 0 | 64 |
-| 0x11 | XFER | 0 | 68 |
-| 0x12 | XFER | 0 | 72 |
-| 0x13 | XFER | 0 | 76 |
-| 0x14 | XFER | 0 | 80 |
-| 0x15 | XFER | 0 | 84 |
 
-Opcode summary: `0x01` ADD · `0x02` LDA · `0x03` STA · `0x04` BEQ · `0x05` JMP · `0x08` LDIO · `0x09` STIO · `0x0A` HALT · `0x0D` CMP · `0x0F` STA16 · `0x10–0x15` TFR.
+Opcode summary: `0x01` ADD · `0x02` LDA · `0x03` STA · `0x04` BEQ · `0x05` JMP · `0x08` LDIO · `0x09` STIO · `0x0A` HALT · `0x0D` CMP · `0x0F` STA16 · TFR `0x11/12/14/16/18/19` (comb, not table).
 
 Flash `$4000`: **unused** (FSM-only).
 
@@ -71,8 +65,9 @@ Superseded **10b Flash CW** path — historical docs only:
 
 ## 4. M3a sign-off
 
-- [ ] Frozen table §2 matches CPLD JED (M2a)
-- [ ] No PARAM 574 on SoC bill of materials ([BOM.md](../../BOM.md))
+- [ ] Frozen table §2 matches committed **`ctrl_lut.inc`** idx5 terms (same opcode/phase → same strobes)
+- [ ] **`system_ctrl.jed`** burned and bench-verified per [M2a-cpld-decode.md](M2a-cpld-decode.md)
+- [ ] No PARAM 574 on SoC bill of materials ([BOM.md](../project/BOM.md))
 - [ ] Flash `$4000` region left empty for v1.0 bring-up
 
 ---
@@ -81,6 +76,8 @@ Superseded **10b Flash CW** path — historical docs only:
 
 | Date | Note |
 |------|------|
+| 2026-07-06 | 20-row idx5 table; TFR comb decode |
+| 2026-07-06 | Sign-off: ctrl_lut.inc parity with §2; repository LUT artifact |
 | 2026-07-04 | FSM table frozen in-doc; tool commands removed |
 | 2026-06-24 | v1.0 FSM-only — hybrid Flash path moved to archive |
 | 2026-06-10 | Prototype 10b CW (archive) |
