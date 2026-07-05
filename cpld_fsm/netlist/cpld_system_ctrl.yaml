@@ -50,11 +50,19 @@ entity_ports:
     - { cupl: pc_load_en, net: pc_load_en, pin: fit }
 
 internal:
+  - tfr_valid
+  - reg_we_lut
+  - w_sel0_lut
+  - w_sel1_lut
   - w_sel0
   - w_sel1
   - ph0
   - ph1
   - idx5
   - r00..r27
+
+notes:
+  - bctrl1 fans out from bctrl0; bctrl3 from bctrl2 (system_ctrl.pld)
+  - TFR opcodes decode outside idx5 LUT via comb tfr_valid
 
 pin_lock_file: cpld_fsm/hdl/system_ctrl.pin

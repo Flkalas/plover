@@ -49,17 +49,35 @@ ph1.d = !macro_end & (ph1 # ph0);
 ph0.ck = clk;
 ph1.ck = clk;
 
-end_ph1 = opcode:'00001' # opcode:'01101';
-end_ph0 = opcode:'00010' # opcode:'00011' # opcode:'00100'
-        # opcode:'01000' # opcode:'01001' # opcode:'01111';
+end_ph1 = opcode : 'b'00001 # opcode : 'b'01101;
+end_ph0 = opcode : 'b'00010 # opcode : 'b'00011 # opcode : 'b'00100
+        # opcode : 'b'01000 # opcode : 'b'01001 # opcode : 'b'01111;
 
 macro_end = (ph1 & end_ph1 # !ph1 & !end_ph1) & (ph0 & end_ph0 # !ph0 & !end_ph0);
 
 /* GEN_CTRL_LUT_BEGIN */
 /* GEN_CTRL_LUT_END */
 
-w_sel0 = lut_w_sel0;
-w_sel1 = lut_w_sel1;
+tfr_valid = opcode : 'b'10001 # opcode : 'b'10010 # opcode : 'b'10100
+          # opcode : 'b'10110 # opcode : 'b'11000 # opcode : 'b'11001;
+
+/* 3-way src mux: opc[1:0] -> R0/R1/R2 read (used only when tfr_valid) */
+xfer_b0 = !opc1 & !opc0 & r00 # !opc1 &  opc0 & r10 #  opc1 & !opc0 & r20;
+xfer_b1 = !opc1 & !opc0 & r01 # !opc1 &  opc0 & r11 #  opc1 & !opc0 & r21;
+xfer_b2 = !opc1 & !opc0 & r02 # !opc1 &  opc0 & r12 #  opc1 & !opc0 & r22;
+xfer_b3 = !opc1 & !opc0 & r03 # !opc1 &  opc0 & r13 #  opc1 & !opc0 & r23;
+xfer_b4 = !opc1 & !opc0 & r04 # !opc1 &  opc0 & r14 #  opc1 & !opc0 & r24;
+xfer_b5 = !opc1 & !opc0 & r05 # !opc1 &  opc0 & r15 #  opc1 & !opc0 & r25;
+xfer_b6 = !opc1 & !opc0 & r06 # !opc1 &  opc0 & r16 #  opc1 & !opc0 & r26;
+xfer_b7 = !opc1 & !opc0 & r07 # !opc1 &  opc0 & r17 #  opc1 & !opc0 & r27;
+
+reg_we = reg_we_lut # tfr_valid;
+
+w_sel0 = tfr_valid & opc2 # !tfr_valid & w_sel0_lut;
+w_sel1 = tfr_valid & opc3 # !tfr_valid & w_sel1_lut;
+
+bctrl1 = bctrl0;
+bctrl3 = bctrl2;
 
 we_r0 = reg_we & !w_sel1 & !w_sel0;
 we_r1 = reg_we & !w_sel1 &  w_sel0;
@@ -88,30 +106,13 @@ q_a4 = r04; q_a5 = r05; q_a6 = r06; q_a7 = r07;
 q_b0 = r10; q_b1 = r11; q_b2 = r12; q_b3 = r13;
 q_b4 = r14; q_b5 = r15; q_b6 = r16; q_b7 = r17;
 
-gpr_d0 = is_xfer & xfer_b0 # !is_xfer & d_in0;
-gpr_d1 = is_xfer & xfer_b1 # !is_xfer & d_in1;
-gpr_d2 = is_xfer & xfer_b2 # !is_xfer & d_in2;
-gpr_d3 = is_xfer & xfer_b3 # !is_xfer & d_in3;
-gpr_d4 = is_xfer & xfer_b4 # !is_xfer & d_in4;
-gpr_d5 = is_xfer & xfer_b5 # !is_xfer & d_in5;
-gpr_d6 = is_xfer & xfer_b6 # !is_xfer & d_in6;
-gpr_d7 = is_xfer & xfer_b7 # !is_xfer & d_in7;
-
-xfer_b0 = opcode:'10000' & r10 # opcode:'10001' & r20 # opcode:'10010' & r00
-        # opcode:'10011' & r20 # opcode:'10100' & r00 # opcode:'10101' & r10;
-xfer_b1 = opcode:'10000' & r11 # opcode:'10001' & r21 # opcode:'10010' & r01
-        # opcode:'10011' & r21 # opcode:'10100' & r01 # opcode:'10101' & r11;
-xfer_b2 = opcode:'10000' & r12 # opcode:'10001' & r22 # opcode:'10010' & r02
-        # opcode:'10011' & r22 # opcode:'10100' & r02 # opcode:'10101' & r12;
-xfer_b3 = opcode:'10000' & r13 # opcode:'10001' & r23 # opcode:'10010' & r03
-        # opcode:'10011' & r23 # opcode:'10100' & r03 # opcode:'10101' & r13;
-xfer_b4 = opcode:'10000' & r14 # opcode:'10001' & r24 # opcode:'10010' & r04
-        # opcode:'10011' & r24 # opcode:'10100' & r04 # opcode:'10101' & r14;
-xfer_b5 = opcode:'10000' & r15 # opcode:'10001' & r25 # opcode:'10010' & r05
-        # opcode:'10011' & r25 # opcode:'10100' & r05 # opcode:'10101' & r15;
-xfer_b6 = opcode:'10000' & r16 # opcode:'10001' & r26 # opcode:'10010' & r06
-        # opcode:'10011' & r26 # opcode:'10100' & r06 # opcode:'10101' & r16;
-xfer_b7 = opcode:'10000' & r17 # opcode:'10001' & r27 # opcode:'10010' & r07
-        # opcode:'10011' & r27 # opcode:'10100' & r07 # opcode:'10101' & r17;
+gpr_d0 = tfr_valid & xfer_b0 # !tfr_valid & d_in0;
+gpr_d1 = tfr_valid & xfer_b1 # !tfr_valid & d_in1;
+gpr_d2 = tfr_valid & xfer_b2 # !tfr_valid & d_in2;
+gpr_d3 = tfr_valid & xfer_b3 # !tfr_valid & d_in3;
+gpr_d4 = tfr_valid & xfer_b4 # !tfr_valid & d_in4;
+gpr_d5 = tfr_valid & xfer_b5 # !tfr_valid & d_in5;
+gpr_d6 = tfr_valid & xfer_b6 # !tfr_valid & d_in6;
+gpr_d7 = tfr_valid & xfer_b7 # !tfr_valid & d_in7;
 
 pc_load_en = macro_end & lut_pc_load & (!lut_pc_flg_z # flg_z);

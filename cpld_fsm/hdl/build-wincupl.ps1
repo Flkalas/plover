@@ -20,9 +20,13 @@ if (-not (Test-Path $GenPld)) {
     Write-Error "system_ctrl_gen.pld not found after codegen"
 }
 
+$ToolsWincupl = Join-Path $Repo "cpld_fsm\tools\wincupl-ii"
 $Wincupl = $env:WINCUPL_DIR
+if (-not $Wincupl -and (Test-Path (Join-Path $ToolsWincupl "Shared\cupl.exe"))) {
+    $Wincupl = $ToolsWincupl
+}
 if (-not $Wincupl) {
-    foreach ($c in @("C:\WinCUPL", "C:\Program Files\WinCUPL", "C:\Program Files (x86)\WinCUPL")) {
+    foreach ($c in @("C:\WinCUPL", "C:\Wincupl", "C:\Program Files\WinCUPL", "C:\Program Files (x86)\WinCUPL")) {
         if (Test-Path $c) { $Wincupl = $c; break }
     }
 }

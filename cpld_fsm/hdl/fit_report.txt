@@ -7,27 +7,17 @@
 | Tool | **WinCUPL** + **FIT1504.EXE** |
 | WinCUPL device | `f1504ispplcc44` |
 | Date | 2026-07-06 |
-| Status | **Pre-fit estimate** — run `build-wincupl.ps1` or WinCUPL F9 |
-
-## Macrocell budget (reference)
-
-| Block | Est. MC |
-|-------|---------|
-| GPR 3×8 + async R0/R1 read | ~26 |
-| idx5 LUT + phase + xfer + branch | ~12 |
-| **Total** | **~38** |
-| **Limit** | **64** |
-| **Gate** | **PASS (estimate)** |
+| Status | **Fitted** — `build-wincupl.ps1`, Design fits |
 
 ## Fit checklist
 
 1. `python cpld_fsm/hdl/gen_ctrl_lut.py`
 2. `FITTERDIR` = `WinCUPL\Fitters`
 3. Open `system_ctrl_gen.pld` → F9 (or `./build-wincupl.ps1`)
-4. MC ≤ 64 in fitter output → save log here
+4. Confirm fitter log ends with **Design fits** (used MC count not recorded here)
 5. `system_ctrl.jed` → commit
 6. Sync `system_ctrl.pin` + `cpld_fsm/netlist/cpld_system_ctrl.yaml`
 
 ## idx5 LUT
 
-26 active rows / 128 slots — `simulators/cyclesim/data/fsm_table.py`
+20 active rows / 128 slots — `simulators/cyclesim/data/fsm_table.py` (TFR comb decode outside LUT)
