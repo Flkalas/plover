@@ -14,5 +14,9 @@ archive/verilog-sim/web/dist/
 *.vvp
 .cursor/
 
+# cpld_fsm JTAG — fetch via cpld_fsm/tools/install-openocd.ps1
+/cpld_fsm/tools/xpack-openocd-*/
+/cpld_fsm/tools/xpack-openocd-*.zip
+
 # vFDD runtime image (recreated by dos-shell / PLFS format)
 hw/fixtures/vfdd/dos_boot.img
