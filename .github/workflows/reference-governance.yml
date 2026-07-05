@@ -46,3 +46,31 @@ jobs:
             exit 1
           fi
           echo "reference scrub OK"
+
+      - name: Stale ISA / MC patterns in reference and whitepaper
+        run: |
+          set -euo pipefail
+          failed=0
+          if rg -n --glob '*.md' 'TFR.*0x10.?0x15|0x10.?0x15.*TFR' reference/ plover-whitepaper.md 2>/dev/null; then
+            echo "::error::Stale TFR range 0x10–0x15 in reference/whitepaper"
+            failed=1
+          fi
+          if rg -n --glob '*.md' '26 idx5|26 active' reference/ plover-whitepaper.md 2>/dev/null; then
+            echo "::error::Stale 26-row idx5 count in reference/whitepaper"
+            failed=1
+          fi
+          if rg -n --glob '*.md' 'is_xfer|lut_w_sel' reference/ plover-whitepaper.md 2>/dev/null; then
+            echo "::error::Stale is_xfer/lut_w_sel in reference/whitepaper"
+            failed=1
+          fi
+          stale_mc=$(rg -n --glob '*.md' '~38 MC|59/64|43/64|42/64|fitter.*[0-9]+/64' reference/ plover-whitepaper.md 2>/dev/null \
+            | rg -v '64 MC|64 macrocell|ATF1504' || true)
+          if [ -n "$stale_mc" ]; then
+            echo "$stale_mc"
+            echo "::error::Stale fitter MC usage count in reference/whitepaper"
+            failed=1
+          fi
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
+          echo "stale ISA/MC scrub OK"

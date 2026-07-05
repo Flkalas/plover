@@ -45,18 +45,25 @@ When implementing a **Cursor plan**, commit in-session per **Plan execution (aut
 
 ---
 
-## Document tiers (reference truth)
+## Document tiers (truth cascade)
 
-When answering **hardware architecture**, **bring-up**, or **decode/CPLD/ALU** questions:
+When answering **hardware architecture**, **bring-up**, or **decode/CPLD/ALU** questions, edit and cite in this order:
 
-| Tier | Path | Use |
-|------|------|-----|
-| **Reference** | `reference/**` + `plover-whitepaper.md` | **Single source of truth** — cite and edit here |
-| **Archive** | `archive/*.tar.gz` | Historical code/docs — **do not** cite for SoC unless user asks |
+| Tier | Path | Role |
+|------|------|------|
+| **Root** | [plover-whitepaper.md](plover-whitepaper.md) §6 | ISA / FSM narrative |
+| **Reference** | `reference/**` | Normative detail, bring-up, frozen fixtures |
+| **Machine** | `simulators/cyclesim/data/isa.py`, `fsm_table.py` | Executable golden |
+| **CPLD** | `cpld_fsm/hdl/` — `gen_ctrl_lut.py`, `system_ctrl.pld` | Bitstream source |
+| **Archive** | `archive/*.tar.gz` | Historical — **do not** cite for SoC unless user asks |
 
 **Anchor docs:** [control-and-decode.md](reference/hardware/control-and-decode.md), [system-architecture.md](reference/hardware/system-architecture.md), [plover-whitepaper.md](plover-whitepaper.md).
 
-**Active hardware truth:** `reference/**` and `plover-whitepaper.md` only. Restore guide: [archive/MANIFEST.md](archive/MANIFEST.md).
+**Active hardware truth:** whitepaper root → reference cascade → machine code → CPLD artifacts. Restore guide: [archive/MANIFEST.md](archive/MANIFEST.md).
+
+**Strobe layers:** LUT/csim tests use `reg_we_lut`, `w_sel*_lut` (18 signals). Bench/cyclesim merged pins use `reg_we`, `w_sel*`. Reference §7 tables describe merged behavior.
+
+**MC policy:** ATF1504 **64 macrocell** is a BOM chip rating only. Bring-up gate = WinCUPL **Design fits** — do not record fitter used-MC counts in normative prose.
 
 **Forbidden for SoC / bring-up answers** (unless user asks for history):
 

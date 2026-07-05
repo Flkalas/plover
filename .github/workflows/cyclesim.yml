@@ -4,10 +4,12 @@ on:
   push:
     paths:
       - "simulators/**"
+      - "cpld_fsm/hdl/**"
       - ".github/workflows/cyclesim.yml"
   pull_request:
     paths:
       - "simulators/**"
+      - "cpld_fsm/hdl/**"
       - ".github/workflows/cyclesim.yml"
 
 jobs:
@@ -19,4 +21,4 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install pytest
-      - run: pytest simulators/cyclesim/tests -q
+      - run: pytest simulators/cyclesim/tests cpld_fsm/hdl/tests -q
