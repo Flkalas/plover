@@ -1,0 +1,117 @@
+Name system_ctrl;
+PartNo 00;
+Date 07/06/2026;
+Revision 01;
+Designer Plover;
+Company Plover;
+Assembly None;
+Location None;
+Device f1504ispplcc44;
+
+PROPERTY ATMEL {POWER_RESET = OFF};
+PROPERTY ATMEL {PIN_KEEP = ON};
+PROPERTY ATMEL {PREASSIGN = KEEP};
+
+/* ATF1504AS-10JU44 PLCC-44 JTAG ISP - pins 7/13/32/38 reserved */
+
+PIN 43 = clk;
+
+PIN  4 = opc0;
+PIN  5 = opc1;
+PIN  6 = opc2;
+PIN  8 = opc3;
+PIN  9 = opc4;
+PIN 11 = d_in0;
+PIN 12 = d_in1;
+PIN 14 = d_in2;
+PIN 16 = d_in3;
+PIN 17 = d_in4;
+PIN 18 = d_in5;
+PIN 19 = d_in6;
+PIN 20 = d_in7;
+PIN 24 = flg_z;
+PIN 25 = flg_c;
+
+/* Outputs unpinned - fitter assigns PLCC pads; export system_ctrl.pin after fit */
+
+/* Buried state */
+Pinnode = [ph0, ph1];
+Pinnode = [r00, r01, r02, r03, r04, r05, r06, r07];
+Pinnode = [r10, r11, r12, r13, r14, r15, r16, r17];
+Pinnode = [r20, r21, r22, r23, r24, r25, r26, r27];
+Pinnode = [gpr_d0, gpr_d1, gpr_d2, gpr_d3, gpr_d4, gpr_d5, gpr_d6, gpr_d7];
+Pinnode = [w_sel0, w_sel1, macro_end, flg_we];
+
+FIELD opcode = [opc4, opc3, opc2, opc1, opc0];
+
+ph0.d = !macro_end & !ph0;
+ph1.d = !macro_end & (ph1 # ph0);
+ph0.ck = clk;
+ph1.ck = clk;
+
+end_ph1 = opcode:'00001' # opcode:'01101';
+end_ph0 = opcode:'00010' # opcode:'00011' # opcode:'00100'
+        # opcode:'01000' # opcode:'01001' # opcode:'01111';
+
+macro_end = (ph1 & end_ph1 # !ph1 & !end_ph1) & (ph0 & end_ph0 # !ph0 & !end_ph0);
+
+/* GEN_CTRL_LUT_BEGIN */
+/* GEN_CTRL_LUT_END */
+
+w_sel0 = lut_w_sel0;
+w_sel1 = lut_w_sel1;
+
+we_r0 = reg_we & !w_sel1 & !w_sel0;
+we_r1 = reg_we & !w_sel1 &  w_sel0;
+we_r2 = reg_we &  w_sel1 & !w_sel0;
+
+r00.d = gpr_d0; r01.d = gpr_d1; r02.d = gpr_d2; r03.d = gpr_d3;
+r04.d = gpr_d4; r05.d = gpr_d5; r06.d = gpr_d6; r07.d = gpr_d7;
+r10.d = gpr_d0; r11.d = gpr_d1; r12.d = gpr_d2; r13.d = gpr_d3;
+r14.d = gpr_d4; r15.d = gpr_d5; r16.d = gpr_d6; r17.d = gpr_d7;
+r20.d = gpr_d0; r21.d = gpr_d1; r22.d = gpr_d2; r23.d = gpr_d3;
+r24.d = gpr_d4; r25.d = gpr_d5; r26.d = gpr_d6; r27.d = gpr_d7;
+
+[r00,r01,r02,r03,r04,r05,r06,r07].ck = clk;
+[r10,r11,r12,r13,r14,r15,r16,r17].ck = clk;
+[r20,r21,r22,r23,r24,r25,r26,r27].ck = clk;
+
+r00.ce = we_r0; r01.ce = we_r0; r02.ce = we_r0; r03.ce = we_r0;
+r04.ce = we_r0; r05.ce = we_r0; r06.ce = we_r0; r07.ce = we_r0;
+r10.ce = we_r1; r11.ce = we_r1; r12.ce = we_r1; r13.ce = we_r1;
+r14.ce = we_r1; r15.ce = we_r1; r16.ce = we_r1; r17.ce = we_r1;
+r20.ce = we_r2; r21.ce = we_r2; r22.ce = we_r2; r23.ce = we_r2;
+r24.ce = we_r2; r25.ce = we_r2; r26.ce = we_r2; r27.ce = we_r2;
+
+q_a0 = r00; q_a1 = r01; q_a2 = r02; q_a3 = r03;
+q_a4 = r04; q_a5 = r05; q_a6 = r06; q_a7 = r07;
+q_b0 = r10; q_b1 = r11; q_b2 = r12; q_b3 = r13;
+q_b4 = r14; q_b5 = r15; q_b6 = r16; q_b7 = r17;
+
+gpr_d0 = is_xfer & xfer_b0 # !is_xfer & d_in0;
+gpr_d1 = is_xfer & xfer_b1 # !is_xfer & d_in1;
+gpr_d2 = is_xfer & xfer_b2 # !is_xfer & d_in2;
+gpr_d3 = is_xfer & xfer_b3 # !is_xfer & d_in3;
+gpr_d4 = is_xfer & xfer_b4 # !is_xfer & d_in4;
+gpr_d5 = is_xfer & xfer_b5 # !is_xfer & d_in5;
+gpr_d6 = is_xfer & xfer_b6 # !is_xfer & d_in6;
+gpr_d7 = is_xfer & xfer_b7 # !is_xfer & d_in7;
+
+xfer_b0 = opcode:'10000' & r10 # opcode:'10001' & r20 # opcode:'10010' & r00
+        # opcode:'10011' & r20 # opcode:'10100' & r00 # opcode:'10101' & r10;
+xfer_b1 = opcode:'10000' & r11 # opcode:'10001' & r21 # opcode:'10010' & r01
+        # opcode:'10011' & r21 # opcode:'10100' & r01 # opcode:'10101' & r11;
+xfer_b2 = opcode:'10000' & r12 # opcode:'10001' & r22 # opcode:'10010' & r02
+        # opcode:'10011' & r22 # opcode:'10100' & r02 # opcode:'10101' & r12;
+xfer_b3 = opcode:'10000' & r13 # opcode:'10001' & r23 # opcode:'10010' & r03
+        # opcode:'10011' & r23 # opcode:'10100' & r03 # opcode:'10101' & r13;
+xfer_b4 = opcode:'10000' & r14 # opcode:'10001' & r24 # opcode:'10010' & r04
+        # opcode:'10011' & r24 # opcode:'10100' & r04 # opcode:'10101' & r14;
+xfer_b5 = opcode:'10000' & r15 # opcode:'10001' & r25 # opcode:'10010' & r05
+        # opcode:'10011' & r25 # opcode:'10100' & r05 # opcode:'10101' & r15;
+xfer_b6 = opcode:'10000' & r16 # opcode:'10001' & r26 # opcode:'10010' & r06
+        # opcode:'10011' & r26 # opcode:'10100' & r06 # opcode:'10101' & r16;
+xfer_b7 = opcode:'10000' & r17 # opcode:'10001' & r27 # opcode:'10010' & r07
+        # opcode:'10011' & r27 # opcode:'10100' & r07 # opcode:'10101' & r17;
+
+pc_load_en = macro_end & lut_pc_load & (!lut_pc_flg_z # flg_z);
