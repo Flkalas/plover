@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from simulators.cyclesim.blocks.mem_decode import MAILBOX_BASE, MemSystem
 from simulators.cyclesim.engine import Block, SimContext
 from simulators.cyclesim.values import H, L
 
@@ -63,6 +64,106 @@ class MbrReg(Block):
             self.mbr = sum((ctx.get(f"net_mem_d{i}") & 1) << i for i in range(8)) & 0xFF
 
 
+class Abs16HiReg(Block):
+    """High byte latch for BEQ/JMP/STA16 abs16 operand."""
+
+    def __init__(self, name: str = "abs16_hi") -> None:
+        super().__init__(name)
+        self.hi = 0
+
+    def eval_comb(self, ctx: SimContext) -> bool:
+        changed = False
+        for i in range(8):
+            changed |= ctx.drive(f"net_abs16_hi{i}", (self.hi >> i) & 1, self.name)
+        return changed
+
+    def tick(self, ctx: SimContext) -> None:
+        if ctx.get("net_abs16_hi_load") & 1:
+            self.hi = sum((ctx.get(f"net_mem_d{i}") & 1) << i for i in range(8)) & 0xFF
+
+
+class PcInMux(Block):
+    """Branch target: PC_in = abs16_hi:MBR."""
+
+    def __init__(self, name: str = "pc_in_mux") -> None:
+        super().__init__(name)
+
+    def eval_comb(self, ctx: SimContext) -> bool:
+        changed = False
+        for i in range(8):
+            changed |= ctx.drive(f"net_pc_in{i}", ctx.get(f"net_mbr{i}") & 1, self.name)
+        for i in range(8):
+            changed |= ctx.drive(f"net_pc_in{i + 8}", ctx.get(f"net_abs16_hi{i}") & 1, self.name)
+        return changed
+
+
+class AddrMux(Block):
+    """FETCH=1 -> PC; data mode -> MBR / LDIO / abs16 effective address."""
+
+    def __init__(self, name: str = "addr_mux") -> None:
+        super().__init__(name)
+
+    def eval_comb(self, ctx: SimContext) -> bool:
+        fetch = ctx.get("net_fetch") & 1
+        changed = False
+        if fetch:
+            for i in range(16):
+                changed |= ctx.drive(f"net_addr{i}", ctx.get(f"net_pc{i}") & 1, self.name)
+            return changed
+        if ctx.get("net_ldio_stio") & 1:
+            addr = MAILBOX_BASE | sum((ctx.get(f"net_mbr{i}") & 1) << i for i in range(8))
+        elif ctx.get("net_abs16_addr") & 1:
+            lo = sum((ctx.get(f"net_mbr{i}") & 1) << i for i in range(8))
+            hi = sum((ctx.get(f"net_abs16_hi{i}") & 1) << i for i in range(8))
+            addr = lo | (hi << 8)
+        else:
+            addr = sum((ctx.get(f"net_mbr{i}") & 1) << i for i in range(8))
+        for i in range(16):
+            changed |= ctx.drive(f"net_addr{i}", (addr >> i) & 1, self.name)
+        return changed
+
+
+class MemArray(Block):
+    def __init__(self, name: str = "mem") -> None:
+        super().__init__(name)
+        self.sys = MemSystem()
+
+    def load_hex(self, path: str, *, target: str = "rom") -> None:
+        self.sys.load_hex(path, target=target)
+
+    def load_bytes(self, base: int, blob: bytes, *, target: str = "rom") -> None:
+        self.sys.load_bytes(base, blob, target=target)
+
+    def load_ram(self, addr: int, val: int) -> None:
+        self.sys.load_ram(addr, val)
+
+    def set_vector(self, pc: int) -> None:
+        self.sys.set_vector(pc)
+
+    @property
+    def map_mode(self) -> int:
+        return self.sys.map_mode
+
+    @map_mode.setter
+    def map_mode(self, val: int) -> None:
+        self.sys.map_mode = val & 1
+
+    def read(self, addr: int) -> int:
+        return self.sys.read(addr)
+
+    def write(self, addr: int, val: int) -> None:
+        self.sys.write(addr, val)
+
+    def eval_comb(self, ctx: SimContext) -> bool:
+        addr = sum((ctx.get(f"net_addr{i}") & 1) << i for i in range(16))
+        reading = (ctx.get("net_mem_rd") & 1) or (ctx.get("net_fetch") & 1)
+        byte = self.sys.read(addr) if reading else 0
+        changed = False
+        for i in range(8):
+            changed |= ctx.drive(f"net_mem_d{i}", (byte >> i) & 1, self.name)
+        return changed
+
+
 class FlgReg(Block):
     def __init__(self, name: str = "flg") -> None:
         super().__init__(name)
@@ -81,57 +182,17 @@ class FlgReg(Block):
             self.c = (ctx.get("net_c_hi") & 1) == H
 
 
-class AddrMux(Block):
-    """FETCH=1 -> PC; FETCH=0 -> MBR (low byte) as address."""
+class YBusMux(Block):
+    """MEM_ST ph0: Y_OE drives q_a (R0) onto D bus; else ALU Y when y_oe."""
 
-    def __init__(self, name: str = "addr_mux") -> None:
+    def __init__(self, name: str = "y_bus_mux") -> None:
         super().__init__(name)
 
     def eval_comb(self, ctx: SimContext) -> bool:
-        fetch = ctx.get("net_fetch") & 1
+        if not (ctx.get("net_y_oe") & 1):
+            return False
         changed = False
-        for i in range(16):
-            if fetch:
-                bit = (ctx.get(f"net_pc{i}") & 1)
-            else:
-                bit = (ctx.get(f"net_mbr{i}") & 1) if i < 8 else L
-            changed |= ctx.drive(f"net_addr{i}", bit, self.name)
-        return changed
-
-
-class MemArray(Block):
-    def __init__(self, name: str = "mem") -> None:
-        super().__init__(name)
-        self.data: dict[int, int] = {}
-
-    def load_hex(self, path: str) -> None:
-        addr = 0
-        with open(path, encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if not line or line.startswith("#"):
-                    continue
-                for tok in line.split():
-                    self.data[addr] = int(tok, 16) & 0xFF
-                    addr += 1
-
-    def load_bytes(self, base: int, blob: bytes) -> None:
-        for i, b in enumerate(blob):
-            self.data[base + i] = b
-
-    def read(self, addr: int) -> int:
-        return self.data.get(addr & 0xFFFF, 0)
-
-    def write(self, addr: int, val: int) -> None:
-        self.data[addr & 0xFFFF] = val & 0xFF
-
-    def eval_comb(self, ctx: SimContext) -> bool:
-        addr = sum((ctx.get(f"net_addr{i}") & 1) << i for i in range(16))
-        if ctx.get("net_mem_wr") & 1:
-            val = sum((ctx.get(f"net_d{i}") & 1) << i for i in range(8))
-            self.write(addr, val)
-        byte = self.read(addr) if (ctx.get("net_mem_rd") & 1) or (ctx.get("net_fetch") & 1) else 0
-        changed = False
-        for i in range(8):
-            changed |= ctx.drive(f"net_mem_d{i}", (byte >> i) & 1, self.name)
+        if ctx.get("net_y_src_a") & 1:
+            for i in range(8):
+                changed |= ctx.drive(f"net_d{i}", ctx.get(f"net_a{i}") & 1, self.name)
         return changed
