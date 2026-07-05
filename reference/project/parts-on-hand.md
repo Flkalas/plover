@@ -29,9 +29,9 @@ Flash (#18)는 **PDIP-32** — 빵판에 **직결** (어댑터 없음).
 
 | BOM # | MPN | Package | Qty | 역할 |
 |-------|-----|---------|-----|------|
-| 14 | ATF1504AS-10JU44 | PLCC-44 | 1 | GPR (R0–R3) |
+| 14 | ATF1504AS-10JU44 | PLCC-44 | 1 | GPR (R0–R2) |
 | 15 | PLCC-44→DIP 어댑터 | — | 1 | CPLD 빵판 장착 |
-| 18 | SST39SF010A-70-4C-PHE | PDIP-32 | 2 | 부트·10b CW·유틸리티 |
+| 18 | SST39SF010A-70-4C-PHE | PDIP-32 | 2 | 부트·program ROM (`$4000` CW reserved / unburned) |
 | 19 | IS62C256AL-45ULI-TR | SOP | 2 | 64 KB RAM |
 | 24 | SN74LVC8T245DWR | SOIC-24 | 3 | 5 V ↔ 3.3 V |
 | 11a | 74HC138N | DIP | 1 보유 | CE decode (아래 재주문) |

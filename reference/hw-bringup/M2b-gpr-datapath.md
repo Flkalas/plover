@@ -14,7 +14,7 @@
 |------|-------|
 | GPR | **ATF1504 내부** R0, R1, R2 |
 | Read | **고정:** R0→`q_a`, R1→`q_b` |
-| Write | `REG_WE` + `REG_WSEL[1:0]` (default R2) |
+| Write | `REG_WE` + internal **`w_sel[1:0]`** (not exported; see [cpld-system-controller.md](../hardware/cpld-system-controller.md) §2) |
 | ALU ctrl | CPLD FSM → `cin`/`bctrl0..3`/`lgc*`/`y_mux` **직접** |
 | Decode | **없음** — `alu8_decode` SoC 미장착 |
 
@@ -41,7 +41,7 @@
 ## 3. GPR 쓰기 규칙
 
 ```text
-REG_WE=1 @ CLK↑ → regs(REG_WSEL) <= d_in
+REG_WE=1 @ CLK↑ → regs(w_sel) <= d_in
 ```
 
 - 한 사이클에 **REG_WE 1회**만 (FSM 보장).
@@ -63,8 +63,8 @@ REG_WE=1 @ CLK↑ → regs(REG_WSEL) <= d_in
 
 **작업:**
 
-1. Bench: `REG_WSEL=00`, `REG_WE` 수동 + `d_in` DIP → R0에 `0x12` 래치.
-2. `REG_WSEL=01` → R1에 `0x34` 래치.
+1. Bench: FSM or manual drive **`w_sel=00`**, `REG_WE` 수동 + `d_in` DIP → R0에 `0x12` 래치.
+2. `w_sel=01` → R1에 `0x34` 래치.
 
 **Pass:** scope/DIP readback으로 R0/R1 확인 (또는 다음 단계 q_a/q_b 관측).
 
@@ -88,7 +88,7 @@ REG_WE=1 @ CLK↑ → regs(REG_WSEL) <= d_in
 
 ### G4 — R2 쓰기
 
-**작업:** `Y_OE=1`, ALU ADD 결과를 `d_in`으로, `REG_WE=1`, `REG_WSEL=10` (R2).
+**작업:** `Y_OE=1`, ALU ADD 결과를 `d_in`으로, `REG_WE=1`, **`w_sel=10`** (R2).
 
 **Pass:** R2 readback (via 다음 write to R0 + q_a) = ALU Y.
 
