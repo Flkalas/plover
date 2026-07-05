@@ -22,3 +22,4 @@ jobs:
           python-version: "3.12"
       - run: pip install pytest
       - run: pytest simulators/cyclesim/tests cpld_fsm/hdl/tests -q
+        timeout-minutes: 5

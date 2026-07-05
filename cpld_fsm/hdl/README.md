@@ -77,11 +77,12 @@ Golden table: `simulators/cyclesim/data/fsm_table.py` (20 active idx5 rows; TFR 
 | LUT text | `tests/test_gen_ctrl_lut.py` | `ctrl_lut.inc` contains correct idx5 terms |
 | LUT eval | `tests/test_csim_fsm_table.py` | Python evaluator vs golden table |
 | cyclesim FSM | `tests/test_csim_fsm_table.py` | `CtrlLookup` vs golden table |
-| CPU macros | `simulators/cyclesim/tests/test_cpu_m3b.py` | ADD/CMP ph1 REG_WE, TFR, fib |
+| Merged strobes | `tests/test_merged_strobe_parity.py` | LUT → PLD merge → `CtrlLookup` |
+| CPU macros | `simulators/cyclesim/tests/test_cpu_m3b.py` | ADD/CMP ph1 REG_WE, TFR, fib, fetch, branch, MMIO |
 
-**Note:** CUPL compiler `.sim` equations are optimized and may differ from the idx5 LUT; parity tests use **`ctrl_lut.inc`**, not `.sim`.
+Full parity matrix: [simulators/README.md](../../simulators/README.md#parity-matrix-functional).
 
-**WinCUPL csim.exe** (optional, Windows): `test_wincupl_csim_vectors` runs generated `system_ctrl_gen.si` against `.abs`. Often **skipped** — ATF1504 `.abs` fails to load from CLI (`could not open: &.abs`); Python LUT eval is the reliable CI path.
+**Note:** CUPL compiler `.sim` equations are optimized and may differ from the idx5 LUT; parity tests use **`ctrl_lut.inc`**, not `.sim`. CI uses Python LUT eval only (no WinCUPL `csim.exe`).
 
 ```powershell
 pytest simulators/cyclesim/tests cpld_fsm/hdl/tests -q

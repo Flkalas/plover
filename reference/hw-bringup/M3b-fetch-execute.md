@@ -141,10 +141,13 @@ ROM: CMP + BEQ; verify `PC_LOAD_EN` only when Z=1.
 
 ## 6. M3b sign-off
 
-- [ ] F0–F4 Pass on **breadboard** (not pre-flight sim)
-- [ ] Operand path: MBR latched before MEM_RD
+**Sim pre-flight (pytest, no silicon):** `simulators/cyclesim/tests/test_cpu_m3b.py` — fetch nets, m3b mini, BEQ/JMP, LDIO/STIO, fib. Wall limit 15s per test (`conftest.py`).
+
+- [ ] F0–F4 Pass on **breadboard** (final; sim pre-flight above)
+- [x] Sim pre-flight: fetch IR/MBR, m3b mini, CMP→ADD R1 latch (`test_cpu_m3b.py`)
+- [ ] Operand path: MBR latched before MEM_RD (sim: `test_mbr_before_mem_rd`)
 - [ ] No Flash param / `$4000` fetch in path
-- [ ] BEQ: FLG_Z gates `PC_LOAD_EN`
+- [ ] BEQ: FLG_Z gates `PC_LOAD_EN` (sim: `test_beq_*`; scope on breadboard)
 
 ---
 

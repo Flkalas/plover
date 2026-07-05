@@ -107,7 +107,7 @@ Use [M3a-control-store.md](M3a-control-store.md) §2 for full slot list. Key smo
 
 | phase | idx5 | Observe |
 |-------|------|---------|
-| 0 | 80 | REG_WE, `w_sel=R2`, internal XFER (R0→R2) |
+| 0 | 96 (inactive LUT; `tfr_valid` comb) | REG_WE, `w_sel=R2`, internal XFER (R0→R2) |
 
 Drive `OPC[4:0]` and phase manually or via integrated fetch (M3b). Probe `REG_WE`, `MEM_RD`/`MEM_WR`, `Y_OE`, `q_a`/`q_b`.
 
