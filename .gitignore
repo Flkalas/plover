@@ -18,5 +18,14 @@ archive/verilog-sim/web/dist/
 /cpld_fsm/tools/xpack-openocd-*/
 /cpld_fsm/tools/xpack-openocd-*.zip
 
+# cpld_fsm WinCUPL build artifacts
+/cpld_fsm/hdl/system_ctrl_gen.pld
+/cpld_fsm/hdl/*.tt2
+/cpld_fsm/hdl/*.fit
+/cpld_fsm/hdl/*.doc
+/cpld_fsm/hdl/*.lst
+/cpld_fsm/hdl/*.abs
+/cpld_fsm/hdl/*.pla
+
 # vFDD runtime image (recreated by dos-shell / PLFS format)
 hw/fixtures/vfdd/dos_boot.img

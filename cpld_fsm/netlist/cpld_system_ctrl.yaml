@@ -1,9 +1,13 @@
-# Plover CPLD system_ctrl — logical netlist (pads: system_ctrl.pin)
-# Normative ports: reference/hardware/cpld-system-controller.md §2
+# Plover CPLD system_ctrl — logical netlist
+# Normative: reference/hardware/cpld-system-controller.md §2
 
 device: ATF1504AS-10JU44
 package: PLCC-44
 top: system_ctrl
+source: cpld_fsm/hdl/system_ctrl.pld
+codegen: cpld_fsm/hdl/ctrl_lut.inc
+build: cpld_fsm/hdl/build-wincupl.ps1
+wincupl_device: f1504ispplcc44
 
 jtag_isp:
   TDI: 7
@@ -13,34 +17,44 @@ jtag_isp:
 
 dedicated:
   CLK: { pin: 43, net: clk, function: GCLK1 }
-  GCLR: { pin: 1, tie: high }
-  OE1: { pin: 44, tie: low }
-  OE2: { pin: 2, tie: low }
 
 entity_ports:
   inputs:
-    - { vhdl: clk,     net: clk,     width: 1 }
-    - { vhdl: opc,     net: opc,     width: 5, nets: [opc0, opc1, opc2, opc3, opc4] }
-    - { vhdl: d_in,    net: d_in,    width: 8 }
-    - { vhdl: flg_z,   net: flg_z,   width: 1 }
-    - { vhdl: flg_c,   net: flg_c,   width: 1 }
+    - { cupl: opc0, net: opc0, pin: 4 }
+    - { cupl: opc1, net: opc1, pin: 5 }
+    - { cupl: opc2, net: opc2, pin: 6 }
+    - { cupl: opc3, net: opc3, pin: 8 }
+    - { cupl: opc4, net: opc4, pin: 9 }
+    - { cupl: d_in0, net: d_in0, pin: 11 }
+    - { cupl: d_in1, net: d_in1, pin: 12 }
+    - { cupl: d_in2, net: d_in2, pin: 14 }
+    - { cupl: d_in3, net: d_in3, pin: 16 }
+    - { cupl: d_in4, net: d_in4, pin: 17 }
+    - { cupl: d_in5, net: d_in5, pin: 18 }
+    - { cupl: d_in6, net: d_in6, pin: 19 }
+    - { cupl: d_in7, net: d_in7, pin: 20 }
+    - { cupl: flg_z, net: flg_z, pin: 24 }
+    - { cupl: flg_c, net: flg_c, pin: 25 }
   outputs:
-    - { vhdl: q_a,     net: q_a,     width: 8 }
-    - { vhdl: q_b,     net: q_b,     width: 8 }
-    - { vhdl: reg_we,  net: reg_we,  width: 1 }
-    - { vhdl: mem_rd,  net: mem_rd,  width: 1 }
-    - { vhdl: mem_wr,  net: mem_wr,  width: 1 }
-    - { vhdl: y_oe,    net: y_oe,    width: 1 }
-    - { vhdl: cin,     net: cin,     width: 1 }
-    - { vhdl: bctrl,   net: bctrl,   width: 4, nets: [bctrl0, bctrl1, bctrl2, bctrl3] }
-    - { vhdl: lgc,     net: lgc,     width: 4, nets: [lgc0, lgc1, lgc2, lgc3] }
-    - { vhdl: s0,      net: s0,      width: 1 }
-    - { vhdl: s1,      net: s1,      width: 1 }
-    - { vhdl: pc_load_en, net: pc_load_en, width: 1 }
+    - { cupl: q_a0..q_a7, net: q_a, width: 8, pin: fit }
+    - { cupl: q_b0..q_b7, net: q_b, width: 8, pin: fit }
+    - { cupl: reg_we, net: reg_we, pin: fit }
+    - { cupl: mem_rd, net: mem_rd, pin: fit }
+    - { cupl: mem_wr, net: mem_wr, pin: fit }
+    - { cupl: y_oe, net: y_oe, pin: fit }
+    - { cupl: cin, net: cin, pin: fit }
+    - { cupl: bctrl0..3, net: bctrl, width: 4, pin: fit }
+    - { cupl: lgc0..3, net: lgc, width: 4, pin: fit }
+    - { cupl: s0, net: s0, pin: fit }
+    - { cupl: s1, net: s1, pin: fit }
+    - { cupl: pc_load_en, net: pc_load_en, pin: fit }
 
 internal:
-  - w_sel
-  - phase
+  - w_sel0
+  - w_sel1
+  - ph0
+  - ph1
   - idx5
+  - r00..r27
 
 pin_lock_file: cpld_fsm/hdl/system_ctrl.pin

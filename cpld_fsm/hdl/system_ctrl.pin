@@ -1,20 +1,30 @@
-# ProChip Designer pin lock — ATF1504AS-10JU44
-# Regenerate after fit; keep JTAG + CLK fixed.
+# WinCUPL pin lock — ATF1504AS-10JU44 (export after fit)
+# Source PLD: cpld_fsm/hdl/system_ctrl.pld
+# Device: f1504ispplcc44
 
-DEVICE ATF1504AS-10JU44
+DEVICE f1504ispplcc44
 
-# Dedicated / global
-PIN 1  = GCLR     ; INPUT ; HIGH
-PIN 2  = OE2      ; INPUT ; HIGH
-PIN 43 = CLK      ; INPUT ; GCLK
-PIN 44 = OE1      ; INPUT ; LOW
+# Locked
+PIN 43 = clk
 
-# JTAG ISP (locked — wiring-flash.md)
-PIN 7  = TDI
-PIN 13 = TMS
-PIN 32 = TCK
-PIN 38 = TDO
+# Inputs (pre-fit lock from PLD)
+PIN  4 = opc0
+PIN  5 = opc1
+PIN  6 = opc2
+PIN  8 = opc3
+PIN  9 = opc4
+PIN 11 = d_in0
+PIN 12 = d_in1
+PIN 14 = d_in2
+PIN 16 = d_in3
+PIN 17 = d_in4
+PIN 18 = d_in5
+PIN 19 = d_in6
+PIN 20 = d_in7
+PIN 24 = flg_z
+PIN 25 = flg_c
 
-# --- User I/O: assign remaining ports in ProChip pin planner ---
-# VHDL top entity: system_ctrl (opc, d_in, flg_z, flg_c, q_a, q_b, strobes, ALU, pc_load_en)
-# Estimated MC ~38 / 64 — see fit_report.txt
+# JTAG ISP (reserved — do not assign)
+# TDI=7 TMS=13 TCK=32 TDO=38
+
+# Outputs: assign after WinCUPL fit (fitter auto-place when unpinned in PLD)
