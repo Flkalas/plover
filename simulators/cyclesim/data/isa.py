@@ -1,4 +1,5 @@
-"""ISA helpers — microcode-spec.md."""
+"""ISA helpers — implements plover-whitepaper §6 / microcode-spec.md."""
+
 
 from __future__ import annotations
 
@@ -13,18 +14,33 @@ OP_LDIO = 0x08
 OP_STIO = 0x09
 OP_STA16 = 0x0F
 
-TFR_OPS = frozenset(range(0x10, 0x16))
+# TFR: opc[4]=1, opc[3:2]=dst, opc[1:0]=src (src != dst, neither field is 11₂)
+TFR_OPS = frozenset({0x11, 0x12, 0x14, 0x16, 0x18, 0x19})
 WIDE_ABS16_OPS = frozenset({OP_BEQ, OP_JMP, OP_STA16})
 
-# XFER opcode -> (src, dst) microcode-spec.md §5
-TFR_REG_MAP: dict[int, tuple[int, int]] = {
-    0x10: (1, 0),
-    0x11: (2, 0),
-    0x12: (0, 1),
-    0x13: (2, 1),
-    0x14: (0, 2),
-    0x15: (1, 2),
-}
+
+def encode_tfr(src: int, dst: int) -> int:
+    """Build TFR opcode from register indices (0=R0, 1=R1, 2=R2)."""
+    if src == dst or src > 2 or dst > 2:
+        raise ValueError(f"invalid TFR src={src} dst={dst}")
+    return 0x10 | (dst << 2) | src
+
+
+def decode_tfr(opcode: int) -> tuple[int, int]:
+    """Return (src, dst) from bit-field TFR opcode."""
+    op = opcode & 0x1F
+    src = op & 0x3
+    dst = (op >> 2) & 0x3
+    return src, dst
+
+
+def is_tfr_valid(opcode: int) -> bool:
+    op = opcode & 0x1F
+    if op not in TFR_OPS:
+        return False
+    src, dst = decode_tfr(op)
+    return src < 3 and dst < 3 and src != dst
+
 
 PHASE_COUNT: dict[int, int] = {
     OP_ADD: 3,
@@ -42,13 +58,16 @@ PHASE_COUNT: dict[int, int] = {
 
 
 def phase_count(opcode: int) -> int:
-    return PHASE_COUNT.get(opcode & 0xFF, 1)
+    op = opcode & 0xFF
+    if is_tfr_valid(op):
+        return 1
+    return PHASE_COUNT.get(op, 1)
 
 
 def insn_length(opcode: int) -> int:
     op = opcode & 0xFF
     if op in WIDE_ABS16_OPS:
         return 3
-    if op in TFR_OPS or op == OP_HALT:
+    if is_tfr_valid(op) or op == OP_HALT:
         return 1
     return 2

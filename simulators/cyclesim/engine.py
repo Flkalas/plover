@@ -72,6 +72,9 @@ class SimContext:
                 self.nets[name] = X
         self._pending.clear()
 
+    def clear_stuck(self) -> None:
+        self._stuck.clear()
+
     def comb_fixup(self) -> None:
         for _ in range(FIXPOINT_LIMIT):
             self._pending.clear()

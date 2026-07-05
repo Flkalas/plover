@@ -9,10 +9,8 @@ OP_CMP = 0x0D
 OP_BEQ = 0x04
 OP_JMP = 0x05
 OP_HALT = 0x0A
-TFR02 = 0x11  # R0 <- R2
-TFR01 = 0x10  # R0 <- R1
-TFR12 = 0x13  # R1 <- R2
-TFR10 = 0x12  # R1 <- R0
+TFR01 = 0x11  # R1 -> R0
+TFR02 = 0x12  # R2 -> R0
 
 ADDR_FIB_A = 0x80
 ADDR_FIB_B = 0x81
@@ -92,35 +90,46 @@ def last_fib_leq(limit: int) -> tuple[int, int]:
     return a, b
 
 
+def fib_pair_before_target(limit: int = FIB_LIMIT) -> tuple[int, int]:
+    """Return (a, b) RAM pair when b reaches largest Fibonacci term <= limit."""
+    target, _ = last_fib_leq(limit)
+    a, b = 0, 1
+    while b < target:
+        a, b = b, a + b
+    return a, b
+
+
 def build_fib_to_limit_rom(limit: int = FIB_LIMIT) -> tuple[bytes, dict[int, int], int]:
     """
-    ROM: iterate Fibonacci while next value <= limit; halt when current b equals target.
+    ROM: advance Fibonacci in RAM until b equals the largest term <= limit.
 
-    Stops before 8-bit overflow (144+233) by halting at b=233 for limit=250.
+    Each step: new_a = b, new_b = a + b via ADD imm (imm = current b, codegen-unrolled).
     """
     target, _next = last_fib_leq(limit)
-    b = RomBuilder(0x0000)
-
-    b.lda(ADDR_FIB_B)
-    b.tfr(TFR10)
-    b.lda(ADDR_FIB_A)
-
-    b.label("loop")
-    b.sta(ADDR_FIB_B)
-    b.lda(ADDR_FIB_B)
-    b.cmp(target)
-    b.beq("halt")
-    b.add(0x00)
-    b.tfr(TFR01)
-    b.tfr(TFR12)
-    b.sta(ADDR_FIB_A)
-    b.jmp("loop")
-
-    b.label("halt")
-    b.halt()
-
+    rb = RomBuilder(0x0000)
     ram_init = {ADDR_FIB_A: 0, ADDR_FIB_B: 1}
-    return b.to_bytes(), ram_init, target
+
+    a, bb = 0, 1
+    while True:
+        rb.lda(ADDR_FIB_B)
+        rb.cmp(target)
+        rb.beq("halt")
+        if bb == target:
+            break
+
+        rb.lda(ADDR_FIB_A)
+        rb.add(bb)
+        rb.tfr(TFR01)
+        rb.sta(ADDR_FIB_A)
+        rb.tfr(TFR02)
+        rb.sta(ADDR_FIB_B)
+
+        a, bb = bb, a + bb
+
+    rb.label("halt")
+    rb.halt()
+
+    return rb.to_bytes(), ram_init, target
 
 
 def build_fib_250_rom() -> tuple[bytes, dict[int, int]]:

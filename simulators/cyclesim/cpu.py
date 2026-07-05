@@ -8,13 +8,12 @@ from simulators.cyclesim.blocks.fsm import BranchAnd, CtrlLookup, PhaseCounter, 
 from simulators.cyclesim.blocks.gpr import GprRegfile
 from simulators.cyclesim.data.fsm_table import Template
 from simulators.cyclesim.data.isa import (
-    OP_ADD,
     OP_BEQ,
     OP_HALT,
     OP_JMP,
-    TFR_OPS,
-    TFR_REG_MAP,
+    decode_tfr,
     insn_length,
+    is_tfr_valid,
     phase_count,
 )
 from simulators.cyclesim.engine import SimContext
@@ -101,15 +100,15 @@ class CpuM3b:
         self.fetch_pending = False
         self.xfer.opcode = op
 
+    def _drive_d_bus(self, val: int) -> None:
+        for i in range(8):
+            self.ctx.set(f"net_d{i}", (val >> i) & 1, stuck=True)
+
     def execute_phase(self) -> None:
         op = self.current_op
         ph = self.phase.phase
         row = self.ctrl.load_opcode_phase(op, ph)
-
-        if row and row.reg_we_r1:
-            # ADD $00 keeps R1 for register-register add (fib loop).
-            if not (op == OP_ADD and self.current_operand == 0):
-                self.gpr.regs[1] = self.current_operand & 0xFF
+        self.ctx.clear_stuck()
 
         self.ctx.set("net_fetch", L)
         self.ctx.set("net_mem_rd", L)
@@ -132,19 +131,21 @@ class CpuM3b:
         if row and row.template == Template.MEM_LD and row.mem_rd:
             self._bus_data = self.mem.read(self.mbr.mbr) & 0xFF
 
+        if row and row.reg_we:
+            if row.template == Template.ALU_REG and ph == 1 and row.w_sel == 1:
+                self._drive_d_bus(self.mbr.mbr)
+            elif row.template == Template.MEM_LD:
+                self._drive_d_bus(self._bus_data)
+            elif row.template == Template.ALU_REG and ph == 2:
+                self.ctx.comb_fixup()
+        elif is_tfr_valid(op) and ph == 0:
+            self.ctx.set("net_reg_we", H)
+            _src, dst = decode_tfr(op)
+            self.ctx.set("net_w_sel0", dst & 1)
+            self.ctx.set("net_w_sel1", (dst >> 1) & 1)
+            self.ctx.comb_fixup()
+
         self.ctx.pulse_clock()
-
-        if row and row.template == Template.MEM_LD and row.reg_we:
-            self.gpr.regs[row.w_sel] = self._bus_data & 0xFF
-
-        if row and row.template == Template.ALU_REG and row.reg_we:
-            w = row.w_sel
-            val = sum((self.ctx.get(f"net_d{i}") & 1) << i for i in range(8))
-            self.gpr.regs[w] = val & 0xFF
-
-        if row and row.template == Template.XFER and op in TFR_OPS:
-            src, dst = TFR_REG_MAP[op]
-            self.gpr.regs[dst] = self.gpr.read(src) & 0xFF
 
         self.phase.advance()
 

@@ -1,4 +1,5 @@
-"""idx5 FSM control table transcribed from reference docs."""
+"""idx5 FSM control table — implements plover-whitepaper §6 / M3a §2."""
+
 
 from __future__ import annotations
 
@@ -28,7 +29,6 @@ class CtrlRow:
     mem_wr: bool = False
     y_oe: bool = False
     w_sel: int = 0
-    reg_we_r1: bool = False
     flg_we: bool = False
     pc_load_en: bool = False
     pc_load_flg_z: bool = False
@@ -47,7 +47,7 @@ def idx5_index(opcode: int, phase: int) -> int:
 FSM_ROWS: tuple[CtrlRow, ...] = (
     # ADD 0x01
     CtrlRow(0x01, 0, Template.ALU_REG, y_oe=True, alu=ALU_ADD),
-    CtrlRow(0x01, 1, Template.ALU_REG, y_oe=True, w_sel=1, reg_we_r1=True, alu=ALU_ADD),
+    CtrlRow(0x01, 1, Template.ALU_REG, y_oe=True, reg_we=True, w_sel=1, alu=ALU_ADD),
     CtrlRow(0x01, 2, Template.ALU_REG, y_oe=True, reg_we=True, w_sel=2, flg_we=True, alu=ALU_ADD),
     # LDA 0x02
     CtrlRow(0x02, 0, Template.MEM_LD, mem_rd=True, alu=ALU_NOP),
@@ -70,18 +70,11 @@ FSM_ROWS: tuple[CtrlRow, ...] = (
     CtrlRow(0x0A, 0, Template.HALT),
     # CMP 0x0D
     CtrlRow(0x0D, 0, Template.ALU_REG, y_oe=True, alu=ALU_CMP),
-    CtrlRow(0x0D, 1, Template.ALU_REG, y_oe=True, w_sel=1, reg_we_r1=True, alu=ALU_CMP),
+    CtrlRow(0x0D, 1, Template.ALU_REG, y_oe=True, reg_we=True, w_sel=1, alu=ALU_CMP),
     CtrlRow(0x0D, 2, Template.ALU_REG, y_oe=True, flg_we=True, alu=ALU_CMP),
     # STA16 0x0F
     CtrlRow(0x0F, 0, Template.MEM_ST, y_oe=True, alu=ALU_NOP),
     CtrlRow(0x0F, 1, Template.MEM_ST, mem_wr=True, alu=ALU_NOP),
-    # TFR 0x10-0x15
-    CtrlRow(0x10, 0, Template.XFER, reg_we=True, w_sel=0),
-    CtrlRow(0x11, 0, Template.XFER, reg_we=True, w_sel=0),
-    CtrlRow(0x12, 0, Template.XFER, reg_we=True, w_sel=1),
-    CtrlRow(0x13, 0, Template.XFER, reg_we=True, w_sel=1),
-    CtrlRow(0x14, 0, Template.XFER, reg_we=True, w_sel=2),
-    CtrlRow(0x15, 0, Template.XFER, reg_we=True, w_sel=2),
 )
 
 FSM_BY_KEY: dict[tuple[int, int], CtrlRow] = {(r.opcode, r.phase): r for r in FSM_ROWS}
