@@ -15,16 +15,19 @@ from simulators.cyclesim.blocks.fetch import (
     PcReg,
     YBusMux,
 )
-from simulators.cyclesim.blocks.fsm import Idx5Decoder, PhaseCounter
+from simulators.cyclesim.blocks.return_stack import ReturnStack, StackError
 from simulators.cyclesim.data.fsm_table import Template, lookup_row
 from simulators.cyclesim.data.isa import (
+    OP_CALL,
     OP_HALT,
     OP_LDIO,
+    OP_RET,
     OP_STA16,
     OP_STIO,
     insn_length,
     phase_count,
 )
+from simulators.cyclesim.blocks.fsm import Idx5Decoder, PhaseCounter
 from simulators.cyclesim.blocks.cpld.gic import NET_REG_WE_LUT
 from simulators.cyclesim.engine import SimContext
 from simulators.cyclesim.values import H, L
@@ -42,6 +45,7 @@ class CpuM3b:
         self.abs16_hi = Abs16HiReg()
         self.flg = FlgReg()
         self.mem = MemArray()
+        self.return_stack = ReturnStack(self.mem)
         self.phase = PhaseCounter()
         self.cpld_cu = CpldCu()
         self.alu_blk = Alu8Block()
@@ -274,6 +278,10 @@ class CpuM3b:
         self.ctx.pulse_clock()
         self.phase.advance()
 
+    def _drive_pc_in(self, addr: int) -> None:
+        for i in range(16):
+            self.ctx.set(f"net_pc_in{i}", (addr >> i) & 1, stuck=True)
+
     def _macro_end_tick(self) -> None:
         op = self.current_op
         n = phase_count(op)
@@ -284,6 +292,22 @@ class CpuM3b:
         self._default_nets()
         self._sync_phase_nets()
         self._sync_opcode_nets()
+
+        if op == OP_CALL:
+            try:
+                self.return_stack.push_return(self.pc.pc)
+            except StackError:
+                self.halted = True
+                return
+
+        if op == OP_RET:
+            try:
+                ret_pc = self.return_stack.pop_return()
+            except StackError:
+                self.halted = True
+                return
+            self._drive_pc_in(ret_pc)
+
         if row:
             self.ctx.set(
                 "net_pc_load_en",

@@ -14,6 +14,8 @@ class Template(str, Enum):
     MEM_ST = "MEM_ST"
     BEQ = "BEQ"
     JMP = "JMP"
+    CALL = "CALL"
+    RET = "RET"
     HALT = "HALT"
 
 
@@ -58,6 +60,10 @@ FSM_ROWS: tuple[CtrlRow, ...] = (
     CtrlRow(0x04, 1, Template.BEQ, pc_load_en=True, pc_load_flg_z=True, alu=ALU_NOP),
     # JMP 0x05
     CtrlRow(0x05, 0, Template.JMP, pc_load_en=True, alu=ALU_NOP),
+    # CALL 0x06
+    CtrlRow(0x06, 0, Template.CALL, pc_load_en=True, alu=ALU_NOP),
+    # RET 0x07
+    CtrlRow(0x07, 0, Template.RET, pc_load_en=True, alu=ALU_NOP),
     # LDIO 0x08
     CtrlRow(0x08, 0, Template.MEM_LD, mem_rd=True, alu=ALU_NOP),
     CtrlRow(0x08, 1, Template.MEM_LD, reg_we=True, w_sel=0, alu=ALU_NOP),

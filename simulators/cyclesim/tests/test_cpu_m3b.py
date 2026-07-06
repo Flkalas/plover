@@ -250,3 +250,84 @@ def test_fib_upto_250() -> None:
     assert visit == len(pairs)
     assert runner.cpu.mem.read(addr_fib_a) == exp_a & 0xFF
     assert runner.cpu.mem.read(addr_fib_b) == exp_b & 0xFF
+
+
+@pytest.mark.timeout(10)
+def test_call_ret_roundtrip() -> None:
+    from simulators.cyclesim.blocks.return_stack import RP_CELL, STACK_BASE
+    from simulators.cyclesim.fixtures.rom_builder import RomBuilder
+
+    marker = 0x30
+    rb = RomBuilder(0)
+    rb.label("main")
+    call_pos = rb.call("sub")
+    return_pc = call_pos + 3
+    rb.lda(marker)
+    rb.halt()
+    rb.label("sub")
+    rb.ret()
+    rom = rb.to_bytes()
+
+    runner = ProgramRunner()
+    runner.load_rom_bytes(rom, base=0)
+    runner.load_ram(RP_CELL, STACK_BASE & 0xFF)
+    runner.load_ram(RP_CELL + 1, (STACK_BASE >> 8) & 0xFF)
+    runner.load_ram(marker, 0xAD)
+    runner.reset(pc=0)
+
+    steps = runner.run_until_halt(max_steps=500)
+    assert steps > 0
+    assert runner.halted
+    assert runner.r0 == 0xAD
+    assert runner.cpu.return_stack.read_rp() == STACK_BASE
+    lo = runner.cpu.mem.read(STACK_BASE)
+    hi = runner.cpu.mem.read(STACK_BASE + 1)
+    assert lo | (hi << 8) == return_pc
+
+
+@pytest.mark.timeout(10)
+def test_ret_underflow_halts() -> None:
+    from simulators.cyclesim.blocks.return_stack import RP_CELL, STACK_BASE
+    from simulators.cyclesim.data.isa import OP_HALT, OP_RET
+
+    runner = ProgramRunner()
+    runner.load_rom_bytes(bytes([OP_RET, OP_HALT]), base=0)
+    runner.load_ram(RP_CELL, STACK_BASE & 0xFF)
+    runner.load_ram(RP_CELL + 1, (STACK_BASE >> 8) & 0xFF)
+    runner.reset(pc=0)
+
+    for _ in range(20):
+        runner.cpu.step()
+        if runner.halted:
+            break
+
+    assert runner.halted
+    assert runner.pc == 1
+
+
+@pytest.mark.timeout(60)
+def test_fib_recursive() -> None:
+    from simulators.cyclesim.fixtures.rom_builder import build_fib_recursive_rom
+
+    n = 3
+    rom, ram_init, expected = build_fib_recursive_rom(n)
+    assert expected == 2
+
+    n_arg = min(k for k in ram_init if k < 0x0F00)
+    result_out = n_arg + 1
+
+    runner = ProgramRunner()
+    runner.load_rom_bytes(rom, base=0)
+    for addr, val in ram_init.items():
+        runner.load_ram(addr, val)
+    runner.reset(pc=0)
+
+    steps = 0
+    max_cpu_steps = 2_000
+    while not runner.halted:
+        runner.cpu.step()
+        steps += 1
+        assert steps <= max_cpu_steps, f"fib recursive exceeded {max_cpu_steps} CPU steps"
+
+    assert runner.r0 == expected & 0xFF
+    assert runner.cpu.mem.read(result_out) == expected & 0xFF
