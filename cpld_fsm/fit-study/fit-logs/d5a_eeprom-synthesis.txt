@@ -1,5 +1,0 @@
-WinCUPL not found ??structural fork only.
-Variant: d5a_eeprom
-Generated: D:\Github\plover\cpld_fsm\fit-study\scripts\..\variants\d5a_eeprom\system_ctrl_gen.pld
-Pin budget: see pin-budget-variants.md
-Action: open system_ctrl_gen.pld in WinCUPL F9 locally
