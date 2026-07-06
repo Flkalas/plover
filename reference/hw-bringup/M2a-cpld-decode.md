@@ -1,10 +1,10 @@
-# M2a — Dual CPLD (rev G) bring-up
+# M2a — Dual CPLD (Gi1) bring-up
 
 | Field | Value |
 |-------|-------|
 | **Milestone** | M2a |
 | **IC** | 2× ATF1504AS-10JU44 (CPLD-CU + CPLD-DP) |
-| **Goal** | WinCUPL JED burn (both chips); verify idx5 FSM, full `q`, ADD/TFR smoke |
+| **Goal** | WinCUPL JED burn (both chips); verify idx5 FSM, R0/`q_a`, ADD smoke, **MBR→B** wire |
 | **Normative** | [cpld-system-controller.md](../hardware/cpld-system-controller.md) · [cpld-dual-jtag.md](../hardware/cpld-dual-jtag.md) · [M3a-control-store.md](M3a-control-store.md) §2 |
 
 ---
@@ -13,8 +13,8 @@
 
 | Order | Reason |
 |-------|--------|
-| After ALU (M1) | ALU path verified before CPLD-DP `q_a`/`q_b` |
-| Before M2b/M3 | Both JEDs must drive ADD/TFR before fetch glue |
+| After ALU (M1) | ALU path verified before CPLD-DP `q_a` and MBR→B |
+| Before M2b/M3 | Both JEDs must drive ADD before fetch glue |
 | CE decode | **138×2 + glue** — off CPLD |
 | SoC decode | **No `alu8_decode` DIP** — strobes from **CPLD-CU** direct |
 
@@ -24,32 +24,29 @@
 
 | Artifact | Role |
 |----------|------|
-| `system_ctrl_cu.pld` | CPLD-CU — idx5 FSM, strobes, G-IC |
-| `system_ctrl_dp.pld` | CPLD-DP — GPR, full `q`, TFR mux |
-| `ctrl_lut.inc` | Generated idx5 LUT (CU) |
+| Gi1 CU idx5 LUT | CPLD-CU — idx5 FSM, strobes, `reg_we` |
+| Gi1 DP PLD fork | CPLD-DP — **R0 only**, `q_a` |
 | `system_ctrl_cu.jed` / `system_ctrl_dp.jed` | JTAG fuse files |
 
-**Active tree:** JTAG toolchain only — [`cpld/tools/`](../cpld/tools/).  
-**HDL restore:** `archive/cpld-rev-g-hdl.tar.gz` → `cpld/hdl/` (then `gen_ctrl_lut.py`, `build-wincupl.ps1`).  
-**JTAG probe:** `cpld/tools/jtag-probe.ps1`
+**JTAG:** [cpld-dual-jtag.md](../hardware/cpld-dual-jtag.md). Prior rev G HDL: [archive/cpld-rev-g-hdl.tar.gz](../../archive/cpld-rev-g-hdl.tar.gz).
 
 ---
 
 ## 3. Pre-burn checklist
 
 - [ ] **idx5 on CU:** `OPC[4:0]` from IR574
-- [ ] **G-IC wired:** 6 signals CU→DP per [cpld-dual-routing.md](../hardware/cpld-dual-routing.md)
-- [ ] **JTAG daisy chain:** CU first, then DP ([cpld-dual-jtag.md](../hardware/cpld-dual-jtag.md))
-- [ ] **No CW latch** — Tier C archived
-- [ ] **3 GPR on DP:** R0→`q_a`, R1→`q_b`, R2 internal
+- [ ] **G-IC wired:** **`reg_we` only** CU→DP ([cpld-dual-routing.md](../hardware/cpld-dual-routing.md))
+- [ ] **MBR→B:** `net_mbr0..7` → `net_b0..7` → ALU B
+- [ ] **JTAG daisy chain:** CU first, then DP
+- [ ] **R0 on DP:** `q_a` → ALU A; **no `q_b`**
 - [ ] **Fitter:** Design fits on **both** ATF1504AS
-- [ ] **Frozen table:** 20 idx5 slots match M3a §2
+- [ ] **Frozen table:** 20 idx5 slots match M3a §2 (Gi1 semantics)
 
 ---
 
 ## 4. Burn procedure
 
-1. Program **`system_ctrl_cu.jed`** then **`system_ctrl_dp.jed`** via JTAG chain (or each chip standalone).
+1. Program **`system_ctrl_cu.jed`** then **`system_ctrl_dp.jed`** via JTAG chain.
 2. Read back device ID — ATF1504 family.
 3. Power-cycle; verify CLK on both pin 43.
 
@@ -57,20 +54,20 @@
 
 ## 5. Bench vectors
 
-Same idx5 keys as prior M2a — observe strobes on **CU**, `q_a`/`q_b` on **DP**.
+### ADD ph2 (`0x01`)
 
-### TFR20 (`0x18`)
+Preload R0; MBR holds imm8; ph2: `Y_OE`, `REG_WE`→R0, observe R0 ← R0+imm.
 
-REG_WE via G-IC; `w_sel=R2`; `src=R0`; DP latches R2←R0.
+**Removed vs rev G:** TFR smoke — archived.
 
 ---
 
 ## 6. M2a sign-off
 
 - [ ] Both JEDs readback OK
-- [ ] ADD 3-phase strobes on CU (scope)
-- [ ] TFR20 smoke on DP GPR
-- [ ] G-IC bundle ≤ 10 cm
+- [ ] ADD ph2 strobes on CU (scope)
+- [ ] MBR→B wired; ALU B sees imm during ADD
+- [ ] G-IC `reg_we` ≤ 10 cm
 
 ---
 
@@ -78,5 +75,5 @@ REG_WE via G-IC; `w_sel=R2`; `src=R0`; DP latches R2←R0.
 
 | Date | Note |
 |------|------|
-| 2026-07-06 | **rev G** — dual CPLD; CW latch removed |
-| 2026-07-06 | idx5, WinCUPL JED |
+| 2026-07-07 | Gi1 — R0 only; MBR→B; no TFR |
+| 2026-07-06 | rev G archived |

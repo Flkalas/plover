@@ -1,21 +1,22 @@
-# M2b — CPLD GPR datapath (상세)
+# M2b — CPLD GPR datapath (Gi1)
 
 | Field | Value |
 |-------|-------|
 | **Milestone** | M2b (datapath) |
-| **Normative** | [cpld-system-controller.md](../hardware/cpld-system-controller.md) v1.0 |
-| **Goal** | **CPLD-only** R0/R1/R2 + fixed read + FSM ADD (no external 574 GPR, no decode block) |
+| **Normative** | [cpld-system-controller.md](../hardware/cpld-system-controller.md) v1.0 Gi1 |
+| **Goal** | **CPLD-only R0 (AC)** + MBR→ALU B + FSM ADD (no external 574 GPR) |
 
 ---
 
 ## 1. 아키텍처 요약
 
-| 항목 | v1.0 |
-|------|-------|
-| GPR | **ATF1504 내부** R0, R1, R2 |
-| Read | **고정:** R0→`q_a`, R1→`q_b` |
-| Write | `REG_WE` + internal **`w_sel[1:0]`** (not exported; see [cpld-system-controller.md](../hardware/cpld-system-controller.md) §2) |
-| ALU ctrl | CPLD FSM → `cin`/`bctrl0..3`/`lgc*`/`y_mux` **직접** |
+| 항목 | v1.0 Gi1 |
+|------|----------|
+| GPR | **ATF1504 내부 R0 only** |
+| Read | **R0→`q_a`→ALU A** |
+| Operand B | **MBR 574 → `net_mbr` → ALU B** |
+| Write | `REG_WE` → **R0** from `d_in` |
+| ALU ctrl | CPLD FSM → `cin`/`bctrl*`/`lgc*` **직접** |
 | Decode | **없음** — `alu8_decode` SoC 미장착 |
 
 공유 버스: `net_d0..7` — [breadboard-wiring.md](breadboard-wiring.md).
@@ -24,24 +25,24 @@
 
 ## 2. CPLD ↔ ALU 결선
 
-| CPLD 출력 | ALU 입력 |
-|-----------|----------|
-| `q_a0..7` | `net_a0..7` |
-| `q_b0..7` | `net_b0..7` |
-| `cin`, `bctrl0..3` | 283 / 153 mux2 |
-| `lgc3..0` | 153 mux1 |
-| `y_mux_sel` | 157_YBP select |
+| CPLD / MBR | ALU 입력 |
+|------------|----------|
+| `q_a0..7` (DP) | `net_a0..7` |
+| `net_mbr0..7` (MBR 574) | `net_b0..7` |
+| `cin`, `bctrl0..3` (CU) | 283 / 153 mux2 |
+| `lgc3..0` (CU) | 153 mux1 |
+| `y_mux_sel` (CU) | 157_YBP select |
 
 | ALU 출력 | 목적지 |
 |----------|--------|
-| `net_y0..7` | 버스 (`Y_OE` 시) → CPLD `d_in` (GPR write) |
+| `net_y0..7` | 버스 (`Y_OE` 시) → CPLD `d_in` (R0 write) |
 
 ---
 
 ## 3. GPR 쓰기 규칙
 
 ```text
-REG_WE=1 @ CLK↑ → regs(w_sel) <= d_in
+REG_WE=1 @ CLK↑ → R0 <= d_in
 ```
 
 - 한 사이클에 **REG_WE 1회**만 (FSM 보장).
@@ -49,86 +50,52 @@ REG_WE=1 @ CLK↑ → regs(w_sel) <= d_in
 
 ---
 
-## 4. 단계별 실장 (G0–G5)
+## 4. 단계별 검증 (G0–G4)
 
-### G0 — CPLD in-system
+### G0 — MBR → ALU B
 
-**작업:** M2a에서 검증한 CPLD를 CPU 보드에 장착. `q_a`/`q_b` → ALU A/B. ALU ctrl CPLD → alu8.
+**작업:** MBR에 imm8 프리로드; scope on `net_b*` = `net_mbr*`.
 
-**Pass:** M2a 벤치 ADD ph0에서 `q_a` LED = R0 패턴.
+**Pass:** ALU B matches MBR (no CPLD `q_b`).
 
----
+### G1 — R0 프리로드
 
-### G1 — R0/R1 프리로드
+**작업:** `REG_WE` + `d_in` → R0에 `0x12` 래치.
 
-**작업:**
+**Pass:** `q_a` = `0x12`.
 
-1. Bench: FSM or manual drive **`w_sel=00`**, `REG_WE` 수동 + `d_in` DIP → R0에 `0x12` 래치.
-2. `w_sel=01` → R1에 `0x34` 래치.
+### G2 — q_a 관측
 
-**Pass:** scope/DIP readback으로 R0/R1 확인 (또는 다음 단계 q_a/q_b 관측).
+**Pass:** `q_a` = R0 async (~10 ns typ).
 
----
+### G3 — CMP 플래그
 
-### G2 — 고정 read path
+**작업:** R0=`0x12`, MBR=`0x34`; ALU CMP; `FLG_WE`.
 
-**작업:** R0=`0x12`, R1=`0x34` 상태에서 `q_a`/`q_b` 프로브.
+**Pass:** Z/C from ALU (B from MBR).
 
-**Pass:** `q_a`=`0x12`, `q_b`=`0x34` (async, ~10 ns typ).
+### G4 — FSM ADD ph2
 
----
+**작업:** R0=`0x12`, MBR=`0x34`; ph2 ADD; `Y_OE`, `REG_WE`.
 
-### G3 — ALU 피연산자
-
-**작업:** FSM ph0/ph1 또는 수동 ALU ctrl로 SUB 경로 스모크.
-
-**Pass:** ALU Y = R0 − R1 (플래그만 관측 가능).
-
----
-
-### G4 — R2 쓰기
-
-**작업:** `Y_OE=1`, ALU ADD 결과를 `d_in`으로, `REG_WE=1`, **`w_sel=10`** (R2).
-
-**Pass:** R2 readback (via 다음 write to R0 + q_a) = ALU Y.
-
----
-
-### G5 — FSM ADD 3-phase
-
-**작업:**
-
-1. R0=`0x12`, R1=`0x34` 프리로드.
-2. `OPC=0x01` (ADD), FSM 자동 3 phase @ `net_clk2`.
-3. 관측: R2 = `0x46`.
-
-**Pass:** scope에서 3 phase strobes; R2=`0x46`. pre-flight sim: `cpld_seq_add.yaml`.
-
-**게이트:** 각 Execute 반주기 **≤250 ns** ([alu-opcodes-timing.md](../hardware/alu-opcodes-timing.md)).
+**Pass:** **R0** = `0x46` (Gi1 writeback to AC).
 
 ---
 
 ## 5. 버스 규칙
 
-동시에 **한 구동원만** `net_d0..7` 구동:
-
-| 구동원 | Enable |
-|--------|--------|
+| 구동원 | 조건 |
+|--------|------|
 | ALU Y | `Y_OE`=1 |
 | SRAM | `MEM_RD`=1 (245 경유) |
 
+**버스 충돌:** `Y_OE`와 `MEM_RD` 동시 1 금지.
+
 ---
 
-## 6. 고장 분리
+## Change log
 
-| 증상 | 조치 |
+| Date | Note |
 |------|------|
-| q_a ≠ R0 | 고정 read VHDL; R0 미래치 |
-| ADD 틀림 | `cin`/`bctrl*` FSM 테이블 |
-| 버스 충돌 | `Y_OE`와 `MEM_RD` 동시 1 금지 |
-
----
-
-## 7. 다음
-
-→ [M2b-memory.md](M2b-memory.md) · [M3a-control-store.md](M3a-control-store.md)
+| 2026-07-07 | Gi1 — R0 only; MBR→B |
+| 2026-07-06 | rev G 3-GPR archived |

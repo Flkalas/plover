@@ -1,11 +1,11 @@
-# M3b — Fetch path and macro execution (상세)
+# M3b — Fetch path and macro execution (Gi1)
 
 | Field | Value |
 |-------|-------|
 | **Milestone** | M3b |
 | **Goal** | ROM fetch → **CPLD FSM (idx5)** → operand via MBR → 첫 프로그램 HALT |
-| **선행** | [M2b G5](M2b-gpr-datapath.md#g5--fsm-add-3-phase), [M3a](M3a-control-store.md) |
-| **Normative** | [cpld-system-controller.md](../hardware/cpld-system-controller.md) §5–7 |
+| **선행** | [M2b G4](M2b-gpr-datapath.md#g4--fsm-add-ph2), [M3a](M3a-control-store.md) |
+| **Normative** | [cpld-system-controller.md](../hardware/cpld-system-controller.md) §7 |
 
 ---
 
@@ -15,13 +15,13 @@
 |------|-----|-----|------|
 | **PC** | 574+161 | `net_pc0..15` | instruction address |
 | **IR** | 574 | `net_ir0..7` | opcode byte → CPLD `OPC[4:0]` |
-| **MBR** | 574 | `net_mbr0..7` | operand imm8 / abs16 lo |
+| **MBR** | 574 | `net_mbr0..7` | operand imm8 / abs16 lo; **Gi1: ALU B** |
 | **MBR hi** | 574 or PC+2 path | — | abs16 high byte (BEQ/JMP) |
 | **Phase** | CPLD internal | `phase[1:0]` | micro-phase 0..2 |
 | **FLG** | 574 | Z, C | BEQ @ macro_end |
 | **PC+1** | 283 (low) | — | sequential fetch |
 
-**없음:** PARAM 574, Flash `$4000` CW fetch, per-phase Flash addr mux.
+**없음:** PARAM 574, Flash `$4000` CW fetch, CPLD `q_b`, TFR comb.
 
 ---
 
@@ -32,16 +32,20 @@
 | **Insn fetch** | 1 | PC → ROM/RAM | IR (byte0), MBR (byte1+) |
 | **Data access** | 0 | MBR (or abs16 latch) | MEM_RD / MEM_WR |
 
-### 오퍼랜드 취득 (Flash param 없음)
+### 오퍼랜드 취득 (Gi1)
 
 | 명령 | Fetch bytes | MBR / latch | FSM |
 |------|-------------|-------------|-----|
-| LDA `02 imm` | PC, PC+1 | imm8 → MBR | ph0 MEM_RD @ MBR |
+| LDA `02 imm` | PC, PC+1 | imm8 → MBR (address) | ph0 MEM_RD @ MBR |
 | STA `03 imm` | PC, PC+1 | imm8 → MBR | ph1 MEM_WR @ MBR |
-| LDIO/STIO | 2-byte | imm8 → MBR | MMIO decode on high nibble |
+| LDIO/STIO | 2-byte | imm8 → MBR | MMIO decode |
 | BEQ/JMP | 3-byte | abs16 LE → MBR+hi | macro_end PC_LOAD_EN |
-| ADD `01 imm` | PC, PC+1 | imm8 → R1 (ph0/1) | ALU_REG |
-| TFR `18` | PC only | — | XFER comb 1 phase |
+| ADD `01 imm` | PC, PC+1 | imm8 → **MBR (held → ALU B)** | ALU_REG ph2 → **R0** |
+| `0x10–0x1F` | — | — | **trap / NOP** |
+
+### MBR hold (ALU_REG)
+
+During ADD/CMP macro ph0–ph2: **do not reload MBR** — operand imm8 must remain on `net_mbr` for ALU B.
 
 RESET: **74HC157** → `$FFFC` → PC `$0000` (Boot).
 
@@ -62,29 +66,23 @@ RESET: **74HC157** → `$FFFC` → PC `$0000` (Boot).
 
 ## 4. 매크로 타임라인 (@ 2 MHz)
 
-**idx5 key:** decimal slot index `(opcode[4:0] << 2) | phase` — same numbers as [M3a-control-store.md](M3a-control-store.md) §2 (not hex).
-
-```
-[fetch opcode+operand] → FSM ph0..N (idx5) → [branch or PC+=len]
-```
+**idx5 key:** `(opcode[4:0] << 2) | phase` — [M3a-control-store.md](M3a-control-store.md) §2.
 
 ### ADD (`0x01`)
 
-| phase | idx5 key | 동작 |
-|-------|----------|------|
-| 0 | 4 | R0→A; ALU ADD |
-| 1 | 5 | imm8→R1 (**REG_WE mandatory**); R1→B |
-| 2 | 6 | ADD → R2; FLG_WE |
+| phase | idx5 | 동작 |
+|-------|------|------|
+| 0 | 4 | idle; MBR holds imm |
+| 1 | 5 | idle |
+| 2 | 6 | R0←R0+imm; `Y_OE`; REG_WE→R0; FLG_WE |
 
 ### CMP (`0x0D`)
 
-| phase | idx5 key | 동작 |
-|-------|----------|------|
-| 0 | 52 | R0→A; ALU CMP |
-| 1 | 53 | imm8→R1 (**REG_WE mandatory**); R1→B |
-| 2 | 54 | FLG_WE only — **R2 not written** |
-
-After CMP ph1, R1 holds the imm8 operand (required for a following ADD that reuses R1).
+| phase | idx5 | 동작 |
+|-------|------|------|
+| 0 | 52 | idle |
+| 1 | 53 | idle |
+| 2 | 54 | FLG_WE only; B from MBR |
 
 ### LDA (`0x02`)
 
@@ -92,12 +90,6 @@ After CMP ph1, R1 holds the imm8 operand (required for a following ADD that reus
 |-------|------|
 | 0 | FETCH=0; MEM_RD @ MBR |
 | 1 | REG_WE → R0 |
-
-### TFR20 (`0x18`, 1 byte)
-
-| phase | idx5 key | 동작 |
-|-------|----------|------|
-| 0 | 96 (inactive LUT) | R2 ← R0 via `tfr_valid` comb (not idx5 row) |
 
 ---
 
@@ -111,9 +103,9 @@ After CMP ph1, R1 holds the imm8 operand (required for a following ADD that reus
 
 **테스트 ROM (`$0000`):**
 
-```
+```hex
 02 42    ; LDA $42
-01 00    ; ADD $00
+01 00    ; ADD $00  → R0 = mem[$42] + 0
 0A       ; HALT
 ```
 
@@ -121,7 +113,7 @@ After CMP ph1, R1 holds the imm8 operand (required for a following ADD that reus
 
 ### F2 — FSM → datapath
 
-1. IR=`0x02` → FSM MEM_LD (idx5 decode `OPC=0x02`).
+1. IR=`0x02` → FSM MEM_LD.
 2. ph0: `FETCH=0`, `MEM_RD` @ MBR=`$42`.
 3. ph1: `REG_WE` → R0.
 
@@ -131,7 +123,7 @@ LDA: PC += 2 after macro; phase reset.
 
 ### F4 — Full mini-program
 
-LDA → ADD → HALT. **Pass:** HALT @ expected GPR (scope/LED).
+LDA → ADD → HALT. **Pass:** R0 holds final sum (Gi1: ADD result in R0).
 
 ### F5 — BEQ smoke (optional)
 
@@ -141,16 +133,23 @@ ROM: CMP + BEQ; verify `PC_LOAD_EN` only when Z=1.
 
 ## 6. M3b sign-off
 
-**Sim pre-flight (pytest, no silicon):** `simulators/cyclesim/tests/test_cpu_m3b.py` — fetch nets, m3b mini, BEQ/JMP, LDIO/STIO, fib. Wall limit 15s per test (`conftest.py`).
-
-- [ ] F0–F4 Pass on **breadboard** (final; sim pre-flight above)
-- [x] Sim pre-flight: fetch IR/MBR, m3b mini, CMP→ADD R1 latch (`test_cpu_m3b.py`)
-- [ ] Operand path: MBR latched before MEM_RD (sim: `test_mbr_before_mem_rd`)
+- [ ] F0–F4 Pass on **breadboard**
+- [ ] Machine golden pre-flight: fetch IR/MBR, m3b mini, BEQ/JMP
+- [ ] MBR hold during ADD/CMP macro
 - [ ] No Flash param / `$4000` fetch in path
-- [ ] BEQ: FLG_Z gates `PC_LOAD_EN` (sim: `test_beq_*`; scope on breadboard)
+- [ ] BEQ: FLG_Z gates `PC_LOAD_EN`
 
 ---
 
 ## 7. 다음
 
 → [M4a-boot-sim.md](M4a-boot-sim.md) · [M4b-boot-hardware.md](M4b-boot-hardware.md)
+
+---
+
+## Change log
+
+| Date | Note |
+|------|------|
+| 2026-07-07 | Gi1 — MBR→B; ADD→R0; TFR removed |
+| 2026-07-06 | rev G timeline archived |

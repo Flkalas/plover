@@ -51,7 +51,7 @@ flowchart LR
 |------|------|
 | [M2a-cpld-decode.md](M2a-cpld-decode.md) | CPLD 3fixed + phase FSM ISP |
 | [M2b-gpr-memory.md](M2b-gpr-memory.md) | M2b 개요 |
-| [M2b-gpr-datapath.md](M2b-gpr-datapath.md) | CPLD q_a/q_b ↔ ALU (no decode) |
+| [M2b-gpr-datapath.md](M2b-gpr-datapath.md) | Gi1 AC (R0) + MBR→ALU B (no decode) |
 | [M2b-memory.md](M2b-memory.md) | SRAM·NOR·MAP_MODE |
 | [breadboard-wiring.md](breadboard-wiring.md) | 138×2 · CPLD FSM idx5 |
 
