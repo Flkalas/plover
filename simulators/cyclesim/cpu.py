@@ -1,8 +1,9 @@
-"""M3b CPU — CPLD idx5 FSM + ALU + net-faithful fetch/execute."""
+"""M3b CPU — dual CPLD idx5 FSM + ALU + net-faithful fetch/execute."""
 
 from __future__ import annotations
 
 from simulators.cyclesim.blocks.alu8_block import Alu8Block
+from simulators.cyclesim.blocks.cpld import BranchAnd, CpldCu, CpldDp
 from simulators.cyclesim.blocks.fetch import (
     Abs16HiReg,
     AddrMux,
@@ -14,8 +15,7 @@ from simulators.cyclesim.blocks.fetch import (
     PcReg,
     YBusMux,
 )
-from simulators.cyclesim.blocks.fsm import BranchAnd, CtrlLookup, Idx5Decoder, PhaseCounter, XferMux
-from simulators.cyclesim.blocks.gpr import GprRegfile
+from simulators.cyclesim.blocks.fsm import Idx5Decoder, PhaseCounter
 from simulators.cyclesim.data.fsm_table import Template
 from simulators.cyclesim.data.isa import (
     OP_HALT,
@@ -23,7 +23,6 @@ from simulators.cyclesim.data.isa import (
     OP_STA16,
     OP_STIO,
     insn_length,
-    is_tfr_valid,
     phase_count,
 )
 from simulators.cyclesim.engine import SimContext
@@ -31,11 +30,11 @@ from simulators.cyclesim.values import H, L
 
 
 class CpuM3b:
-    """Functional-block CPU for M3b fetch + execute."""
+    """Functional-block CPU for M3b fetch + execute (rev G dual CPLD)."""
 
     def __init__(self) -> None:
         self.ctx = SimContext()
-        self.gpr = GprRegfile()
+        self.cpld_dp = CpldDp()
         self.pc = PcReg()
         self.ir = IrReg()
         self.mbr = MbrReg()
@@ -43,8 +42,7 @@ class CpuM3b:
         self.flg = FlgReg()
         self.mem = MemArray()
         self.phase = PhaseCounter()
-        self.ctrl = CtrlLookup()
-        self.xfer = XferMux(self.gpr)
+        self.cpld_cu = CpldCu()
         self.alu_blk = Alu8Block()
         self.addr_mux = AddrMux()
         self.pc_in_mux = PcInMux()
@@ -60,11 +58,10 @@ class CpuM3b:
             self.mem,
             self.addr_mux,
             self.pc_in_mux,
-            self.gpr,
+            self.cpld_dp,
             self.phase,
-            self.ctrl,
+            self.cpld_cu,
             Idx5Decoder(),
-            self.xfer,
             self.y_bus,
             self.alu_blk,
             self.branch,
@@ -80,6 +77,11 @@ class CpuM3b:
 
         self._trace_fetch: dict[str, int | bool] = {}
 
+    @property
+    def gpr(self) -> CpldDp:
+        """GPR datapath alias (CPLD-DP)."""
+        return self.cpld_dp
+
     def reset(self, pc: int | None = None, *, from_vector: bool = False) -> None:
         if from_vector or pc is None:
             if self.mem.sys.rom.get(0xFFFC) is not None or self.mem.sys.rom.get(0xFFFD) is not None:
@@ -93,13 +95,12 @@ class CpuM3b:
         self._fetch_byte = 0
         self._fetch_ilen = 0
         self.current_op = 0
-        self.gpr.regs = [0, 0, 0]
+        self.cpld_dp.regs = [0, 0, 0]
         self.flg.z = False
         self.flg.c = False
         self.ir.ir = 0
         self.mbr.mbr = 0
         self.abs16_hi.hi = 0
-        self.xfer.opcode = 0
 
     def _default_nets(self) -> None:
         for net in (
@@ -163,7 +164,6 @@ class CpuM3b:
 
             self._fetch_ilen = insn_length(op)
             self.current_op = op
-            self.xfer.opcode = op
             if self._fetch_ilen == 1:
                 self._finish_fetch()
             else:
@@ -213,7 +213,7 @@ class CpuM3b:
         self._fetch_ilen = 0
 
     def _drive_d_from_qa(self) -> None:
-        val = self.gpr.qa()
+        val = self.cpld_dp.qa()
         for i in range(8):
             self.ctx.set(f"net_d{i}", (val >> i) & 1, stuck=True)
 
@@ -239,7 +239,7 @@ class CpuM3b:
     def execute_phase(self) -> None:
         op = self.current_op
         ph = self.phase.phase
-        row = self.ctrl.load_opcode_phase(op, ph)
+        row = self.cpld_cu.load_opcode_phase(op, ph)
         self.ctx.clear_stuck()
         self._default_nets()
         self._sync_phase_nets()
@@ -259,16 +259,12 @@ class CpuM3b:
         if row and row.template == Template.MEM_ST and row.y_oe:
             self.ctx.set("net_y_src_a", H, stuck=True)
 
-        self.ctrl.eval_comb(self.ctx)
-        if is_tfr_valid(op) and ph == 0:
-            self.xfer.eval_comb(self.ctx)
-
         self.ctx.comb_fixup()
 
         if row and row.template == Template.MEM_LD and row.mem_rd:
             self._bus_data = self.mem.read(self._eff_addr(op))
         if row and row.template == Template.MEM_ST and row.mem_wr:
-            self.mem.write(self._eff_addr(op), self.gpr.qa())
+            self.mem.write(self._eff_addr(op), self.cpld_dp.qa())
         if row and row.reg_we:
             if row.template == Template.ALU_REG and ph == 1 and row.w_sel == 1:
                 self._drive_d_from_mbr()
@@ -283,12 +279,12 @@ class CpuM3b:
         op = self.current_op
         n = phase_count(op)
         last_ph = max(0, n - 1)
-        self.ctrl.load_opcode_phase(op, last_ph)
+        self.cpld_cu.load_opcode_phase(op, last_ph)
         self.ctx.clear_stuck()
         self._default_nets()
         self._sync_phase_nets()
         self._sync_opcode_nets()
-        self.ctrl.eval_comb(self.ctx)
+        self.ctx.comb_fixup()
         self.ctx.set("net_macro_end", H)
         self.ctx.comb_fixup()
         self.ctx.pulse_clock()
