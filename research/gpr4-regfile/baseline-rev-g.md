@@ -1,6 +1,10 @@
-# Baseline — v1.0 rev G (3-GPR)
+# Baseline — rev G (3-GPR·TFR) — **archived**
 
-**Source of truth:** [reference/hardware/cpld-system-controller.md](../../reference/hardware/cpld-system-controller.md) · [reference/hardware/microcode-spec.md](../../reference/hardware/microcode-spec.md)
+**Status:** Superseded **2026-07** by **Gi1 v1.0** normative. Do not cite for SoC bring-up.
+
+**Normative snapshot:** [archive/rev-g-normative-snapshot/](../../archive/rev-g-normative-snapshot/) · Index: [archive/rev-g-dual-3gpr/README.md](../../archive/rev-g-dual-3gpr/README.md)
+
+**Historical source of truth (pre-Gi1):** snapshot copies above; live reference now describes Gi1.
 
 ---
 

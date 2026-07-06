@@ -59,9 +59,9 @@ When answering **hardware architecture**, **bring-up**, or **decode/CPLD/ALU** q
 
 **Anchor docs:** [control-and-decode.md](reference/hardware/control-and-decode.md), [system-architecture.md](reference/hardware/system-architecture.md), [plover-whitepaper.md](plover-whitepaper.md).
 
-**Active hardware truth:** whitepaper root → reference cascade → machine code → CPLD artifacts. Restore guide: [archive/MANIFEST.md](archive/MANIFEST.md).
+**Active hardware truth:** whitepaper root → reference cascade → machine code → CPLD artifacts. **v1.0 normative = Gi1** (R0/AC only, MBR→ALU B, TFR removed, G-IC 1-wire). **rev G** (3-GPR·TFR) is archived — [archive/rev-g-dual-3gpr/README.md](archive/rev-g-dual-3gpr/README.md). Restore guide: [archive/MANIFEST.md](archive/MANIFEST.md).
 
-**Strobe layers:** LUT/csim tests use `reg_we_lut`, `w_sel*_lut` (18 signals). Bench/cyclesim merged pins use `reg_we`, `w_sel*`. Reference §7 tables describe merged behavior.
+**Strobe layers:** LUT/csim tests use `reg_we_lut` (Gi1 G-IC is **reg_we only**). Bench/cyclesim merged pin `net_reg_we`. Reference tables describe Gi1 merged behavior.
 
 **MC policy:** ATF1504 **64 macrocell** is a BOM chip rating only. Bring-up gate = WinCUPL **Design fits** — do not record fitter used-MC counts in normative prose.
 
@@ -75,4 +75,4 @@ When answering **hardware architecture**, **bring-up**, or **decode/CPLD/ALU** q
 
 **Do not** implement bring-up or reference edits based on archived tarball content unless the user explicitly requests historical comparison.
 
-**Stale terms** (after 2026-07 ALU refactor): `inc_en`, `INC_B_SEL`, `INC_2C2`, `14 IC` for ALU BOM, `b_sel`/`b_const_sel` as SoC signal names (use `net_bctrl0..3`).
+**Stale terms** (after 2026-07 Gi1 adoption): `inc_en`, `INC_B_SEL`, `INC_2C2`, `14 IC` for ALU BOM, `b_sel`/`b_const_sel` as SoC signal names (use `net_bctrl0..3`), **`cpld_3fixed` / rev G normative** (use **Gi1** / `cpld_ac_mbr`), **`tfr_valid` / TFR opcodes** as v1.0 (reserved `0x10–0x1F`).

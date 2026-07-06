@@ -15,7 +15,7 @@
 | **P1M1** | P1 + M1 dual 574 + 2-half ph2 ([p1m1-dual574/](p1m1-dual574/)) | **29/32 PASS** | ~50–60 likely | Full 4-GPR; ph2 **500 ns** | 2×1504 +2×574 | **Pins PASS; timing PASS (desk)** |
 | **P1-old** | G-IC time-mux / `d_in` share only (no q merge) | 33–42 TBD | TBD | Full 4-GPR | 2×1504 | Superseded by bus-TDM study |
 | **P2** | STR-only; fixed ALU reads | **31/32 PASS** | ~22–32 | Partial — STR + R3? | 2×1504 | **Conditional PASS** |
-| **Gi1** | AC + MBR→B; R0 only ([gi1-ac-mbr/](gi1-ac-mbr/)) | **17/32 PASS** | ~10–18 | AC-centric; **no TFR** | 2×1504, **3×574** | **Timing PASS @ 250 ns (desk)** |
+| **Gi1** | AC + MBR→B; R0 only ([gi1-ac-mbr/](gi1-ac-mbr/)) | **17/32 PASS** | ~10–18 | AC-centric; **no TFR** | 2×1504, **3×574** | **Normative v1.0 adopted (2026-07)** |
 | **P3** | External GPR (fit-study A1) | ≤32 PASS | ~20–30 on DP | Full | **+574×N** | **PASS** (cost) |
 | **P4** | ATF1508 (fit-study C2) | >>32 | headroom | Full | **Different CPLD** | **PASS** (BOM change) |
 | **P5** | Hidden TMP (TFR-tmp-2op) | 31/32 PASS | +8 FF | 3 visible + scratch | 2×1504 | **PASS** — not 4 visible GPR |
@@ -90,17 +90,19 @@
 
 **Description:** Single **R0 (AC)** in CPLD-DP; **`net_mbr → ALU B`**; ADD/CMP writeback **R0**; **TFR opcodes removed**; ph2 **250 ns** desk closed.
 
-**Detail:** [gi1-ac-mbr/SUMMARY-REPORT.md](gi1-ac-mbr/SUMMARY-REPORT.md) · [pin-map.md](gi1-ac-mbr/pin-map.md) · [timing-closed.md](gi1-ac-mbr/timing-closed.md)
+**Detail:** [gi1-ac-mbr/SUMMARY-REPORT.md](gi1-ac-mbr/SUMMARY-REPORT.md) · [cpld-dual-delta.md](gi1-ac-mbr/cpld-dual-delta.md) · [pin-map.md](gi1-ac-mbr/pin-map.md) · [timing-closed.md](gi1-ac-mbr/timing-closed.md)
 
 | Gate | Result |
 |------|--------|
 | Pins (DP) | **PASS 17/32** |
-| MC | ~10–18 desk |
+| Pins (CU) | **PASS ~21/32** — G-IC 6→1; TFR logic removed |
+| MC (DP / CU) | ~10–18 / ~24–30 desk |
 | Timing | **PASS** — ADD @ 133 ns vs 250 ns |
 | ISA | AC-centric; **no TFR**; not 4-GPR |
 | BOM | **unchanged** 3×574 |
+| Monolith | **36/32 FAIL (+4 pins)** — see [io-pin-allocation.md](gi1-ac-mbr/io-pin-allocation.md) |
 
-**Recommendation:** Preferred when **2 MHz timing certainty** beats 4-GPR / TFR. Spike [gi1_dp PLD](variants/gi1_dp/system_ctrl.pld) + MBR→B wire.
+**Recommendation:** Preferred when **2 MHz timing certainty** beats 4-GPR / TFR. **Stay dual 1504** unless BOM moves to ATF1508. Spike [gi1_dp PLD](variants/gi1_dp/system_ctrl.pld) + CU idx5 ([gi1_cu memo](variants/gi1_cu/README.md)) + MBR→B wire.
 
 ---
 
