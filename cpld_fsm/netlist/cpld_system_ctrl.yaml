@@ -21,39 +21,49 @@ dedicated:
 
 entity_ports:
   inputs:
-    - { cupl: opc0, net: opc0, pin: 4 }
-    - { cupl: opc1, net: opc1, pin: 5 }
-    - { cupl: opc2, net: opc2, pin: 6 }
+    - { cupl: opc0, net: opc0, pin: 12 }
+    - { cupl: opc1, net: opc1, pin: 9 }
+    - { cupl: opc2, net: opc2, pin: 2 }
     - { cupl: opc3, net: opc3, pin: 8 }
-    - { cupl: opc4, net: opc4, pin: 9 }
-    - { cupl: d_in0, net: d_in0, pin: 11 }
-    - { cupl: d_in1, net: d_in1, pin: 12 }
-    - { cupl: d_in2, net: d_in2, pin: 14 }
-    - { cupl: d_in3, net: d_in3, pin: 16 }
-    - { cupl: d_in4, net: d_in4, pin: 17 }
-    - { cupl: d_in5, net: d_in5, pin: 18 }
-    - { cupl: d_in6, net: d_in6, pin: 19 }
-    - { cupl: d_in7, net: d_in7, pin: 20 }
-    - { cupl: flg_z, net: flg_z, pin: 24 }
+    - { cupl: opc4, net: opc4, pin: 11 }
+    - { cupl: d_in0, net: d_in0, pin: 44 }
+    - { cupl: d_in1, net: d_in1, pin: 1 }
+    - { cupl: d_in2, net: d_in2, pin: 33 }
+    - { cupl: d_in3, net: d_in3, pin: 34 }
+    - { cupl: d_in4, net: d_in4, pin: 24 }
+    - { cupl: d_in5, net: d_in5, pin: 6 }
+    - { cupl: d_in6, net: d_in6, pin: 4 }
+    - { cupl: d_in7, net: d_in7, pin: 5 }
+    - { cupl: flg_z, net: flg_z, pin: 36 }
     - { cupl: flg_c, net: flg_c, pin: 25, note: "tie 0 on breadboard; not used in v1.0 equations" }
   outputs_fit:
     source: cpld_fsm/hdl/system_ctrl.pin
     method: "pin = signal in PLD + PREASSIGN OFF; run gen_pin_lock.py after fit"
+    tier: C
     exported:
       - reg_we
-      - q_a0..q_a7
-      - q_b0..q_b5
-    internal_tier_a:
-      - flg_z
-      - q_b6
-      - q_b7
+      - cw_data0..7
+      - cw_le
+      - cw_bank
+      - q_a0..q_a2
+      - q_b0..q_b2
+    internal_tier_c:
+      - q_a3..q_a7
+      - q_b3..q_b7
 
 cw_bus:
   normative: reference/hardware/control-word-latch.md
   cpld_outputs:
-    - { cupl: cw_data0..7, net: cw_data, width: 8, pin: fit }
-    - { cupl: cw_le, net: cw_le, pin: fit }
-    - { cupl: cw_bank, net: cw_bank, pin: fit }
+    - { cupl: cw_data0, net: cw_data0, pin: 21 }
+    - { cupl: cw_data1, net: cw_data1, pin: 17 }
+    - { cupl: cw_data2, net: cw_data2, pin: 16 }
+    - { cupl: cw_data3, net: cw_data3, pin: 19 }
+    - { cupl: cw_data4, net: cw_data4, pin: 18 }
+    - { cupl: cw_data5, net: cw_data5, pin: 40 }
+    - { cupl: cw_data6, net: cw_data6, pin: 37 }
+    - { cupl: cw_data7, net: cw_data7, pin: 20 }
+    - { cupl: cw_le, net: cw_le, pin: 39 }
+    - { cupl: cw_bank, net: cw_bank, pin: 41 }
   externalized_via_latch:
     - mem_rd
     - mem_wr
@@ -75,6 +85,10 @@ internal:
   - w_sel1
   - ph0
   - ph1
+  - ph0_prev
+  - ph1_prev
+  - cw_cnt0
+  - cw_cnt1
   - idx5
   - r00..r27
 

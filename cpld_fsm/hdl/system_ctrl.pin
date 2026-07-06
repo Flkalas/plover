@@ -1,30 +1,41 @@
-# WinCUPL pin lock — ATF1504AS-10JU44 (export after fit)
+# WinCUPL pin lock — ATF1504AS-10JU44 (from system_ctrl_gen.fit)
 # Source PLD: cpld_fsm/hdl/system_ctrl.pld
-# Device: f1504ispplcc44
+# Regenerate: python gen_pin_lock.py (after build-wincupl.ps1)
 
 DEVICE f1504ispplcc44
 
-# Locked
-PIN 43 = clk
-
-# Inputs (pre-fit lock from PLD)
-PIN  4 = opc0
-PIN  5 = opc1
-PIN  6 = opc2
-PIN  8 = opc3
-PIN  9 = opc4
-PIN 11 = d_in0
-PIN 12 = d_in1
-PIN 14 = d_in2
-PIN 16 = d_in3
-PIN 17 = d_in4
-PIN 18 = d_in5
-PIN 19 = d_in6
-PIN 20 = d_in7
-PIN 24 = flg_z
-PIN 25 = flg_c
-
-# JTAG ISP (reserved — do not assign)
+# JTAG ISP (reserved during program)
 # TDI=7 TMS=13 TCK=32 TDO=38
 
-# Outputs: assign after WinCUPL fit (fitter auto-place when unpinned in PLD)
+PIN  1 = d_in1
+PIN  2 = opc2
+PIN  4 = d_in6
+PIN  5 = d_in7
+PIN  6 = d_in5
+PIN  8 = opc3
+PIN  9 = opc1
+PIN 11 = opc4
+PIN 12 = opc0
+PIN 14 = reg_we
+PIN 16 = cw_data2
+PIN 17 = cw_data1
+PIN 18 = cw_data4
+PIN 19 = cw_data3
+PIN 20 = cw_data7
+PIN 21 = cw_data0
+PIN 24 = d_in4
+PIN 25 = q_b2
+PIN 26 = q_b0
+PIN 27 = q_b1
+PIN 28 = q_a2
+PIN 29 = q_a0
+PIN 31 = q_a1
+PIN 33 = d_in2
+PIN 34 = d_in3
+PIN 36 = flg_z
+PIN 37 = cw_data6
+PIN 39 = cw_le
+PIN 40 = cw_data5
+PIN 41 = cw_bank
+PIN 43 = clk
+PIN 44 = d_in0
