@@ -45,6 +45,24 @@ When implementing a **Cursor plan**, commit in-session per **Plan execution (aut
 
 ---
 
+## Test timeouts (cyclesim and new pytest suites)
+
+**Mandatory** for `simulators/cyclesim/tests/**` and any **new** pytest tree in this repo:
+
+1. **Install** `pytest-timeout` (`simulators/cyclesim/requirements-dev.txt`).
+2. **Default** per-test wall limit: **30s** via `simulators/cyclesim/pytest.ini` (`timeout_method = thread` for Windows).
+3. **Every new test** must either stay well under 30s or carry an explicit `@pytest.mark.timeout(N)` with margin over measured runtime.
+4. **CPU integration tests** (`ProgramRunner`, `CpuM3b.step` loops):
+   - Prefer `run_until_halt` (autouse **15s** wall cap in `conftest.py`).
+   - Any manual `while not runner.halted` **must** include a **step counter** assert (no unbounded spin).
+   - Infinite-loop guards (e.g. `test_jmp_to_zero`): bounded steps **and** `@pytest.mark.timeout(10)` or similar.
+5. **Register slow tests** in `TIMEOUT_OVERRIDES_S` in [`simulators/cyclesim/tests/conftest.py`](simulators/cyclesim/tests/conftest.py) when adding hang-prone cases.
+6. **`conftest.py` fails fast** if `pytest-timeout` is missing — do not disable this check.
+
+Agents adding tests: run the suite locally; if a test needs >30s, document why in the test docstring and set the mark.
+
+---
+
 ## Document tiers (truth cascade)
 
 When answering **hardware architecture**, **bring-up**, or **decode/CPLD/ALU** questions, edit and cite in this order:

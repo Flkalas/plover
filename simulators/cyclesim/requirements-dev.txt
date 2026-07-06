@@ -1,0 +1,3 @@
+# cyclesim dev/CI — install: pip install -r simulators/cyclesim/requirements-dev.txt
+pytest>=8.0
+pytest-timeout>=2.3

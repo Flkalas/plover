@@ -199,6 +199,7 @@ def test_map_mode_boot_vs_run() -> None:
     assert runner.cpu.mem.read(0x100) == 0xBB
 
 
+@pytest.mark.timeout(10)
 def test_jmp_to_zero() -> None:
     """JMP $0000 must reload PC=0 (branch target may be zero)."""
     runner = ProgramRunner()
@@ -210,6 +211,7 @@ def test_jmp_to_zero() -> None:
     assert runner.pc == 0
 
 
+@pytest.mark.timeout(120)
 def test_fib_upto_250() -> None:
     from simulators.cyclesim.fixtures.rom_builder import (
         FIB_LIMIT,

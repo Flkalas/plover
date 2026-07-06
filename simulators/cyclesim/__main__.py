@@ -34,8 +34,8 @@ def cmd_run(args: argparse.Namespace) -> int:
 def cmd_test(_: argparse.Namespace) -> int:
     import pytest
 
-    cyclesim_tests = Path(__file__).resolve().parent / "tests"
-    return pytest.main([str(cyclesim_tests), "-q"])
+    cyclesim_tests = Path(__file__).resolve().parent
+    return pytest.main([str(cyclesim_tests / "tests"), "-q", "-c", str(cyclesim_tests / "pytest.ini")])
 
 
 def cmd_export_alu8(args: argparse.Namespace) -> int:
