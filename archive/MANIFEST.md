@@ -36,6 +36,8 @@ Restore: `tar -xzf archive/NAME.tar.gz -C .` from repository root.
 | `fit-study-gpr-fsm.tar.gz` | **Frozen 2026-07-06** — GPR-FSM variant studies (A1/D5a/E1/F2/G), WinCUPL fit logs, desk reports |
 | `cpld-rev-g-hdl.tar.gz` | **Frozen 2026-07-06** — rev G dual CPLD HDL (`hdl/`, `netlist/`) — restore before WinCUPL build |
 | [tier-c-single-cpld/](tier-c-single-cpld/) | **Superseded 2026-07-06** — single ATF1504 + CW 574×2 (pre rev G) |
+| [rev-g-normative-snapshot/](rev-g-normative-snapshot/) | **Frozen 2026-07-07** — rev G normative prose before Gi1 adoption |
+| [rev-g-dual-3gpr/](rev-g-dual-3gpr/) | **Superseded 2026-07-07** — rev G 3-GPR + TFR index |
 
 `build/`, `target/`, `.venv/` — local artifacts; not bundled. Delete locally.
 
@@ -72,7 +74,7 @@ For **architecture**, **bring-up**, **timing**, or **decode**:
 
 ### Frozen FSM snapshot (M3a)
 
-PASS — 16 FSM opcodes, **20 active idx5 rows** (+ comb TFR) — see [reference/hw-bringup/M3a-control-store.md](../reference/hw-bringup/M3a-control-store.md) §2.
+PASS — **20 active idx5 rows** (no comb TFR in Gi1) — see [reference/hw-bringup/M3a-control-store.md](../reference/hw-bringup/M3a-control-store.md) §2.
 
 ---
 
