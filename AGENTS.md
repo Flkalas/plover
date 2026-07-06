@@ -55,7 +55,7 @@ When answering **hardware architecture**, **bring-up**, or **decode/CPLD/ALU** q
 | **Reference** | `reference/**` | Normative detail, bring-up, frozen fixtures |
 | **Machine** | `simulators/cyclesim/data/isa.py`, `fsm_table.py` | Executable golden |
 | **CPLD** | `cpld/tools/` — WinCUPL, OpenOCD, JTAG probe | Toolchain (active); HDL archived |
-| **Archive** | `archive/*.tar.gz`, `archive/tier-c-single-cpld/`, `cpld-rev-g-hdl.tar.gz`, `fit-study-gpr-fsm.tar.gz` | Historical — **do not** cite for SoC unless user asks |
+| **Archive** | `archive/*.tar.gz`, `archive/tier-c-single-cpld/`, `cpld-rev-g-hdl.tar.gz`, `fit-study-gpr-fsm.tar.gz`, `gpr4-regfile-research.tar.gz` | Historical — **do not** cite for SoC unless user asks |
 
 **Anchor docs:** [control-and-decode.md](reference/hardware/control-and-decode.md), [system-architecture.md](reference/hardware/system-architecture.md), [plover-whitepaper.md](plover-whitepaper.md).
 

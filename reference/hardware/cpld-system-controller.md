@@ -7,7 +7,7 @@
 **Related:** [control-and-decode.md](control-and-decode.md) · [cpld-dual-routing.md](cpld-dual-routing.md) · [cpld-dual-jtag.md](cpld-dual-jtag.md) · [microcode-spec.md](microcode-spec.md)  
 **Superseded:** rev G 3-GPR — [archive/rev-g-dual-3gpr/README.md](../../archive/rev-g-dual-3gpr/README.md)
 
-**Bitstream:** WinCUPL **Design fits** per device (64 MC part rating). DP skeleton: research `gi1_dp/system_ctrl.pld`; CU idx5 LUT fork pending.
+**Bitstream:** WinCUPL **Design fits** per device (64 MC part rating). Gi1 DP PLD spike: [archive/gpr4-regfile-research.tar.gz](../../archive/gpr4-regfile-research.tar.gz) (`variants/gi1_dp/`); CU idx5 LUT fork pending.
 
 ---
 
