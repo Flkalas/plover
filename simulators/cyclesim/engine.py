@@ -75,6 +75,9 @@ class SimContext:
     def clear_stuck(self) -> None:
         self._stuck.clear()
 
+    def flush_pending(self) -> bool:
+        return self._flush_pending()
+
     def comb_fixup(self) -> None:
         for _ in range(FIXPOINT_LIMIT):
             self._pending.clear()
