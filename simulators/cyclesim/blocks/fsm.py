@@ -1,4 +1,4 @@
-"""CPLD idx5 FSM functional blocks."""
+"""CPLD idx5 FSM — phase counter and idx5 decode."""
 
 from __future__ import annotations
 
@@ -45,7 +45,7 @@ class PhaseCounter(Block):
 
 
 class CtrlLookup(Block):
-    """ROM lookup: idx5 -> control row (registered outputs pre-tick)."""
+    """Legacy monolithic control — merged strobes (pre dual-CPLD split)."""
 
     def __init__(self, name: str = "ctrl_lut") -> None:
         super().__init__(name)
@@ -120,7 +120,7 @@ class CtrlLookup(Block):
 
 
 class XferMux(Block):
-    """Internal read MUX for TFR — src reg -> d bus."""
+    """Legacy TFR mux — src reg -> d bus (monolithic shortcut)."""
 
     def __init__(self, gpr, name: str = "xfer_mux") -> None:
         super().__init__(name)
@@ -136,23 +136,6 @@ class XferMux(Block):
         for i in range(8):
             changed |= ctx.drive(f"net_d{i}", (val >> i) & 1, self.name)
         return changed
-
-
-class BranchAnd(Block):
-    """BEQ: PC_LOAD gated by FLG_Z at macro_end (system_ctrl.pld pc_load_en)."""
-
-    def __init__(self, name: str = "branch_and") -> None:
-        super().__init__(name)
-
-    def eval_comb(self, ctx: SimContext) -> bool:
-        if not (ctx.get("net_macro_end") & 1):
-            return ctx.drive("net_pc_load", L, self.name)
-        if not (ctx.get("net_pc_load_en") & 1):
-            return ctx.drive("net_pc_load", L, self.name)
-        if ctx.get("net_pc_load_flg_z") & 1:
-            z = ctx.get("net_flg_z") & 1
-            return ctx.drive("net_pc_load", H if z else L, self.name)
-        return ctx.drive("net_pc_load", H, self.name)
 
 
 def row_for_idx5(idx: int) -> CtrlRow | None:
