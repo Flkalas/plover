@@ -19,7 +19,7 @@ Plover v0.1 software milestones **S0–S7** on logic VM (developer), then hardwa
 |----|-------------|-----|-----------|
 | S0 | Roadmap, layout, regression script | this file | baseline regression |
 | S1 | `plover_asm` | [plover-asm.md](plover-asm.md) | milestone checklist |
-| S2 | CALL/RET ISA + CW | [calling-convention-v0.1.md](calling-convention-v0.1.md) | S2 bring-up checklist |
+| S2 | CALL/RET ISA (CU idx5, no Flash CW) | [calling-convention-v0.1.md](calling-convention-v0.1.md) | M3a + M2a CALL/RET smoke |
 | S3 | Forth core | [forth-system.md](forth-system.md) | milestone checklist, `forth_boot.yaml` |
 | S3c | Normative asm Forth | forth-system §normative | `breadboard ISA` |
 | S4 | Forth OS services | [forth-os-services.md](forth-os-services.md) | milestone checklist |
@@ -34,7 +34,7 @@ Plover v0.1 software milestones **S0–S7** on logic VM (developer), then hardwa
 
 | Software | Hardware |
 |----------|----------|
-| S2 CALL/RET | M3 control-store pack |
+| S2 CALL/RET | M3a idx5 pack + [call-ret-cu-fit](../../research/call-ret-cu-fit/SUMMARY-REPORT.md) |
 | S7 vFDD | [mailbox-protocol.md](../copro/mailbox-protocol.md), [rp2350-coprocessor.md](../copro/rp2350-coprocessor.md) |
 | Boot / PL-DOS | [bootloader.md](../boot/bootloader.md) |
 

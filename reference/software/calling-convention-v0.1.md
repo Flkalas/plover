@@ -17,10 +17,17 @@ Gi1 has **no** hardware R1/R2. Values that previously lived in R1/R2 use **fixed
 
 ## CALL / RET
 
-- `CALL target` — push **return PC** (address after CALL) on software return stack; PC ← target (16-bit absolute).
-- `RET` — pop return PC from stack.
+- `CALL target` — opcode pushes **return PC** (address after the 3-byte insn) on the software return stack; PC ← target (16-bit absolute).
+- `RET` — opcode pops return PC from stack into PC.
 
-Return stack is **software** (RAM list in VM fast/macro engines; RP @ `$F600` on target Forth layout).
+**Hardware:** push/pop performed by **CPLD-CU @ macro_end** ([microcode-spec.md](../hardware/microcode-spec.md) §2.3) — not separate LDA/STA opcodes.
+
+| Cell | Role |
+|------|------|
+| `$0F00` / `$0F01` | **RP** — stack pointer (16-bit LE) |
+| `$F600`–`$FEEF` | Return-address stack body (upward growth) |
+
+Boot initial RP = `$F600` ([boot-jmp-handoff.md](../boot/boot-jmp-handoff.md), [software-memory-layout.md](software-memory-layout.md)).
 
 ## Branch
 

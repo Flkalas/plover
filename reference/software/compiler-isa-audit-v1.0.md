@@ -42,7 +42,7 @@
 
 | 평가 범주 | 시스템 구현자 대상 질문 | 컴파일러 구현 시 요구 근거 | v1.0 답변 | 근거·비고 |
 |-----------|-------------------------|---------------------------|-----------|-----------|
-| 스택 | **16비트 하드웨어 SP**와 **PUSH/POP**, **CALL/RET** 명령이 구현되어 있습니까? | 복귀 주소 저장, 인자 전달, 호출 규약·컨텍스트 스위칭 | **아니오** (CALL/RET **부분**) | **SP:** RAM 셀 **`$0E00`** (16-bit LE), Boot ROM이 초기값 기록 — **하드웨어 SP 레지스터 없음** ([software-memory-layout.md](software-memory-layout.md), [boot-jmp-handoff.md](../boot/boot-jmp-handoff.md)). **PUSH/POP:** 전용 opcode 없음. **CALL/RET:** opcode 정의·미패킹 상태.py](../../logic VM/macro/isa.py))이나 **마이크로코드 미패킹 (TBD)** ([microcode-spec.md](../hardware/microcode-spec.md) §CALL/RET). 실물 S2 게이트는 [calling-convention-v0.1.md](calling-convention-v0.1.md) + S2 bring-up checklist — **소프트웨어 리턴 스택** (`RP` @ `$0F00`). |
+| 스택 | **16비트 하드웨어 SP**와 **PUSH/POP**, **CALL/RET** 명령이 구현되어 있습니까? | 복귀 주소 저장, 인자 전달, 호출 규약·컨텍스트 스위칭 | **부분** | **SP:** RAM 셀 **`$0E00`** (16-bit LE), Boot ROM이 초기값 기록 — **하드웨어 SP 레지스터 없음** ([software-memory-layout.md](software-memory-layout.md), [boot-jmp-handoff.md](../boot/boot-jmp-handoff.md)). **PUSH/POP:** 전용 opcode 없음. **CALL/RET:** Gi1 CU idx5 packed (**22-row** LUT); CU return-stack assist @ macro_end ([microcode-spec.md](../hardware/microcode-spec.md) §2.3). **RP** @ `$0F00`; stack body `$F600+` ([calling-convention-v0.1.md](calling-convention-v0.1.md)). Breadboard CU reburn gated on [research/call-ret-cu-fit/SUMMARY-REPORT.md](../../research/call-ret-cu-fit/SUMMARY-REPORT.md). |
 | 스택 | **SP 값**을 범용 레지스터로 복사하거나 **산술 연산**할 데이터 경로가 있습니까? | 프레임 포인터 설정, `SP+offset` 지역 변수 주소 | **부분** | `LDA`/`STA`로 **`$0E00`/`$0E01`** 읽기·쓰기 가능. **단일 명령 `ADD SP, imm`** 없음. 16비트 SP 증감은 **8비트 ALU 다중 스텝** 소프트웨어 다중 스텝으로 처리. FP = SP 복사본을 GPR·RAM에 유지하는 **소프트웨어 관례**로만 가능. |
 
 ---
@@ -72,7 +72,7 @@
 | Register Indirect | 예 | **아니오** | `*p` 역참조 불편 |
 | 16비트 포인터 레지 | 예 | **부분** (PC/MBR 전용) | 포인터는 RAM·다중 명령 |
 | GPR 4개 (할당 가능) | 예 | **부분** (R0 HW + RAM) | 고정 호출 규약·RAM temps; rev G 3-GPR archived |
-| HW SP + PUSH/POP/CALL/RET | 예 | **아니오~부분** | 함수·스택 프레임 **미완** (CALL/RET TBD) |
+| HW SP + PUSH/POP/CALL/RET | 예 | **부분** (CALL/RET packed; no PUSH/POP) |
 | SP 산술 데이터 경로 | 예 | **부분** | FP·동적 프레임 = 소프트웨어 시퀀스 |
 | ADC/SBC | 예 | **아니오** | 16/32비트 정수 = 긴 헬퍼 |
 | Shift/Rotate | 예 | **아니오** | 인덱스 스케일링 = 루프 |
@@ -98,7 +98,7 @@
 
 | 순위 | 항목 | 효과 |
 |------|------|------|
-| 1 | `CALL`/`RET` 마이크로시퀀스 패킹 + RP 규약 | 함수 호출 실물 경로 |
+| 1 | `CALL`/`RET` — **문서·idx5 golden 완료**; CU fit research → breadboard burn | 함수 호출 실물 경로 |
 | 2 | `LDA16` / `LDA [abs16]` (간접 로드) | 포인터 역참조 |
 | 3 | `LDA [R+imm8]` 또는 인덱스 레지 1개 | 배열·오프셋 |
 | 4 | `PUSH R` / `POP R` (SP=RAM 셀 또는 HW SP) | 프롤로그 단순화 |
@@ -113,4 +113,5 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-07-07 | CALL/RET — Gi1 CU idx5 packed (22-row); research fit gate |
 | 2026-06-24 | 초판 — 컴파일러 ISA 적합성 답변지 (v1.0 breadboard 기준) |
