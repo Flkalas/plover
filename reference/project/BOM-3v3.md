@@ -21,7 +21,7 @@
 | CPU · 주소 | 11 | SN74LVC574APWR | Octal D-type flip-flop, 3-state | TSSOP-20 | 7 | 버스 레지스터·범용 레지스터·플래그·PC 상위 저장 | ↔ #11 |
 | CPU · 주소 | 12 | SN74LVC161APWR | 4-bit synchronous binary counter | TSSOP-16 | 3 | PC 하위·명령 실행 단계(phase) 카운트 | ↔ #12 |
 | CPU · 주소 | 13 | SN74LVC157APWR | Quad 2-line to 1-line data selector/multiplexer | TSSOP-16 | 2 | 주소 버스 하위 8비트 선택 | ↔ #13 · #6과 합산 4 |
-| CPLD · 스위치 | 14 | ATF1504AS-10JU44 | CPLD, 64 macrocell | PLCC-44 | 1 | ROM/RAM/주변 칩 선택·버스 중재·레지스터 쓰기 디코드 | ↔ #14 |
+| CPLD · 스위치 | 14 | ATF1504AS-10JU44 | CPLD, 64 macrocell | PLCC-44 | **2** | rev G CU + DP | ↔ #14 |
 | CPLD · 스위치 | 15 | *(JTAG 2×5, 1.27 mm)* | Pin header, through-hole | TH | 1 | CPLD 구성 데이터 기록 포트 | ↔ #15 어댑터 **대체** |
 | CPLD · 스위치 | 16 | *(SMD slide or tact)* | Single-pole 2-position switch | SMD | 1 | 부팅 시 ROM 맵 / 실행 시 RAM 맵을 운영자가 선택 | ↔ #16 |
 | 버스 · 메모리 | 17 | SN74LVC245APWR | Octal bus transceiver | TSSOP-20 | 1 | SRAM 데이터 버스 ↔ CPU 버스 레지스터 | ↔ #17 |

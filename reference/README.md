@@ -20,7 +20,7 @@ v1.0 confirmed facts — hardware specs, bring-up, software stack, boot, copro M
 | **Root** | [plover-whitepaper.md](../plover-whitepaper.md) §6 | ISA / FSM narrative |
 | **Reference** | `reference/**` (this tree) | Normative detail, bring-up, frozen fixtures |
 | **Machine** | `simulators/cyclesim/data/isa.py`, `fsm_table.py` | Executable golden |
-| **CPLD** | `cpld_fsm/hdl/` — `gen_ctrl_lut.py`, `system_ctrl.pld` | Bitstream source |
+| **CPLD** | `system_ctrl_cu.pld`, `system_ctrl_dp.pld`, `gen_ctrl_lut.py` | Bitstream source (rev G) |
 
 ISA or idx5 changes: **whitepaper first** → reference → machine code → CPLD regen → pytest.
 
@@ -29,7 +29,7 @@ ISA or idx5 changes: **whitepaper first** → reference → machine code → CPL
 | Document | Description |
 |----------|-------------|
 | [hardware/microcode-spec.md](hardware/microcode-spec.md) | FSM-only ISA, idx5 |
-| [hardware/cpld-system-controller.md](hardware/cpld-system-controller.md) | ATF1504 GPR + idx5 FSM |
+| [hardware/cpld-system-controller.md](hardware/cpld-system-controller.md) | Dual CPLD CU/DP (rev G) |
 | [hardware/memory-map.md](hardware/memory-map.md) | Address map |
 | [hardware/alu-opcodes-timing.md](hardware/alu-opcodes-timing.md) | ALU comb delay |
 | [fixtures/README.md](fixtures/README.md) | Frozen burn images |

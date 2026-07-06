@@ -66,7 +66,7 @@ Superseded **10b Flash CW** path — historical docs only:
 ## 4. M3a sign-off
 
 - [ ] Frozen table §2 matches committed **`ctrl_lut.inc`** idx5 terms (same opcode/phase → same strobes)
-- [ ] **`system_ctrl.jed`** burned and bench-verified per [M2a-cpld-decode.md](M2a-cpld-decode.md)
+- [ ] **`system_ctrl_cu.jed`** and **`system_ctrl_dp.jed`** burned per [M2a-cpld-decode.md](M2a-cpld-decode.md)
 - [ ] No PARAM 574 on SoC bill of materials ([BOM.md](../project/BOM.md))
 - [ ] Flash `$4000` region left empty for v1.0 bring-up
 

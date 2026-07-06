@@ -13,7 +13,7 @@
 | Opcode | **`op_legacy`** core + **Extended `0x10–0x1F`** (TFR bit-field §2.2) | 5-bit opcode field `[4:0]` |
 | Index | **`idx5`** | CPLD FSM key `(opcode[4:0]<<2)\|phase` — **128 logical slots** |
 | Decode | **`dec_cpld_seq`** | Phase FSM in CPLD; **no `alu8_decode`** |
-| CPLD | **`cpld_3fixed`** | R0→A, R1→B; R2 via internal read for XFER |
+| CPLD | **`cpld_dual`** | **CU:** idx5 + strobes · **DP:** R0→A, R1→B, R2 internal XFER |
 | CW/Flash | **`cw_fsm_only`** | **No Flash param/CW** — FSM opcode table only |
 
 **No Flash fetch** at macro_start for control. Flash `$4000` region **unused** ([rom-architecture.md](rom-architecture.md)).
@@ -106,7 +106,7 @@ Encoding: `opcode = 0x10 \| (dst << 2) \| src` with dst/src ∈ {0,1,2}, src ≠
 | `w_sel` | Internal FSM opcode/template table |
 | `PC_LOAD_EN` | Opcode + `FLG_Z` @ macro_end |
 | Operand address | **MBR** from fetch (no PARAM) |
-| ALU / bus strobes | FSM registered outputs per §4 |
+| ALU / bus strobes | **CPLD-CU** direct outputs per §4 |
 
 Verify: frozen FSM table in [M3a-control-store.md](../hw-bringup/M3a-control-store.md) §2 (2026-07-06, 20 rows).
 
@@ -124,15 +124,15 @@ Summary:
 | ALU_REG (CMP) | ph0–1: same as ADD; ph2: **FLG_WE only** (flags_only — no REG_WE, no R2 latch) |
 | MEM_LD | ph0: MEM_RD; ph1: REG_WE, w_sel=R0 |
 | MEM_ST | ph0: Y_OE; ph1: MEM_WR |
-| XFER | ph0: REG_WE, w_sel=dst; src via internal opcode mux |
+| XFER | ph0: REG_WE via G-IC; w_sel=dst; src via `opc[1:0]` on G-IC |
 | BEQ | ph0: ALU SUB; end: PC_LOAD_EN<=FLG_Z |
 | JMP | end: PC_LOAD_EN<=1 |
 
-**Tier C:** Bus and ALU strobes in the summary table are **held in CW_LO/CW_HI** 574 across each phase ([control-word-latch.md](control-word-latch.md)). `REG_WE` remains a direct CPLD output.
+**rev G:** Bus and ALU strobes are **direct CPLD-CU outputs** (no CW latch). `REG_WE` and `w_sel` reach CPLD-DP via **G-IC**.
 
 ---
 
-## 5. Internal `w_sel` (not exported)
+## 5. `w_sel` on G-IC (CPLD-CU → DP)
 
 | Template | Phase | `w_sel` |
 |----------|-------|---------|
@@ -192,7 +192,8 @@ P1 `DECODE_BYPASS` — not normative SoC path.
 
 | Date | Note |
 |------|------|
-| 2026-07-06 | Tier C CW latch footnote on per-phase strobes |
+| 2026-07-06 | **rev G** — `cpld_dual`; G-IC `w_sel` |
+| 2026-07-06 | Tier C CW latch footnote removed (archived) |
 | 2026-07-06 | ALU_REG ADD vs CMP ph2 split; mandatory ph1 REG_WE for ADD/CMP |
 | 2026-06-24 | idx5 FSM decode; ISA `[4:0]`; per-phase strobes; operand datapath |
 | 2026-07-06 | TFR bit-field opcodes; idx5 20 rows; `tfr_valid` comb |

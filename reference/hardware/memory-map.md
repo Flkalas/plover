@@ -31,7 +31,7 @@
 | **08/32/04** | `MAILBOX_EN`, MAP×A11 boot ROM, final `/CE` combine |
 | **74HC138 #2** | Half-select: low 32 KiB vs high 32 KiB (A15, MAP-gated) |
 | **74HC138 #1** | CBA = A15,A14,A13 → coarse Y*; E = `!MAILBOX_EN` |
-| **ATF1504** | GPR only — **no** address decode |
+| **CPLD-DP** | GPR only — **no** address decode (CU has no decode) |
 
 Reference: [`decode_ce_breadboard()`](../hw/logic/cpld_decode.py) · [breadboard-wiring.md](../hw-bringup/breadboard-wiring.md).
 
@@ -53,7 +53,7 @@ No automatic map switch from software — operator toggles DIP, then **RESET**.
 | Access | Address source |
 |--------|----------------|
 | Instruction fetch (Mode A boot) | PC → decode glue |
-| Control store | **Unused** — Flash `$4000` not wired; CPLD idx5 FSM ([microcode-spec.md](microcode-spec.md)) |
+| Control store | **Unused** — Flash `$4000` not wired; CPLD-CU idx5 FSM |
 | Utility read | PC or boot copy loops |
 
 Superseded Flash CW prototype: [prototype-flash-cw](../archive/prototype-flash-cw/README.md).
