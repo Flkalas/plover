@@ -1,0 +1,323 @@
+Name system_ctrl_p1m1_dp;
+
+PartNo FS04;
+
+Date 07/07/2026;
+
+Revision 01;
+
+Designer Plover_p1m1_dual574;
+
+Company Plover;
+
+Assembly None;
+
+Location research/gpr4-regfile/variants/p1m1_dp;
+
+Device f1504ispplcc44;
+
+
+
+PROPERTY ATMEL {POWER_RESET = OFF};
+
+PROPERTY ATMEL {PIN_KEEP = ON};
+
+PROPERTY ATMEL {PREASSIGN = OFF};
+
+
+
+/* P1M1: P1 bus-TDM + dual 574 (ALU A/B latch) + op_fetch half-cycle gate */
+
+/* Pin map: research/gpr4-regfile/p1m1-dual574/pin-map.md */
+
+/* Fork of p1_dp_bus_tdm — +alu_b_le, op_fetch gates q_bus during compute half */
+
+
+
+PIN 43 = clk_4m;
+
+PIN  1 = d_in0;
+
+PIN  2 = d_in1;
+
+PIN  4 = d_in2;
+
+PIN  5 = d_in3;
+
+PIN  6 = d_in4;
+
+PIN  8 = d_in5;
+
+PIN  9 = d_in6;
+
+PIN 11 = d_in7;
+
+PIN 12 = reg_we;
+
+PIN 14 = w_sel0;
+
+PIN 16 = w_sel1;
+
+PIN 17 = tfr_valid;
+
+PIN 18 = src0;
+
+PIN 19 = src1;
+
+PIN 20 = r_sel_a0;
+
+PIN 21 = r_sel_a1;
+
+PIN 22 = r_sel_b0;
+
+PIN 23 = r_sel_b1;
+
+PIN  3 = q_bus0;
+
+PIN 10 = q_bus1;
+
+PIN 15 = q_bus2;
+
+PIN 24 = q_bus3;
+
+PIN 25 = q_bus4;
+
+PIN 26 = q_bus5;
+
+PIN 27 = q_bus6;
+
+PIN 28 = q_bus7;
+
+PIN 29 = alu_a_le;
+
+PIN 33 = alu_b_le;
+
+
+
+Pinnode = [r00, r01, r02, r03, r04, r05, r06, r07];
+
+Pinnode = [r10, r11, r12, r13, r14, r15, r16, r17];
+
+Pinnode = [r20, r21, r22, r23, r24, r25, r26, r27];
+
+Pinnode = [r30, r31, r32, r33, r34, r35, r36, r37];
+
+Pinnode = [gpr_d0, gpr_d1, gpr_d2, gpr_d3, gpr_d4, gpr_d5, gpr_d6, gpr_d7];
+
+Pinnode = [we_r0, we_r1, we_r2, we_r3];
+
+Pinnode = [u_phase, clk_sys, div_q];
+
+Pinnode = [mux_a0, mux_a1, mux_a2, mux_a3, mux_a4, mux_a5, mux_a6, mux_a7];
+
+Pinnode = [mux_b0, mux_b1, mux_b2, mux_b3, mux_b4, mux_b5, mux_b6, mux_b7];
+
+Pinnode = [le_pulse, le_pulse_b, u_d, op_fetch];
+
+
+
+/* Divide-by-2: 4 MHz -> 2 MHz system clock for GPR FF and op_fetch */
+
+div_q.d = !div_q;
+
+div_q.ck = clk_4m;
+
+clk_sys = div_q;
+
+
+
+/* Micro-phase toggles each 4 MHz cycle (125 ns high / 125 ns low) */
+
+u_phase.d = !u_phase;
+
+u_phase.ck = clk_4m;
+
+
+
+/* op_fetch: toggles each clk_sys edge — 1=fetch half (TDM), 0=compute half */
+
+/* Desk: CU holds ph2 for 2 halves; production may add tdm_en G-IC gate */
+
+op_fetch.d = !op_fetch;
+
+op_fetch.ck = clk_sys;
+
+
+
+/* 4:1 read mux — operand A (for T1 latch path) */
+
+mux_a0 = !r_sel_a1 & !r_sel_a0 & r00 # !r_sel_a1 &  r_sel_a0 & r10 #  r_sel_a1 & !r_sel_a0 & r20 # r_sel_a1 & r_sel_a0 & r30;
+
+mux_a1 = !r_sel_a1 & !r_sel_a0 & r01 # !r_sel_a1 &  r_sel_a0 & r11 #  r_sel_a1 & !r_sel_a0 & r21 # r_sel_a1 & r_sel_a0 & r31;
+
+mux_a2 = !r_sel_a1 & !r_sel_a0 & r02 # !r_sel_a1 &  r_sel_a0 & r12 #  r_sel_a1 & !r_sel_a0 & r22 # r_sel_a1 & r_sel_a0 & r32;
+
+mux_a3 = !r_sel_a1 & !r_sel_a0 & r03 # !r_sel_a1 &  r_sel_a0 & r13 #  r_sel_a1 & !r_sel_a0 & r23 # r_sel_a1 & r_sel_a0 & r33;
+
+mux_a4 = !r_sel_a1 & !r_sel_a0 & r04 # !r_sel_a1 &  r_sel_a0 & r14 #  r_sel_a1 & !r_sel_a0 & r24 # r_sel_a1 & r_sel_a0 & r34;
+
+mux_a5 = !r_sel_a1 & !r_sel_a0 & r05 # !r_sel_a1 &  r_sel_a0 & r15 #  r_sel_a1 & !r_sel_a0 & r25 # r_sel_a1 & r_sel_a0 & r35;
+
+mux_a6 = !r_sel_a1 & !r_sel_a0 & r06 # !r_sel_a1 &  r_sel_a0 & r16 #  r_sel_a1 & !r_sel_a0 & r26 # r_sel_a1 & r_sel_a0 & r36;
+
+mux_a7 = !r_sel_a1 & !r_sel_a0 & r07 # !r_sel_a1 &  r_sel_a0 & r17 #  r_sel_a1 & !r_sel_a0 & r27 # r_sel_a1 & r_sel_a0 & r37;
+
+
+
+/* 4:1 read mux — operand B */
+
+mux_b0 = !r_sel_b1 & !r_sel_b0 & r00 # !r_sel_b1 &  r_sel_b0 & r10 #  r_sel_b1 & !r_sel_b0 & r20 # r_sel_b1 & r_sel_b0 & r30;
+
+mux_b1 = !r_sel_b1 & !r_sel_b0 & r01 # !r_sel_b1 &  r_sel_b0 & r11 #  r_sel_b1 & !r_sel_b0 & r21 # r_sel_b1 & r_sel_b0 & r31;
+
+mux_b2 = !r_sel_b1 & !r_sel_b0 & r02 # !r_sel_b1 &  r_sel_b0 & r12 #  r_sel_b1 & !r_sel_b0 & r22 # r_sel_b1 & r_sel_b0 & r32;
+
+mux_b3 = !r_sel_b1 & !r_sel_b0 & r03 # !r_sel_b1 &  r_sel_b0 & r13 #  r_sel_b1 & !r_sel_b0 & r23 # r_sel_b1 & r_sel_b0 & r33;
+
+mux_b4 = !r_sel_b1 & !r_sel_b0 & r04 # !r_sel_b1 &  r_sel_b0 & r14 #  r_sel_b1 & !r_sel_b0 & r24 # r_sel_b1 & r_sel_b0 & r34;
+
+mux_b5 = !r_sel_b1 & !r_sel_b0 & r05 # !r_sel_b1 &  r_sel_b0 & r15 #  r_sel_b1 & !r_sel_b0 & r25 # r_sel_b1 & r_sel_b0 & r35;
+
+mux_b6 = !r_sel_b1 & !r_sel_b0 & r06 # !r_sel_b1 &  r_sel_b0 & r16 #  r_sel_b1 & !r_sel_b0 & r26 # r_sel_b1 & r_sel_b0 & r36;
+
+mux_b7 = !r_sel_b1 & !r_sel_b0 & r07 # !r_sel_b1 &  r_sel_b0 & r17 #  r_sel_b1 & !r_sel_b0 & r27 # r_sel_b1 & r_sel_b0 & r37;
+
+
+
+/* Time-mux: T1 (u_phase=0) -> mux_a; T2 (u_phase=1) -> mux_b */
+
+/* Gated by op_fetch: compute half (op_fetch=0) drives q_bus low — no TDM on bus */
+
+q_bus0 = op_fetch & (!u_phase & mux_a0 # u_phase & mux_b0);
+
+q_bus1 = op_fetch & (!u_phase & mux_a1 # u_phase & mux_b1);
+
+q_bus2 = op_fetch & (!u_phase & mux_a2 # u_phase & mux_b2);
+
+q_bus3 = op_fetch & (!u_phase & mux_a3 # u_phase & mux_b3);
+
+q_bus4 = op_fetch & (!u_phase & mux_a4 # u_phase & mux_b4);
+
+q_bus5 = op_fetch & (!u_phase & mux_a5 # u_phase & mux_b5);
+
+q_bus6 = op_fetch & (!u_phase & mux_a6 # u_phase & mux_b6);
+
+q_bus7 = op_fetch & (!u_phase & mux_a7 # u_phase & mux_b7);
+
+
+
+/* alu_a_le: one-shot on rising edge of u_phase (end of T1 @ 125 ns) */
+
+u_d = u_phase;
+
+le_pulse.d = u_phase & !u_d;
+
+le_pulse.ck = clk_4m;
+
+alu_a_le = le_pulse & op_fetch;
+
+
+
+/* alu_b_le: one-shot on falling edge of u_phase (end of T2 @ 250 ns) */
+
+le_pulse_b.d = !u_phase & u_d;
+
+le_pulse_b.ck = clk_4m;
+
+alu_b_le = le_pulse_b & op_fetch;
+
+
+
+/* 4:1 xfer mux for TFR / internal write */
+
+xfer_b0 = !src1 & !src0 & r00 # !src1 &  src0 & r10 #  src1 & !src0 & r20 # src1 & src0 & r30;
+
+xfer_b1 = !src1 & !src0 & r01 # !src1 &  src0 & r11 #  src1 & !src0 & r21 # src1 & src0 & r31;
+
+xfer_b2 = !src1 & !src0 & r02 # !src1 &  src0 & r12 #  src1 & !src0 & r22 # src1 & src0 & r32;
+
+xfer_b3 = !src1 & !src0 & r03 # !src1 &  src0 & r13 #  src1 & !src0 & r23 # src1 & src0 & r33;
+
+xfer_b4 = !src1 & !src0 & r04 # !src1 &  src0 & r14 #  src1 & !src0 & r24 # src1 & src0 & r34;
+
+xfer_b5 = !src1 & !src0 & r05 # !src1 &  src0 & r15 #  src1 & !src0 & r25 # src1 & src0 & r35;
+
+xfer_b6 = !src1 & !src0 & r06 # !src1 &  src0 & r16 #  src1 & !src0 & r26 # src1 & src0 & r36;
+
+xfer_b7 = !src1 & !src0 & r07 # !src1 &  src0 & r17 #  src1 & !src0 & r27 # src1 & src0 & r37;
+
+
+
+we_r0 = reg_we & !w_sel1 & !w_sel0;
+
+we_r1 = reg_we & !w_sel1 &  w_sel0;
+
+we_r2 = reg_we &  w_sel1 & !w_sel0;
+
+we_r3 = reg_we &  w_sel1 &  w_sel0;
+
+
+
+r00.d = gpr_d0; r01.d = gpr_d1; r02.d = gpr_d2; r03.d = gpr_d3;
+
+r04.d = gpr_d4; r05.d = gpr_d5; r06.d = gpr_d6; r07.d = gpr_d7;
+
+r10.d = gpr_d0; r11.d = gpr_d1; r12.d = gpr_d2; r13.d = gpr_d3;
+
+r14.d = gpr_d4; r15.d = gpr_d5; r16.d = gpr_d6; r17.d = gpr_d7;
+
+r20.d = gpr_d0; r21.d = gpr_d1; r22.d = gpr_d2; r23.d = gpr_d3;
+
+r24.d = gpr_d4; r25.d = gpr_d5; r26.d = gpr_d6; r27.d = gpr_d7;
+
+r30.d = gpr_d0; r31.d = gpr_d1; r32.d = gpr_d2; r33.d = gpr_d3;
+
+r34.d = gpr_d4; r35.d = gpr_d5; r36.d = gpr_d6; r37.d = gpr_d7;
+
+
+
+[r00,r01,r02,r03,r04,r05,r06,r07].ck = clk_sys;
+
+[r10,r11,r12,r13,r14,r15,r16,r17].ck = clk_sys;
+
+[r20,r21,r22,r23,r24,r25,r26,r27].ck = clk_sys;
+
+[r30,r31,r32,r33,r34,r35,r36,r37].ck = clk_sys;
+
+
+
+r00.ce = we_r0; r01.ce = we_r0; r02.ce = we_r0; r03.ce = we_r0;
+
+r04.ce = we_r0; r05.ce = we_r0; r06.ce = we_r0; r07.ce = we_r0;
+
+r10.ce = we_r1; r11.ce = we_r1; r12.ce = we_r1; r13.ce = we_r1;
+
+r14.ce = we_r1; r15.ce = we_r1; r16.ce = we_r1; r17.ce = we_r1;
+
+r20.ce = we_r2; r21.ce = we_r2; r22.ce = we_r2; r23.ce = we_r2;
+
+r24.ce = we_r2; r25.ce = we_r2; r26.ce = we_r2; r27.ce = we_r2;
+
+r30.ce = we_r3; r31.ce = we_r3; r32.ce = we_r3; r33.ce = we_r3;
+
+r34.ce = we_r3; r35.ce = we_r3; r36.ce = we_r3; r37.ce = we_r3;
+
+
+
+gpr_d0 = tfr_valid & xfer_b0 # !tfr_valid & d_in0;
+
+gpr_d1 = tfr_valid & xfer_b1 # !tfr_valid & d_in1;
+
+gpr_d2 = tfr_valid & xfer_b2 # !tfr_valid & d_in2;
+
+gpr_d3 = tfr_valid & xfer_b3 # !tfr_valid & d_in3;
+
+gpr_d4 = tfr_valid & xfer_b4 # !tfr_valid & d_in4;
+
+gpr_d5 = tfr_valid & xfer_b5 # !tfr_valid & d_in5;
+
+gpr_d6 = tfr_valid & xfer_b6 # !tfr_valid & d_in6;
+
+gpr_d7 = tfr_valid & xfer_b7 # !tfr_valid & d_in7;
+
+
