@@ -1,0 +1,273 @@
+CSIM(WM): CUPL Simulation Program
+Version 5.0a Serial# MW-10400000
+Copyright (c) 1983, 1998 Logical Devices, Inc.
+CREATED Mon Jul 06 08:34:55 2026
+
+LISTING FOR SIMULATION FILE: system_ctrl_gen.si
+
+   1: Name      system_ctrl;
+   2: Partno    00;
+   3: Date      07/06/2026;
+   4: Rev       01;
+   5: Designer  Plover;
+   6: Company   Plover;
+   7: Assembly  None;
+   8: Location  None;
+   9: Device    f1504ispplcc44;
+  10: 
+  11: FIELD idx5 = [opc4,opc3,opc2,opc1,opc0,ph1,ph0];
+  12: FIELD opcode = [opc4,opc3,opc2,opc1,opc0];
+  13:
+  14: ORDER: clk, opc0, opc1, opc2, opc3, opc4, ph0, ph1, flg_z, flg_c, d_in0, d_in1, d_in2, d_in3, d_in4, d_in5, d_in6, d_in7, %1, reg_we_lut, mem_rd, mem_wr, y_oe, w_sel0_lut, w_sel1_lut, cin, bctrl0, bctrl2, lgc0, lgc1, lgc2, lgc3, s0, s1, lut_pc_load, lut_pc_flg_z, flg_we;
+  15: 
+
+==============================================
+                                         l    
+                                        lu    
+                         r   ww         ut    
+                         e   __         t_    
+                         g   ss         _p    
+                         _   ee         pc    
+                         wmm ll bb      c_f   
+              ffdddddddd eee 01 cc      _fl   
+       ooooo  ll________ _mmy__ ttllll  llg   
+      cpppppppggiiiiiiii l___llcrrgggg  og_   
+      lccccchh__nnnnnnnn urwouuillccccssa_w   
+      k0123401zc01234567 tdrettn02012301dze   
+==============================================
+0001: 010000LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^              ^    ^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (H) for y_oe
+[0019sa] user expected (H) for bctrl2
+
+0002: 010000LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^           ^  ^^   ^
+[0021sa] invalid test value:  1 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (1) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (H) for reg_we_lut
+[0019sa] user expected (H) for y_oe
+[0019sa] user expected (H) for w_sel0_lut
+[0019sa] user expected (H) for bctrl2
+
+0003: 010000LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^           ^  ^ ^  ^        ^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  1 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (1) for ph1
+[0019sa] user expected (H) for reg_we_lut
+[0019sa] user expected (H) for y_oe
+[0019sa] user expected (H) for w_sel1_lut
+[0019sa] user expected (H) for bctrl2
+[0019sa] user expected (H) for flg_we
+
+0004: 001000LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^            ^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (H) for mem_rd
+
+0005: 001000LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^           ^
+[0021sa] invalid test value:  1 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (1) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (H) for reg_we_lut
+
+0006: 011000LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^              ^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (H) for y_oe
+
+0007: 011000LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^             ^
+[0021sa] invalid test value:  1 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (1) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (H) for mem_wr
+
+0008: 000100LL0000000000 LLLHLLLLHLLLLLLLLL
+            ^^              ^  ^^^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (L) for y_oe
+[0019sa] user expected (H) for cin
+[0019sa] user expected (H) for bctrl0
+[0019sa] user expected (L) for bctrl2
+
+0009: 000100LL0000000000 LLLHLLLLHLLLLLLLLL
+            ^^              ^    ^      ^^
+[0021sa] invalid test value:  1 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (1) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (L) for y_oe
+[0019sa] user expected (L) for bctrl2
+[0019sa] user expected (H) for lut_pc_load
+[0019sa] user expected (H) for lut_pc_flg_z
+
+0010: 010100LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^                          ^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (H) for lut_pc_load
+
+0011: 000010LL0000000000 LHLLLLLLLLLLLLLLLL
+            ^^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+
+0012: 000010LL0000000000 LHLLLLLLLLLLLLLLLL
+            ^^           ^^
+[0021sa] invalid test value:  1 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (1) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (H) for reg_we_lut
+[0019sa] user expected (L) for mem_rd
+
+0013: 010010LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^              ^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (H) for y_oe
+
+0014: 010010LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^             ^
+[0021sa] invalid test value:  1 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (1) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (H) for mem_wr
+
+0015: 001010LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+
+0016: 010110LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^              ^  ^^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (H) for y_oe
+[0019sa] user expected (H) for cin
+[0019sa] user expected (H) for bctrl0
+
+0017: 010110LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^           ^  ^^ ^^
+[0021sa] invalid test value:  1 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (1) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (H) for reg_we_lut
+[0019sa] user expected (H) for y_oe
+[0019sa] user expected (H) for w_sel0_lut
+[0019sa] user expected (H) for cin
+[0019sa] user expected (H) for bctrl0
+
+0018: 010110LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^              ^  ^^         ^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  1 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (1) for ph1
+[0019sa] user expected (H) for y_oe
+[0019sa] user expected (H) for cin
+[0019sa] user expected (H) for bctrl0
+[0019sa] user expected (H) for flg_we
+
+0019: 011110LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^              ^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (H) for y_oe
+
+0020: 011110LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^             ^
+[0021sa] invalid test value:  1 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (1) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (H) for mem_wr
+
+0021: 000000LL0000000000 LHLLLLLLLLLLLLLLLL
+            ^^            ^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (L) for mem_rd
+
+0022: 010001LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+
+0023: 001001LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+
+0024: 000101LL0000000000 LLLHLLHHLLLLLLLHLL
+            ^^              ^  ^^       ^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+[0019sa] user expected (L) for y_oe
+[0019sa] user expected (L) for cin
+[0019sa] user expected (L) for bctrl0
+[0019sa] user expected (L) for lut_pc_load
+
+0025: 001101LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+
+0026: 000011LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+
+0027: 010011LL0000000000 LLLLLLLLLLLLLLLLLL
+            ^^
+[0021sa] invalid test value:  0 for ph0
+[0021sa] invalid test value:  0 for ph1
+[0019sa] user expected (0) for ph0
+[0019sa] user expected (0) for ph1
+

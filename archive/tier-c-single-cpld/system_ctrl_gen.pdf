@@ -1,0 +1,182 @@
+{COMPONENT D:\GITHUB\PLOVER\CPLD_FSM\HDL\SYSTEM_CTRL_GEN.PLD.SYM
+
+ {ENVIRONMENT
+  {PDIFvrev 3.00}
+  {Program "CUPL(WM) Version 5.0a"}
+  {DBtype "Schematic"}
+  {DBvrev 1.01}
+  {DBtime "Mon Jul 06 09:58:47 2026 "}
+  {DBunit "MIL"}
+  {DBgrid 10}
+  {Lyrstr "WIRES" 1 "BUS" 1 "GATE" 2 "IEEE" 2 "PINFUN" 3 "PINNUM" 1 
+          "PINNAM" 6 "PINCON" 4 "REFDES" 2 "ATTR" 6 "SDOT" 1 
+          "DEVICE" 5 "OUTLIN" 5 "ATTR2" 6 "NOTES" 6 "NETNAM" 4 
+          "CMPNAM" 5 "BORDER" 5}
+ }
+
+ {USER
+  {VIEW
+   {Mode SYMB}
+   {Nlst OPEN}
+   {Vw 0 0 2}
+   {Lv 12 2 2 2 0 0 2 2 2 2 0 0 2 1 2 0 0 0 0}
+   {Gs 10 10}
+  }
+ }
+
+ {DISPLAY
+  [Ly "PINNUM"]
+  [Ls "SOLID"][Wd 0]
+  [Ts 15][Tj "LC"][Tr 0][Tm "N"]
+ }
+
+ {SYMBOL
+  {PIN_DEF
+   [Ly "PINCON"]
+   {P CLK {Pt "INPUT"}{Lq 0}{Ploc 100 340}}
+   {P OPC0 {Pt "INPUT"}{Lq 0}{Ploc 100 300}}
+   {P OPC1 {Pt "INPUT"}{Lq 0}{Ploc 100 280}}
+   {P OPC2 {Pt "INPUT"}{Lq 0}{Ploc 100 260}}
+   {P OPC3 {Pt "INPUT"}{Lq 0}{Ploc 100 240}}
+   {P OPC4 {Pt "INPUT"}{Lq 0}{Ploc 100 220}}
+   {P D_IN0 {Pt "INPUT"}{Lq 0}{Ploc 100 200}}
+   {P D_IN1 {Pt "INPUT"}{Lq 0}{Ploc 100 180}}
+   {P D_IN2 {Pt "INPUT"}{Lq 0}{Ploc 100 160}}
+   {P D_IN3 {Pt "INPUT"}{Lq 0}{Ploc 100 140}}
+   {P D_IN4 {Pt "INPUT"}{Lq 0}{Ploc 100 120}}
+   {P D_IN5 {Pt "INPUT"}{Lq 0}{Ploc 100 100}}
+   {P D_IN6 {Pt "INPUT"}{Lq 0}{Ploc 100 80}}
+   {P D_IN7 {Pt "INPUT"}{Lq 0}{Ploc 100 60}}
+   {P FLG_Z {Pt "INPUT"}{Lq 0}{Ploc 100 40}}
+   {P FLG_C {Pt "INPUT"}{Lq 0}{Ploc 100 20}}
+  }
+
+  {PKG
+   [Ly "REFDES"]
+   [Ts 25][Tj "CB"][Tr 0][Tm "N"]
+   {Rdl 190 370}
+
+   [Ly "PINNUM"]
+   [Ts 15][Tj "RC"]
+   {Pnl 120 350}
+   [Ts 15][Tj "RC"]
+   {Pnl 120 310}
+   {Pnl 120 290}
+   {Pnl 120 270}
+   {Pnl 120 250}
+   {Pnl 120 230}
+   {Pnl 120 210}
+   {Pnl 120 190}
+   {Pnl 120 170}
+   {Pnl 120 150}
+   {Pnl 120 130}
+   {Pnl 120 110}
+   {Pnl 120 90}
+   {Pnl 120 70}
+   {Pnl 120 50}
+   {Pnl 120 30}
+
+   {Sd A 43 4 5 6 8 9 11 12 14 16 17 18 19 20 24 25}
+  }
+
+  {PIC
+   [Ly "GATE"]
+   [Ts 15][Tj "LC"][Tr 0][Tm "N"]
+   {R 130 360 250 0}
+   {L 130 340 100 340}
+   {L 130 350 140 340 130 330}
+   {L 130 300 100 300}
+   {L 130 280 100 280}
+   {L 130 260 100 260}
+   {L 130 240 100 240}
+   {L 130 220 100 220}
+   {L 130 200 100 200}
+   {L 130 180 100 180}
+   {L 130 160 100 160}
+   {L 130 140 100 140}
+   {L 130 120 100 120}
+   {L 130 100 100 100}
+   {L 130 80 100 80}
+   {L 130 60 100 60}
+   {L 130 40 100 40}
+   {L 130 20 100 20}
+   [Ly "PINNAM"]
+   [Tj "LC"]
+   {T "CLK" 140 340}
+   {T "OPC0" 140 300}
+   {T "OPC1" 140 280}
+   {T "OPC2" 140 260}
+   {T "OPC3" 140 240}
+   {T "OPC4" 140 220}
+   {T "D_IN0" 140 200}
+   {T "D_IN1" 140 180}
+   {T "D_IN2" 140 160}
+   {T "D_IN3" 140 140}
+   {T "D_IN4" 140 120}
+   {T "D_IN5" 140 100}
+   {T "D_IN6" 140 80}
+   {T "D_IN7" 140 60}
+   {T "FLG_Z" 140 40}
+   {T "FLG_C" 140 20}
+   [Tj "RC"]
+   [Ly "DEVICE"]
+   [Tj "CT"]
+   {T "F1504ISPPLCC44" 190 -10}
+  }
+
+  {ATR
+   {IN
+    {Org 100 20}
+    {Ty 255}
+   }
+   {EX
+    [Ly "ATTR2"]
+    [Ts 12][Tj "CT"][Tr 0][Tm "N"]
+    {At PLD D:\GITHUB\PLOVER\CPLD_FSM\HDL\SYSTEM_CTRL_GEN.PLD 190 360}
+   }
+  }
+ }
+
+ {DETAIL
+  {ANNOTATE
+  }
+
+  {NET_DEF
+   {N CLK
+   }
+   {N OPC0
+   }
+   {N OPC1
+   }
+   {N OPC2
+   }
+   {N OPC3
+   }
+   {N OPC4
+   }
+   {N D_IN0
+   }
+   {N D_IN1
+   }
+   {N D_IN2
+   }
+   {N D_IN3
+   }
+   {N D_IN4
+   }
+   {N D_IN5
+   }
+   {N D_IN6
+   }
+   {N D_IN7
+   }
+   {N FLG_Z
+   }
+   {N FLG_C
+   }
+  }
+
+  {SUBCOMP
+  }
+ }
+}

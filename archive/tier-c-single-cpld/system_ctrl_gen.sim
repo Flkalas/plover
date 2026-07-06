@@ -1,0 +1,841 @@
+%SIGNAL
+PIN  43 =  clk 
+PIN  11 =  d_in0 
+PIN  12 =  d_in1 
+PIN  14 =  d_in2 
+PIN  16 =  d_in3 
+PIN  17 =  d_in4 
+PIN  18 =  d_in5 
+PIN  19 =  d_in6 
+PIN  20 =  d_in7 
+PIN  25 =  flg_c 
+PIN   0 =  flg_we 
+PIN  24 =  flg_z 
+PIN   0 =  gpr_d0 
+PIN   0 =  gpr_d1 
+PIN   0 =  gpr_d2 
+PIN   0 =  gpr_d3 
+PIN   0 =  gpr_d4 
+PIN   0 =  gpr_d5 
+PIN   0 =  gpr_d6 
+PIN   0 =  gpr_d7 
+PIN   0 =  macro_end 
+PIN   4 =  opc0 
+PIN   5 =  opc1 
+PIN   6 =  opc2 
+PIN   8 =  opc3 
+PIN   9 =  opc4 
+PIN   0 =  ph0 
+PIN   0 =  ph1 
+PIN   0 =  r00 
+PIN   0 =  r01 
+PIN   0 =  r02 
+PIN   0 =  r03 
+PIN   0 =  r04 
+PIN   0 =  r05 
+PIN   0 =  r06 
+PIN   0 =  r07 
+PIN   0 =  r10 
+PIN   0 =  r11 
+PIN   0 =  r12 
+PIN   0 =  r13 
+PIN   0 =  r14 
+PIN   0 =  r15 
+PIN   0 =  r16 
+PIN   0 =  r17 
+PIN   0 =  r20 
+PIN   0 =  r21 
+PIN   0 =  r22 
+PIN   0 =  r23 
+PIN   0 =  r24 
+PIN   0 =  r25 
+PIN   0 =  r26 
+PIN   0 =  r27 
+PIN   0 =  w_sel0 
+PIN   0 =  w_sel1 
+%END
+
+%FIELD
+FIELD opcode = opc4,opc3,opc2,opc1,opc0
+%END
+
+%EQUATION
+bctrl0 =>
+    !opc0 & !opc1 & opc2 & !opc3 & !opc4 & !ph0 & !ph1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & !ph1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & !ph0 & ph1
+
+bctrl1 =>
+    !opc0 & !opc1 & opc2 & !opc3 & !opc4 & !ph0 & !ph1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & !ph1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & !ph0 & ph1
+
+bctrl2 =>
+    opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1
+
+bctrl3 =>
+    opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1
+
+cin =>
+    !opc0 & !opc1 & opc2 & !opc3 & !opc4 & !ph0 & !ph1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & !ph1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & !ph0 & ph1
+
+end_ph0 =>
+    opc1 & !opc2 & !opc3 & !opc4
+  # !opc0 & !opc1 & opc2 & !opc3 & !opc4
+  # !opc1 & !opc2 & opc3 & !opc4
+  # opc0 & opc1 & opc2 & opc3 & !opc4
+
+end_ph1 =>
+    opc0 & !opc1 & !opc2 & !opc3 & !opc4
+  # opc0 & !opc1 & opc2 & opc3 & !opc4
+
+flg_we =>
+    opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & !ph0 & ph1
+
+gpr_d0 =>
+    !opc0 & !opc1 & opc2 & !opc3 & opc4 & r00
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & r00
+  # !opc0 & opc1 & !opc3 & opc4 & r20
+  # opc0 & !opc1 & !opc2 & opc4 & r10
+  # d_in0 & !opc4
+  # d_in0 & !opc0 & !opc1 & !opc2 & !opc3
+  # d_in0 & opc2 & opc3
+  # d_in0 & opc0 & opc2
+  # d_in0 & opc1 & opc3
+  # d_in0 & opc0 & opc1
+
+gpr_d1 =>
+    !opc0 & !opc1 & opc2 & !opc3 & opc4 & r01
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & r01
+  # !opc0 & opc1 & !opc3 & opc4 & r21
+  # opc0 & !opc1 & !opc2 & opc4 & r11
+  # d_in1 & !opc4
+  # d_in1 & !opc0 & !opc1 & !opc2 & !opc3
+  # d_in1 & opc2 & opc3
+  # d_in1 & opc0 & opc2
+  # d_in1 & opc1 & opc3
+  # d_in1 & opc0 & opc1
+
+gpr_d2 =>
+    !opc0 & !opc1 & opc2 & !opc3 & opc4 & r02
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & r02
+  # !opc0 & opc1 & !opc3 & opc4 & r22
+  # opc0 & !opc1 & !opc2 & opc4 & r12
+  # d_in2 & !opc4
+  # d_in2 & !opc0 & !opc1 & !opc2 & !opc3
+  # d_in2 & opc2 & opc3
+  # d_in2 & opc0 & opc2
+  # d_in2 & opc1 & opc3
+  # d_in2 & opc0 & opc1
+
+gpr_d3 =>
+    !opc0 & !opc1 & opc2 & !opc3 & opc4 & r03
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & r03
+  # !opc0 & opc1 & !opc3 & opc4 & r23
+  # opc0 & !opc1 & !opc2 & opc4 & r13
+  # d_in3 & !opc4
+  # d_in3 & !opc0 & !opc1 & !opc2 & !opc3
+  # d_in3 & opc2 & opc3
+  # d_in3 & opc0 & opc2
+  # d_in3 & opc1 & opc3
+  # d_in3 & opc0 & opc1
+
+gpr_d4 =>
+    !opc0 & !opc1 & opc2 & !opc3 & opc4 & r04
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & r04
+  # !opc0 & opc1 & !opc3 & opc4 & r24
+  # opc0 & !opc1 & !opc2 & opc4 & r14
+  # d_in4 & !opc4
+  # d_in4 & !opc0 & !opc1 & !opc2 & !opc3
+  # d_in4 & opc2 & opc3
+  # d_in4 & opc0 & opc2
+  # d_in4 & opc1 & opc3
+  # d_in4 & opc0 & opc1
+
+gpr_d5 =>
+    !opc0 & !opc1 & opc2 & !opc3 & opc4 & r05
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & r05
+  # !opc0 & opc1 & !opc3 & opc4 & r25
+  # opc0 & !opc1 & !opc2 & opc4 & r15
+  # d_in5 & !opc4
+  # d_in5 & !opc0 & !opc1 & !opc2 & !opc3
+  # d_in5 & opc2 & opc3
+  # d_in5 & opc0 & opc2
+  # d_in5 & opc1 & opc3
+  # d_in5 & opc0 & opc1
+
+gpr_d6 =>
+    !opc0 & !opc1 & opc2 & !opc3 & opc4 & r06
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & r06
+  # !opc0 & opc1 & !opc3 & opc4 & r26
+  # opc0 & !opc1 & !opc2 & opc4 & r16
+  # d_in6 & !opc4
+  # d_in6 & !opc0 & !opc1 & !opc2 & !opc3
+  # d_in6 & opc2 & opc3
+  # d_in6 & opc0 & opc2
+  # d_in6 & opc1 & opc3
+  # d_in6 & opc0 & opc1
+
+gpr_d7 =>
+    !opc0 & !opc1 & opc2 & !opc3 & opc4 & r07
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & r07
+  # !opc0 & opc1 & !opc3 & opc4 & r27
+  # opc0 & !opc1 & !opc2 & opc4 & r17
+  # d_in7 & !opc4
+  # d_in7 & !opc0 & !opc1 & !opc2 & !opc3
+  # d_in7 & opc2 & opc3
+  # d_in7 & opc0 & opc2
+  # d_in7 & opc1 & opc3
+  # d_in7 & opc0 & opc1
+
+lgc0 =>
+    0 
+
+lgc1 =>
+    0 
+
+lgc2 =>
+    0 
+
+lgc3 =>
+    0 
+
+lut_pc_flg_z =>
+    !opc0 & !opc1 & opc2 & !opc3 & !opc4 & ph0 & !ph1
+
+lut_pc_load =>
+    !opc0 & !opc1 & opc2 & !opc3 & !opc4 & ph0 & !ph1
+  # opc0 & !opc1 & opc2 & !opc3 & !opc4 & !ph0 & !ph1
+
+macro_end =>
+    opc4 & !ph0 & !ph1
+  # !opc0 & !opc1 & !opc2 & !opc3 & !ph0 & !ph1
+  # opc1 & opc2 & !opc3 & !ph0 & !ph1
+  # opc0 & opc2 & !opc3 & !ph0 & !ph1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1
+  # opc1 & !opc2 & opc3 & !ph0 & !ph1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & !ph0 & ph1
+  # !opc0 & opc1 & opc3 & !ph0 & !ph1
+  # !opc0 & opc1 & opc2 & !ph0 & !ph1
+  # !opc0 & opc2 & opc3 & !ph0 & !ph1
+  # opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1
+  # !opc0 & !opc1 & opc2 & !opc3 & !opc4 & ph0 & !ph1
+  # !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1
+  # opc0 & opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1
+
+mem_rd =>
+    !opc0 & opc1 & !opc2 & !opc3 & !opc4 & !ph0 & !ph1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & !ph0 & !ph1
+
+mem_wr =>
+    opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1
+  # opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1
+  # opc0 & opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1
+
+pc_load_en =>
+    macro_end & opc0 & !opc1 & opc2 & !opc3 & !opc4 & !ph0 & !ph1
+  # flg_z & macro_end & !opc0 & !opc1 & opc2 & !opc3 & !opc4 & ph0 & !ph1
+
+ph0.d  =>
+    !macro_end & !ph0
+
+ph0.ck  =>
+    clk
+
+ph1.d  =>
+    !macro_end & ph1
+  # !macro_end & ph0
+
+ph1.ck  =>
+    clk
+
+q_a0 =>
+    r00
+
+q_a1 =>
+    r01
+
+q_a2 =>
+    r02
+
+q_a3 =>
+    r03
+
+q_a4 =>
+    r04
+
+q_a5 =>
+    r05
+
+q_a6 =>
+    r06
+
+q_a7 =>
+    r07
+
+q_b0 =>
+    r10
+
+q_b1 =>
+    r11
+
+q_b2 =>
+    r12
+
+q_b3 =>
+    r13
+
+q_b4 =>
+    r14
+
+q_b5 =>
+    r15
+
+q_b6 =>
+    r16
+
+q_b7 =>
+    r17
+
+r00.d  =>
+    gpr_d0
+
+r00.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+
+r00.ck  =>
+    clk
+
+r01.d  =>
+    gpr_d1
+
+r01.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+
+r01.ck  =>
+    clk
+
+r02.d  =>
+    gpr_d2
+
+r02.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+
+r02.ck  =>
+    clk
+
+r03.d  =>
+    gpr_d3
+
+r03.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+
+r03.ck  =>
+    clk
+
+r04.d  =>
+    gpr_d4
+
+r04.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+
+r04.ck  =>
+    clk
+
+r05.d  =>
+    gpr_d5
+
+r05.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+
+r05.ck  =>
+    clk
+
+r06.d  =>
+    gpr_d6
+
+r06.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+
+r06.ck  =>
+    clk
+
+r07.d  =>
+    gpr_d7
+
+r07.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+
+r07.ck  =>
+    clk
+
+r10.d  =>
+    gpr_d0
+
+r10.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+
+r10.ck  =>
+    clk
+
+r11.d  =>
+    gpr_d1
+
+r11.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+
+r11.ck  =>
+    clk
+
+r12.d  =>
+    gpr_d2
+
+r12.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+
+r12.ck  =>
+    clk
+
+r13.d  =>
+    gpr_d3
+
+r13.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+
+r13.ck  =>
+    clk
+
+r14.d  =>
+    gpr_d4
+
+r14.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+
+r14.ck  =>
+    clk
+
+r15.d  =>
+    gpr_d5
+
+r15.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+
+r15.ck  =>
+    clk
+
+r16.d  =>
+    gpr_d6
+
+r16.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+
+r16.ck  =>
+    clk
+
+r17.d  =>
+    gpr_d7
+
+r17.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+
+r17.ck  =>
+    clk
+
+r20.d  =>
+    gpr_d0
+
+r20.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+
+r20.ck  =>
+    clk
+
+r21.d  =>
+    gpr_d1
+
+r21.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+
+r21.ck  =>
+    clk
+
+r22.d  =>
+    gpr_d2
+
+r22.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+
+r22.ck  =>
+    clk
+
+r23.d  =>
+    gpr_d3
+
+r23.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+
+r23.ck  =>
+    clk
+
+r24.d  =>
+    gpr_d4
+
+r24.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+
+r24.ck  =>
+    clk
+
+r25.d  =>
+    gpr_d5
+
+r25.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+
+r25.ck  =>
+    clk
+
+r26.d  =>
+    gpr_d6
+
+r26.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+
+r26.ck  =>
+    clk
+
+r27.d  =>
+    gpr_d7
+
+r27.ce  =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+
+r27.ck  =>
+    clk
+
+reg_we =>
+    opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1
+  # opc0 & !opc1 & !opc2 & opc4
+  # !opc0 & opc1 & !opc3 & opc4
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4
+
+reg_we_lut =>
+    opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1
+
+s0 =>
+    0 
+
+s1 =>
+    0 
+
+tfr_valid =>
+    opc0 & !opc1 & !opc2 & opc4
+  # !opc0 & opc1 & !opc3 & opc4
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4
+
+w_sel0 =>
+    !opc0 & opc2 & !opc3 & opc4
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1
+
+w_sel0_lut =>
+    opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1
+
+w_sel1 =>
+    !opc1 & !opc2 & opc3 & opc4
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1
+
+w_sel1_lut =>
+    opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1
+
+we_r0 =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & !w_sel1
+
+we_r1 =>
+    opc0 & !opc1 & !opc2 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & w_sel0 & !w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & w_sel0 & !w_sel1
+
+we_r2 =>
+    opc0 & !opc1 & !opc2 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & opc2 & !opc3 & opc4 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & opc4 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1 & !w_sel0 & w_sel1
+  # !opc0 & opc1 & !opc2 & !opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+  # !opc0 & !opc1 & !opc2 & opc3 & !opc4 & ph0 & !ph1 & !w_sel0 & w_sel1
+
+xfer_b0 =>
+    !opc0 & !opc1 & r00
+  # opc0 & !opc1 & r10
+  # !opc0 & opc1 & r20
+
+xfer_b1 =>
+    !opc0 & !opc1 & r01
+  # opc0 & !opc1 & r11
+  # !opc0 & opc1 & r21
+
+xfer_b2 =>
+    !opc0 & !opc1 & r02
+  # opc0 & !opc1 & r12
+  # !opc0 & opc1 & r22
+
+xfer_b3 =>
+    !opc0 & !opc1 & r03
+  # opc0 & !opc1 & r13
+  # !opc0 & opc1 & r23
+
+xfer_b4 =>
+    !opc0 & !opc1 & r04
+  # opc0 & !opc1 & r14
+  # !opc0 & opc1 & r24
+
+xfer_b5 =>
+    !opc0 & !opc1 & r05
+  # opc0 & !opc1 & r15
+  # !opc0 & opc1 & r25
+
+xfer_b6 =>
+    !opc0 & !opc1 & r06
+  # opc0 & !opc1 & r16
+  # !opc0 & opc1 & r26
+
+xfer_b7 =>
+    !opc0 & !opc1 & r07
+  # opc0 & !opc1 & r17
+  # !opc0 & opc1 & r27
+
+y_oe =>
+    opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph1
+  # opc0 & !opc1 & !opc2 & !opc3 & !opc4 & !ph0 & ph1
+  # opc0 & opc1 & !opc2 & !opc3 & !opc4 & !ph0 & !ph1
+  # opc0 & !opc1 & opc3 & !opc4 & !ph0 & !ph1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & ph0 & !ph1
+  # opc0 & !opc1 & opc2 & opc3 & !opc4 & !ph0 & ph1
+  # opc0 & opc1 & opc2 & opc3 & !opc4 & !ph0 & !ph1
+
+%END
