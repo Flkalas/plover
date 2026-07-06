@@ -1,5 +1,6 @@
 # Plover CPLD system_ctrl — logical netlist
 # Normative: reference/hardware/cpld-system-controller.md §2
+# CW latch: reference/hardware/control-word-latch.md
 
 device: ATF1504AS-10JU44
 package: PLCC-44
@@ -34,20 +35,36 @@ entity_ports:
     - { cupl: d_in6, net: d_in6, pin: 19 }
     - { cupl: d_in7, net: d_in7, pin: 20 }
     - { cupl: flg_z, net: flg_z, pin: 24 }
-    - { cupl: flg_c, net: flg_c, pin: 25 }
-  outputs:
-    - { cupl: q_a0..q_a7, net: q_a, width: 8, pin: fit }
-    - { cupl: q_b0..q_b7, net: q_b, width: 8, pin: fit }
-    - { cupl: reg_we, net: reg_we, pin: fit }
-    - { cupl: mem_rd, net: mem_rd, pin: fit }
-    - { cupl: mem_wr, net: mem_wr, pin: fit }
-    - { cupl: y_oe, net: y_oe, pin: fit }
-    - { cupl: cin, net: cin, pin: fit }
-    - { cupl: bctrl0..3, net: bctrl, width: 4, pin: fit }
-    - { cupl: lgc0..3, net: lgc, width: 4, pin: fit }
-    - { cupl: s0, net: s0, pin: fit }
-    - { cupl: s1, net: s1, pin: fit }
-    - { cupl: pc_load_en, net: pc_load_en, pin: fit }
+    - { cupl: flg_c, net: flg_c, pin: 25, note: "tie 0 on breadboard; not used in v1.0 equations" }
+  outputs_fit:
+    source: cpld_fsm/hdl/system_ctrl.pin
+    method: "pin = signal in PLD + PREASSIGN OFF; run gen_pin_lock.py after fit"
+    exported:
+      - reg_we
+      - q_a0..q_a7
+      - q_b0..q_b5
+    internal_tier_a:
+      - flg_z
+      - q_b6
+      - q_b7
+
+cw_bus:
+  normative: reference/hardware/control-word-latch.md
+  cpld_outputs:
+    - { cupl: cw_data0..7, net: cw_data, width: 8, pin: fit }
+    - { cupl: cw_le, net: cw_le, pin: fit }
+    - { cupl: cw_bank, net: cw_bank, pin: fit }
+  externalized_via_latch:
+    - mem_rd
+    - mem_wr
+    - y_oe
+    - flg_we
+    - pc_load_en
+    - cin
+    - bctrl0..3
+    - lgc0..3
+    - s0
+    - s1
 
 internal:
   - tfr_valid
