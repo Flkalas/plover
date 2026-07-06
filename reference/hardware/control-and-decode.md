@@ -13,7 +13,7 @@ This document is the **single normative reference** for who decodes what on the 
 | Layer | Block | Input | Output / effect | On v1.0 SoC? |
 |-------|-------|-------|-----------------|--------------|
 | **Program store** | SST39 Flash | Address | Instruction bytes, boot, utilities | Yes |
-| **Macro sequencer** | **CPLD-CU** idx5 FSM | `IR[4:0]`, `phase`, `FLG_Z` | Direct strobes + G-IC `reg_we` | Yes |
+| **Macro sequencer** | **CPLD-CU** idx5 FSM | `IR[4:0]`, `phase`, `FLG_Z` | Direct strobes + G-IC `reg_we`; CALL/RET stack assist @ macro_end | Yes |
 | **GPR datapath** | **CPLD-DP** | `d_in`, `reg_we` | `q_a` ← R0; write R0 | Yes |
 | **Operand B** | **MBR 574** | Fetch | `net_mbr` → ALU B (off CPLD) | Yes |
 | **ALU control** | FSM row constants on CU | CU outputs | `net_cin`, `net_bctrl0..3`, `net_lgc0..3`, `net_153_s0/s1` | Yes — **no `alu8_decode` DIP** |
@@ -45,7 +45,7 @@ This document is the **single normative reference** for who decodes what on the 
 
 | Chip | Function |
 |------|----------|
-| **CPLD-CU** | idx5 FSM + LUT; branch `PC_LOAD_EN`; **14 direct strobes** to SoC |
+| **CPLD-CU** | idx5 FSM + LUT (**22 active rows**); branch `PC_LOAD_EN`; CALL/RET stack assist; **14 direct strobes** to SoC |
 | **CPLD-DP** | **R0 (8 FF)**; async `q_a`; `reg_we` → R0 from `d_in` |
 
 FSM index (CU internal only):
@@ -70,6 +70,10 @@ fsm_index[6:0] = (opcode[4:0] << 2) | phase[1:0]
 **Fanout at 153:** `bctrl1` ← `bctrl0`, `bctrl3` ← `bctrl2` (CU ties internally).
 
 **INC (opcode 9):** `cin=1`, `bctrl=0000` → A+0+1. See [b3-opcode.md](../hw-bringup/b3-opcode.md).
+
+### CALL / RET (software return stack)
+
+Gi1 has no dedicated RP register. **CPLD-CU** performs push/pop at **macro_end** using existing `MEM_RD`/`MEM_WR` and address glue — RP cell `$0F00`, stack body `$F600+` ([microcode-spec.md](microcode-spec.md) §2.3, [calling-convention-v0.1.md](../software/calling-convention-v0.1.md)). RET loads PC from the popped word, not from MBR.
 
 ---
 
@@ -107,6 +111,7 @@ fsm_index[6:0] = (opcode[4:0] << 2) | phase[1:0]
 
 | Date | Note |
 |------|------|
+| 2026-07-07 | **CALL/RET** — CU stack assist; 22-row idx5 |
 | 2026-07-07 | **Gi1 v1.0** — AC + MBR; no TFR |
 | 2026-07-06 | rev G archived |
 | 2026-07-04 | Initial anchor: FSM-only v1.0 |

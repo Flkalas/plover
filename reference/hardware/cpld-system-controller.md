@@ -20,7 +20,8 @@
 5. **idx5 decode:** FSM key `(opcode[4:0] << 2) | phase[1:0]` — **128 slots** on CU.
 6. **Strobes:** CU drives **14 nets directly** to SoC (no external CW latch).
 7. **Branch:** `PC_LOAD_EN = macro_end & lut_pc_load & (!lut_pc_flg_z | FLG_Z)` on CU.
-8. **TFR:** **Removed** — `0x10–0x1F` trap/NOP; no `tfr_valid` comb.
+8. **Return stack assist:** CALL/RET push/pop @ **macro_end** — CU reads/writes RP cell `$0F00` and stack RAM via implicit `MEM_RD`/`MEM_WR` ([microcode-spec.md](microcode-spec.md) §2.3).
+9. **TFR:** **Removed** — `0x10–0x1F` trap/NOP; no `tfr_valid` comb.
 9. **Mailbox, MAP, `/CE`** — outside CPLD.
 
 ---
@@ -112,6 +113,16 @@ For ALU_REG templates, **ph1 does not assert REG_WE** — imm8 operand is held i
 
 **MBR hold:** Do not reload MBR operand byte during ALU_REG macro ([M3b-fetch-execute.md](../hw-bringup/M3b-fetch-execute.md)).
 
+### PC load path (JMP / CALL / RET)
+
+| Op | `PC_in` source @ `PC_LOAD_EN` |
+|----|-------------------------------|
+| JMP, CALL | abs16 from MBR (lo + hi latch) |
+| RET | **popped 16-bit return address** from stack (not MBR) |
+| BEQ | abs16 from MBR when `FLG_Z` |
+
+CALL additionally runs stack **push** before PC load; RET runs stack **pop** before PC load. Sequencer detail: [microcode-spec.md](microcode-spec.md) §2.3 · [M3b-fetch-execute.md](../hw-bringup/M3b-fetch-execute.md).
+
 ---
 
 ## 8. MC / fit gate
@@ -121,6 +132,8 @@ For ALU_REG templates, **ph1 does not assert REG_WE** — imm8 operand is held i
 | CPLD-CU | ~24–30 MC | WinCUPL Design fits |
 | CPLD-DP | ~10–18 MC | WinCUPL Design fits |
 
+CALL/RET return-stack assist and RET `PC_in` mux add CU logic beyond baseline Gi1 desk estimate. Delta MC/pin budget is tracked in [research/call-ret-cu-fit/mc-pin-budget.md](../../research/call-ret-cu-fit/mc-pin-budget.md); bring-up gate remains **Design fits** only.
+
 Do not record fitter used-MC counts as normative BOM gates — **Design fits** is the bring-up gate.
 
 ---
@@ -129,6 +142,7 @@ Do not record fitter used-MC counts as normative BOM gates — **Design fits** i
 
 | Date | Note |
 |------|------|
+| 2026-07-07 | **CALL/RET** — return-stack assist @ macro_end; RET PC mux |
 | 2026-07-07 | **Gi1 v1.0** — R0 only; G-IC 1-wire; MBR→ALU B |
 | 2026-07-06 | **rev G** archived |
 | 2026-07-06 | Tier C monolithic spec archived |

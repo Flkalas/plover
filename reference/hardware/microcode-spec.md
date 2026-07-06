@@ -51,7 +51,7 @@ Opcode field: **bits `[4:0]`** of the first instruction byte. Bits `[7:5]` are *
 
 | Format | Size | Layout |
 |--------|------|--------|
-| **Implied** | 1 B | `[7:5]=0`, `[4:0]=opcode` — HALT |
+| **Implied** | 1 B | `[7:5]=0`, `[4:0]=opcode` — HALT, **RET** |
 | **Imm8** | 2 B | byte0: opcode; byte1: imm8 — LDA, STA, CMP, ADD, LDIO, STIO |
 | **Abs16** | 3 B | byte0: opcode; bytes1–2: addr LE — BEQ, JMP, CALL, STA16 |
 
@@ -70,8 +70,8 @@ Opcode field: **bits `[4:0]`** of the first instruction byte. Bits `[7:5]` are *
 | `0x03` | STA | Store R0 to mem |
 | `0x04` | BEQ | Branch if Z |
 | `0x05` | JMP | Jump |
-| `0x06` | CALL | Subroutine (TBD) |
-| `0x07` | RET | Return (TBD) |
+| `0x06` | CALL | Subroutine — push return PC; PC ← abs16 |
+| `0x07` | RET | Return — pop return PC → PC |
 | `0x08` | LDIO | Load MMIO → R0 |
 | `0x09` | STIO | Store R0 to MMIO |
 | `0x0A` | HALT | Stop |
@@ -90,6 +90,23 @@ Opcode field: **bits `[4:0]`** of the first instruction byte. Bits `[7:5]` are *
 | BEQ | 2 | BEQ |
 | JMP, HALT, CALL, RET | 1 | BRANCH / HALT |
 
+### 2.3 Return stack (CU-assisted)
+
+Gi1 has **no hardware RP register**. CALL/RET push/pop is performed by **CPLD-CU @ macro_end** using implicit `MEM_RD`/`MEM_WR` to RAM — not exposed as separate LDA/STA opcodes.
+
+| Item | Normative value |
+|------|-----------------|
+| RP cell | `$0F00` / `$0F01` (16-bit LE) |
+| Stack body | `$F600`–`$FEEF`, upward growth |
+| Boot initial RP | `$F600` ([boot-jmp-handoff.md](../boot/boot-jmp-handoff.md)) |
+| CALL @ macro_end | `return_pc` = address **after** 3-byte insn; `mem[RP]←return_pc` (16-bit LE); `RP+=2`; `PC←abs16` (from MBR) |
+| RET @ macro_end | `RP-=2`; `PC←mem[RP]` (16-bit LE); **`PC_in` ≠ MBR** (popped word) |
+| Overflow (`RP > $FEEF`) | execution **stops** (same as HALT — fetch ceases) |
+| Underflow (`RP ≤ $F600`) | execution **stops** |
+| Flash CW | **not used** — stack assist is CU sequencer logic |
+
+Non-normative MC/pin fit study: [research/call-ret-cu-fit/SUMMARY-REPORT.md](../../research/call-ret-cu-fit/SUMMARY-REPORT.md).
+
 ---
 
 ## 3. FSM-only control (`cw_fsm_only`)
@@ -101,7 +118,7 @@ Opcode field: **bits `[4:0]`** of the first instruction byte. Bits `[7:5]` are *
 | Operand imm8 | **MBR** from fetch (no internal R1 latch) |
 | ALU / bus strobes | **CPLD-CU** direct outputs per §4 |
 
-Verify: frozen FSM table in [M3a-control-store.md](../hw-bringup/M3a-control-store.md) §2 (20 active idx5 slots).
+Verify: frozen FSM table in [M3a-control-store.md](../hw-bringup/M3a-control-store.md) §2 (**22 active idx5 slots**).
 
 ---
 
@@ -118,7 +135,7 @@ Summary:
 | MEM_LD | ph0: MEM_RD; ph1: REG_WE → R0 |
 | MEM_ST | ph0: Y_OE; ph1: MEM_WR |
 | BEQ | ph0: ALU SUB; end: PC_LOAD_EN<=FLG_Z |
-| JMP | end: PC_LOAD_EN<=1 |
+| JMP, CALL, RET | end: PC_LOAD_EN<=1 |
 
 Bus and ALU strobes are **direct CPLD-CU outputs** (no CW latch). `REG_WE` reaches CPLD-DP via **G-IC** (`reg_we` only).
 
@@ -136,13 +153,15 @@ No `w_sel`, `tfr_valid`, or `src` on G-IC (Gi1).
 
 ## 6. Branch macros
 
-| Op | `PC_LOAD_EN` @ macro_end |
-|----|--------------------------|
-| BEQ | `FLG_Z` |
-| JMP | unconditional |
-| CALL/RET/HALT | TBD |
+| Op | `PC_LOAD_EN` @ macro_end | Operand / PC source |
+|----|--------------------------|---------------------|
+| BEQ | `FLG_Z` | abs16 in MBR |
+| JMP | unconditional | abs16 in MBR |
+| CALL | unconditional | abs16 in MBR; stack push @ macro_end |
+| RET | unconditional | **popped return PC** (not MBR) |
+| HALT | — | — |
 
-Operand (abs16) latched in MBR during fetch — see [M3b-fetch-execute.md](../hw-bringup/M3b-fetch-execute.md).
+CALL/RET stack assist: §2.3. Operand (abs16) for CALL latched in MBR during fetch — see [M3b-fetch-execute.md](../hw-bringup/M3b-fetch-execute.md).
 
 ---
 
@@ -170,6 +189,7 @@ P1 `DECODE_BYPASS` — not normative SoC path.
 
 | Date | Note |
 |------|------|
+| 2026-07-07 | **CALL/RET** — CU return-stack assist; 22 idx5 rows; RET implied |
 | 2026-07-07 | **Gi1 v1.0** — AC + MBR→B; R0 only; TFR removed; G-IC 1-wire |
 | 2026-07-06 | **rev G** archived — see [rev-g-dual-3gpr](../../archive/rev-g-dual-3gpr/README.md) |
 | 2026-06-24 | idx5 FSM decode; ISA `[4:0]`; FSM-only |
