@@ -199,6 +199,17 @@ def test_map_mode_boot_vs_run() -> None:
     assert runner.cpu.mem.read(0x100) == 0xBB
 
 
+def test_jmp_to_zero() -> None:
+    """JMP $0000 must reload PC=0 (branch target may be zero)."""
+    runner = ProgramRunner()
+    runner.load_rom_bytes(bytes([0x05, 0x00, 0x00, 0x0A]), base=0)
+    runner.reset(pc=0)
+    for _ in range(12):
+        runner.cpu.step()
+    assert not runner.halted
+    assert runner.pc == 0
+
+
 def test_fib_upto_250() -> None:
     from simulators.cyclesim.fixtures.rom_builder import (
         FIB_LIMIT,

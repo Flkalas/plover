@@ -285,8 +285,16 @@ class CpuM3b:
         self._sync_phase_nets()
         self._sync_opcode_nets()
         if row:
-            self.ctx.drive("net_pc_load_en", H if row.pc_load_en else L, "macro_end")
-            self.ctx.drive("net_pc_load_flg_z", H if row.pc_load_flg_z else L, "macro_end")
+            self.ctx.set(
+                "net_pc_load_en",
+                H if row.pc_load_en else L,
+                stuck=True,
+            )
+            self.ctx.set(
+                "net_pc_load_flg_z",
+                H if row.pc_load_flg_z else L,
+                stuck=True,
+            )
         self.ctx.drive(NET_REG_WE_LUT, L, "macro_end")
         self.ctx.comb_fixup()
         self.ctx.set("net_macro_end", H)
