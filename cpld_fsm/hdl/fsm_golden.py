@@ -50,6 +50,26 @@ CYCLESIM_NET_MAP: dict[str, str] = {
     "flg_we": "net_flg_we",
 }
 
+# Tier C external 574 CW latch (control-word-latch.md sec 4)
+CW_LO_BITS: tuple[str, ...] = (
+    "mem_rd",
+    "mem_wr",
+    "y_oe",
+    "flg_we",
+    "pc_load_en",
+    "cin",
+    "bctrl0",
+    "bctrl2",
+)
+CW_HI_BITS: tuple[str, ...] = (
+    "lgc0",
+    "lgc1",
+    "lgc2",
+    "lgc3",
+    "s0",
+    "s1",
+)
+
 CSIM_INPUT_ORDER = (
     "clk",
     "opc0",
@@ -127,6 +147,36 @@ def merge_lut_strobes(lut: dict[str, bool], opcode: int) -> dict[str, bool]:
         "lut_pc_flg_z": lut["lut_pc_flg_z"],
         "flg_we": lut["flg_we"],
     }
+    return merged
+
+
+def pack_cw_byte(merged: dict[str, bool], bit_names: tuple[str, ...]) -> int:
+    value = 0
+    for i, name in enumerate(bit_names):
+        if merged.get(name, False):
+            value |= 1 << i
+    return value
+
+
+def pack_cw_lo(merged: dict[str, bool]) -> int:
+    return pack_cw_byte(merged, CW_LO_BITS)
+
+
+def pack_cw_hi(merged: dict[str, bool]) -> int:
+    return pack_cw_byte(merged, CW_HI_BITS)
+
+
+def merged_for_cw_pack(
+    opcode: int,
+    phase: int,
+    *,
+    macro_end: bool = False,
+    flg_z: bool = False,
+) -> dict[str, bool]:
+    """Merged strobes including pc_load_en for CW_LO serialization."""
+    lut = golden_for_opcode_phase(opcode, phase)
+    merged = merge_lut_strobes(lut, opcode)
+    merged["pc_load_en"] = pc_load_at_macro_end(lut, flg_z, macro_end=macro_end)
     return merged
 
 
