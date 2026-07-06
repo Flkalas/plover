@@ -10,9 +10,9 @@ Device f1504ispplcc44;
 
 PROPERTY ATMEL {POWER_RESET = OFF};
 PROPERTY ATMEL {PIN_KEEP = ON};
-PROPERTY ATMEL {PREASSIGN = KEEP};
+PROPERTY ATMEL {PREASSIGN = OFF};
 
-/* ATF1504AS-10JU44 PLCC-44 JTAG ISP - pins 7/13/32/38 reserved */
+/* ATF1504AS-10JU44 PLCC-44 JTAG ISP - pins 7/13/32/38 reserved for ISP */
 
 PIN 43 = clk;
 
@@ -30,17 +30,37 @@ PIN 18 = d_in5;
 PIN 19 = d_in6;
 PIN 20 = d_in7;
 PIN 24 = flg_z;
-PIN 25 = flg_c;
 
-/* Outputs unpinned - fitter assigns PLCC pads; export system_ctrl.pin after fit */
+/* Tier C: CW bus to external 574x2 (control-word-latch.md). Fitter-first q export. */
+pin = reg_we;
+pin = cw_data0;
+pin = cw_data1;
+pin = cw_data2;
+pin = cw_data3;
+pin = cw_data4;
+pin = cw_data5;
+pin = cw_data6;
+pin = cw_data7;
+pin = cw_le;
+pin = cw_bank;
+pin = q_a0;
+pin = q_a1;
+pin = q_a2;
+/* q_a3..q_a7 internal - fitter-first trim (pin_budget.md) */
+pin = q_b0;
+pin = q_b1;
+pin = q_b2;
+/* q_b3..q_b7 internal - fitter-first trim (pin_budget.md) */
 
 /* Buried state */
 Pinnode = [ph0, ph1];
+Pinnode = [ph0_prev, ph1_prev];
+Pinnode = [cw_cnt0, cw_cnt1];
 Pinnode = [r00, r01, r02, r03, r04, r05, r06, r07];
 Pinnode = [r10, r11, r12, r13, r14, r15, r16, r17];
 Pinnode = [r20, r21, r22, r23, r24, r25, r26, r27];
 Pinnode = [gpr_d0, gpr_d1, gpr_d2, gpr_d3, gpr_d4, gpr_d5, gpr_d6, gpr_d7];
-Pinnode = [w_sel0, w_sel1, macro_end, flg_we];
+Pinnode = [w_sel0, w_sel1, macro_end];
 
 FIELD opcode = [opc4, opc3, opc2, opc1, opc0];
 
@@ -75,9 +95,6 @@ reg_we = reg_we_lut # tfr_valid;
 
 w_sel0 = tfr_valid & opc2 # !tfr_valid & w_sel0_lut;
 w_sel1 = tfr_valid & opc3 # !tfr_valid & w_sel1_lut;
-
-bctrl1 = bctrl0;
-bctrl3 = bctrl2;
 
 we_r0 = reg_we & !w_sel1 & !w_sel0;
 we_r1 = reg_we & !w_sel1 &  w_sel0;
@@ -116,3 +133,47 @@ gpr_d6 = tfr_valid & xfer_b6 # !tfr_valid & d_in6;
 gpr_d7 = tfr_valid & xfer_b7 # !tfr_valid & d_in7;
 
 pc_load_en = macro_end & lut_pc_load & (!lut_pc_flg_z # flg_z);
+
+/* CW_LO pack (control-word-latch.md sec 4) */
+cw_lo0 = mem_rd;
+cw_lo1 = mem_wr;
+cw_lo2 = y_oe;
+cw_lo3 = flg_we;
+cw_lo4 = pc_load_en;
+cw_lo5 = cin;
+cw_lo6 = bctrl0;
+cw_lo7 = bctrl2;
+
+/* CW_HI pack */
+cw_hi0 = lgc0;
+cw_hi1 = lgc1;
+cw_hi2 = lgc2;
+cw_hi3 = lgc3;
+cw_hi4 = s0;
+cw_hi5 = s1;
+
+cw_data0 = !cw_bank & cw_lo0 # cw_bank & cw_hi0;
+cw_data1 = !cw_bank & cw_lo1 # cw_bank & cw_hi1;
+cw_data2 = !cw_bank & cw_lo2 # cw_bank & cw_hi2;
+cw_data3 = !cw_bank & cw_lo3 # cw_bank & cw_hi3;
+cw_data4 = !cw_bank & cw_lo4 # cw_bank & cw_hi4;
+cw_data5 = !cw_bank & cw_lo5 # cw_bank & cw_hi5;
+cw_data6 = !cw_bank & cw_lo6;
+cw_data7 = !cw_bank & cw_lo7;
+
+/* Phase edge detect + 2-cycle CW load (LO then HI) */
+ph0_prev.d = ph0;
+ph0_prev.ck = clk;
+ph1_prev.d = ph1;
+ph1_prev.ck = clk;
+
+phase_edge = !macro_end & (ph0 & !ph0_prev # !ph0 & ph0_prev
+          # ph1 & !ph1_prev # !ph1 & ph1_prev);
+
+cw_cnt0.d = phase_edge;
+cw_cnt0.ck = clk;
+cw_cnt1.d = cw_cnt0 & !cw_cnt1;
+cw_cnt1.ck = clk;
+
+cw_le = cw_cnt0 # cw_cnt1;
+cw_bank = cw_cnt1;
