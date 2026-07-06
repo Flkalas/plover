@@ -10,8 +10,8 @@ OP_BEQ = 0x04
 OP_JMP = 0x05
 OP_HALT = 0x0A
 
-# Gi1 unrolled fib ROM must fit addr8 RAM cells above image (max limit ≈232).
-FIB_LIMIT = 232
+# Largest Fibonacci term to reach (sequence stops when fb == largest term <= FIB_LIMIT).
+FIB_LIMIT = 250
 
 # Set by build_fib_to_limit_rom — RAM cells sit above the ROM image (see below).
 ADDR_FIB_A: int | None = None
@@ -128,75 +128,90 @@ def _operand_fetch_pcs(rom: bytes) -> set[int]:
     return pcs
 
 
-def _emit_fib_body(rb: RomBuilder, fa: int, fb: int, tmp: int, target: int, limit: int) -> None:
-    """Gi1 Fibonacci step — temp RAM cell; no TFR."""
-    a, bb = 0, 1
-    while True:
-        rb.lda(fb)
-        rb.cmp(target)
-        rb.beq("halt")
-        if bb == target:
-            break
+def _emit_fib_loop(
+    rb: RomBuilder,
+    fa: int,
+    fb: int,
+    tmp: int,
+    add_imm_pc: int,
+    target: int,
+) -> int:
+    """Gi1 looped Fibonacci — JMP/BEQ outer (no CALL/RET).
 
-        rb.lda(fb)
-        rb.sta(tmp)
-        rb.lda(fa)
-        rb.add(bb)
-        rb.sta(fb)
-        rb.lda(tmp)
-        rb.sta(fa)
+    Gi1 ADD is R0+imm only; each step patches the ADD immediate byte in RAM
+    (map_mode=1 program mirror) with the current ``fb`` before ``ADD #imm``.
+    Returns PC of ``outer`` label for checkpoint tests.
+    """
+    rb.label("outer")
+    outer_pc = rb.labels["outer"]
+    rb.lda(fb)
+    rb.cmp(target)
+    rb.beq("halt")
 
-        a, bb = bb, a + bb
+    rb.lda(fb)
+    rb.sta(tmp)
+    rb.lda(fb)
+    rb.sta(add_imm_pc)
+    rb.lda(fa)
+    rb.add(0)
+    rb.sta(fb)
+    rb.lda(tmp)
+    rb.sta(fa)
+    rb.jmp("outer")
 
     rb.label("halt")
     rb.halt()
+    return outer_pc
 
 
-def build_fib_to_limit_rom(limit: int = FIB_LIMIT) -> tuple[bytes, dict[int, int], int]:
+def build_fib_to_limit_rom(
+    limit: int = FIB_LIMIT,
+) -> tuple[bytes, dict[int, int], int, int]:
     """
-    ROM: advance Fibonacci in RAM until b equals the largest term <= limit.
+    ROM: JMP-loop Fibonacci in RAM until ``fb`` equals the largest term <= limit.
 
-    Gi1 step (tmp holds previous b):
-      LDA fb; STA tmp
-      LDA fa; ADD #bb; STA fb
-      LDA tmp; STA fa
+    RAM layout above ROM image: ``fa``, ``fb``, ``tmp``; ``add_imm_pc`` is the
+    program offset of the ADD immediate byte (self-patched each outer iteration).
 
-    RAM cells are placed immediately above the ROM image (addr8) so operand
-    fetches never alias live data under map_mode=1.
+    Returns ``(rom, ram_init, target, outer_pc)`` — ``outer_pc`` is the loop-head
+    PC for visit-count checkpoint tests.
     """
     global ADDR_FIB_A, ADDR_FIB_B
 
     target, _next = last_fib_leq(limit)
 
     probe = RomBuilder(0x0000)
-    _emit_fib_body(probe, 0xF0, 0xF1, 0xF2, target, limit)
-    data_base = len(probe.to_bytes())
+    _emit_fib_loop(probe, 0xF0, 0xF1, 0xF2, 0xF3, target)
+    probe_rom = probe.to_bytes()
+    data_base = len(probe_rom)
+    add_imm_pc = next(i + 1 for i in range(len(probe_rom) - 1) if probe_rom[i] == OP_ADD)
 
     fa = data_base
     fb = data_base + 1
     tmp = data_base + 2
     if tmp > 0xFF:
-        raise ValueError(
-            f"fib ROM {data_base} bytes — Gi1 sequence exceeds addr8; "
-            f"lower FIB_LIMIT (max fits ~200)"
-        )
+        raise ValueError(f"fib ROM {data_base} bytes — RAM layout exceeds addr8")
 
     rb = RomBuilder(0x0000)
-    _emit_fib_body(rb, fa, fb, tmp, target, limit)
+    outer_pc = _emit_fib_loop(rb, fa, fb, tmp, add_imm_pc, target)
     rom = rb.to_bytes()
     assert len(rom) == data_base
 
+    data_addrs = {fa, fb, tmp}
     fetches = _operand_fetch_pcs(rom)
-    if fetches.intersection({fa, fb, tmp}):
+    if fetches.intersection(data_addrs):
         raise ValueError("fib RAM aliases operand-fetch PCs — adjust layout")
+
+    pairs = fib_pairs_to_limit(limit)
+    checkpoints = [(outer_pc, a, b) for a, b in pairs]
 
     ADDR_FIB_A = fa
     ADDR_FIB_B = fb
     ram_init = {fa: 0, fb: 1}
-    return rom, ram_init, target
+    return rom, ram_init, target, outer_pc
 
 
 def build_fib_250_rom() -> tuple[bytes, dict[int, int]]:
     """Fibonacci up to largest term <= FIB_LIMIT."""
-    rom, ram, _ = build_fib_to_limit_rom(FIB_LIMIT)
+    rom, ram, _, _ = build_fib_to_limit_rom(FIB_LIMIT)
     return rom, ram

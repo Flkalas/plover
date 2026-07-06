@@ -215,20 +215,36 @@ def test_fib_upto_250() -> None:
         FIB_LIMIT,
         build_fib_to_limit_rom,
         fib_pair_before_target,
+        fib_pairs_to_limit,
     )
 
-    rom, ram_init, target = build_fib_to_limit_rom(FIB_LIMIT)
-    assert target == 144  # largest term ≤ FIB_LIMIT with Gi1 ROM ≤ 239 B
+    rom, ram_init, target, outer_pc = build_fib_to_limit_rom(FIB_LIMIT)
+    assert target == 233  # largest Fibonacci term <= 250
+    assert len(rom) < 80  # loop, not unrolled
     addr_fib_a, addr_fib_b = sorted(ram_init)
     exp_a, exp_b = fib_pair_before_target(FIB_LIMIT)
     assert exp_b == target
+    pairs = fib_pairs_to_limit(FIB_LIMIT)
 
     runner = ProgramRunner()
     runner.load_rom_bytes(rom, base=0)
     for addr, val in ram_init.items():
         runner.load_ram(addr, val)
     runner.reset(pc=0)
-    steps = runner.run_until_halt(max_steps=2000, wall_s=15.0)
-    assert runner.halted, f"fib did not halt in {steps} steps (wall limit 15s)"
+
+    visit = 0
+    steps = 0
+    max_cpu_steps = 100_000
+    while not runner.halted:
+        if runner.pc == outer_pc and runner.cpu.fetch_pending:
+            exp_a_step, exp_b_step = pairs[visit]
+            assert runner.cpu.mem.read(addr_fib_a) == exp_a_step & 0xFF
+            assert runner.cpu.mem.read(addr_fib_b) == exp_b_step & 0xFF
+            visit += 1
+        runner.cpu.step()
+        steps += 1
+        assert steps <= max_cpu_steps, f"fib exceeded {max_cpu_steps} CPU steps"
+
+    assert visit == len(pairs)
     assert runner.cpu.mem.read(addr_fib_a) == exp_a & 0xFF
     assert runner.cpu.mem.read(addr_fib_b) == exp_b & 0xFF
