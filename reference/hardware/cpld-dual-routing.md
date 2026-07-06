@@ -1,4 +1,4 @@
-# Dual CPLD breadboard routing (rev G)
+# Dual CPLD breadboard routing (Gi1)
 
 **Pins:** [cpld-system-controller.md](cpld-system-controller.md) · **Bring-up:** [breadboard-wiring.md](../hw-bringup/breadboard-wiring.md)
 
@@ -7,10 +7,11 @@
 ## Topology
 
 ```text
-  IR/FLG ──► CPLD-CU ── G-IC (6) ──► CPLD-DP ◄── data bus
+  IR/FLG ──► CPLD-CU ── reg_we ──► CPLD-DP ◄── data bus
                 │                      │
                 └── strobes (14) ──────┼──► ALU / MEM / PC
-                                       └── q_a/q_b (16) ──► ALU
+                                       └── q_a (8) ──► ALU A
+  MBR 574 Q ─────────────────────────────────────────► ALU B
 ```
 
 ---
@@ -21,8 +22,9 @@ Place **CPLD-CU** and **CPLD-DP** on **adjacent 830-tie rows**, pin-1 aligned.
 
 | Rule | Rationale |
 |------|-----------|
-| G-IC on inner tie row | Short CU→DP for `reg_we`, `tfr_valid`, `src` |
-| DP `q` to ALU on outer edge | 16 wires; avoid crossing G-IC |
+| G-IC on inner tie row | Short CU→DP for `reg_we` |
+| DP `q_a` to ALU on outer edge | 8 wires |
+| MBR → ALU B | Dedicated 8-wire bundle; keep ≤10 cm |
 | IR/FLG → CU only | DP has no `opc`/`flg_z` |
 | Wire length ≤ 10 cm | Inter-chip timing budget |
 
@@ -30,16 +32,23 @@ Place **CPLD-CU** and **CPLD-DP** on **adjacent 830-tie rows**, pin-1 aligned.
 
 ## G-IC bundle (CU → DP)
 
-| ID | Signal | DP pin |
-|----|--------|--------|
+| ID | Signal | DP pin (desk) |
+|----|--------|---------------|
 | G01 | `reg_we` | 12 |
-| G02 | `w_sel0` | 14 |
-| G03 | `w_sel1` | 16 |
-| G04 | `tfr_valid` | 17 |
-| G05 | `src0` | 18 |
-| G06 | `src1` | 19 |
 
 **CLK:** pin 43 both chips (not counted in G-IC).
+
+---
+
+## MBR → ALU B (Gi1)
+
+| Net | Source | Destination |
+|-----|--------|-------------|
+| `net_mbr0..7` | MBR 574 Q | `net_b0..7` → ALU B |
+
+**Removed vs rev G:** CPLD `q_b0..7` → ALU B (disconnect).
+
+Optional **74HC244** on MBR fanout if needed (desk: direct wire OK).
 
 ---
 
@@ -58,3 +67,12 @@ Place **CPLD-CU** and **CPLD-DP** on **adjacent 830-tie rows**, pin-1 aligned.
 `mem_rd`, `mem_wr`, `y_oe`, `flg_we`, `pc_load_en`, `cin`, `bctrl0`, `bctrl2`, `lgc0..3`, `s0`, `s1`.
 
 JTAG: [cpld-dual-jtag.md](cpld-dual-jtag.md)
+
+---
+
+## Change log
+
+| Date | Note |
+|------|------|
+| 2026-07-07 | Gi1 — G-IC 1-wire; MBR→B |
+| 2026-07-06 | rev G 6-wire G-IC |

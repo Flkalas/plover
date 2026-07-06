@@ -1,9 +1,9 @@
-# Plover v1.0 — System Architecture
+# Plover v1.0 — System Architecture (Gi1)
 
-**Version:** 1.0 (pre-release) · **Hardware rev:** G dual-CPLD · **Date:** 2026-07-06  
+**Version:** 1.0 · **Hardware:** Gi1 dual-CPLD · **Date:** 2026-07-07  
 **Status:** Active normative specification (breadboard)
 
-**v1.0:** FSM-only **idx5** control, 3×GPR in **CPLD-DP**, Extended TFR bit-field (§ [microcode-spec.md](microcode-spec.md) §2.2), Flash `$4000` unused.
+**v1.0 Gi1:** FSM-only **idx5** control, **R0 (AC) only** in CPLD-DP, **MBR→ALU B**, Flash `$4000` unused. Prior rev G 3-GPR archived.
 
 ---
 
@@ -11,10 +11,10 @@
 
 | Item | Specification |
 |------|---------------|
-| **CPU** | 8-bit TTL datapath: custom ALU (74HC, 12 DIP) + **3×GPR in CPLD-DP** (R0→A, R1→B, R2=result) |
-| **Control** | **FSM-only (idx5)** in **CPLD-CU** — `(opcode[4:0]<<2)\|phase`; **direct strobes** (no CW latch); **no `alu8_decode`** |
-| **ISA** | Opcode **`[4:0]`**; core `0x01–0x0F` + **Extended TFR** (`0x11`,`0x12`,`0x14`,`0x16`,`0x18`,`0x19`); `0x0C` reserved |
-| **System CPLD** | **2× ATF1504AS-10JU44** — CPLD-CU (control) + CPLD-DP (datapath) |
+| **CPU** | 8-bit TTL datapath: custom ALU (74HC, 12 DIP) + **R0 (AC) in CPLD-DP**; **MBR 574 → ALU B** |
+| **Control** | **FSM-only (idx5)** in **CPLD-CU** — `(opcode[4:0]<<2)\|phase`; **direct strobes**; **no `alu8_decode`** |
+| **ISA** | Opcode **`[4:0]`**; core `0x01–0x0F`; **`0x10–0x1F` reserved** (no TFR); `0x0C` reserved |
+| **System CPLD** | **2× ATF1504AS-10JU44** — CPLD-CU + CPLD-DP (Gi1) |
 | **CE decode** | **74HC138×2** + **74HC08/32/04** glue → RAM/ROM `/CE` |
 | **Flags / branch** | **574×1 FLG** (Z/C) + CPLD-CU `PC_LOAD_EN` |
 | **RAM** | **2× IS62C256AL** — 64 KB via **A15** bank |
@@ -22,14 +22,17 @@
 | **I/O** | MMIO **Mailbox** @ `$FF00–$FFFB` — polling only, **no IRQ** |
 | **Coprocessor** | **RP2350B** — GPU, HID, virtual FDD (separate board) |
 
-### Metrics (rev G vs superseded Tier C single-CPLD)
+### Metrics (Gi1 vs archived rev G)
 
-| Metric | Tier C (archived) | **rev G** |
-|--------|-------------------|-----------|
-| ATF1504 count | 1 | **2** |
-| 574 (control path) | 5 (incl. CW×2) | **3** (PC/MBR/FLG) |
-| Full 8b `q_a`/`q_b` | No (trim) | **Yes** |
-| Branch BEQ desk @ 2 MHz | internal | internal (~212 ns) |
+| Metric | rev G (archived) | **Gi1 v1.0** |
+|--------|------------------|--------------|
+| CPLD-DP pins | 31/32 | **17/32** |
+| CPLD-CU pins | 26/32 | **~21/32** |
+| G-IC wires | 6 | **1** (`reg_we`) |
+| ph2 ADD @ 2 MHz | ~168 ns PASS | **~133 ns PASS** |
+| GPR in CPLD | R0–R2 (24 FF) | **R0 (8 FF)** |
+| TFR opcodes | 6 | **none** |
+| 574 count | 3 | **3** (unchanged) |
 
 ---
 
@@ -38,6 +41,7 @@
 - **Deterministic:** no IRQ; operator-visible mode switches.
 - **Passive map:** mailbox/MAP in **discrete gates**; CPLD pair holds GPR + sequencer.
 - **Thin decode:** ALU controls from CPLD-CU FSM, not comb `alu8_decode` block.
+- **AC-centric:** single visible GPR; extra state in **RAM** (Gigatron-style).
 - **ROM as law:** boot + program only; Flash **`$4000` unused** ([rom-architecture.md](rom-architecture.md)).
 - **Flat memory:** 64 KiB linear map; **no MMU**.
 
@@ -49,8 +53,9 @@
   IR OPC[4:0] ──► CPLD-CU idx5 FSM ──► MEM_RD/WR, Y_OE, FLG_WE, PC_LOAD_EN
   FLG_Z ─────────► branch merge          cin/bctrl/lgc/s0/s1 ──► alu8
                     │
-                    └── G-IC (6) ──► CPLD-DP GPR + full q_a/q_b ──► alu8 A/B
-  d_bus[7:0] ─────────────────────────► CPLD-DP (LDA/STA write)
+                    └── reg_we ──► CPLD-DP R0 ──► q_a ──► alu8 A
+  MBR 574 Q ──────────────────────────────────────────────► alu8 B
+  d_bus[7:0] ─────────────────────────► CPLD-DP (write R0)
 
   A[15:0] ──► 08/32 mailbox·MAP ──► 74HC138×2 ──► /CE ──► SRAM×2 + SST39
 ```
@@ -70,9 +75,11 @@ Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md
 
 ---
 
-## 5. Physical packages (v1.0 breadboard rev G)
+## 5. Physical packages (v1.0 breadboard Gi1)
 
-2× CPLD `ATF1504AS-10JU44` + 2× PLCC→DIP (#15); Flash `SST39SF010A-70-4C-PHE` PDIP 직결; SRAM `IS62C256` + SOP28 (#3a)×2; `SN74LVC8T245` + SOIC-24 (#3c)×3. 상세: [parts-on-hand.md](../project/parts-on-hand.md) · [BOM.md](../project/BOM.md).
+2× CPLD `ATF1504AS-10JU44` + 2× PLCC→DIP (#15); Flash `SST39SF010A-70-4C-PHE` PDIP; SRAM `IS62C256` + SOP28 (#3a)×2; `SN74LVC8T245` + SOIC-24 (#3c)×3; **574×3** (PC/MBR/FLG). 상세: [parts-on-hand.md](../project/parts-on-hand.md) · [BOM.md](../project/BOM.md).
+
+**Wiring delta vs rev G:** `net_mbr[7:0]` → `net_b[7:0]`; CPLD `q_b` disconnected.
 
 ---
 
@@ -81,8 +88,8 @@ Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md
 | Document | Content |
 |----------|---------|
 | [memory-map.md](memory-map.md) | Address map, 138×2 + gate decode |
-| [cpld-system-controller.md](cpld-system-controller.md) | Dual CPLD CU/DP ports |
-| [cpld-dual-routing.md](cpld-dual-routing.md) | G-IC bundle, breadboard placement |
+| [cpld-system-controller.md](cpld-system-controller.md) | Dual CPLD Gi1 ports |
+| [cpld-dual-routing.md](cpld-dual-routing.md) | G-IC, MBR→B wiring |
 | [cpld-dual-jtag.md](cpld-dual-jtag.md) | JTAG daisy chain |
 | [microcode-spec.md](microcode-spec.md) | FSM-only ISA, idx5 |
 | [hw-bringup/README.md](../hw-bringup/README.md) | M1–M5 breadboard bring-up |
@@ -95,7 +102,7 @@ Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md
 |-------|------|
 | Breadboard | M1–M5 bring-up checklists ([hw-bringup/README.md](../hw-bringup/README.md)) |
 | FSM table | M3a checklist — opcode×phase logical consistency |
-| Scope | CPLD-CU `REG_WE`, `MEM_RD`, `PC_LOAD_EN` vs FLG |
+| Scope | CPLD-CU `REG_WE`, `MEM_RD`, `PC_LOAD_EN` vs FLG; MBR hold on ADD |
 
 ---
 
@@ -103,5 +110,6 @@ Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md
 
 | Date | Note |
 |------|------|
-| 2026-07-06 | **rev G** — dual ATF1504; direct strobes; full `q`; Tier C archived |
-| 2026-06-24 | **v1.0** — FSM-only idx5 normative; prototype-flash-cw archived |
+| 2026-07-07 | **Gi1 v1.0** — AC + MBR; rev G archived |
+| 2026-07-06 | rev G dual ATF1504 |
+| 2026-06-24 | v1.0 FSM-only idx5 normative |

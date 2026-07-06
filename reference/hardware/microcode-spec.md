@@ -1,8 +1,8 @@
-# Microcode Specification v1.0
+# Microcode Specification v1.0 (Gi1) (Gi1)
 
-**Normative:** v1.0 breadboard (FSM-only idx5)  
+**Normative:** v1.0 breadboard — **Gi1** AC + MBR operand path (FSM-only idx5)  
 **Related:** [rom-architecture.md](rom-architecture.md) · [cpld-system-controller.md](cpld-system-controller.md)  
-**Superseded prototype:** [prototype-flash-cw](../archive/prototype-flash-cw/README.md)
+**Superseded:** rev G 3-GPR + TFR — [archive/rev-g-dual-3gpr/README.md](../../archive/rev-g-dual-3gpr/README.md)
 
 ---
 
@@ -10,10 +10,10 @@
 
 | Axis | Choice | Rationale |
 |------|--------|-----------|
-| Opcode | **`op_legacy`** core + **Extended `0x10–0x1F`** (TFR bit-field §2.2) | 5-bit opcode field `[4:0]` |
+| Opcode | **`op_legacy`** core; **`0x10–0x1F` reserved** (no TFR) | 5-bit opcode field `[4:0]` |
 | Index | **`idx5`** | CPLD FSM key `(opcode[4:0]<<2)\|phase` — **128 logical slots** |
-| Decode | **`dec_cpld_seq`** | Phase FSM in CPLD; **no `alu8_decode`** |
-| CPLD | **`cpld_dual`** | **CU:** idx5 + strobes · **DP:** R0→A, R1→B, R2 internal XFER |
+| Decode | **`dec_cpld_seq`** | Phase FSM in CPLD-CU; **no `alu8_decode`** |
+| CPLD | **`cpld_dual_gi1`** | **CU:** idx5 + strobes · **DP:** **R0 (AC) only**; **ALU B from MBR 574** |
 | CW/Flash | **`cw_fsm_only`** | **No Flash param/CW** — FSM opcode table only |
 
 **No Flash fetch** at macro_start for control. Flash `$4000` region **unused** ([rom-architecture.md](rom-architecture.md)).
@@ -24,12 +24,22 @@
 fsm_index[6:0] = (opcode[4:0] << 2) | phase[1:0]
 ```
 
-| | idx4 (archive / Pareto record) | idx5 (normative) |
-|---|-------------------------------|------------------|
+| | idx4 (archive) | idx5 (normative) |
+|---|----------------|------------------|
 | Opcode bits | `[3:0]` | **`[4:0]`** |
 | Logical slots | 64 | **128** |
 | Physical Flash | v1.0 `$4000` CW | **none** — CPLD PLA only |
 | IR → CPLD | 4 wires | **5 wires** (`IR[4]` added) |
+
+### 1.2 Operand datapath (Gi1)
+
+| Port | Source |
+|------|--------|
+| ALU A | CPLD-DP `q_a` ← **R0** |
+| ALU B | **MBR 574** `net_mbr[7:0]` → `net_b[7:0]` (off-chip wire) |
+| GPR write | `d_in` → **R0** when `reg_we` (G-IC) |
+
+**MBR hold:** During ALU_REG (ADD/CMP), operand byte latched at fetch must **not** reload until macro completes ([M3b-fetch-execute.md](../hw-bringup/M3b-fetch-execute.md)).
 
 ---
 
@@ -41,24 +51,21 @@ Opcode field: **bits `[4:0]`** of the first instruction byte. Bits `[7:5]` are *
 
 | Format | Size | Layout |
 |--------|------|--------|
-| **Implied** | 1 B | `[7:5]=0`, `[4:0]=opcode` — TFR, HALT |
+| **Implied** | 1 B | `[7:5]=0`, `[4:0]=opcode` — HALT |
 | **Imm8** | 2 B | byte0: opcode; byte1: imm8 — LDA, STA, CMP, ADD, LDIO, STIO |
 | **Abs16** | 3 B | byte0: opcode; bytes1–2: addr LE — BEQ, JMP, CALL, STA16 |
 
-**Extended opcode group:** `0x10–0x1F` officially allocated.
+**Extended opcode group:** `0x10–0x1F` — **reserved / trap** (no TFR in v1.0 Gi1).
 
 | Range | Use |
 |-------|-----|
-| `0x11`, `0x12`, `0x14`, `0x16`, `0x18`, `0x19` | TFR (bit-field, normative) |
-| `0x10`, `0x13`, `0x15`, `0x17`, `0x1A–0x1F` | Reserved / invalid TFR |
-
-**TFR bit-field** (`opc[4]=1`): `opc[3:2]` = dst (00=R0, 01=R1, 10=R2), `opc[1:0]` = src; valid when src ≠ dst and neither field is `11₂`.
+| `0x10–0x1F` | **Invalid** on breadboard (prior rev G TFR archived) |
 
 ### 2.1 Core (`0x01–0x0F`)
 
 | Op | Mnemonic | Summary |
 |----|----------|---------|
-| `0x01` | ADD | R2 ← R0 + R1 (3-phase) |
+| `0x01` | ADD | **R0 ← R0 + imm** (3-phase) |
 | `0x02` | LDA | Load from mem → R0 |
 | `0x03` | STA | Store R0 to mem |
 | `0x04` | BEQ | Branch if Z |
@@ -69,23 +76,10 @@ Opcode field: **bits `[4:0]`** of the first instruction byte. Bits `[7:5]` are *
 | `0x09` | STIO | Store R0 to MMIO |
 | `0x0A` | HALT | Stop |
 | `0x0C` | — | **Reserved** (was MOV) |
-| `0x0D` | CMP | R0 − imm; flags only |
+| `0x0D` | CMP | R0 − imm (B from MBR); flags only |
 | `0x0F` | STA16 | Store abs16 (boot) |
 
-### 2.2 Implied transfer (TFR bit-field)
-
-| Op | Mnemonic | Action |
-|----|----------|--------|
-| `0x11` | TFR01 | R0 ← R1 |
-| `0x12` | TFR02 | R0 ← R2 |
-| `0x14` | TFR10 | R1 ← R0 |
-| `0x16` | TFR12 | R1 ← R2 |
-| `0x18` | TFR20 | R2 ← R0 |
-| `0x19` | TFR21 | R2 ← R1 |
-
-Encoding: `opcode = 0x10 \| (dst << 2) \| src` with dst/src ∈ {0,1,2}, src ≠ dst.
-
-### 2.3 Phase counts (CPLD FSM)
+### 2.2 Phase counts (CPLD FSM)
 
 | Op | Phases | Template |
 |----|--------|----------|
@@ -93,9 +87,8 @@ Encoding: `opcode = 0x10 \| (dst << 2) \| src` with dst/src ∈ {0,1,2}, src ≠
 | LDA, LDIO | 2 | MEM_LD |
 | STA, STIO, STA16 | 2 | MEM_ST |
 | CMP | 3 | ALU_REG (flags_only) |
-| TFR (6 opcodes §2.2) | 1 | XFER (comb decode, not idx5 LUT row) |
 | BEQ | 2 | BEQ |
-| JMP, HALT, CALL, RET | 1 | BRANCH |
+| JMP, HALT, CALL, RET | 1 | BRANCH / HALT |
 
 ---
 
@@ -103,56 +96,41 @@ Encoding: `opcode = 0x10 \| (dst << 2) \| src` with dst/src ∈ {0,1,2}, src ≠
 
 | Mechanism | Source |
 |-----------|--------|
-| `w_sel` | Internal FSM opcode/template table |
+| GPR write | G-IC **`reg_we`** only — DP hardwires **R0** |
 | `PC_LOAD_EN` | Opcode + `FLG_Z` @ macro_end |
-| Operand address | **MBR** from fetch (no PARAM) |
+| Operand imm8 | **MBR** from fetch (no internal R1 latch) |
 | ALU / bus strobes | **CPLD-CU** direct outputs per §4 |
 
-Verify: frozen FSM table in [M3a-control-store.md](../hw-bringup/M3a-control-store.md) §2 (2026-07-06, 20 rows).
+Verify: frozen FSM table in [M3a-control-store.md](../hw-bringup/M3a-control-store.md) §2 (20 active idx5 slots).
 
 ---
 
 ## 4. Per-phase control strobes
 
-See [cpld-system-controller.md](cpld-system-controller.md) §7 for full tables.
+See [cpld-system-controller.md](cpld-system-controller.md) §7.
 
 Summary:
 
 | Template | Key strobes |
 |----------|-------------|
-| ALU_REG (ADD) | ph0–1: Y_OE; ph1: **REG_WE**, w_sel=R1 (mandatory); ph2: REG_WE, w_sel=R2, FLG_WE |
-| ALU_REG (CMP) | ph0–1: same as ADD; ph2: **FLG_WE only** (flags_only — no REG_WE, no R2 latch) |
-| MEM_LD | ph0: MEM_RD; ph1: REG_WE, w_sel=R0 |
+| ALU_REG (ADD) | ph0–1: idle (no GPR write); ph2: `Y_OE`, `REG_WE`→R0, `FLG_WE`, ALU ADD |
+| ALU_REG (CMP) | ph0–1: idle; ph2: `FLG_WE` only, ALU CMP; B from MBR |
+| MEM_LD | ph0: MEM_RD; ph1: REG_WE → R0 |
 | MEM_ST | ph0: Y_OE; ph1: MEM_WR |
-| XFER | ph0: REG_WE via G-IC; w_sel=dst; src via `opc[1:0]` on G-IC |
 | BEQ | ph0: ALU SUB; end: PC_LOAD_EN<=FLG_Z |
 | JMP | end: PC_LOAD_EN<=1 |
 
-**rev G:** Bus and ALU strobes are **direct CPLD-CU outputs** (no CW latch). `REG_WE` and `w_sel` reach CPLD-DP via **G-IC**.
+Bus and ALU strobes are **direct CPLD-CU outputs** (no CW latch). `REG_WE` reaches CPLD-DP via **G-IC** (`reg_we` only).
 
 ---
 
-## 5. `w_sel` on G-IC (CPLD-CU → DP)
+## 5. G-IC (CPLD-CU → DP)
 
-| Template | Phase | `w_sel` |
-|----------|-------|---------|
-| ALU_REG (ADD) | ph2 | R2 |
-| ALU_REG (ADD/CMP) | ph1 | R1 (**REG_WE mandatory** — imm8 operand latch) |
-| MEM_LD | ph1 | R0 |
-| XFER | ph0 | opcode bit-field → dst (`opc[3:2]`) |
+| Signal | Function |
+|--------|----------|
+| `reg_we` | GPR write strobe — **always targets R0** in DP |
 
-### XFER opcode → (src, dst)
-
-Bit-field: src = `opc[1:0]`, dst = `opc[3:2]`.
-
-| Opcode | src | dst |
-|--------|-----|-----|
-| TFR01 `0x11` | R1 | R0 |
-| TFR02 `0x12` | R2 | R0 |
-| TFR10 `0x14` | R0 | R1 |
-| TFR12 `0x16` | R2 | R1 |
-| TFR20 `0x18` | R0 | R2 |
-| TFR21 `0x19` | R1 | R2 |
+No `w_sel`, `tfr_valid`, or `src` on G-IC (Gi1).
 
 ---
 
@@ -172,7 +150,7 @@ Operand (abs16) latched in MBR during fetch — see [M3b-fetch-execute.md](../hw
 
 CPLD drives `cin`, `bctrl0..3`, `lgc3:0`, `y_mux_sel` — no `alu8_decode` on SoC ([control-and-decode.md](control-and-decode.md)).
 
-**2 MHz budget:** worst-case **INC 153 ns**, SUB **136 ns** ([alu-opcodes-timing.md](alu-opcodes-timing.md)).
+**2 MHz budget (Gi1 ph2 ADD):** Y ≈ **133 ns** @ 250 ns execute half ([alu-opcodes-timing.md](alu-opcodes-timing.md)).
 
 ---
 
@@ -192,10 +170,7 @@ P1 `DECODE_BYPASS` — not normative SoC path.
 
 | Date | Note |
 |------|------|
-| 2026-07-06 | **rev G** — `cpld_dual`; G-IC `w_sel` |
-| 2026-07-06 | Tier C CW latch footnote removed (archived) |
-| 2026-07-06 | ALU_REG ADD vs CMP ph2 split; mandatory ph1 REG_WE for ADD/CMP |
-| 2026-06-24 | idx5 FSM decode; ISA `[4:0]`; per-phase strobes; operand datapath |
-| 2026-07-06 | TFR bit-field opcodes; idx5 20 rows; `tfr_valid` comb |
-| 2026-06-24 | FSM-only; TFR bit-field; `0x0C` reserved |
-| 2026-06-10 | v1.0 archived |
+| 2026-07-07 | **Gi1 v1.0** — AC + MBR→B; R0 only; TFR removed; G-IC 1-wire |
+| 2026-07-06 | **rev G** archived — see [rev-g-dual-3gpr](../../archive/rev-g-dual-3gpr/README.md) |
+| 2026-06-24 | idx5 FSM decode; ISA `[4:0]`; FSM-only |
+| 2026-06-10 | v1.0 initial |

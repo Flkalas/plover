@@ -1,10 +1,10 @@
-# Control and decode (v1.0 rev G)
+# Control and decode (v1.0 Gi1)
 
 **Related:** [system-architecture.md](system-architecture.md) · [microcode-spec.md](microcode-spec.md) · [cpld-system-controller.md](cpld-system-controller.md) · [rom-architecture.md](rom-architecture.md)
 
-This document is the **single normative reference** for who decodes what on the v1.0 breadboard CPU. Other normative docs link here instead of redefining decode roles.
+This document is the **single normative reference** for who decodes what on the v1.0 breadboard CPU.
 
-**Superseded:** Tier C single-CPLD + CW 574×2 — [archive/tier-c-single-cpld/README.md](../../archive/tier-c-single-cpld/README.md).
+**Superseded:** rev G 3-GPR + TFR — [archive/rev-g-dual-3gpr/README.md](../../archive/rev-g-dual-3gpr/README.md). Tier C single-CPLD — [archive/tier-c-single-cpld/README.md](../../archive/tier-c-single-cpld/README.md).
 
 ---
 
@@ -13,18 +13,19 @@ This document is the **single normative reference** for who decodes what on the 
 | Layer | Block | Input | Output / effect | On v1.0 SoC? |
 |-------|-------|-------|-----------------|--------------|
 | **Program store** | SST39 Flash | Address | Instruction bytes, boot, utilities | Yes |
-| **Macro sequencer** | **CPLD-CU** idx5 FSM | `IR[4:0]`, `phase`, `FLG_Z` | Direct strobes + G-IC to DP | Yes |
-| **GPR datapath** | **CPLD-DP** | `d_in`, G-IC | `q_a`/`q_b`, GPR writes | Yes |
+| **Macro sequencer** | **CPLD-CU** idx5 FSM | `IR[4:0]`, `phase`, `FLG_Z` | Direct strobes + G-IC `reg_we` | Yes |
+| **GPR datapath** | **CPLD-DP** | `d_in`, `reg_we` | `q_a` ← R0; write R0 | Yes |
+| **Operand B** | **MBR 574** | Fetch | `net_mbr` → ALU B (off CPLD) | Yes |
 | **ALU control** | FSM row constants on CU | CU outputs | `net_cin`, `net_bctrl0..3`, `net_lgc0..3`, `net_153_s0/s1` | Yes — **no `alu8_decode` DIP** |
 | **ALU execute** | alu8 (12 DIP) | A, B, control nets | `net_y*`, `net_c_hi` | Yes |
 | **Memory CE** | 74HC138×2 + glue | `A[15:0]`, MAP, mailbox | `/CE` to SRAM×2 + Flash | Yes (off CPLD) |
 | **12-opcode comb decode** | `alu8_decode` | `alu_sel[3:0]` | Control nets | **M1 bench only** |
 
 ```text
-  Flash ROM          CPLD-CU (idx5)              CPLD-DP (GPR)           74HC off-CPLD
+  Flash ROM          CPLD-CU (idx5)              CPLD-DP (R0)            MBR 574
   program bytes  IR ──► macro phases ──► strobes ──► alu8 / MEM / PC
-  boot, vector       G-IC (6) ─────────► GPR, q_a/q_b ──► alu8 A/B
-  $4000 unused       TFR comb + branch merge
+  boot, vector       reg_we ───────────► R0, q_a ──► alu8 A
+  $4000 unused                              net_mbr ───────────────► alu8 B
   A[15:0] ─────────────────────────────────────────────────────► 138×2 ──► /CE
 ```
 
@@ -40,12 +41,12 @@ This document is the **single normative reference** for who decodes what on the 
 | `$FFFC` | Reset vector image |
 | **`$4000–$4FFF`** | **Reserved — unburned in v1.0** |
 
-### CPLD pair (rev G)
+### CPLD pair (Gi1)
 
 | Chip | Function |
 |------|----------|
-| **CPLD-CU** | idx5 FSM + LUT; comb TFR detect; branch `PC_LOAD_EN`; **14 direct strobes** to SoC |
-| **CPLD-DP** | GPR 24 FF; full async `q_a`/`q_b`; TFR src mux from G-IC `src[1:0]` |
+| **CPLD-CU** | idx5 FSM + LUT; branch `PC_LOAD_EN`; **14 direct strobes** to SoC |
+| **CPLD-DP** | **R0 (8 FF)**; async `q_a`; `reg_we` → R0 from `d_in` |
 
 FSM index (CU internal only):
 
@@ -53,7 +54,7 @@ FSM index (CU internal only):
 fsm_index[6:0] = (opcode[4:0] << 2) | phase[1:0]
 ```
 
-**Not in CPLD:** memory `/CE`, mailbox MAP, `FETCH` addr mux. See [memory-map.md](memory-map.md).
+**Not in CPLD:** memory `/CE`, mailbox MAP, `FETCH` addr mux, **ALU B operand wire** (MBR). See [memory-map.md](memory-map.md).
 
 ---
 
@@ -97,8 +98,8 @@ fsm_index[6:0] = (opcode[4:0] << 2) | phase[1:0]
 |------|------|------|
 | **Root** | [plover-whitepaper.md](../../plover-whitepaper.md) §6 | ISA / FSM narrative |
 | **Reference** | `reference/**` | Normative detail |
-| **Machine** | `simulators/cyclesim/data/isa.py`, `fsm_table.py` | Executable golden |
-| **CPLD** | `system_ctrl_cu.pld`, `system_ctrl_dp.pld`, `gen_ctrl_lut.py` | Bitstream source |
+| **Machine** | idx5 FSM golden tables | Executable parity (developer tree) |
+| **CPLD** | Gi1 PLD forks | Bitstream source |
 
 ---
 
@@ -106,5 +107,6 @@ fsm_index[6:0] = (opcode[4:0] << 2) | phase[1:0]
 
 | Date | Note |
 |------|------|
-| 2026-07-06 | **rev G** — dual CPLD; CW latch layer removed |
+| 2026-07-07 | **Gi1 v1.0** — AC + MBR; no TFR |
+| 2026-07-06 | rev G archived |
 | 2026-07-04 | Initial anchor: FSM-only v1.0 |
