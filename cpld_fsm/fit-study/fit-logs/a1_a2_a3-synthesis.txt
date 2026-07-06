@@ -1,0 +1,5 @@
+WinCUPL not found ??structural fork only.
+Variant: a1_a2_a3
+Generated: D:\Github\plover\cpld_fsm\fit-study\scripts\..\variants\a1_a2_a3\system_ctrl_gen.pld
+Pin budget: see pin-budget-variants.md
+Action: open system_ctrl_gen.pld in WinCUPL F9 locally

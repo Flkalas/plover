@@ -1,0 +1,13 @@
+/* TFR-ring-2bit decode snippet — fit-study desk-check */
+/* Hot 3 only: 00=R0<-R1, 01=R1<-R2, 10=R2<-R0 */
+
+tfr_valid = opc4 & !opc3 & !opc2 & (opc1 # opc0);
+
+w_sel0 = tfr_valid & (!opc1 & opc0);
+w_sel1 = tfr_valid & ( opc1 & !opc0);
+
+xfer_sel0 = !opc1 & !opc0;
+xfer_sel1 = !opc1 &  opc0;
+
+/* Cold 3 pairs: software 2-insn or ring-macro — not in this snippet */
+/* MC estimate: tfr_valid 3-term OR; fixed w_sel per ring opcode */

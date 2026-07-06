@@ -1,0 +1,5 @@
+WinCUPL not found ??structural fork only.
+Variant: e1_gpr_eeprom_trim
+Generated: D:\Github\plover\cpld_fsm\fit-study\scripts\..\variants\e1_gpr_eeprom_trim\system_ctrl_gen.pld
+Pin budget: see pin-budget-e1.md (E1) or pin-budget-variants.md
+Action: open system_ctrl_gen.pld in WinCUPL F9 locally
