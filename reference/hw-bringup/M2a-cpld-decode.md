@@ -40,7 +40,8 @@
 - [ ] **JTAG daisy chain:** CU first, then DP
 - [ ] **R0 on DP:** `q_a` → ALU A; **no `q_b`**
 - [ ] **Fitter:** Design fits on **both** ATF1504AS
-- [ ] **Frozen table:** 20 idx5 slots match M3a §2 (Gi1 semantics)
+- [ ] **Frozen table:** **22** idx5 slots match M3a §2 (Gi1 semantics incl. CALL/RET)
+- [ ] **CALL/RET fit:** [research/call-ret-cu-fit/SUMMARY-REPORT.md](../../research/call-ret-cu-fit/SUMMARY-REPORT.md) pass before CU reburn
 
 ---
 
@@ -60,6 +61,12 @@ Preload R0; MBR holds imm8; ph2: `Y_OE`, `REG_WE`→R0, observe R0 ← R0+imm.
 
 **Removed vs rev G:** TFR smoke — archived.
 
+### CALL / RET smoke (post CU reburn)
+
+1. ROM: `CALL` to subroutine; subroutine `RET`; verify PC returns to insn after CALL.
+2. Nested `CALL` (depth ≥ 2) then matching `RET`s — stack cells at `$F600+` hold return PCs (16-bit LE).
+3. Underflow: `RET` with RP=`$F600` → execution stops (HALT-class).
+
 ---
 
 ## 6. M2a sign-off
@@ -68,12 +75,12 @@ Preload R0; MBR holds imm8; ph2: `Y_OE`, `REG_WE`→R0, observe R0 ← R0+imm.
 - [ ] ADD ph2 strobes on CU (scope)
 - [ ] MBR→B wired; ALU B sees imm during ADD
 - [ ] G-IC `reg_we` ≤ 10 cm
-
----
+- [ ] CALL/RET smoke (§5) after CU JED with 22-row LUT
 
 ## Change log
 
 | Date | Note |
 |------|------|
+| 2026-07-07 | CALL/RET — 22 idx5 slots; lab smoke |
 | 2026-07-07 | Gi1 — R0 only; MBR→B; no TFR |
 | 2026-07-06 | rev G archived |

@@ -16,7 +16,7 @@
 | **PC** | 574+161 | `net_pc0..15` | instruction address |
 | **IR** | 574 | `net_ir0..7` | opcode byte → CPLD `OPC[4:0]` |
 | **MBR** | 574 | `net_mbr0..7` | operand imm8 / abs16 lo; **Gi1: ALU B** |
-| **MBR hi** | 574 or PC+2 path | — | abs16 high byte (BEQ/JMP) |
+| **MBR hi** | 574 or PC+2 path | — | abs16 high byte (BEQ/JMP/CALL) |
 | **Phase** | CPLD internal | `phase[1:0]` | micro-phase 0..2 |
 | **FLG** | 574 | Z, C | BEQ @ macro_end |
 | **PC+1** | 283 (low) | — | sequential fetch |
@@ -39,7 +39,8 @@
 | LDA `02 imm` | PC, PC+1 | imm8 → MBR (address) | ph0 MEM_RD @ MBR |
 | STA `03 imm` | PC, PC+1 | imm8 → MBR | ph1 MEM_WR @ MBR |
 | LDIO/STIO | 2-byte | imm8 → MBR | MMIO decode |
-| BEQ/JMP | 3-byte | abs16 LE → MBR+hi | macro_end PC_LOAD_EN |
+| BEQ/JMP/CALL | 3-byte | abs16 LE → MBR+hi | macro_end PC_LOAD_EN |
+| RET | 1-byte | — | macro_end pop + PC_LOAD_EN |
 | ADD `01 imm` | PC, PC+1 | imm8 → **MBR (held → ALU B)** | ALU_REG ph2 → **R0** |
 | `0x10–0x1F` | — | — | **trap / NOP** |
 
@@ -57,7 +58,9 @@ RESET: **74HC157** → `$FFFC` → PC `$0000` (Boot).
 |------|------|
 | BEQ ph0 | ALU SUB (or prior CMP) → **FLG 574** ← Z |
 | BEQ macro_end | CPLD `PC_LOAD_EN <= FLG_Z`; if Z, PC ← abs16 in MBR |
-| JMP macro_end | `PC_LOAD_EN <= 1`; PC ← abs16 |
+| JMP macro_end | `PC_LOAD_EN <= 1`; PC ← abs16 in MBR |
+| CALL macro_end | stack push (`mem[RP]←return_pc`, `RP+=2`); then `PC_LOAD_EN <= 1`; PC ← abs16 in MBR |
+| RET macro_end | `RP-=2`; read `mem[RP]` → **PC_in**; `PC_LOAD_EN <= 1` |
 | Non-branch macro_end | `PC_LOAD_EN=0`; PC += insn_length (283/161 glue) |
 
 **관측:** 스코프 on `FLG_Z`, `PC_LOAD_EN`, PC transition.
@@ -83,6 +86,20 @@ RESET: **74HC157** → `$FFFC` → PC `$0000` (Boot).
 | 0 | 52 | idle |
 | 1 | 53 | idle |
 | 2 | 54 | FLG_WE only; B from MBR |
+
+### CALL (`0x06`) — idx5 24
+
+| phase | idx5 | 동작 |
+|-------|------|------|
+| 0 | 24 | macro_end: push return PC; `PC_LOAD_EN`; PC ← abs16 (MBR) |
+
+### RET (`0x07`) — idx5 28
+
+| phase | idx5 | 동작 |
+|-------|------|------|
+| 0 | 28 | macro_end: pop return PC → **PC_in**; `PC_LOAD_EN` |
+
+Return stack semantics: [microcode-spec.md](../hardware/microcode-spec.md) §2.3.
 
 ### LDA (`0x02`)
 
@@ -134,7 +151,7 @@ ROM: CMP + BEQ; verify `PC_LOAD_EN` only when Z=1.
 ## 6. M3b sign-off
 
 - [ ] F0–F4 Pass on **breadboard**
-- [ ] Machine golden pre-flight: fetch IR/MBR, m3b mini, BEQ/JMP
+- [ ] Machine golden pre-flight: fetch IR/MBR, m3b mini, BEQ/JMP/CALL/RET
 - [ ] MBR hold during ADD/CMP macro
 - [ ] No Flash param / `$4000` fetch in path
 - [ ] BEQ: FLG_Z gates `PC_LOAD_EN`
@@ -151,5 +168,6 @@ ROM: CMP + BEQ; verify `PC_LOAD_EN` only when Z=1.
 
 | Date | Note |
 |------|------|
+| 2026-07-07 | CALL/RET — 3B/1B fetch; macro_end push/pop |
 | 2026-07-07 | Gi1 — MBR→B; ADD→R0; TFR removed |
 | 2026-07-06 | rev G timeline archived |
