@@ -1,0 +1,20 @@
+CALL/RET CU fit report — gi1_cu_callret
+=========================================
+Date: 2026-07-07
+Device: ATF1504AS-10JU44 (CPLD-CU)
+Source: desk estimate pending PLD merge — see README.md
+
+WinCUPL Design fits: PENDING (no system_ctrl.pld in tree yet)
+
+Desk projection (mc-pin-budget.md):
+  Baseline CU MC: ~24-30
+  CALL/RET delta:  ~10-22 MC
+  Projected total: ~34-52 MC / 64 MC rating
+  I/O delta:       0 pins (RET PC_in mux internal)
+
+Gate for M2a CU reburn:
+  [ ] system_ctrl.pld merged with idx5 rows 24/28 + stack assist
+  [ ] WinCUPL Design fits = Yes
+  [ ] fit-report.txt updated with fitter log
+
+Conditional Go per SUMMARY-REPORT.md until fitter confirms.
