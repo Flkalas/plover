@@ -29,7 +29,9 @@
 | `ctrl_lut.inc` | Generated idx5 LUT (CU) |
 | `system_ctrl_cu.jed` / `system_ctrl_dp.jed` | JTAG fuse files |
 
-Codegen: `cpld_fsm/hdl/gen_ctrl_lut.py` · Build: `cpld_fsm/hdl/build-wincupl.ps1`
+**Active tree:** JTAG toolchain only — [`cpld/tools/`](../cpld/tools/).  
+**HDL restore:** `archive/cpld-rev-g-hdl.tar.gz` → `cpld/hdl/` (then `gen_ctrl_lut.py`, `build-wincupl.ps1`).  
+**JTAG probe:** `cpld/tools/jtag-probe.ps1`
 
 ---
 

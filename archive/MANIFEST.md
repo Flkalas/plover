@@ -34,6 +34,7 @@ Restore: `tar -xzf archive/NAME.tar.gz -C .` from repository root.
 | `docs_archive.tar.gz` | `docs/archive/` — superseded specs, gemini |
 | `developer_docs.tar.gz` | `docs/developer/`, `docs/plans/` — sim guide, implementation plans |
 | `fit-study-gpr-fsm.tar.gz` | **Frozen 2026-07-06** — GPR-FSM variant studies (A1/D5a/E1/F2/G), WinCUPL fit logs, desk reports |
+| `cpld-rev-g-hdl.tar.gz` | **Frozen 2026-07-06** — rev G dual CPLD HDL (`hdl/`, `netlist/`) — restore before WinCUPL build |
 | [tier-c-single-cpld/](tier-c-single-cpld/) | **Superseded 2026-07-06** — single ATF1504 + CW 574×2 (pre rev G) |
 
 `build/`, `target/`, `.venv/` — local artifacts; not bundled. Delete locally.
@@ -54,7 +55,8 @@ Restore: `tar -xzf archive/NAME.tar.gz -C .` from repository root.
 | `docs/archive/**` | `docs_archive.tar.gz` |
 | `BOM.md` (root) | `reference/project/BOM.md` |
 | `archive/bundles/**` | `archive/*.tar.gz` |
-| `cpld_fsm/fit-study/` (full tree) | `fit-study-gpr-fsm.tar.gz` — stub [README](../cpld_fsm/fit-study/README.md) |
+| `cpld_fsm/` (full tree) | `cpld/` — **tools only**; HDL in `cpld-rev-g-hdl.tar.gz` |
+| `cpld_fsm/fit-study/` (full tree) | `fit-study-gpr-fsm.tar.gz` — restore to `cpld/fit-study` |
 | `hwsim/`, `hw/`, `tools/`, … | matching code bundle above |
 
 ---
@@ -80,7 +82,8 @@ PASS — 16 FSM opcodes, **20 active idx5 rows** (+ comb TFR) — see [reference
 tar -czf archive/research_docs.tar.gz docs/hardware/research
 tar -czf archive/docs_archive.tar.gz docs/archive
 tar -czf archive/developer_docs.tar.gz docs/developer docs/plans
-tar -czf archive/fit-study-gpr-fsm.tar.gz -C cpld_fsm fit-study
+tar -czf archive/fit-study-gpr-fsm.tar.gz -C cpld fit-study
+tar -czf archive/cpld-rev-g-hdl.tar.gz -C cpld hdl netlist
 ```
 
 Code bundles: see `archive/pack-bundles.ps1`.

@@ -54,8 +54,8 @@ When answering **hardware architecture**, **bring-up**, or **decode/CPLD/ALU** q
 | **Root** | [plover-whitepaper.md](plover-whitepaper.md) §6 | ISA / FSM narrative |
 | **Reference** | `reference/**` | Normative detail, bring-up, frozen fixtures |
 | **Machine** | `simulators/cyclesim/data/isa.py`, `fsm_table.py` | Executable golden |
-| **CPLD** | `cpld_fsm/hdl/` — `system_ctrl_cu.pld`, `system_ctrl_dp.pld`, `gen_ctrl_lut.py` | Bitstream source (rev G dual) |
-| **Archive** | `archive/*.tar.gz`, `archive/tier-c-single-cpld/`, `fit-study-gpr-fsm.tar.gz` | Historical — **do not** cite for SoC unless user asks |
+| **CPLD** | `cpld/tools/` — WinCUPL, OpenOCD, JTAG probe | Toolchain (active); HDL archived |
+| **Archive** | `archive/*.tar.gz`, `archive/tier-c-single-cpld/`, `cpld-rev-g-hdl.tar.gz`, `fit-study-gpr-fsm.tar.gz` | Historical — **do not** cite for SoC unless user asks |
 
 **Anchor docs:** [control-and-decode.md](reference/hardware/control-and-decode.md), [system-architecture.md](reference/hardware/system-architecture.md), [plover-whitepaper.md](plover-whitepaper.md).
 
@@ -67,7 +67,7 @@ When answering **hardware architecture**, **bring-up**, or **decode/CPLD/ALU** q
 
 **Forbidden for SoC / bring-up answers** (unless user asks for history):
 
-- Citing or executing restored content from `archive/*.tar.gz` or restored `cpld_fsm/fit-study/`
+- Citing or executing restored content from `archive/*.tar.gz` or restored `cpld/` HDL/fit-study trees
 - Treating **`alu8_decode`** as the breadboard decode path
 - Flash **`$4000`** control-word burn, **`cpu_cw_direct`**, pareto MC as v1.0 gates
 

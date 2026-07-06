@@ -19,16 +19,16 @@ Blocks: MUX4, ADD4, MUX2, Idx5Decoder, GPR regfile, PC/IR/MBR, memory array.
 
 Normative source: `reference/hardware/`, `reference/hw-bringup/M3a`, `M3b`.
 
-CPLD verification (LUT layer): [cpld_fsm/hdl/README.md](../cpld_fsm/hdl/README.md).
+CPLD toolchain (active): [cpld/tools/README.md](../cpld/tools/README.md). Dual HDL and WinCUPL tests are in `archive/cpld-rev-g-hdl.tar.gz`.
 
 ## Strobe layers
 
 | Layer | Signals | Verified by |
 |-------|---------|-------------|
-| **LUT / csim** | `reg_we_lut`, `w_sel*_lut`, … (18 signals in `ctrl_lut.inc`) | `cpld_fsm/hdl/tests/test_csim_fsm_table.py` |
-| **Merged / bench / cyclesim** | `reg_we`, `w_sel0/1`, full `bctrl0..3`, package strobes | `test_merged_strobe_parity.py`, `CtrlLookup` tests |
+| **LUT / csim** | `reg_we_lut`, `w_sel*_lut`, … (18 signals in `ctrl_lut.inc`) | archived `cpld/hdl/tests` (restore HDL tarball) |
+| **Merged / bench / cyclesim** | `reg_we`, `w_sel0/1`, full `bctrl0..3`, package strobes | `CtrlLookup` tests in cyclesim |
 
-Merge rules live in `cpld_fsm/hdl/system_ctrl.pld` (`tfr_valid`, `bctrl1=bctrl0`, …). Reference: [control-and-decode.md](../reference/hardware/control-and-decode.md) §6.
+Merge rules: [control-and-decode.md](../reference/hardware/control-and-decode.md) §6 (rev G dual CPLD-CU).
 
 ## Parity matrix (functional)
 
@@ -49,7 +49,6 @@ Golden: `simulators/cyclesim/data/{isa,fsm_table}.py`. Timing (2 MHz) is **bench
 | MAP_MODE / mailbox | — | — | — | — | — | `test_map_mode_*`, `test_mailbox_*` | M2b |
 | 2 MHz timing | — | — | — | — | — | — | scope |
 
-Full regression (local):
+Full regression (local): `pytest simulators/cyclesim/tests -q`
 
-Pre-flash gate: [cpld_fsm/hdl/verify-cpld.ps1](../cpld_fsm/hdl/verify-cpld.ps1) (Windows + WinCUPL).  
-Python-only: `pytest simulators/cyclesim/tests cpld_fsm/hdl/tests -q`
+Pre-flash gate (Windows + WinCUPL): restore `archive/cpld-rev-g-hdl.tar.gz`, then `cpld/hdl/verify-cpld.ps1`.

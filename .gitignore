@@ -14,34 +14,21 @@ archive/verilog-sim/web/dist/
 *.vvp
 .cursor/
 
-# cpld_fsm JTAG — fetch via cpld_fsm/tools/install-openocd.ps1
-/cpld_fsm/tools/xpack-openocd-*/
-/cpld_fsm/tools/xpack-openocd-*.zip
+# cpld JTAG — fetch via cpld/tools/install-openocd.ps1
+/cpld/tools/xpack-openocd-*/
+/cpld/tools/xpack-openocd-*.zip
 
-# cpld_fsm WinCUPL — unpack via cpld_fsm/tools/install-wincupl.ps1
-/cpld_fsm/tools/wincupl-ii/
-/cpld_fsm/tools/WinCUPL_II_v1_1_0.zip
-/cpld_fsm/tools/innounp-2/
-/cpld_fsm/tools/innounp-2.zip
-/cpld_fsm/tools/innounp050.rar
-/cpld_fsm/tools/innoextract-1.9/
-/cpld_fsm/tools/innoextract-1.9-windows.zip
-/cpld_fsm/tools/7zr.exe
-/cpld_fsm/tools/_wincupl_*/
-/cpld_fsm/tools/fit5_*/
-
-# cpld_fsm WinCUPL build artifacts
-/cpld_fsm/hdl/system_ctrl_gen.pld
-/cpld_fsm/hdl/system_ctrl_gen.*
-/cpld_fsm/hdl/ctrl_lut_csim.*
-/cpld_fsm/hdl/fit_last.log
-/cpld_fsm/hdl/csim_run.log
-/cpld_fsm/hdl/*.tt2
-/cpld_fsm/hdl/*.fit
-/cpld_fsm/hdl/*.doc
-/cpld_fsm/hdl/*.lst
-/cpld_fsm/hdl/*.abs
-/cpld_fsm/hdl/*.pla
+# cpld WinCUPL — unpack via cpld/tools/install-wincupl.ps1
+/cpld/tools/wincupl-ii/
+/cpld/tools/WinCUPL_II_v1_1_0.zip
+/cpld/tools/innounp-2/
+/cpld/tools/innounp-2.zip
+/cpld/tools/innounp050.rar
+/cpld/tools/innoextract-1.9/
+/cpld/tools/innoextract-1.9-windows.zip
+/cpld/tools/7zr.exe
+/cpld/tools/_wincupl_*/
+/cpld/tools/fit5_*/
 
 # vFDD runtime image (recreated by dos-shell / PLFS format)
 hw/fixtures/vfdd/dos_boot.img
