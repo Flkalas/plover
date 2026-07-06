@@ -22,16 +22,16 @@ from simulators.cyclesim.data.isa import TFR_OPS, decode_tfr
 from simulators.cyclesim.engine import SimContext
 from simulators.cyclesim.values import H
 
-PLD = HDL / "system_ctrl.pld"
+PLD = HDL / "system_ctrl_cu.pld"
 TFR_LITERAL_RE = re.compile(r"'b'([01]{5})")
 
 
 def _parse_pld_tfr_opcodes() -> set[int]:
     text = PLD.read_text(encoding="utf-8")
-    start = text.index("tfr_valid")
-    end = text.index("\n\n", start)
-    block = text[start:end]
-    return {int(m.group(1), 2) for m in TFR_LITERAL_RE.finditer(block)}
+    m = re.search(r"tfr_valid\s*=\s*(.+?);", text, re.DOTALL)
+    if not m:
+        return set()
+    return {int(x.group(1), 2) for x in TFR_LITERAL_RE.finditer(m.group(1))}
 
 
 def _drive_cyclesim_inputs(ctx: SimContext, opcode: int, phase: int) -> None:

@@ -17,7 +17,7 @@ LUT_SLOTS = 128
 MERGE_BEGIN = "/* GEN_CTRL_LUT_BEGIN */"
 MERGE_END = "/* GEN_CTRL_LUT_END */"
 
-# LUT outputs (TFR strobes come from tfr_valid comb in system_ctrl.pld)
+# LUT outputs (TFR strobes come from tfr_valid comb in system_ctrl_cu.pld)
 LUT_SIGNALS = (
     "reg_we_lut",
     "mem_rd",
@@ -116,7 +116,7 @@ def emit_inc(table: list[dict[str, int | bool]]) -> str:
 
 
 def merge_into_pld(inc_text: str) -> None:
-    pld = Path(__file__).resolve().parent / "system_ctrl.pld"
+    pld = Path(__file__).resolve().parent / "system_ctrl_cu.pld"
     if not pld.exists():
         return
     body = pld.read_text(encoding="utf-8")
@@ -125,8 +125,14 @@ def merge_into_pld(inc_text: str) -> None:
     pre, rest = body.split(MERGE_BEGIN, 1)
     _, post = rest.split(MERGE_END, 1)
     merged = pre + MERGE_BEGIN + "\n" + inc_text + MERGE_END + post
-    gen = pld.parent / "system_ctrl_gen.pld"
+    gen = pld.parent / "system_ctrl_cu_gen.pld"
     gen.write_text(merged, encoding="utf-8")
+    # DP has no idx5 LUT — gen equals base
+    dp = pld.parent / "system_ctrl_dp.pld"
+    if dp.is_file():
+        (pld.parent / "system_ctrl_dp_gen.pld").write_text(
+            dp.read_text(encoding="utf-8"), encoding="utf-8"
+        )
 
 
 def main() -> None:

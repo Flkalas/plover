@@ -41,4 +41,4 @@ if (-not $SkipCsim) {
 
 Write-Host ""
 Write-Host "OK: pre-flash Tier 0-2 passed (no silicon burn)"
-Write-Host "Next: M2a bench smoke after JTAG program of system_ctrl.jed"
+Write-Host "Next: M2a bench smoke after JTAG program of system_ctrl_cu.jed + system_ctrl_dp.jed"

@@ -18,7 +18,7 @@ from fsm_golden import FSM_OUTPUT_SIGNALS, golden_for_opcode_phase
 from sim_fsm_eval import eval_signal, load_sim_equations
 from simulators.cyclesim.data.fsm_table import FSM_ROWS
 
-SIM = HDL / "system_ctrl_gen.sim"
+SIM = HDL / "system_ctrl_cu_gen.sim"
 
 
 def _sim_env(opcode: int, phase: int) -> dict[str, int]:
