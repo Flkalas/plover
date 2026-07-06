@@ -1,6 +1,6 @@
 # Control and decode (v1.0)
 
-**Related:** [system-architecture.md](system-architecture.md) · [microcode-spec.md](microcode-spec.md) · [cpld-system-controller.md](cpld-system-controller.md) · [rom-architecture.md](rom-architecture.md)
+**Related:** [system-architecture.md](system-architecture.md) · [microcode-spec.md](microcode-spec.md) · [cpld-system-controller.md](cpld-system-controller.md) · [control-word-latch.md](control-word-latch.md) · [rom-architecture.md](rom-architecture.md)
 
 This document is the **single normative reference** for who decodes what on the v1.0 breadboard CPU. Other normative docs link here instead of redefining decode roles.
 
@@ -11,18 +11,19 @@ This document is the **single normative reference** for who decodes what on the 
 | Layer | Block | Input | Output / effect | On v1.0 SoC? |
 |-------|-------|-------|-----------------|--------------|
 | **Program store** | SST39 Flash | Address | Instruction bytes, boot, utilities | Yes |
-| **Macro sequencer** | ATF1504 CPLD idx5 FSM | `IR[4:0]`, `phase` | `REG_WE`, `MEM_RD/WR`, `Y_OE`, `PC_LOAD_EN`, internal `w_sel` | Yes |
-| **ALU control** | Same CPLD FSM (per-row constants) | FSM row | `net_cin`, `net_bctrl0..3`, `net_lgc0..3`, `net_y_mux_sel`, `net_153_s0/s1` | Yes — **no `alu8_decode` DIP** |
+| **Macro sequencer** | ATF1504 CPLD idx5 FSM | `IR[4:0]`, `phase` | `REG_WE`, `cw_*` load, internal `w_sel` | Yes |
+| **Control word latch** | 74HC574×2 (`CW_LO`, `CW_HI`) | CPLD `cw_data`, `cw_le`, `cw_bank` | `MEM_RD/WR`, `Y_OE`, `FLG_WE`, `PC_LOAD_EN`, ALU ctrl nets | Yes |
+| **ALU control** | FSM row constants → CW latch | Latched CW_HI/CW_LO | `net_cin`, `net_bctrl0..3`, `net_lgc0..3`, `net_153_s0/s1` | Yes — **no `alu8_decode` DIP** |
 | **ALU execute** | alu8 (12 DIP: 8×153 + 2×283 + 2×157) | A, B, control nets | `net_y*`, `net_c_hi` | Yes — **no opcode decode inside** |
 | **Memory CE** | 74HC138×2 + 08/32/04 glue | `A[15:0]`, MAP, mailbox | `/CE` to SRAM×2 + Flash | Yes (off CPLD) |
 | **12-opcode comb decode** | `alu8_decode` or M1 DIP cheatsheet | `alu_sel[3:0]` | Control nets | **M1 bench only** — not on SoC |
 
 ```text
-  Flash ROM          CPLD (idx5 FSM)              74HC off-CPLD
-  program bytes  IR ──► macro phases ──┬──► bctrl/cin/lgc/y_mux ──► alu8 (12 DIP)
-  boot, vector       GPR R0→A, R1→B    ├──► MEM_RD/WR, Y_OE
-  $4000 unused       CPLD FSM          └──► PC_LOAD_EN
-  A[15:0] ─────────────────────────────────────► 138×2 ──► /CE
+  Flash ROM          CPLD (idx5 FSM)           574 CW×2              74HC off-CPLD
+  program bytes  IR ──► macro phases ──► cw_data/le/bank ──► MEM_RD/WR, Y_OE, FLG_WE
+  boot, vector       GPR R0→A, R1→B              │          └──► bctrl/cin/lgc/s0/s1 ──► alu8
+  $4000 unused       REG_WE (direct)             └──► PC_LOAD_EN
+  A[15:0] ───────────────────────────────────────────────────────► 138×2 ──► /CE
 ```
 
 ---
@@ -44,7 +45,7 @@ Flash holds **what to execute** (opcodes and immediates). It does **not** supply
 | Function | Role |
 |----------|------|
 | GPR 24 FF + fixed async read (R0→`q_a`, R1→`q_b`) | Sequenced macros |
-| idx5 FSM + ALU ctrl outputs + branch + comb TFR | Per-phase strobes |
+| idx5 FSM + CW serialize + branch + comb TFR | Per-phase strobes → external latch |
 | **Fitter gate** | WinCUPL **Design fits** on ATF1504AS (64 MC device rating) |
 
 FSM index (internal only):
@@ -118,6 +119,7 @@ Do not conflate **“decode in CPLD”** (macro FSM) with **`alu8_decode` comb b
 |-------|----------|
 | ISA opcodes × phases | [microcode-spec.md](microcode-spec.md) |
 | CPLD ports, FSM templates | [cpld-system-controller.md](cpld-system-controller.md) |
+| CW latch bit map, timing | [control-word-latch.md](control-word-latch.md) |
 | Flash layout | [rom-architecture.md](rom-architecture.md) |
 | ALU opcode table + delay | [alu-opcodes-timing.md](alu-opcodes-timing.md) |
 | M1 DIP cheatsheet | [b3-opcode.md](../hw-bringup/b3-opcode.md) |
@@ -129,5 +131,6 @@ Do not conflate **“decode in CPLD”** (macro FSM) with **`alu8_decode` comb b
 
 | Date | Note |
 |------|------|
+| 2026-07-06 | Tier C control word latch layer |
 | 2026-07-06 | Truth cascade (whitepaper root); strobe layer note |
 | 2026-07-04 | Initial anchor: FSM-only v1.0, bctrl naming, INC=cin, M1 vs SoC decode split |

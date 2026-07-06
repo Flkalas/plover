@@ -3,7 +3,7 @@
 **Device:** ATF1504AS-10JU44 (**PLCC-44**) · **Role:** **GPR + phase sequencer** (`cpld_3fixed` + `dec_cpld_seq`)  
 **CE tree:** 74HC138×2 + 08/32/04 (off-chip)
 
-**Bring-up:** [M2a-cpld-decode.md](../hw-bringup/M2a-cpld-decode.md) · [microcode-spec.md](microcode-spec.md) · [M3b-fetch-execute.md](../hw-bringup/M3b-fetch-execute.md)
+**Bring-up:** [M2a-cpld-decode.md](../hw-bringup/M2a-cpld-decode.md) · [microcode-spec.md](microcode-spec.md) · [M3b-fetch-execute.md](../hw-bringup/M3b-fetch-execute.md) · [control-word-latch.md](control-word-latch.md)
 
 **CPLD bitstream:** WinCUPL fitter **Design fits** within ATF1504AS device limit (64 macrocell part rating).
 
@@ -15,7 +15,7 @@
 2. **Write target:** internal `w_sel` from FSM opcode table — **not** a package pin.
 3. **Phase FSM** drives all sequenced macros; **no Flash param fetch**; Flash `$4000` **unused**.
 4. **idx5 decode:** FSM key `(opcode[4:0] << 2) | phase[1:0]` — **128 logical slots** inside CPLD only.
-5. **ALU controls** from FSM registered outputs.
+5. **ALU controls and bus strobes** from **CW latch outputs** ([control-word-latch.md](control-word-latch.md)); CPLD drives `cw_data`/`cw_le`/`cw_bank` at phase boundaries.
 6. **Branch:** `PC_LOAD_EN` from opcode + `FLG_Z`/`FLG_C` sampled at `macro_end`.
 7. **Operands:** PC/MBR fetch path only — no PARAM latch.
 8. **ADD/CMP ph1 REG_WE:** For ALU_REG templates, **ph1 always asserts REG_WE with `w_sel=R1`** — imm8 from MBR must latch to R1 before ph2 execute (not optional).
@@ -35,15 +35,22 @@
 | `d_in[7:0]` | Data bus | GPR write, XFER source mux |
 | `FLG_Z`, `FLG_C` | FLG 574 | BEQ branch @ macro_end |
 
-### Outputs
+### Outputs — direct (CPLD package)
 
 | Signal | Function |
 |--------|----------|
 | `q_a[7:0]`, `q_b[7:0]` | Async read → ALU A/B (R0, R1) |
 | `REG_WE` | GPR write strobe |
+| `cw_data[7:0]`, `cw_le`, `cw_bank` | Muxed load to **CW_LO/CW_HI** 574 ([control-word-latch.md](control-word-latch.md)) |
+
+### Outputs — via CW latch (off CPLD pads)
+
+| Signal | Function |
+|--------|----------|
 | `MEM_RD`, `MEM_WR` | Memory strobes |
 | `Y_OE` | Bus drive (STA path) |
-| `cin`, `bctrl0..3`, `lgc3:0`, `y_mux_sel` | ALU controls |
+| `FLG_WE` | Flag register write |
+| `cin`, `bctrl0..3`, `lgc0..3`, `s0`, `s1` | ALU controls |
 | `PC_LOAD_EN` | Branch commit (loads PC from MBR/abs16 latch) |
 
 ### Off-chip (glue, not CPLD)
@@ -116,8 +123,8 @@ Operands enter only via **instruction fetch** (PC → ROM/RAM → IR/MBR). CPLD 
 | Event | Action |
 |-------|--------|
 | ALU execute (ADD/CMP/BEQ ph0) | ALU → **FLG 574** latches Z, C (end of execute phase) |
-| BEQ `macro_end` | `PC_LOAD_EN <= FLG_Z` (if Z=0, PC unchanged) |
-| JMP `macro_end` | `PC_LOAD_EN <= '1'` |
+| BEQ `macro_end` | CPLD merges `FLG_Z` → `PC_LOAD_EN`; latched on **CW_LO[4]** @ phase load |
+| JMP `macro_end` | `PC_LOAD_EN <= '1'` → **CW_LO[4]** |
 | HALT | Assert `HALT` / inhibit fetch (external glue TBD) |
 
 | OPC | `PC_LOAD_EN` @ macro_end |
@@ -215,7 +222,7 @@ Unchanged — [memory-map.md](memory-map.md).
 - **74HC138×2** adjacent to SRAM/Flash.
 - **0.1 µF×4** at PLCC adapter.
 - **33 Ω SIP** on `q_a`/`q_b`.
-- **No PARAM 574** — FSM-only control.
+- **CW_LO/CW_HI 574** — Tier C control word ([control-word-latch.md](control-word-latch.md)); **no PARAM 574**.
 - **IR[4] → CPLD** — idx5 decode wire (vs archived idx4).
 
 ---
@@ -244,6 +251,7 @@ idx5 (5-bit opcode decode, Extended TFR `0x11+`) replaces archived idx4 four-bit
 
 | Date | Note |
 |------|------|
+| 2026-07-06 | Tier C CW latch — direct vs latched port split |
 | 2026-07-06 | TFR bit-field opcodes; `tfr_valid` comb glue (not idx5 LUT row) |
 | 2026-07-06 | CMP ph2 split (flags-only, no REG_WE); mandatory ADD/CMP ph1 REG_WE |
 | 2026-06-24 | idx5 FSM decode; operand/branch datapath; phase strobe tables |

@@ -128,6 +128,8 @@ Summary:
 | BEQ | ph0: ALU SUB; end: PC_LOAD_EN<=FLG_Z |
 | JMP | end: PC_LOAD_EN<=1 |
 
+**Tier C:** Bus and ALU strobes in the summary table are **held in CW_LO/CW_HI** 574 across each phase ([control-word-latch.md](control-word-latch.md)). `REG_WE` remains a direct CPLD output.
+
 ---
 
 ## 5. Internal `w_sel` (not exported)
@@ -190,6 +192,7 @@ P1 `DECODE_BYPASS` — not normative SoC path.
 
 | Date | Note |
 |------|------|
+| 2026-07-06 | Tier C CW latch footnote on per-phase strobes |
 | 2026-07-06 | ALU_REG ADD vs CMP ph2 split; mandatory ph1 REG_WE for ADD/CMP |
 | 2026-06-24 | idx5 FSM decode; ISA `[4:0]`; per-phase strobes; operand datapath |
 | 2026-07-06 | TFR bit-field opcodes; idx5 20 rows; `tfr_valid` comb |

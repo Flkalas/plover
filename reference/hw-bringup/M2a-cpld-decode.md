@@ -5,7 +5,7 @@
 | **Milestone** | M2a |
 | **IC** | ATF1504AS-10JU44 (PLCC-44) |
 | **Goal** | WinCUPL CUPL + FIT1504 JED burn; bench verify **3×GPR**, **idx5 phase FSM**, ADD/TFR smoke |
-| **Normative** | [cpld-system-controller.md](../hardware/cpld-system-controller.md) · [M3a-control-store.md](M3a-control-store.md) §2 |
+| **Normative** | [cpld-system-controller.md](../hardware/cpld-system-controller.md) · [control-word-latch.md](../hardware/control-word-latch.md) · [M3a-control-store.md](M3a-control-store.md) §2 |
 
 ---
 
@@ -16,7 +16,7 @@
 | After ALU (M1) | ALU path verified before CPLD `q_a`/`q_b` integration |
 | Before M2b/M3 | JED must drive 3-phase ADD and 1-phase TFR before fetch glue |
 | CE decode | **138×2 + glue** — off CPLD ([breadboard-wiring.md](breadboard-wiring.md)) |
-| SoC decode | **No `alu8_decode` DIP** — ALU control from CPLD FSM outputs only |
+| SoC decode | **No `alu8_decode` DIP** — ALU control from **CW latch** ([control-word-latch.md](../hardware/control-word-latch.md)) |
 
 **Prerequisite:** [M1-alu.md](M1-alu.md) B3a complete.
 
@@ -53,6 +53,7 @@ Align with [cpld-system-controller.md](../hardware/cpld-system-controller.md) §
 - [ ] **3 GPR:** R0→`q_a`, R1→`q_b`, R2 via internal read for XFER
 - [ ] **Fitter:** WinCUPL reports **Design fits** on ATF1504AS
 - [ ] **Pre-flash gate:** local Tier 0–2 verification (codegen, pytest, CUPL `.sim`, csim LUT) complete per `cpld_fsm/hdl/README.md` — before first JTAG program
+- [ ] **CW latch wired:** `CW_LO`/`CW_HI` 574, `cw_le`/`cw_bank`/`cw_data` from CPLD per [control-word-latch.md](../hardware/control-word-latch.md)
 - [ ] **Frozen table:** 20 idx5 slots match [M3a-control-store.md](M3a-control-store.md) §2 and committed `ctrl_lut.inc`
 
 ---

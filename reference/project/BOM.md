@@ -17,7 +17,7 @@ PCB 3.3 V 대응 목록: [BOM-3v3.md](BOM-3v3.md) (**중복 주문 금지**)
 | ALU | 4 | 74HC283N | 4-bit binary full adder | 2 | 8비트 덧셈·뺄셈·증감 연산 | |
 | ALU | 5 | 74HC153 | Dual 4-to-1 line data selector/multiplexer | 8 | 비트슬라이스 Gigatron (mux1 논리 + mux2 B경로) | |
 | ALU | 6 | 74HC157 | Quad 2-line to 1-line data selector/multiplexer | 2 | 산술 결과와 논리 결과 중 ALU 출력 선택 | |
-| CPU · 주소 | 11 | 74HC574 | Octal D-type flip-flop, 3-state | **3** | PC/MBR/FLG | FSM-only — no CW latch |
+| CPU · 주소 | 11 | 74HC574 | Octal D-type flip-flop, 3-state | **5** | PC/MBR/FLG + **CW_LO/CW_HI** ([control-word-latch.md](../hardware/control-word-latch.md)) |
 | CPU · 주소 | 11a | 74HC138N | 3-to-8 line decoder | **2** | CE half-select + coarse map (**×1 보유, +1 주문**) | |
 | CPU · 주소 | 11b | 74HC08 / 74HC32 | AND / OR | 2 each | CE glue + mailbox/MAP + BEQ | |
 | CPU · 주소 | 12 | 74HC161 | 4-bit synchronous binary counter | 3 | PC 하위·명령 실행 단계(phase) 카운트 | |
