@@ -27,6 +27,7 @@ This folder studies a **4×8-bit GPR** with **selectable read ports**, **write s
 | **[REPORT.md](REPORT.md)** | **종합 리포트 (Korean executive summary)** |
 | **[p1-bus-tdm/SUMMARY-REPORT.md](p1-bus-tdm/SUMMARY-REPORT.md)** | **P1 연구만 요약한 별도 리포트** |
 | **[p1m1-dual574/SUMMARY-REPORT.md](p1m1-dual574/SUMMARY-REPORT.md)** | **P1M1 (P1 + M1 듀얼 574) 통합 연구 요약** |
+| **[gi1-ac-mbr/SUMMARY-REPORT.md](gi1-ac-mbr/SUMMARY-REPORT.md)** | **Gi1 (Gigatron식 AC + MBR) 연구 요약** |
 | **[p1-bus-tdm/REPORT.md](p1-bus-tdm/REPORT.md)** | P1 버스 시분할 + 클럭 분주 (상세) |
 | [baseline-rev-g.md](baseline-rev-g.md) | Current 3-GPR rev G summary |
 | [proposal.md](proposal.md) | 4-GPR + STR target microarchitecture |

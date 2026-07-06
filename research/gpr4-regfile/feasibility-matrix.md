@@ -15,6 +15,7 @@
 | **P1M1** | P1 + M1 dual 574 + 2-half ph2 ([p1m1-dual574/](p1m1-dual574/)) | **29/32 PASS** | ~50–60 likely | Full 4-GPR; ph2 **500 ns** | 2×1504 +2×574 | **Pins PASS; timing PASS (desk)** |
 | **P1-old** | G-IC time-mux / `d_in` share only (no q merge) | 33–42 TBD | TBD | Full 4-GPR | 2×1504 | Superseded by bus-TDM study |
 | **P2** | STR-only; fixed ALU reads | **31/32 PASS** | ~22–32 | Partial — STR + R3? | 2×1504 | **Conditional PASS** |
+| **Gi1** | AC + MBR→B; R0 only ([gi1-ac-mbr/](gi1-ac-mbr/)) | **17/32 PASS** | ~10–18 | AC-centric; **no TFR** | 2×1504, **3×574** | **Timing PASS @ 250 ns (desk)** |
 | **P3** | External GPR (fit-study A1) | ≤32 PASS | ~20–30 on DP | Full | **+574×N** | **PASS** (cost) |
 | **P4** | ATF1508 (fit-study C2) | >>32 | headroom | Full | **Different CPLD** | **PASS** (BOM change) |
 | **P5** | Hidden TMP (TFR-tmp-2op) | 31/32 PASS | +8 FF | 3 visible + scratch | 2×1504 | **PASS** — not 4 visible GPR |
@@ -85,6 +86,24 @@
 
 ---
 
+## Gi1 — Gigatron-style AC + MBR operand (Gi1 full)
+
+**Description:** Single **R0 (AC)** in CPLD-DP; **`net_mbr → ALU B`**; ADD/CMP writeback **R0**; **TFR opcodes removed**; ph2 **250 ns** desk closed.
+
+**Detail:** [gi1-ac-mbr/SUMMARY-REPORT.md](gi1-ac-mbr/SUMMARY-REPORT.md) · [pin-map.md](gi1-ac-mbr/pin-map.md) · [timing-closed.md](gi1-ac-mbr/timing-closed.md)
+
+| Gate | Result |
+|------|--------|
+| Pins (DP) | **PASS 17/32** |
+| MC | ~10–18 desk |
+| Timing | **PASS** — ADD @ 133 ns vs 250 ns |
+| ISA | AC-centric; **no TFR**; not 4-GPR |
+| BOM | **unchanged** 3×574 |
+
+**Recommendation:** Preferred when **2 MHz timing certainty** beats 4-GPR / TFR. Spike [gi1_dp PLD](variants/gi1_dp/system_ctrl.pld) + MBR→B wire.
+
+---
+
 ## P3 — External GPR (A1 lineage)
 
 **Description:** GPR in **74HC574×4**; CPLD-DP or CU drives `reg_we`/`w_sel`/bus only.
@@ -130,7 +149,8 @@
 
 | Rank | Path | Rationale |
 |------|------|-----------|
-| 1 | **P2** + STR0..3 | Pins PASS; solves store-from-R2; smallest JED delta |
+| 1 | **Gi1** AC+MBR | **250 ns timing PASS**; max pin/MC headroom; ISA change |
+| 1b | **P2** + STR0..3 | Pins PASS; store-from-R2; smaller ISA delta than Gi1 |
 | 2 | **P1 bus-TDM** | Full vision; pins proven; timing needs M1/M2 |
 | 2b | **P1M1** | P1 + M1 integrated; pins + desk timing PASS |
 | 3 | **P3** | Full vision with BOM cost |
@@ -148,6 +168,7 @@
 | P1 | Done PASS | Est. ~48–58 | Spike PLD | — | — |
 | P1M1 | Done PASS | Est. ~50–60 | Spike PLD | — | — |
 | P2 | Done PASS | Est. | TBD | TBD | TBD |
+| Gi1 | Done PASS | Est. ~10–18 | Spike PLD | — | — |
 | P3 | Archive PASS | Archive | Archive | — | — |
 | P4 | Archive | Archive | — | — | — |
 | P5 | Archive | Archive | — | — | — |

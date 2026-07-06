@@ -168,14 +168,16 @@ CPLD-CU spare 6핀은 DP 입력 pad를 만들지 못함
 | **P0** | `r_sel_a/b` G-IC (+4) | 35/32 | ~46–56 | 완전 4-GPR+STR | 2×1504 | **FAIL 핀** |
 | **P1** | [Bus-TDM](p1-bus-tdm/REPORT.md) `q_bus` + 574 A + `r_sel` | **28/32 PASS** | ~48–58 | 완전 4-GPR | +1×574 | **핀 PASS; 타이밍 조건부** |
 | **P2** | STR만; ALU 읽기 고정 | **31/32** | ~22–32 | 부분 (STR, R3?) | 2×1504 | **조건부 PASS** |
+| **Gi1** | [AC+MBR](gi1-ac-mbr/SUMMARY-REPORT.md); R0만; TFR 없음 | **17/32** | ~10–18 | AC 중심 | 3×574 | **250 ns PASS (desk)** |
 | **P3** | 외부 574 GPR (A1) | ≤32 | DP 감소 | 완전 | +574×N | **PASS** |
 | **P4** | ATF1508 | 여유 | 여유 | 완전 | 칩 교체 | **PASS** |
 | **P5** | 숨은 TMP (아카이브) | 31/32 | +8 FF | 3 visible | 2×1504 | PASS이나 목표 불일치 |
 
 ### 6.1 현 빵판 BOM 기준 권장 순위
 
-1. **P2 + STR0..STR3** — 핀 PASS, Fibonacci에서 `TFR02` 제거, JED 변경 최소
-2. **P1 bus-TDM** — 핀 proven; [타이밍 M1/M2](p1-bus-tdm/timing-cross-domain.md) 선택 후 스파이크
+1. **Gi1 AC+MBR** — **250 ns 타이밍 PASS**; 핀/MC 여유; ISA·TFR trade-off ([gi1-ac-mbr/](gi1-ac-mbr/))
+2. **P2 + STR0..STR3** — 핀 PASS, Fibonacci에서 `TFR02` 제거, JED 변경 최소
+3. **P1 bus-TDM** — 핀 proven; [타이밍 M1/M2](p1-bus-tdm/timing-cross-domain.md) 선택 후 스파이크
 3. **P3** — 완전 비전; 배선·BOM 비용
 4. **P0** — **기각** (핀)
 5. **P4/P5** — BOM 변경 또는 레지스터 모델 불일치
