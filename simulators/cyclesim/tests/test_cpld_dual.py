@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-from simulators.cyclesim.blocks.cpld import CpldCu, CpldDp, GicMerge, LutRom
+from simulators.cyclesim.blocks.cpld import CpldCu, CpldDp
 from simulators.cyclesim.blocks.cpld.gic import NET_GIC_REG_WE, NET_REG_WE_LUT
-from simulators.cyclesim.blocks.fetch import IrReg
-from simulators.cyclesim.blocks.fsm import CtrlLookup, PhaseCounter
-from simulators.cyclesim.blocks.gpr import GprRegfile
 from simulators.cyclesim.engine import SimContext
 from simulators.cyclesim.values import H, L
 
@@ -57,6 +54,7 @@ def test_gic_merge_reg_we() -> None:
 
 
 def test_dp_r0_lda_write() -> None:
+    """LDA ph1: CU asserts reg_we; DP latches d bus into R0."""
     ctx = SimContext()
     dp = CpldDp()
     cu = CpldCu()
@@ -72,37 +70,6 @@ def test_dp_r0_lda_write() -> None:
     ctx.comb_fixup()
     dp.apply_g_ic(ctx)
     assert dp.qa() == 0x42
-
-
-def test_merged_equals_legacy_lda_ph1() -> None:
-    ctx_legacy = SimContext()
-    gpr = GprRegfile()
-    ctrl = CtrlLookup()
-    ctx_legacy.add_block(ctrl)
-    ctx_legacy.add_block(gpr)
-    ctrl.load_opcode_phase(0x02, 1)
-    ctrl.eval_comb(ctx_legacy)
-    for i in range(8):
-        ctx_legacy.set(f"net_d{i}", (0x42 >> i) & 1)
-    ctx_legacy.comb_fixup()
-    gpr.tick(ctx_legacy)
-
-    ctx_dual = SimContext()
-    dp = CpldDp()
-    cu = CpldCu()
-    for blk in (cu, dp):
-        ctx_dual.add_block(blk)
-    cu.load_opcode_phase(0x02, 1)
-    _set_opcode(ctx_dual, 0x02)
-    _set_phase(ctx_dual, 1)
-    _dual_fixup(ctx_dual, cu)
-    for i in range(8):
-        ctx_dual.set(f"net_d{i}", (0x42 >> i) & 1)
-    ctx_dual.comb_fixup()
-    dp.apply_g_ic(ctx_dual)
-
-    assert gpr.regs[0] == dp.regs[0] == 0x42
-    assert ctx_legacy.get("net_reg_we") == ctx_dual.get("net_reg_we") == H
 
 
 def test_dp_mbr_to_alu_b() -> None:

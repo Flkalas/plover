@@ -14,29 +14,12 @@ OP_LDIO = 0x08
 OP_STIO = 0x09
 OP_STA16 = 0x0F
 
-# TFR: opc[4]=1, opc[3:2]=dst, opc[1:0]=src (src != dst, neither field is 11₂)
-TFR_OPS = frozenset({0x11, 0x12, 0x14, 0x16, 0x18, 0x19})
 WIDE_ABS16_OPS = frozenset({OP_BEQ, OP_JMP, OP_STA16})
 
 
-def encode_tfr(src: int, dst: int) -> int:
-    """Build TFR opcode from register indices (0=R0, 1=R1, 2=R2)."""
-    if src == dst or src > 2 or dst > 2:
-        raise ValueError(f"invalid TFR src={src} dst={dst}")
-    return 0x10 | (dst << 2) | src
-
-
-def decode_tfr(opcode: int) -> tuple[int, int]:
-    """Return (src, dst) from bit-field TFR opcode."""
-    op = opcode & 0x1F
-    src = op & 0x3
-    dst = (op >> 2) & 0x3
-    return src, dst
-
-
-def is_tfr_valid(opcode: int) -> bool:
-    """Gi1 v1.0 — 0x10–0x1F reserved; no TFR."""
-    return False
+def is_reserved_opcode(opcode: int) -> bool:
+    """Gi1 v1.0 — 0x10–0x1F invalid (no TFR); M3b trap/NOP."""
+    return (opcode & 0xFF) & 0x10 == 0x10
 
 
 PHASE_COUNT: dict[int, int] = {
@@ -55,8 +38,8 @@ PHASE_COUNT: dict[int, int] = {
 
 def phase_count(opcode: int) -> int:
     op = opcode & 0xFF
-    if (op & 0x10) == 0x10:
-        return 1  # 0x10–0x1F invalid — single-phase trap behavior
+    if is_reserved_opcode(op):
+        return 1
     return PHASE_COUNT.get(op, 1)
 
 
@@ -64,6 +47,6 @@ def insn_length(opcode: int) -> int:
     op = opcode & 0xFF
     if op in WIDE_ABS16_OPS:
         return 3
-    if op == OP_HALT or (op & 0x10) == 0x10:
+    if op == OP_HALT or is_reserved_opcode(op):
         return 1
     return 2

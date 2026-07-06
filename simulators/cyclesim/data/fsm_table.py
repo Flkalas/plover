@@ -12,7 +12,6 @@ class Template(str, Enum):
     ALU_REG = "ALU_REG"
     MEM_LD = "MEM_LD"
     MEM_ST = "MEM_ST"
-    XFER = "XFER"
     BEQ = "BEQ"
     JMP = "JMP"
     HALT = "HALT"

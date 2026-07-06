@@ -12,19 +12,10 @@ class CpldDp(Block):
 
     def __init__(self, name: str = "cpld_dp") -> None:
         super().__init__(name)
-        self.regs = [0, 0, 0]  # [R0, _, _] — R1/R2 slots unused (test compat)
+        self.regs = [0]
 
     def qa(self) -> int:
         return self.regs[0] & 0xFF
-
-    def qb(self) -> int:
-        """Legacy alias — Gi1 ALU B is not from CPLD."""
-        return 0
-
-    def read(self, sel: int) -> int:
-        if sel == 0:
-            return self.qa()
-        return 0
 
     def _d_in(self, ctx: SimContext) -> int:
         return sum((ctx.get(f"net_d{i}") & 1) << i for i in range(8))
@@ -34,7 +25,6 @@ class CpldDp(Block):
         qa = self.qa()
         for i in range(8):
             changed |= ctx.drive(f"net_a{i}", (qa >> i) & 1, self.name)
-            # Gi1: ALU B operand from MBR hold (net_mbr* driven by MbrReg)
             changed |= ctx.drive(f"net_b{i}", ctx.get(f"net_mbr{i}") & 1, self.name)
         return changed
 

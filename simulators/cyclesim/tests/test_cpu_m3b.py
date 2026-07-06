@@ -76,7 +76,37 @@ def test_m3b_mini_program() -> None:
     steps = runner.run_until_halt(max_steps=500)
     assert runner.halted, f"did not halt in {steps} steps"
     assert runner.gpr[0] == 0x42
-    assert runner.gpr[2] == 0
+
+
+def test_add_writes_r0() -> None:
+    runner = ProgramRunner()
+    runner.load_rom_bytes(bytes([0x02, 0x10, 0x01, 0x05, 0x0A]), base=0)
+    runner.load_ram(0x10, 0x10)
+    runner.reset(pc=0)
+    runner.run_until_halt(max_steps=200)
+    assert runner.halted
+    assert runner.gpr[0] == 0x15
+
+
+def test_cmp_no_gpr_write() -> None:
+    runner = ProgramRunner()
+    runner.load_rom_bytes(bytes([0x02, 0x10, 0x0D, 0x10, 0x0A]), base=0)
+    runner.load_ram(0x10, 0x10)
+    runner.reset(pc=0)
+    runner.run_until_halt(max_steps=200)
+    assert runner.halted
+    assert runner.gpr[0] == 0x10
+
+
+def test_invalid_opcode_trap_nop() -> None:
+    """0x10–0x1F: one-byte trap/NOP then fetch continues (not fetch-time HALT)."""
+    runner = ProgramRunner()
+    runner.load_rom_bytes(bytes([0x18, 0x0A]), base=0)
+    runner.reset(pc=0)
+    runner.run_until_halt(max_steps=50)
+    assert runner.halted
+    assert runner.pc == 1
+    assert runner.gpr[0] == 0
 
 
 def test_add_zero_after_cmp() -> None:
@@ -90,7 +120,6 @@ def test_add_zero_after_cmp() -> None:
     runner.run_until_halt(max_steps=400)
     assert runner.halted
     assert runner.gpr[0] == 0x10
-    assert runner.gpr[2] == 0
 
 
 def test_beq_branch_taken() -> None:

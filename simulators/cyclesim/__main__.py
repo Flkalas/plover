@@ -27,7 +27,7 @@ def cmd_run(args: argparse.Namespace) -> int:
     runner.reset(pc=args.pc)
     steps = runner.run_until_halt(max_steps=args.max_steps)
     print(f"steps={steps} halted={runner.halted} pc=0x{runner.pc:04X}")
-    print(f"gpr R0=0x{runner.gpr[0]:02X} R1=0x{runner.gpr[1]:02X} R2=0x{runner.gpr[2]:02X}")
+    print(f"R0=0x{runner.r0:02X}")
     return 0 if runner.halted else 1
 
 

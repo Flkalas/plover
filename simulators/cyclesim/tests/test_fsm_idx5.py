@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 
 from simulators.cyclesim.data.fsm_table import FSM_ROWS, active_idx5_slots, lookup_row
-from simulators.cyclesim.data.isa import is_tfr_valid
+from simulators.cyclesim.data.isa import is_reserved_opcode
 
 
 def test_idx5_slot_count() -> None:
@@ -49,7 +49,7 @@ def test_cmp_phase_strobes() -> None:
     assert r2 and r2.flg_we and not r2.reg_we
 
 
-def test_tfr_opcodes_invalid() -> None:
+def test_reserved_opcodes_invalid() -> None:
     for op in (0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A):
-        assert not is_tfr_valid(op)
+        assert is_reserved_opcode(op)
         assert lookup_row(op, 0) is None

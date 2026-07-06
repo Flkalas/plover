@@ -30,8 +30,12 @@ class ProgramRunner:
         return self.cpu.run(max_steps, wall_s=wall_s)
 
     @property
+    def r0(self) -> int:
+        return self.cpu.gpr.regs[0] & 0xFF
+
+    @property
     def gpr(self) -> list[int]:
-        return list(self.cpu.gpr.regs)
+        return [self.r0]
 
     @property
     def halted(self) -> bool:
