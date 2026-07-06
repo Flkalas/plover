@@ -16,7 +16,7 @@ from simulators.cyclesim.blocks.fetch import (
     YBusMux,
 )
 from simulators.cyclesim.blocks.fsm import Idx5Decoder, PhaseCounter
-from simulators.cyclesim.data.fsm_table import Template
+from simulators.cyclesim.data.fsm_table import Template, lookup_row
 from simulators.cyclesim.data.isa import (
     OP_HALT,
     OP_LDIO,
@@ -25,12 +25,13 @@ from simulators.cyclesim.data.isa import (
     insn_length,
     phase_count,
 )
+from simulators.cyclesim.blocks.cpld.gic import NET_REG_WE_LUT
 from simulators.cyclesim.engine import SimContext
 from simulators.cyclesim.values import H, L
 
 
 class CpuM3b:
-    """Functional-block CPU for M3b fetch + execute (rev G dual CPLD)."""
+    """Functional-block CPU for M3b fetch + execute (Gi1 dual CPLD)."""
 
     def __init__(self) -> None:
         self.ctx = SimContext()
@@ -266,9 +267,7 @@ class CpuM3b:
         if row and row.template == Template.MEM_ST and row.mem_wr:
             self.mem.write(self._eff_addr(op), self.cpld_dp.qa())
         if row and row.reg_we:
-            if row.template == Template.ALU_REG and ph == 1 and row.w_sel == 1:
-                self._drive_d_from_mbr()
-            elif row.template == Template.MEM_LD:
+            if row.template == Template.MEM_LD:
                 self._drive_d_from_bus()
 
         self.ctx.comb_fixup()
@@ -279,11 +278,16 @@ class CpuM3b:
         op = self.current_op
         n = phase_count(op)
         last_ph = max(0, n - 1)
-        self.cpld_cu.load_opcode_phase(op, last_ph)
+        row = lookup_row(op, last_ph)
+        self.cpld_cu.lut.row = None
         self.ctx.clear_stuck()
         self._default_nets()
         self._sync_phase_nets()
         self._sync_opcode_nets()
+        if row:
+            self.ctx.drive("net_pc_load_en", H if row.pc_load_en else L, "macro_end")
+            self.ctx.drive("net_pc_load_flg_z", H if row.pc_load_flg_z else L, "macro_end")
+        self.ctx.drive(NET_REG_WE_LUT, L, "macro_end")
         self.ctx.comb_fixup()
         self.ctx.set("net_macro_end", H)
         self.ctx.comb_fixup()

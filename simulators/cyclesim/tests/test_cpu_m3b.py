@@ -12,9 +12,6 @@ from simulators.cyclesim.data.isa import (
     OP_LDIO,
     OP_STA16,
     OP_STIO,
-    TFR_OPS,
-    decode_tfr,
-    encode_tfr,
     insn_length,
 )
 from simulators.cyclesim.program import ProgramRunner
@@ -79,11 +76,10 @@ def test_m3b_mini_program() -> None:
     steps = runner.run_until_halt(max_steps=500)
     assert runner.halted, f"did not halt in {steps} steps"
     assert runner.gpr[0] == 0x42
-    assert runner.gpr[1] == 0
-    assert runner.gpr[2] == 0x42
+    assert runner.gpr[2] == 0
 
 
-def test_add_zero_after_cmp_latches_r1() -> None:
+def test_add_zero_after_cmp() -> None:
     runner = ProgramRunner()
     runner.load_rom_bytes(
         bytes([0x02, 0x10, 0x0D, 0xE9, 0x01, 0x00, 0x0A]),
@@ -94,32 +90,7 @@ def test_add_zero_after_cmp_latches_r1() -> None:
     runner.run_until_halt(max_steps=400)
     assert runner.halted
     assert runner.gpr[0] == 0x10
-    assert runner.gpr[1] == 0
-    assert runner.gpr[2] == 0x10
-
-
-def test_tfr20() -> None:
-    runner = ProgramRunner()
-    runner.load_rom_bytes(bytes([0x18, 0x0A]), base=0)
-    runner.reset(pc=0)
-    runner.cpu.gpr.regs[0] = 0xAB
-    runner.run_until_halt(max_steps=80)
-    assert runner.gpr[2] == 0xAB
-
-
-@pytest.mark.parametrize(
-    "src,dst",
-    [(s, d) for s in range(3) for d in range(3) if s != d],
-)
-def test_tfr_all_pairs(src: int, dst: int) -> None:
-    op = encode_tfr(src, dst)
-    assert op in TFR_OPS
-    runner = ProgramRunner()
-    runner.load_rom_bytes(bytes([op, 0x0A]), base=0)
-    runner.reset(pc=0)
-    runner.cpu.gpr.regs[src] = 0x50 + src
-    runner.run_until_halt(max_steps=80)
-    assert runner.gpr[dst] == 0x50 + src
+    assert runner.gpr[2] == 0
 
 
 def test_beq_branch_taken() -> None:
@@ -134,8 +105,8 @@ def test_beq_branch_taken() -> None:
 
 def test_beq_not_taken() -> None:
     runner = ProgramRunner()
-    runner.load_rom_bytes(bytes([0x02, 0x01, 0x0D, 0x00, 0x04, 0x06, 0x00, 0x0A]), base=0)
-    runner.load_ram(0x01, 0x05)
+    runner.load_rom_bytes(bytes([0x02, 0x10, 0x0D, 0x00, 0x04, 0x08, 0x00, 0x0A]), base=0)
+    runner.load_ram(0x10, 0x05)
     runner.reset(pc=0)
     runner.run_until_halt(max_steps=400)
     assert runner.halted
@@ -201,15 +172,14 @@ def test_map_mode_boot_vs_run() -> None:
 
 def test_fib_upto_250() -> None:
     from simulators.cyclesim.fixtures.rom_builder import (
-        ADDR_FIB_A,
-        ADDR_FIB_B,
         FIB_LIMIT,
         build_fib_to_limit_rom,
         fib_pair_before_target,
     )
 
     rom, ram_init, target = build_fib_to_limit_rom(FIB_LIMIT)
-    assert target == 233
+    assert target == 144  # largest term ≤ FIB_LIMIT with Gi1 ROM ≤ 239 B
+    addr_fib_a, addr_fib_b = sorted(ram_init)
     exp_a, exp_b = fib_pair_before_target(FIB_LIMIT)
     assert exp_b == target
 
@@ -220,5 +190,5 @@ def test_fib_upto_250() -> None:
     runner.reset(pc=0)
     steps = runner.run_until_halt(max_steps=2000, wall_s=15.0)
     assert runner.halted, f"fib did not halt in {steps} steps (wall limit 15s)"
-    assert runner.cpu.mem.read(ADDR_FIB_A) == exp_a & 0xFF
-    assert runner.cpu.mem.read(ADDR_FIB_B) == exp_b & 0xFF
+    assert runner.cpu.mem.read(addr_fib_a) == exp_a & 0xFF
+    assert runner.cpu.mem.read(addr_fib_b) == exp_b & 0xFF

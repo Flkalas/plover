@@ -35,11 +35,8 @@ def decode_tfr(opcode: int) -> tuple[int, int]:
 
 
 def is_tfr_valid(opcode: int) -> bool:
-    op = opcode & 0x1F
-    if op not in TFR_OPS:
-        return False
-    src, dst = decode_tfr(op)
-    return src < 3 and dst < 3 and src != dst
+    """Gi1 v1.0 — 0x10–0x1F reserved; no TFR."""
+    return False
 
 
 PHASE_COUNT: dict[int, int] = {
@@ -53,14 +50,13 @@ PHASE_COUNT: dict[int, int] = {
     OP_LDIO: 2,
     OP_STIO: 2,
     OP_STA16: 2,
-    **{op: 1 for op in TFR_OPS},
 }
 
 
 def phase_count(opcode: int) -> int:
     op = opcode & 0xFF
-    if is_tfr_valid(op):
-        return 1
+    if (op & 0x10) == 0x10:
+        return 1  # 0x10–0x1F invalid — single-phase trap behavior
     return PHASE_COUNT.get(op, 1)
 
 
@@ -68,6 +64,6 @@ def insn_length(opcode: int) -> int:
     op = opcode & 0xFF
     if op in WIDE_ABS16_OPS:
         return 3
-    if is_tfr_valid(op) or op == OP_HALT:
+    if op == OP_HALT or (op & 0x10) == 0x10:
         return 1
     return 2
