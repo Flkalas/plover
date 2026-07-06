@@ -1,12 +1,12 @@
-# CPLD FSM — JTAG tools (FT232H + OpenOCD)
+# CPLD — JTAG tools (FT232H + OpenOCD)
 
 Probe and (later) flash **ATF1504AS-10JU44** via Adafruit-style **FT232H** and xPack OpenOCD.
 
 ## Quick start
 
 ```powershell
-cd cpld_fsm/tools
-./install-wincupl.ps1    # CUPL + FIT1504 (build JED)
+cd cpld/tools
+./install-wincupl.ps1    # CUPL + FIT1504 (toolchain)
 ./install-openocd.ps1    # JTAG probe / flash
 ./jtag-probe.ps1
 ```
@@ -19,7 +19,7 @@ Microchip's `WinCUPL_II_v1_1_0.zip` contains **Setup.exe** (Inno Setup), not a r
 **Do not run Setup.exe** — installers may reboot the PC.
 
 ```powershell
-cd cpld_fsm/tools
+cd cpld/tools
 ./install-wincupl.ps1   # auto-download + unpack → wincupl-ii/
 ```
 
@@ -29,10 +29,13 @@ Setup-only files (innounp, bundle ZIP under this folder, `_wincupl_*` staging) a
 
 Requirements: **Windows**, path **without spaces**.
 
-After install:
+### Build JED (after HDL restore)
+
+Dual CPLD HDL is archived — not in the active tree. Restore then build:
 
 ```powershell
-cd cpld_fsm/hdl
+tar -xzf archive/cpld-rev-g-hdl.tar.gz -C cpld
+cd cpld/hdl
 ./build-wincupl.ps1
 ```
 
@@ -80,4 +83,4 @@ See **[wiring-flash.md](wiring-flash.md)** and `images/ft232h-breakout.svg`.
 
 ## Flash (follow-up)
 
-After `cpld_fsm/hdl/system_ctrl.jed` exists: ATMISP JED→SVF, then OpenOCD `svf` (not in this build phase).
+After restoring HDL and building `*.jed`: ATMISP JED→SVF, then OpenOCD `svf` (not in this build phase).

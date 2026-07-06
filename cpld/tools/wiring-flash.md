@@ -54,7 +54,7 @@ Gnd ──────────────► GND
 ## Verify before flash
 
 ```powershell
-cd cpld_fsm/tools
+cd cpld/tools
 ./install-openocd.ps1
 ./jtag-probe.ps1
 ```
