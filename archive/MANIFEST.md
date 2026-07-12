@@ -17,6 +17,7 @@ Restore: `tar -xzf archive/NAME.tar.gz -C .` from repository root (unless noted)
 | [reference/](../reference/) | v1.0 P12 specifications, bring-up, fixtures |
 | [reference/hardware/cpld-pipe-cu.md](../reference/hardware/cpld-pipe-cu.md) | **Active pipe CU** |
 | [reference/project/BOM.md](../reference/project/BOM.md) | Breadboard BOM |
+| [`reference-background/`](../reference-background/) | Peer surveys — **not** Active implementer specs (kept outside `archive/`) |
 
 ---
 
@@ -44,7 +45,6 @@ Restore: `tar -xzf archive/NAME.tar.gz -C .` from repository root (unless noted)
 | `rev-g-normative-snapshot.tar.gz` | **Frozen 2026-07-07** — rev G normative prose before Gi1; restore `-C archive` |
 | `rev-g-dual-3gpr.tar.gz` | **Superseded 2026-07-07** — rev G 3-GPR + TFR index; restore `-C archive` |
 | `gi1-v1.0-normative.tar.gz` | **Superseded 2026-07-13** — Gi1 idx5 multiphase normative before **v1.0 P12**; restore `-C archive` |
-| `reference-background.tar.gz` | **Frozen 2026-07-13** — peer comparisons (not Active implementer specs); restore `-C archive` |
 | `pl-dos-fs-interchange-notes.tar.gz` | **Frozen 2026-07-13** — PL-DOS / SD FDD interchange design notes (not Active) |
 
 `pack-bundles.ps1` — helper to rebuild code bundles. `build/`, `target/`, `.venv/` — local artifacts; not bundled.
@@ -71,7 +71,7 @@ Restore: `tar -xzf archive/NAME.tar.gz -C .` from repository root (unless noted)
 | `archive/rev-g-dual-3gpr/` (loose) | `rev-g-dual-3gpr.tar.gz` |
 | `archive/rev-g-normative-snapshot/` (loose) | `rev-g-normative-snapshot.tar.gz` |
 | `archive/tier-c-single-cpld/` (loose) | `tier-c-single-cpld.tar.gz` |
-| `archive/reference-background/` (loose) | `reference-background.tar.gz` |
+| `archive/reference-background/` (loose) | [`reference-background/`](../reference-background/) (repo root; not Active normative) |
 | `cpld_fsm/` (full tree) | `cpld/` — **tools only**; HDL in `cpld-rev-g-hdl.tar.gz` |
 | `cpld_fsm/fit-study/` (full tree) | `fit-study-gpr-fsm.tar.gz` — restore to `cpld/fit-study` |
 | `hwsim/`, `hw/`, `tools/`, … | matching code bundle above |
@@ -108,7 +108,6 @@ tar -czf archive/gi1-v1.0-normative.tar.gz -C archive gi1-v1.0-normative
 tar -czf archive/rev-g-dual-3gpr.tar.gz -C archive rev-g-dual-3gpr
 tar -czf archive/rev-g-normative-snapshot.tar.gz -C archive rev-g-normative-snapshot
 tar -czf archive/tier-c-single-cpld.tar.gz -C archive tier-c-single-cpld
-tar -czf archive/reference-background.tar.gz -C archive reference-background
 ```
 
 Code bundles: see `archive/pack-bundles.ps1`.
