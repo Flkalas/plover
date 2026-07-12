@@ -19,7 +19,7 @@
 4. **Pipe FSM** on CPLD-CU — [cpld-pipe-cu.md](cpld-pipe-cu.md); **no Flash param fetch**; Flash `$4000` **unused**.
 5. **Strobes:** CU drives memory/ALU/PC nets directly to SoC (no external CW latch).
 6. **Branch:** `PC_LOAD_EN` with taken **BRANCH_BUBBLE** (no prediction).
-7. **Return stack assist:** CALL/RET in **STACK_EX** — RP `$0F00`, stack RAM via `MEM_RD`/`MEM_WR` ([microcode-spec.md](microcode-spec.md) §2.3).
+7. **Return stack assist:** CALL/RET in **STACK_EX** — RP `$0F00`, stack RAM via `MEM_RD`/`MEM_WR` ([microcode-spec.md](microcode-spec.md) §2.3 · [call-ret-cu-fit.md](call-ret-cu-fit.md)).
 8. **TFR:** **Removed** — `0x10–0x1F` trap; no `tfr_valid`.
 9. **Mailbox, MAP, `/CE`** — outside CPLD.
 

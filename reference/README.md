@@ -32,6 +32,7 @@ ISA or pipe CU changes: **whitepaper first** → reference → machine code → 
 | Document | Description |
 |----------|-------------|
 | [hardware/cpld-pipe-cu.md](hardware/cpld-pipe-cu.md) | **Pipe CU** — states, bubbles, stretch, timing |
+| [hardware/call-ret-cu-fit.md](hardware/call-ret-cu-fit.md) | CALL/RET CU fit desk / Design fits gate |
 | [hardware/microcode-spec.md](hardware/microcode-spec.md) | ISA + pipe SYS sheet |
 | [hardware/cpld-system-controller.md](hardware/cpld-system-controller.md) | Dual CPLD CU/DP ports |
 | [hardware/memory-map.md](hardware/memory-map.md) | Address map |

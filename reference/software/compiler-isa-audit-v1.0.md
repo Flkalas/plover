@@ -42,7 +42,7 @@
 
 | 평가 범주 | 시스템 구현자 대상 질문 | 컴파일러 구현 시 요구 근거 | v1.0 답변 | 근거·비고 |
 |-----------|-------------------------|---------------------------|-----------|-----------|
-| 스택 | **16비트 하드웨어 SP**와 **PUSH/POP**, **CALL/RET** 명령이 구현되어 있습니까? | 복귀 주소 저장, 인자 전달, 호출 규약·컨텍스트 스위칭 | **부분** | **SP:** RAM 셀 **`$0E00`** (16-bit LE), Boot ROM이 초기값 기록 — **하드웨어 SP 레지스터 없음** ([software-memory-layout.md](software-memory-layout.md), [boot-jmp-handoff.md](../boot/boot-jmp-handoff.md)). **PUSH/POP:** 전용 opcode 없음. **CALL/RET:** CU return-stack assist ([microcode-spec.md](../hardware/microcode-spec.md) §2.3). **RP** @ `$0F00`; stack body `$F600+` ([calling-convention-v0.1.md](calling-convention-v0.1.md)). Historical CU fit desk: [p12-era-research](../../archive/p12-era-research/README.md) (`call-ret-cu-fit`). |
+| 스택 | **16비트 하드웨어 SP**와 **PUSH/POP**, **CALL/RET** 명령이 구현되어 있습니까? | 복귀 주소 저장, 인자 전달, 호출 규약·컨텍스트 스위칭 | **부분** | **SP:** RAM 셀 **`$0E00`** (16-bit LE), Boot ROM이 초기값 기록 — **하드웨어 SP 레지스터 없음** ([software-memory-layout.md](software-memory-layout.md), [boot-jmp-handoff.md](../boot/boot-jmp-handoff.md)). **PUSH/POP:** 전용 opcode 없음. **CALL/RET:** CU return-stack assist ([microcode-spec.md](../hardware/microcode-spec.md) §2.3). **RP** @ `$0F00`; stack body `$F600+` ([calling-convention-v0.1.md](calling-convention-v0.1.md)). CU fit desk: [call-ret-cu-fit.md](../hardware/call-ret-cu-fit.md). |
 | 스택 | **SP 값**을 범용 레지스터로 복사하거나 **산술 연산**할 데이터 경로가 있습니까? | 프레임 포인터 설정, `SP+offset` 지역 변수 주소 | **부분** | `LDA`/`STA`로 **`$0E00`/`$0E01`** 읽기·쓰기 가능. **단일 명령 `ADD SP, imm`** 없음. 16비트 SP 증감은 **8비트 ALU 다중 스텝** 소프트웨어 다중 스텝으로 처리. FP = SP 복사본을 GPR·RAM에 유지하는 **소프트웨어 관례**로만 가능. |
 
 ---

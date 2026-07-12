@@ -34,7 +34,7 @@ Plover v0.1 software milestones **S0–S7** on logic VM (developer), then hardwa
 
 | Software | Hardware |
 |----------|----------|
-| S2 CALL/RET | M3a pack + archived [call-ret-cu-fit](../../archive/p12-era-research/README.md) desk (restore tarball) |
+| S2 CALL/RET | M3a pack + [call-ret-cu-fit](../hardware/call-ret-cu-fit.md) desk |
 | S7 vFDD | [mailbox-protocol.md](../copro/mailbox-protocol.md), [rp2350-coprocessor.md](../copro/rp2350-coprocessor.md) |
 | Boot / PL-DOS | [bootloader.md](../boot/bootloader.md) |
 

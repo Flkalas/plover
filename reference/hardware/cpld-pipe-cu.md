@@ -3,7 +3,7 @@
 **Status:** Active normative CU specification (**v1.0 P12**)  
 **Bitstream:** WinCUPL **Design fits pending** — no Active pipe CU PLD yet  
 **Devices:** CPLD-CU on **ATF1504AS-10JU44** (pair with CPLD-DP; DP role unchanged)  
-**Related:** [system-architecture.md](system-architecture.md) · [control-and-decode.md](control-and-decode.md) · [cpld-system-controller.md](cpld-system-controller.md) · [microcode-spec.md](microcode-spec.md)  
+**Related:** [system-architecture.md](system-architecture.md) · [control-and-decode.md](control-and-decode.md) · [cpld-system-controller.md](cpld-system-controller.md) · [microcode-spec.md](microcode-spec.md) · [call-ret-cu-fit.md](call-ret-cu-fit.md)  
 **Superseded CU:** Gi1 idx5 multiphase — [archive/gi1-v1.0-normative/](../../archive/gi1-v1.0-normative/)
 
 This document is the **single Active CU truth** for v1.0 P12. It replaces Gi1 `(opcode<<2)|phase` idle-capable schedules.
