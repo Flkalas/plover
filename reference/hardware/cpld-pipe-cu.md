@@ -3,10 +3,9 @@
 **Status:** Active normative CU specification (**v1.0 P12**)  
 **Bitstream:** WinCUPL **Design fits pending** — no Active pipe CU PLD yet  
 **Devices:** CPLD-CU on **ATF1504AS-10JU44** (pair with CPLD-DP; DP role unchanged)  
-**Related:** [system-architecture.md](system-architecture.md) · [control-and-decode.md](control-and-decode.md) · [cpld-system-controller.md](cpld-system-controller.md) · [microcode-spec.md](microcode-spec.md) · [call-ret-cu-fit.md](call-ret-cu-fit.md)  
-**Superseded CU:** Gi1 idx5 multiphase — [archive/gi1-v1.0-normative/](../../archive/gi1-v1.0-normative/)
+**Related:** [system-architecture.md](system-architecture.md) · [control-and-decode.md](control-and-decode.md) · [cpld-system-controller.md](cpld-system-controller.md) · [microcode-spec.md](microcode-spec.md)
 
-This document is the **single Active CU truth** for v1.0 P12. It replaces Gi1 `(opcode<<2)|phase` idle-capable schedules.
+This document is the **single Active CU truth** for v1.0 P12 (IF\|EX pipe; no idle phases).
 
 ---
 
@@ -16,7 +15,7 @@ This document is the **single Active CU truth** for v1.0 P12. It replaces Gi1 `(
 2. **PROG∥DATA** ports — IF must not share the DATA SRAM cycle with EX without a stall.
 3. **No idle phases** — every counted SYS does IF work, EX work, a documented stall/bubble, or stretch.
 4. **CPLD FSM-only** — no Flash `$4000` CW; pipe/stall PLA in CPLD-CU.
-5. **Datapath kept from Gi1:** ALU A ← R0 (`q_a`); ALU B ← **MBR** `net_mbr`; G-IC **`reg_we` only**.
+5. **Datapath:** ALU A ← R0 (`q_a`); ALU B ← **MBR** `net_mbr`; G-IC **`reg_we` only**.
 6. **No branch prediction** — taken redirect = visible bubble.
 7. **P12 discipline:** lab fail → **stretch** (+1 visible SYS); ports fail → named **FALLBACK_FE2**; stretch before raising `f_SYS`.
 8. **Fit gate:** Design fits when PLD exists — do not publish fitter used-MC counts as normative.
@@ -129,9 +128,41 @@ Optimistic packing: MEM EX packs MEM_RD+REG_WE (or Y_OE+MEM_WR) in **one** EX wh
 | RET | — | Stack pop EX×k + `PC_LOAD_EN`; bubble |
 | HALT | — | Halt hold |
 
-**CALL/RET** stack assist (RP cell `$0F00`, body `$F600–$FEEF`) remains CU-owned — see [microcode-spec.md](microcode-spec.md) §2.3. Multi-cycle DATA EX maps to **STACK_EX**, not Gi1 “macro_end after idle phases.”
+**CALL/RET** stack assist (RP cell `$0F00`, body `$F600–$FEEF`) remains CU-owned — see [microcode-spec.md](microcode-spec.md) §2.3. Multi-cycle DATA EX maps to **STACK_EX**.
 
 **PC_in:** JMP/CALL/BEQ from abs latch; RET from popped stack word (not MBR).
+
+### 5.1 CALL/RET fit desk (Conditional Go)
+
+CALL/RET return-stack assist is **architecturally compatible** with dual-CPLD (R0 + MBR→B, G-IC `reg_we`). Desk budget projects **0 additional I/O pins** and CU MC within the ATF1504AS **64 MC / 32 I/O** part rating with margin.
+
+**Bring-up gate = WinCUPL Design fits** — MC numbers below are **estimates only**, not normative BOM gates.
+
+| Condition | Gate |
+|-----------|------|
+| Pipe CU **Design fits = Yes** on ATF1504AS | before CU reburn |
+| Lab confirms **STACK_EX** push/pop @ **2 MHz** (stretch if needed) | before PASS |
+| M2a CALL/RET smoke + M3b fetch/execute on programmed JED | before PASS |
+
+Part rating: ATF1504AS **64 MC**, **32 I/O**. Baseline CU desk ~24–30 MC, ~21/32 I/O ([cpld-system-controller.md](cpld-system-controller.md)).
+
+| Block | MC delta (desk) | Pin delta | Notes |
+|-------|----------------:|----------:|-------|
+| CALL/RET decode / load path | ~0–2 | 0 | Shares redirect strobes with JMP |
+| Stack assist FSM (**STACK_EX**) | ~4–8 | 0 | Reuses `MEM_RD` / `MEM_WR` |
+| RP / return_pc internal latch | ~2–4 | 0 | No new addr pins |
+| 16-bit push/pop sequencing | ~2 | 0 | Byte bus; multi-cycle EX |
+| RET `PC_in` mux | ~1 | **0** | Internal mux |
+| Overflow / underflow compare | ~1 | 0 | vs `$F600` / `$FEEF` |
+| **Projected CU total** | **~34±2 MC** | **~21/32** | Headroom vs 64 MC rating |
+
+Stack assist must **not** add new `net_addr` outputs or new PC bus pins (RET pop feeds internal `PC_in`).
+
+| Risk | Mitigation |
+|------|------------|
+| MC overflow on ATF1504 | Design fits on pipe CU PLD |
+| STACK_EX longer than one SYS | Stretch / multi-cycle EX; re-lab at low clock first |
+| RP race with program stores | Keep `$0F00` CU-only; not a normal LDA/STA target |
 
 ---
 
@@ -151,7 +182,7 @@ Optimistic packing: MEM EX packs MEM_RD+REG_WE (or Y_OE+MEM_WR) in **one** EX wh
 | `FLG_Z` | FLG 574 | BEQ |
 | Port / stall sense | PROG vs DATA qualify (glue or CU) | MEM_STALL / FALLBACK |
 
-### CU outputs — SoC strobes (reuse Gi1 net names where possible)
+### CU outputs — SoC strobes
 
 | Signal | Function |
 |--------|----------|
@@ -189,14 +220,23 @@ Desk limiter under stress: **BEQ**. Mailbox is not the limiter if RP response �
 
 Preferred trial above 2 MHz after measured BEQ slack ≥ **50 ns**: **3.6864 MHz**. Prefer stretch before clock hope.
 
+### 7.1 Operand / ADD path (desk, frozen)
+
+R0→A (`q_a`) and MBR→B in **parallel**; ALU Y ≈ **133 ns** on the EX ADD path (see also [alu-opcodes-timing.md](alu-opcodes-timing.md)).
+
+**Branch BEQ (stress half-cycle reference):**  
+`t_ALU(SUB) + t_FLG + t_CU_merge + t_SETUP(PC) + wire` = 136 + 23 + 15 + 28 + 10 = **212 ns** (slack **38 ns** @ 250 ns). Prefer full-period §7 table for Active pipe budgeting.
+
+Normative clock remains **2.0 MHz**; raise only after measured BEQ slack ≥ **50 ns**.
+
 ---
 
 ## 8. P12 caveats (normative discipline)
 
-1. **No Gi1 idle return** — do not reintroduce ADD/CMP padding phases.
+1. **No idle return** — do not reintroduce ADD/CMP padding phases.
 2. **Stretch on fail** — unstable at low SYS → +1 visible SYS; update §4 table.
 3. **FALLBACK_FE2** — only if PROG∥DATA isolation fails; serial F+E; IPC drops (ALU stream ~0.33 vs ~1.0).
-4. **Optimistic IPC ≡ PE1 machine** — P12 does not add a faster schedule than the pipe in §2–§4.
+4. **Optimistic IPC** — P12 does not add a faster schedule than the pipe in §2–§4.
 
 ---
 
@@ -206,7 +246,7 @@ Preferred trial above 2 MHz after measured BEQ slack ≥ **50 ns**: **3.6864 MHz
 |------|--------|
 | Active **specification** | This document |
 | WinCUPL pipe CU `.pld` | **Not yet** — Design fits when written |
-| Legacy Gi1 idx5 bitstream / cyclesim multiphase | **Superseded golden lag** — not Active truth |
+| Machine golden | Pipe golden TBD |
 
 MC desk estimates are non-normative; bring-up gate = **Design fits** only.
 
@@ -216,7 +256,7 @@ MC desk estimates are non-normative; bring-up gate = **Design fits** only.
 
 - No claim that breadboard already runs IF∥EX lab PASS.
 - No Active pipe CU bitstream.
-- Executable cyclesim golden may still implement Gi1 multiphase until rewritten — treat as **legacy**, not Active.
+- Executable cyclesim golden may lag the pipe until rewritten — treat as **non-Active** until pipe golden lands.
 
 ---
 
@@ -224,4 +264,5 @@ MC desk estimates are non-normative; bring-up gate = **Design fits** only.
 
 | Date | Note |
 |------|------|
-| 2026-07-13 | **Active v1.0 P12** pipe CU — Gi1 idx5 CU superseded |
+| 2026-07-13 | CALL/RET fit desk + SoC timing absorbed; dual-timing / call-ret-cu-fit Active files dropped |
+| 2026-07-13 | **Active v1.0 P12** pipe CU |
