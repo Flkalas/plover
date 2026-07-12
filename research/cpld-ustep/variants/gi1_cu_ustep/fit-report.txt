@@ -1,0 +1,16 @@
+gi1_cu_ustep — WinCUPL fit report (placeholder)
+
+Status: PENDING — no .pld body in this tree yet.
+
+Desk estimate (see README.md):
+  MC delta:  +6..16  (sync FFs + wait FSM)
+  Pin delta: +1      (CLK_USTEP)
+  Projected CU total: still within ATF1504AS 64 MC / 32 I/O part rating
+
+When PLD lands:
+  1. Fork Gi1 CU sources into this directory.
+  2. Add CLK_USTEP; qualify strobes on CLK_SYS.
+  3. Paste fitter "Design fits" / resource summary below.
+
+--- fitter output ---
+(pending)
