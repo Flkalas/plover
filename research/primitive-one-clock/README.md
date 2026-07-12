@@ -38,8 +38,16 @@ This study **reverses** the [`cpld-ustep`](../cpld-ustep/) pedagogy priority (ke
 - PLL / second oscillator
 - Archive tarball restore
 
+## Related
+
+| Build | Role |
+|-------|------|
+| [PE1](../pe1/) | IF\|EX + ports for FE1-class throughput |
+| [P12](../p12/) | PE1 + FE2 stretch / no-idle / FE2 fallback |
+
 ## Change log
 
 | Date | Note |
 |------|------|
+| 2026-07-13 | Link P12 |
 | 2026-07-13 | Initial desk study |

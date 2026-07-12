@@ -41,6 +41,7 @@ Recover owner intent (**~1 macro retired per SYS** in steady state) by **adding 
 | FE2 | Delete idle; serial F then E |
 | [cpld-ustep](../cpld-ustep/) | Hide control on fast CU clock |
 | **PE1** | Overlap IF of N+1 with EX of N; pay for ports |
+| [**P12**](../p12/) | PE1 + FE2 stretch / no-idle / FE2 fallback |
 
 ## Out of scope
 
@@ -53,6 +54,7 @@ Recover owner intent (**~1 macro retired per SYS** in steady state) by **adding 
 
 | Date | Note |
 |------|------|
+| 2026-07-13 | Link P12 contrast |
 | 2026-07-13 | Clock candidates + BEQ lab procedure |
 | 2026-07-13 | Mailbox @ 2 MHz deepen |
 | 2026-07-13 | Initial PE1 desk study |

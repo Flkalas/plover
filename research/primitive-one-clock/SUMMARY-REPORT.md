@@ -56,10 +56,13 @@ FE1 column in the model is **wishful** (`fe1_possible=False` for every op) — s
 
 **FE1-class throughput with extra silicon:** see research build **PE1** — [../pe1/SUMMARY-REPORT.md](../pe1/SUMMARY-REPORT.md) (IF\|EX pipe, no branch prediction).
 
+**PE1 + FE2 stretch / fallback:** build **P12** — [../p12/SUMMARY-REPORT.md](../p12/SUMMARY-REPORT.md) absorbs FE2 no-idle + stretch-on-fail into the pipe machine; serial FE2 remains the named fallback if ports fail.
+
 ## Change log
 
 | Date | Note |
 |------|------|
+| 2026-07-13 | Link P12 (PE1 + FE2 discipline) |
 | 2026-07-13 | Link PE1 pipelined FE1 extension study |
 | 2026-07-13 | Optimistic FE2 sheet + stretch-E lab policy |
 | 2026-07-13 | Initial desk study — FE1 No, FE2 Conditional Go |

@@ -65,13 +65,13 @@ Exact numbers: run `python pe1_ipc_model.py`.
 
 ## Contrast
 
-| | Shared FE1 | FE2 | PE1 |
-|--|------------|-----|-----|
-| Extra silicon | none | none | **yes** |
-| Steady ALU IPC | wishful 1 | ~0.33–0.5 | **~1.0** |
-| Mechanism | same tick | serial F/E | **overlap IF/EX** |
-| Mailbox @ 2 MHz | (Gi1 baseline) | OK | **OK if RP≤80 ns** |
-| Elevated OSC | — | — | **3.6864 trial; 4.0 stress** |
+| | Shared FE1 | FE2 | PE1 | P12 |
+|--|------------|-----|-----|-----|
+| Extra silicon | none | none | **yes** | same as PE1 |
+| Steady ALU IPC | wishful 1 | ~0.33–0.5 | **~1.0** | **~1.0** + stretch/fallback |
+| Mechanism | same tick | serial F/E | **overlap IF/EX** | PE1 + FE2 rules |
+| Mailbox @ 2 MHz | (Gi1 baseline) | OK | **OK if RP≤80 ns** | same |
+| Elevated OSC | — | — | **3.6864 trial; 4.0 stress** | stretch first |
 
 ## Next steps
 
@@ -81,11 +81,13 @@ Exact numbers: run `python pe1_ipc_model.py`.
 4. Keep Gi1 normative until PE1 lab + fit gates pass.
 5. Prefer PE1 over cpld-ustep when the goal is **programmer 1-work≈1-clock**, not multiphase pedagogy.
 6. vFDD fast path only if **throughput** goal exceeds ~0.3 MB/s copy — not required for 2 MHz timing closure.
+7. For stretch sheet + FE2 fallback documentation, use build **P12** — [../p12/SUMMARY-REPORT.md](../p12/SUMMARY-REPORT.md).
 
 ## Change log
 
 | Date | Note |
 |------|------|
+| 2026-07-13 | Link P12 (PE1 + FE2 discipline) |
 | 2026-07-13 | Clock margin policy; 3.6864 candidate; BEQ lab |
 | 2026-07-13 | Mailbox @ 2 MHz Conditional Go; copy B/s table |
 | 2026-07-13 | timing-budget.md — IF/EX ns slack |
