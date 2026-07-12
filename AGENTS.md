@@ -116,11 +116,11 @@ When answering **hardware architecture**, **bring-up**, or **decode/CPLD/ALU** q
 | **Reference** | `reference/**` | Normative detail, bring-up, frozen fixtures |
 | **Machine** | `simulators/cyclesim/data/isa.py`, `fsm_table.py` | Executable golden |
 | **CPLD** | `cpld/tools/` — WinCUPL, OpenOCD, JTAG probe | Toolchain (active); HDL archived |
-| **Archive** | `archive/*.tar.gz`, `archive/tier-c-single-cpld/`, `cpld-rev-g-hdl.tar.gz`, `fit-study-gpr-fsm.tar.gz`, `gpr4-regfile-research.tar.gz` | Historical — **do not** cite for SoC unless user asks |
+| **Archive** | `archive/*.tar.gz` (+ [MANIFEST.md](archive/MANIFEST.md)) | Historical — **do not** cite for SoC unless user asks |
 
 **Anchor docs:** [cpld-pipe-cu.md](reference/hardware/cpld-pipe-cu.md), [control-and-decode.md](reference/hardware/control-and-decode.md), [system-architecture.md](reference/hardware/system-architecture.md), [plover-whitepaper.md](plover-whitepaper.md).
 
-**Active hardware truth:** whitepaper root → reference cascade → machine code → CPLD artifacts. **v1.0 normative = P12** (IF\|EX pipe CU, PROG∥DATA intent, R0/AC + MBR→ALU B, TFR removed, G-IC 1-wire, no idle). **Gi1** (idx5 multiphase) is archived — [archive/gi1-v1.0-normative/](archive/gi1-v1.0-normative/README.md). **rev G** (3-GPR·TFR) is archived — [archive/rev-g-dual-3gpr/](archive/rev-g-dual-3gpr/README.md). Restore guide: [archive/MANIFEST.md](archive/MANIFEST.md).
+**Active hardware truth:** whitepaper root → reference cascade → machine code → CPLD artifacts. **v1.0 normative = P12** (IF\|EX pipe CU, PROG∥DATA intent, R0/AC + MBR→ALU B, TFR removed, G-IC 1-wire, no idle). **Gi1** (idx5 multiphase) is archived — `archive/gi1-v1.0-normative.tar.gz`. **rev G** (3-GPR·TFR) is archived — `archive/rev-g-dual-3gpr.tar.gz`. Restore guide: [archive/MANIFEST.md](archive/MANIFEST.md).
 
 **Strobe layers:** LUT/csim tests may still use Gi1-era `reg_we_lut` / multiphase tables — treat as **legacy golden lag**. Bench merged pin `net_reg_we`. Active reference tables describe **P12 pipe** behavior ([cpld-pipe-cu.md](reference/hardware/cpld-pipe-cu.md)).
 

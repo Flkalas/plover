@@ -3,7 +3,9 @@
 **Frozen:** 2026-07-04  
 **Active tree:** `plover-whitepaper.md` + `reference/**` only — no `docs/` folder.
 
-Restore: `tar -xzf archive/NAME.tar.gz -C .` from repository root.
+**Layout:** searchable prose under `archive/` is **`MANIFEST.md` only**. Historical trees and code live in `archive/*.tar.gz` (not indexed as loose files).
+
+Restore: `tar -xzf archive/NAME.tar.gz -C .` from repository root (unless noted). Snapshot trees that used to live under `archive/` restore with `tar -xzf archive/NAME.tar.gz -C archive`.
 
 ---
 
@@ -38,16 +40,14 @@ Restore: `tar -xzf archive/NAME.tar.gz -C .` from repository root.
 | `cpld-rev-g-hdl.tar.gz` | **Frozen 2026-07-06** — rev G dual CPLD HDL (`hdl/`, `netlist/`) — restore before WinCUPL build |
 | `gpr4-regfile-research.tar.gz` | **Frozen 2026-07-07** — 4-GPR / P1 / P1M1 / Gi1 feasibility study (`research/gpr4-regfile/`) |
 | `p12-era-research.tar.gz` | **Frozen 2026-07-13** — call-ret / cpld-ustep / primitive-one-clock / pe1 / p12 desk studies (fed **v1.0 P12**) |
-| [p12-era-research/](p12-era-research/) | Index README for `p12-era-research.tar.gz` |
-| [tier-c-single-cpld/](tier-c-single-cpld/) | **Superseded 2026-07-06** — single ATF1504 + CW 574×2 (pre rev G) |
-| [rev-g-normative-snapshot/](rev-g-normative-snapshot/) | **Frozen 2026-07-07** — rev G normative prose before Gi1 adoption |
-| [rev-g-dual-3gpr/](rev-g-dual-3gpr/) | **Superseded 2026-07-07** — rev G 3-GPR + TFR index |
-| [gi1-v1.0-normative/](gi1-v1.0-normative/) | **Superseded 2026-07-13** — Gi1 idx5 multiphase normative before **v1.0 P12** |
-| [reference-background/](reference-background/) | **Frozen 2026-07-13** — peer comparisons + FPGA guide (not Active implementer specs) |
+| `tier-c-single-cpld.tar.gz` | **Superseded 2026-07-06** — single ATF1504 + CW 574×2 (pre rev G); restore `-C archive` |
+| `rev-g-normative-snapshot.tar.gz` | **Frozen 2026-07-07** — rev G normative prose before Gi1; restore `-C archive` |
+| `rev-g-dual-3gpr.tar.gz` | **Superseded 2026-07-07** — rev G 3-GPR + TFR index; restore `-C archive` |
+| `gi1-v1.0-normative.tar.gz` | **Superseded 2026-07-13** — Gi1 idx5 multiphase normative before **v1.0 P12**; restore `-C archive` |
+| `reference-background.tar.gz` | **Frozen 2026-07-13** — peer comparisons (not Active implementer specs); restore `-C archive` |
 | `pl-dos-fs-interchange-notes.tar.gz` | **Frozen 2026-07-13** — PL-DOS / SD FDD interchange design notes (not Active) |
-| [pl-dos-fs-interchange-notes/](pl-dos-fs-interchange-notes/) | Index README for `pl-dos-fs-interchange-notes.tar.gz` |
 
-`build/`, `target/`, `.venv/` — local artifacts; not bundled. Delete locally.
+`pack-bundles.ps1` — helper to rebuild code bundles. `build/`, `target/`, `.venv/` — local artifacts; not bundled.
 
 ---
 
@@ -67,6 +67,11 @@ Restore: `tar -xzf archive/NAME.tar.gz -C .` from repository root.
 | `docs/archive/**` | `docs_archive.tar.gz` |
 | `BOM.md` (root) | `reference/project/BOM.md` |
 | `archive/bundles/**` | `archive/*.tar.gz` |
+| `archive/gi1-v1.0-normative/` (loose) | `gi1-v1.0-normative.tar.gz` |
+| `archive/rev-g-dual-3gpr/` (loose) | `rev-g-dual-3gpr.tar.gz` |
+| `archive/rev-g-normative-snapshot/` (loose) | `rev-g-normative-snapshot.tar.gz` |
+| `archive/tier-c-single-cpld/` (loose) | `tier-c-single-cpld.tar.gz` |
+| `archive/reference-background/` (loose) | `reference-background.tar.gz` |
 | `cpld_fsm/` (full tree) | `cpld/` — **tools only**; HDL in `cpld-rev-g-hdl.tar.gz` |
 | `cpld_fsm/fit-study/` (full tree) | `fit-study-gpr-fsm.tar.gz` — restore to `cpld/fit-study` |
 | `hwsim/`, `hw/`, `tools/`, … | matching code bundle above |
@@ -81,10 +86,11 @@ For **architecture**, **bring-up**, **timing**, or **decode**:
 2. Do **not** run or quote sim/code from `archive/*.tar.gz` unless the user explicitly asks for historical comparison.
 3. **Forbidden as v1.0 SoC truth:** `alu8_decode` on breadboard, Flash `$4000` CW burn, `cpu_cw_direct`, pareto MC reports.
 4. Research and developer docs exist only in tarballs — exploration history, not current spec. **No `research/` folder in the active tree** — restore `gpr4-regfile-research.tar.gz` or `p12-era-research.tar.gz` only when comparing history.
+5. Do **not** keep unpacked trees under `archive/` in the working tree — pack into `*.tar.gz` and leave this MANIFEST as the only searchable archive index.
 
 ### Frozen FSM snapshot (M3a) — Gi1 legacy
 
-Historical Gi1 idx5 rows — see [gi1-v1.0-normative/](gi1-v1.0-normative/) bring-up copies. **Active CU:** [reference/hardware/cpld-pipe-cu.md](../reference/hardware/cpld-pipe-cu.md).
+Historical Gi1 idx5 prose: `gi1-v1.0-normative.tar.gz` (restore `-C archive`). **Active CU:** [reference/hardware/cpld-pipe-cu.md](../reference/hardware/cpld-pipe-cu.md).
 
 ---
 
@@ -97,6 +103,12 @@ tar -czf archive/developer_docs.tar.gz docs/developer docs/plans
 tar -czf archive/fit-study-gpr-fsm.tar.gz -C cpld fit-study
 tar -czf archive/cpld-rev-g-hdl.tar.gz -C cpld hdl netlist
 tar -czf archive/gpr4-regfile-research.tar.gz research
+# Snapshot trees that lived under archive/:
+tar -czf archive/gi1-v1.0-normative.tar.gz -C archive gi1-v1.0-normative
+tar -czf archive/rev-g-dual-3gpr.tar.gz -C archive rev-g-dual-3gpr
+tar -czf archive/rev-g-normative-snapshot.tar.gz -C archive rev-g-normative-snapshot
+tar -czf archive/tier-c-single-cpld.tar.gz -C archive tier-c-single-cpld
+tar -czf archive/reference-background.tar.gz -C archive reference-background
 ```
 
 Code bundles: see `archive/pack-bundles.ps1`.
