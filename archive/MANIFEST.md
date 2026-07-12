@@ -11,8 +11,9 @@ Restore: `tar -xzf archive/NAME.tar.gz -C .` from repository root.
 
 | Path | Role |
 |------|------|
-| [plover-whitepaper.md](../plover-whitepaper.md) | Project main document |
-| [reference/](../reference/) | v1.0 specifications, bring-up, fixtures |
+| [plover-whitepaper.md](../plover-whitepaper.md) | Project main document (**v1.0 P12**) |
+| [reference/](../reference/) | v1.0 P12 specifications, bring-up, fixtures |
+| [reference/hardware/cpld-pipe-cu.md](../reference/hardware/cpld-pipe-cu.md) | **Active pipe CU** |
 | [reference/project/BOM.md](../reference/project/BOM.md) | Breadboard BOM |
 
 ---
@@ -39,6 +40,7 @@ Restore: `tar -xzf archive/NAME.tar.gz -C .` from repository root.
 | [tier-c-single-cpld/](tier-c-single-cpld/) | **Superseded 2026-07-06** — single ATF1504 + CW 574×2 (pre rev G) |
 | [rev-g-normative-snapshot/](rev-g-normative-snapshot/) | **Frozen 2026-07-07** — rev G normative prose before Gi1 adoption |
 | [rev-g-dual-3gpr/](rev-g-dual-3gpr/) | **Superseded 2026-07-07** — rev G 3-GPR + TFR index |
+| [gi1-v1.0-normative/](gi1-v1.0-normative/) | **Superseded 2026-07-13** — Gi1 idx5 multiphase normative before **v1.0 P12** |
 
 `build/`, `target/`, `.venv/` — local artifacts; not bundled. Delete locally.
 
@@ -74,9 +76,9 @@ For **architecture**, **bring-up**, **timing**, or **decode**:
 3. **Forbidden as v1.0 SoC truth:** `alu8_decode` on breadboard, Flash `$4000` CW burn, `cpu_cw_direct`, pareto MC reports.
 4. Research and developer docs exist only in tarballs — exploration history, not current spec. **No `research/` folder in the active tree** — restore `gpr4-regfile-research.tar.gz` only when comparing history.
 
-### Frozen FSM snapshot (M3a)
+### Frozen FSM snapshot (M3a) — Gi1 legacy
 
-PASS — **20 active idx5 rows** (no comb TFR in Gi1) — see [reference/hw-bringup/M3a-control-store.md](../reference/hw-bringup/M3a-control-store.md) §2.
+Historical Gi1 idx5 rows — see [gi1-v1.0-normative/](gi1-v1.0-normative/) bring-up copies. **Active CU:** [reference/hardware/cpld-pipe-cu.md](../reference/hardware/cpld-pipe-cu.md).
 
 ---
 
