@@ -32,6 +32,10 @@ ISA or idx5 changes: **whitepaper first** → reference → machine code → CPL
 | [hardware/cpld-system-controller.md](hardware/cpld-system-controller.md) | Dual CPLD CU/DP (Gi1 v1.0) |
 | [hardware/memory-map.md](hardware/memory-map.md) | Address map |
 | [hardware/alu-opcodes-timing.md](hardware/alu-opcodes-timing.md) | ALU comb delay |
+| [hardware/ttl-computer-comparison.md](hardware/ttl-computer-comparison.md) | Gi1 vs other TTL homebrew CPUs |
+| [hardware/cu-dp-comparison.md](hardware/cu-dp-comparison.md) | Gi1 CU·DP vs Gigatron, Ben Eater, Magic-1, Isetta, Novasaur, Apple II, PDP-11 |
+| [hardware/rom-comparison.md](hardware/rom-comparison.md) | ROM/Flash count, structure, and roles vs peers |
+| [hardware/clock-comparison.md](hardware/clock-comparison.md) | Master / µstep / ISA throughput clock comparison |
 | [fixtures/README.md](fixtures/README.md) | Frozen burn images |
 
 ## Software, boot, copro

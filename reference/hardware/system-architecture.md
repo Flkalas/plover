@@ -92,6 +92,10 @@ Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md
 | [cpld-dual-routing.md](cpld-dual-routing.md) | G-IC, MBR→B wiring |
 | [cpld-dual-jtag.md](cpld-dual-jtag.md) | JTAG daisy chain |
 | [microcode-spec.md](microcode-spec.md) | FSM-only ISA, idx5 |
+| [ttl-computer-comparison.md](ttl-computer-comparison.md) | Gi1 vs TTL homebrew peers |
+| [cu-dp-comparison.md](cu-dp-comparison.md) | Gi1 CU·DP vs Gigatron, Ben Eater, Magic-1, Isetta, Novasaur, Apple II, PDP-11 |
+| [rom-comparison.md](rom-comparison.md) | ROM/Flash count, structure, roles vs peers |
+| [clock-comparison.md](clock-comparison.md) | System clock / µstep / throughput vs peers |
 | [hw-bringup/README.md](../hw-bringup/README.md) | M1–M5 breadboard bring-up |
 
 ---
@@ -110,6 +114,7 @@ Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md
 
 | Date | Note |
 |------|------|
+| 2026-07-07 | Link to [ttl-computer-comparison.md](ttl-computer-comparison.md) |
 | 2026-07-07 | **Gi1 v1.0** — AC + MBR; rev G archived |
 | 2026-07-06 | rev G dual ATF1504 |
 | 2026-06-24 | v1.0 FSM-only idx5 normative |

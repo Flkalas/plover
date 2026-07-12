@@ -105,7 +105,7 @@ Gi1 has **no hardware RP register**. CALL/RET push/pop is performed by **CPLD-CU
 | Underflow (`RP ≤ $F600`) | execution **stops** |
 | Flash CW | **not used** — stack assist is CU sequencer logic |
 
-Non-normative MC/pin fit study: [research/call-ret-cu-fit/SUMMARY-REPORT.md](../../research/call-ret-cu-fit/SUMMARY-REPORT.md).
+Non-normative MC/pin fit study: [research/call-ret-cu-fit/SUMMARY-REPORT.md](../../research/call-ret-cu-fit/SUMMARY-REPORT.md). Peer TTL comparison: [ttl-computer-comparison.md](ttl-computer-comparison.md) §3.
 
 ---
 
