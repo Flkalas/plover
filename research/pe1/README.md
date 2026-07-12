@@ -15,6 +15,7 @@ Recover owner intent (**~1 macro retired per SYS** in steady state) by **adding 
 1. With Harvard-like program/data split + pipe latches, can ALU streams approach **IPC ≈ 1.0**?
 2. What BOM delta vs Gi1 is required?
 3. How do mem ops, multi-byte immediates, and taken branches appear as **visible bubbles** (not hidden idle phases)?
+4. With PE1 latches, do **all mailbox** ops still close at **2 MHz**?
 
 ## Deliverables
 
@@ -24,7 +25,9 @@ Recover owner intent (**~1 macro retired per SYS** in steady state) by **adding 
 | [bom-delta.md](bom-delta.md) | Extra DIP desk list |
 | [isetta-gigatron-map.md](isetta-gigatron-map.md) | Peer mapping |
 | [opcode-pipe-table.md](opcode-pipe-table.md) | Per-op SYS / stalls |
-| [model/](model/) | `pe1_ipc_model.py` + pytest |
+| [timing-budget.md](timing-budget.md) | **ns path budget / slack @ 2 MHz** (incl. mailbox) |
+| [mailbox-2mhz.md](mailbox-2mhz.md) | **Mailbox jobs @ 2 MHz + PE1 latches** |
+| [model/](model/) | `pe1_ipc_model.py`, `mailbox_copy_bps.py` + pytest |
 | [SUMMARY-REPORT.md](SUMMARY-REPORT.md) | Verdict |
 
 ## Contrast
@@ -47,4 +50,5 @@ Recover owner intent (**~1 macro retired per SYS** in steady state) by **adding 
 
 | Date | Note |
 |------|------|
+| 2026-07-13 | Mailbox @ 2 MHz deepen |
 | 2026-07-13 | Initial PE1 desk study |
