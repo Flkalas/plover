@@ -20,6 +20,7 @@ This does **not** overturn the shared-bus FE1 **No** in [primitive-one-clock](..
 | 3 | Bubbles visible? | **Yes** — mem_stall, taken-branch bubble, operand IF bytes, CALL/RET stack_extra ([opcode-pipe-table.md](opcode-pipe-table.md)). |
 | 4 | Timing slack @ 2 MHz? | See [timing-budget.md](timing-budget.md): IF **~335 ns** / EX ADD **~352 ns** @ 500 ns period; BEQ stress @ 250 ns only **~23 ns**. |
 | 5 | Mailbox @ 2 MHz + PE1 latches? | **Conditional Go** — EX mailbox **170 ns**, slack **330 @ 500** / **80 @ 250** if RP ≤ **80 ns** ([mailbox-2mhz.md](mailbox-2mhz.md)). Not the limiter (BEQ is). **No** vFDD fast path needed for **timing**; only for **B/s > ~0.3 MB/s**. |
+| 6 | Elevated f_SYS / which OSC? | Margin **≥ 20–30%** of BEQ 227 ns or **≥ 50 ns** measured ([clock-candidates.md](clock-candidates.md)). **3.6864 MHz half-can** ≈ 44 ns (~19%) — preferred trial above 2 MHz; **4.0 MHz** ≈ 23 ns (~10%) — stress only. Lab: [beq-lab.md](beq-lab.md). |
 
 ## Timing snapshot (desk)
 
@@ -60,6 +61,7 @@ Exact numbers: run `python pe1_ipc_model.py`.
 4. CU pipe/stall **Design fits** on ATF1504 if PLD forked later.
 5. Do **not** add branch prediction in v1 of PE1.
 6. Lab-measure RP mailbox GPIO response; keep **≤ 80 ns** desk or stretch MMIO EX / update budget.
+7. For f_SYS > 2 MHz: prefer **3.6864 MHz** over 4.0; gate on **measured BEQ slack ≥ 50 ns**.
 
 ## Contrast
 
@@ -69,19 +71,22 @@ Exact numbers: run `python pe1_ipc_model.py`.
 | Steady ALU IPC | wishful 1 | ~0.33–0.5 | **~1.0** |
 | Mechanism | same tick | serial F/E | **overlap IF/EX** |
 | Mailbox @ 2 MHz | (Gi1 baseline) | OK | **OK if RP≤80 ns** |
+| Elevated OSC | — | — | **3.6864 trial; 4.0 stress** |
 
 ## Next steps
 
 1. Optional breadboard sketch: PROG 245 + IR 574 wiring note.
 2. Scope mailbox `LDIO` D-valid vs 80 ns assumption ([mailbox-2mhz.md](mailbox-2mhz.md)).
-3. Keep Gi1 normative until PE1 lab + fit gates pass.
-4. Prefer PE1 over cpld-ustep when the goal is **programmer 1-work≈1-clock**, not multiphase pedagogy.
-5. vFDD fast path only if **throughput** goal exceeds ~0.3 MB/s copy — not required for 2 MHz timing closure.
+3. Scope BEQ slack at 2.0 then 3.6864 ([beq-lab.md](beq-lab.md)).
+4. Keep Gi1 normative until PE1 lab + fit gates pass.
+5. Prefer PE1 over cpld-ustep when the goal is **programmer 1-work≈1-clock**, not multiphase pedagogy.
+6. vFDD fast path only if **throughput** goal exceeds ~0.3 MB/s copy — not required for 2 MHz timing closure.
 
 ## Change log
 
 | Date | Note |
 |------|------|
+| 2026-07-13 | Clock margin policy; 3.6864 candidate; BEQ lab |
 | 2026-07-13 | Mailbox @ 2 MHz Conditional Go; copy B/s table |
 | 2026-07-13 | timing-budget.md — IF/EX ns slack |
 | 2026-07-13 | Initial desk study — Conditional Go |

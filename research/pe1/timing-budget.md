@@ -171,7 +171,7 @@ Using `Fmax ≈ 1 / path` for single-edge pipe (period must exceed path):
 | EX BEQ 227 | 227 | **~4.4 MHz** |
 | EX mailbox 170 | 170 | **~5.9 MHz** |
 
-PE1 remains at **2.0 MHz** for breadboard margin (same policy as Gi1 keeping 2 MHz despite ADD Fmax >3 MHz). Raising clock is optional **after** lab proves PROG isolation.
+PE1 remains at **2.0 MHz** for large margin bring-up. Elevated clocks: see [clock-candidates.md](clock-candidates.md) (**3.6864 MHz** preferred over raw **4.0 MHz**). Measure BEQ slack per [beq-lab.md](beq-lab.md).
 
 ## What eats the Gi1 slack
 
@@ -187,11 +187,12 @@ PE1 remains at **2.0 MHz** for breadboard margin (same policy as Gi1 keeping 2 M
 1. Scope IF Flash→IR and EX ADD Y at **2 MHz**; confirm both finish before the capturing edge.
 2. Scope **mailbox `LDIO`**: MEM_RD→D valid from RP before capturing edge; if >80 ns RP, update this sheet.
 3. If BEQ fails with half-cycle discipline, either use **full-period** latching or **stretch** BEQ (extra SYS) — same stretch policy as FE2/PE1 bubble tables.
-4. Do not raise `f_SYS` until IF||EX ADD has **>50 ns** measured margin on the breadboard.
+4. Do not raise `f_SYS` until **measured** BEQ slack is **≥ 50 ns** ([beq-lab.md](beq-lab.md)); design margin policy **≥ 20–30%** of 227 ns ([clock-candidates.md](clock-candidates.md)).
 
 ## Change log
 
 | Date | Note |
 |------|------|
+| 2026-07-13 | Link clock-candidates + beq-lab; margin ≥50 ns / 20–30% |
 | 2026-07-13 | Mailbox EX path + slack vs MEM/BEQ |
 | 2026-07-13 | Initial PE1 ns budget / slack desk |
