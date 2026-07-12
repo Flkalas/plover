@@ -46,7 +46,7 @@ Place **CPLD-CU** and **CPLD-DP** on **adjacent 830-tie rows**, pin-1 aligned.
 |-----|--------|-------------|
 | `net_mbr0..7` | MBR 574 Q | `net_b0..7` → ALU B |
 
-ALU B is **not** driven from CPLD `q_b` (no `q_b` on DP).
+ALU B is driven from **MBR 574 Q** on this path.
 
 Optional **74HC244** on MBR fanout if needed (desk: direct wire OK).
 
@@ -67,12 +67,3 @@ Optional **74HC244** on MBR fanout if needed (desk: direct wire OK).
 `mem_rd`, `mem_wr`, `y_oe`, `flg_we`, `pc_load_en`, `cin`, `bctrl0`, `bctrl2`, `lgc0..3`, `s0`, `s1`.
 
 JTAG: [cpld-dual-jtag.md](cpld-dual-jtag.md)
-
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-07-13 | v1.0 P12 title; Active-only wording |
-| 2026-07-07 | G-IC 1-wire; MBR→B |

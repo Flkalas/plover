@@ -32,7 +32,7 @@ Single breadboard target — **v1.0 dual CPLD / pipe CU**. **CPLD-CU** = pipe + 
 
 ---
 
-## 574 inventory
+## 574 package count
 
 | IC | Role |
 |----|------|
@@ -53,7 +53,7 @@ Single breadboard target — **v1.0 dual CPLD / pipe CU**. **CPLD-CU** = pipe + 
 | MBR 574 `net_mbr` | ALU B |
 | CPLD-CU strobes | `cin`, `bctrl*`, `lgc*`, `s0`, `s1`, `MEM_*`, `Y_OE`, `FLG_WE`, `PC_LOAD_EN` |
 
-ALU B is **not** driven from CPLD `q_b` (no `q_b` on DP).
+ALU B is driven from **MBR 574** on this path.
 
 ---
 

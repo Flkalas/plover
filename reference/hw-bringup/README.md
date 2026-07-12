@@ -1,7 +1,7 @@
 # Plover hardware bring-up index
 
 > **Normative v1.0 P12:** pipe CU — [cpld-pipe-cu.md](../hardware/cpld-pipe-cu.md) · [system-architecture.md](../hardware/system-architecture.md).  
-> **실구매 패키지:** [parts-on-hand.md](../project/parts-on-hand.md) · Wiring: [breadboard-wiring.md](breadboard-wiring.md).  
+> **Wiring:** [breadboard-wiring.md](breadboard-wiring.md).
 > Reading ladder: [reference/README.md](../README.md) (L0–L10).
 
 초보 작업자도 **문서만 따라** 빵판 CPU를 올릴 수 있도록 단계별 시방서입니다.
@@ -25,7 +25,7 @@ flowchart LR
 | 1 | ALU 납땜 + Y LED | [M1-alu.md](M1-alu.md) → [M1-b3-procedure.md](M1-b3-procedure.md) |
 | 2 | Dual CPLD JED (WinCUPL + Design fits) | [M2a-cpld-decode.md](M2a-cpld-decode.md) |
 | 3 | R0/MBR datapath · SRAM/NOR | [M2b-gpr-memory.md](M2b-gpr-memory.md) · [breadboard-wiring.md](breadboard-wiring.md) |
-| 4 | Pipe CU verify (no Flash CW) | [M3a-control-store.md](M3a-control-store.md) |
+| 4 | Pipe CU verify | [M3a-control-store.md](M3a-control-store.md) |
 | 5 | PROG fetch + pipe execute | [M3b-fetch-execute.md](M3b-fetch-execute.md) |
 | 6 | (PC) 부트 sim | [M4a-boot-sim.md](M4a-boot-sim.md) |
 | 7 | 부트 실기 | [M4b-boot-hardware.md](M4b-boot-hardware.md) |
@@ -58,7 +58,7 @@ flowchart LR
 
 | 문서 | 내용 |
 |------|------|
-| [M3a-control-store.md](M3a-control-store.md) | Pipe CU verify (no Flash CW) |
+| [M3a-control-store.md](M3a-control-store.md) | Pipe CU verify |
 | [M3b-fetch-execute.md](M3b-fetch-execute.md) | PC · pipe · 첫 ROM 프로그램 |
 
 ### M4 / M5
@@ -74,13 +74,3 @@ flowchart LR
 ## 사전 검증
 
 Use frozen fixtures in [fixtures](../fixtures/) before breadboard burn.
-
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-07-13 | Pipe CU retarget; M2b hub; no archive banners |
-| 2026-06-24 | **v1.0** — CPLD + no alu8_decode in SoC |
-| 2026-06-08 | Milestone index M1–M5 |

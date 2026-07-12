@@ -5,16 +5,16 @@
 **Devices:** CPLD-CU on **ATF1504AS-10JU44** (pair with CPLD-DP; DP role unchanged)  
 **Related:** [system-architecture.md](system-architecture.md) · [control-and-decode.md](control-and-decode.md) · [cpld-system-controller.md](cpld-system-controller.md) · [microcode-spec.md](microcode-spec.md)
 
-This document is the **single Active CU truth** for v1.0 P12 (IF\|EX pipe; no idle phases).
+This document is the **single Active CU truth** for v1.0 P12 (IF\|EX pipe).
 
 ---
 
 ## 1. Design rules
 
-1. **IF∥EX** on each `CLK_SYS` when not stalled — program fetch overlaps execute.
+1. **IF\|EX** on each `CLK_SYS` when not stalled — program fetch overlaps execute.
 2. **PROG∥DATA** ports — IF must not share the DATA SRAM cycle with EX without a stall.
-3. **No idle phases** — every counted SYS does IF work, EX work, a documented stall/bubble, or stretch.
-4. **CPLD FSM-only** — no Flash `$4000` CW; pipe/stall PLA in CPLD-CU.
+3. **Every counted SYS** does IF work, EX work, a documented stall/bubble, or stretch.
+4. **CPLD FSM** — pipe/stall PLA in CPLD-CU.
 5. **Datapath:** ALU A ← R0 (`q_a`); ALU B ← **MBR** `net_mbr`; G-IC **`reg_we` only**.
 6. **No branch prediction** — taken redirect = visible bubble.
 7. **P12 discipline:** lab fail → **stretch** (+1 visible SYS); ports fail → named **FALLBACK_FE2**; stretch before raising `f_SYS`.
@@ -206,17 +206,17 @@ CPLD-DP pin list and R0-only datapath: [cpld-system-controller.md](cpld-system-c
 
 ## 7. Timing desk (`CLK_SYS` = 2.0 MHz, T = 500 ns)
 
-Primary budget = **full period 500 ns** (IF∥EX). Half-cycle **250 ns** is stress only.
+Primary budget = **full period 500 ns** (`CLK_SYS` = 2.000 MHz, `IF|EX`).
 
-| Path | path ns | Slack @ 500 | Slack @ 250 |
-|------|--------:|------------:|------------:|
-| IF (Flash→IR) | 165 | **335** | 85 |
-| EX ADD | 148 | **352** | 102 |
-| EX MEM | 130 | 370 | 120 |
-| EX mailbox (RP ≤ 80 ns assume) | 170 | **330** | **80** |
-| EX BEQ + squash | 227 | **273** | **23** |
+| Path | path ns | Slack @ 500 |
+|------|--------:|------------:|
+| IF (Flash→IR) | 165 | **335** |
+| EX ADD | 148 | **352** |
+| EX MEM | 130 | 370 |
+| EX mailbox (RP ≤ 80 ns assume) | 170 | **330** |
+| EX BEQ + squash | 227 | **273** |
 
-Desk limiter under stress: **BEQ**. Mailbox is not the limiter if RP response ≤ 80 ns; else stretch MMIO EX.
+Desk limiter: **BEQ** (still comfortable @ 500 ns). Mailbox is not the limiter if RP response ≤ 80 ns; else stretch MMIO EX.
 
 Preferred trial above 2 MHz after measured BEQ slack ≥ **50 ns**: **3.6864 MHz**. Prefer stretch before clock hope.
 
@@ -224,8 +224,8 @@ Preferred trial above 2 MHz after measured BEQ slack ≥ **50 ns**: **3.6864 MHz
 
 R0→A (`q_a`) and MBR→B in **parallel**; ALU Y ≈ **133 ns** on the EX ADD path (see also [alu-opcodes-timing.md](alu-opcodes-timing.md)).
 
-**Branch BEQ (stress half-cycle reference):**  
-`t_ALU(SUB) + t_FLG + t_CU_merge + t_SETUP(PC) + wire` = 136 + 23 + 15 + 28 + 10 = **212 ns** (slack **38 ns** @ 250 ns). Prefer full-period §7 table for Active pipe budgeting.
+**Branch BEQ:**  
+`t_ALU(SUB) + t_FLG + t_CU_merge + t_SETUP(PC) + wire` = 136 + 23 + 15 + 28 + 10 = **212 ns** (slack **288 ns** @ 500 ns).
 
 Normative clock remains **2.0 MHz**; raise only after measured BEQ slack ≥ **50 ns**.
 
@@ -233,7 +233,7 @@ Normative clock remains **2.0 MHz**; raise only after measured BEQ slack ≥ **5
 
 ## 8. P12 caveats (normative discipline)
 
-1. **No idle return** — do not reintroduce ADD/CMP padding phases.
+1. **Packed ADD/CMP EX** — every counted SYS is IF, EX, stall/bubble, or stretch.
 2. **Stretch on fail** — unstable at low SYS → +1 visible SYS; update §4 table.
 3. **FALLBACK_FE2** — only if PROG∥DATA isolation fails; serial F+E; IPC drops (ALU stream ~0.33 vs ~1.0).
 4. **Optimistic IPC** — P12 does not add a faster schedule than the pipe in §2–§4.
@@ -254,15 +254,6 @@ MC desk estimates are non-normative; bring-up gate = **Design fits** only.
 
 ## 10. Explicit non-claims
 
-- No claim that breadboard already runs IF∥EX lab PASS.
+- No claim that breadboard already runs IF\|EX lab PASS.
 - No Active pipe CU bitstream.
 - Executable cyclesim golden may lag the pipe until rewritten — treat as **non-Active** until pipe golden lands.
-
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-07-13 | CALL/RET fit desk + SoC timing absorbed; dual-timing / call-ret-cu-fit Active files dropped |
-| 2026-07-13 | **Active v1.0 P12** pipe CU |

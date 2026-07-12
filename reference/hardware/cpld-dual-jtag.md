@@ -30,4 +30,4 @@ TMS pin 13 ── parallel to both CPLDs
 
 ## BOM
 
-2× ATF1504 (#14), 2× PLCC adapter (#15). See [BOM.md](../project/BOM.md).
+2× ATF1504 (#12), 2× PLCC adapter (#13). See [BOM.md](../project/BOM.md).

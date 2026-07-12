@@ -62,12 +62,3 @@ Used when Boot ROM ends in **HALT**, or when **Run** map and RAM vector reset ar
 `$FFFD`: high byte (same page or `$08` for `$0800`)
 
 Mode A ROM vector @ `$FFFC` points to **`$0000`** or **`$0100`** boot entry.
-
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-06-01 | Manual Run + RESET handoff |
-| 2026-06-08 | JMP chain-load handoff; §5 init contract |

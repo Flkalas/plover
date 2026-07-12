@@ -15,9 +15,9 @@
 | [M1-b3-procedure.md](M1-b3-procedure.md) | B3a/b/c 전체 브링업 |
 | [b3-opcode.md](b3-opcode.md) | 12 opcode DIP/타이 값 |
 | [M2a-cpld-decode.md](M2a-cpld-decode.md) | CPLD GPR 소각 (v1.0) |
-| [M2b-gpr-datapath.md](M2b-gpr-datapath.md) | CPLD q_a/q_b ↔ ALU |
+| [M2b-gpr-datapath.md](M2b-gpr-datapath.md) | CPLD `q_a` / MBR→B ↔ ALU |
 | [hw/netlist/blocks/alu8.md](../../hw/netlist/blocks/alu8.md) | IC 맵 · 제어 넷 |
-| [BOM.md](../../BOM.md) | 구매 수량 |
+| [BOM.md](../project/BOM.md) | 구매 수량 |
 | [hw/pinout/](../../hw/pinout/) | DIP 핀 번호 |
 
 **도구 (배선 전)**
@@ -46,7 +46,7 @@ flowchart LR
   end
   subgraph core [연산]
     ADD[283 x2]
-    LOGIC[153 mux1 Gigatron]
+    LOGIC[153 mux1 logic]
   end
   subgraph ab [A/B 버스]
     ABBUS[opcode별 A/B]
@@ -89,7 +89,7 @@ flowchart LR
 | 결과 Y | LED ×8 ← `net_y0..7` | MSB=y7, LSB=y0 |
 | 캐리(선택) | LED ← `net_c_hi` | SUB/CMP 디버그용 |
 
-### 2.3 제어선 기본값 (미사용 시)
+### 2.3 제어선 기본값
 
 타이 하지 않은 제어 입력은 **GND**. 예외는 치트시트에 **VCC** 로 적힌 핀만 5 V.
 
@@ -161,7 +161,7 @@ flowchart LR
 
 **배선**
 
-- Per bit `i`: **mux2** `2C0..3`=`net_bctrl0..3` (Gigatron B_CTRL), `2Y`→`net_b_add[i]`; **mux1** `1C0..3`=`net_lgc0..3`, `1Y`→`net_y_logic[i]`; `1G`/`2G`→GND  
+- Per bit `i`: **mux2** `2C0..3`=`net_bctrl0..3` (B_CTRL), `2Y`→`net_b_add[i]`; **mux1** `1C0..3`=`net_lgc0..3`, `1Y`→`net_y_logic[i]`; `1G`/`2G`→GND  
 - SUB/CMP: `bctrl=0011` → mux2 selects inverted B (no 74HC04)  
 - `net_b_add*` → **283 B** (**단계 1 B 직결 제거**)
 
@@ -228,12 +228,11 @@ flowchart LR
 
 ---
 
-### 단계 5 — (M1 벤치 전용) `alu8_decode` 블록
+### 단계 5 — (M1 벤치 전용) 자동 제어 옵션
 
-**SoC(M2+)에는 `alu8_decode` 없음** — CPLD FSM이 `net_bctrl*`/`cin`/`lgc*`를 직접 구동 ([control-and-decode.md](../hardware/control-and-decode.md)).
+**SoC(M2+):** CPLD FSM drives `net_bctrl*`/`cin`/`lgc*` directly ([control-and-decode.md](../hardware/control-and-decode.md)).
 
-M1에서 CW 스타일 자동 제어를 시험하려면 [`alu8_decode.yaml`](../../hw/netlist/blocks/alu8_decode.yaml) 블록 추가.  
-**권장:** 단계 3까지 **수동 DIP** ([b3-opcode.md](b3-opcode.md)) 로 안정화한 뒤 디코드 블록을 붙임.
+**M1:** Prefer manual DIP ([b3-opcode.md](b3-opcode.md)) through step 3. Optional bench decode block may drive the same nets for automation.
 
 ---
 
@@ -244,7 +243,7 @@ ALU 단독 Pass 후 [M1-b3-procedure.md](M1-b3-procedure.md) § B3b/B3c 진행:
 | 단계 | 추가 | 목표 |
 |------|------|------|
 | B3b | 74HC574 ×1 | Y → D, 수동 CP로 Q 래치 |
-| B3c | OSC+74HC74 | 2 MHz 연속 래치, setup 마진 |
+| B3c | 2 MHz OSC + 74HC14 | 2 MHz 연속 래치, setup 마진 |
 
 ---
 
@@ -254,9 +253,9 @@ ALU 단독 Pass 후 [M1-b3-procedure.md](M1-b3-procedure.md) § B3b/B3c 진행:
 |------|---------|------|-----------|
 | 0 | — | 0 | 전원 |
 | 1 | 283×2 | 2 | ADD / 캐리 |
-| 2 | 153×8 | 10 | B_CTRL + Gigatron logic, AB bus jumpers |
+| 2 | 153×8 | 10 | B_CTRL + mux1 logic, AB bus jumpers |
 | 3 | 157 YBP×2 | **12** | sum bypass → Y, 12 opcode |
-| 4 | (M1 `alu8_decode`) | +α | M1 bench only — not SoC BOM |
+| 4 | (M1 optional decode) | +α | M1 bench automation only |
 | 5 | 574·클록 | 시스템 | B3b/c |
 
 ---
@@ -305,7 +304,7 @@ ALU 단독 Pass 후 [M1-b3-procedure.md](M1-b3-procedure.md) § B3b/B3c 진행:
 
 ## 8. 완료 체크리스트 (ALU8 단독)
 
-- [ ] 12 DIP ALU 전원·0.1 µF 완료 ([BOM.md](../../BOM.md))  
+- [ ] 12 DIP ALU 전원·0.1 µF 완료 ([BOM.md](../project/BOM.md))  
 - [ ] `alu8_full` pre-flight sim PASS  
 - [ ] 스모크 SUB / XOR / INC LED 일치  
 - [ ] (권장) opcode 치트시트 12종 전부  
@@ -320,8 +319,8 @@ ALU 단독 Pass 후 [M1-b3-procedure.md](M1-b3-procedure.md) § B3b/B3c 진행:
 
 | 날짜 | 변경 |
 |------|------|
-| 2026-07-04 | 12 DIP, B_CTRL mux2, INC=`cin`+`bctrl=0`, M1-only `alu8_decode` |
+| 2026-07-04 | 12 DIP, B_CTRL mux2, INC=`cin`+`bctrl=0` |
 | 2026-07-03 | Bit-slice `U_ALU_153_0..7` + AB bus; steps 2–3 merged |
 | 2026-06-11 | v1.0 정합: 링크·단계 번호, INC/DEC 하드와이어 명시 |
-| 2026-06-02 | Phase B2: Gigatron logic, logic **46 ns** @ max |
+| 2026-06-02 | Phase B2: 153 mux1 logic, logic **46 ns** @ max |
 | 2026-06-02 | Phase B1: `157_B2` 제거, `157_YBP` sum bypass, SUB **136 ns** @ max |

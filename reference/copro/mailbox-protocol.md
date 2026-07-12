@@ -161,15 +161,3 @@ Full OS loop: interleave poll with main scheduler — see `hw/fixtures/sw/monito
 ## 5. Hardware decode
 
 CPLD asserts `MAILBOX_EN` for `$FF00–$FFFB` only; RAM_2 `/CE` negated in this window.
-
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-06-01 | 252 B window; cmd 0/1/2 |
-| 2026-06-08 | MB_AUX; VDU/GFX cmds 0x10–0x31 |
-| 2026-06-08 | APU_READY bit3; PSG cmds 0x50–0x53 |
-| 2026-06-08 | HID_KEY/MOUSE_PENDING bit4/5; HID cmds 0x40–0x43 |
-| 2026-06-08 | GFX v0.2 layer/OAM 0x27–0x2D; APU NOTE_ON 0x54–0x57 |

@@ -65,11 +65,3 @@ See [mailbox-protocol.md](mailbox-protocol.md) §2.4.
 | Host speaker | **Deferred v0.2** |
 | Forth / PL-DOS | `BEEP ( period duration -- )` minimal API |
 | Gate | `apu_smoke.pls` + VM register assert; hardware 1 kHz on oscilloscope |
-
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-06-08 | v0.1 normative: 4ch PSG, Mailbox 0x50–0x53 |

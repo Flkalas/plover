@@ -17,7 +17,7 @@
 | Operand B | **MBR 574 → `net_mbr` → ALU B** |
 | Write | `REG_WE` → **R0** from `d_in` |
 | ALU ctrl | CPLD FSM → `cin`/`bctrl*`/`lgc*` **직접** |
-| Decode | **없음** — `alu8_decode` SoC 미장착 |
+| Decode | SoC: CPLD-CU; M1 bench may use DIP |
 
 공유 버스: `net_d0..7` — [breadboard-wiring.md](breadboard-wiring.md).
 
@@ -56,7 +56,7 @@ REG_WE=1 @ CLK↑ → R0 <= d_in
 
 **작업:** MBR에 imm8 프리로드; scope on `net_b*` = `net_mbr*`.
 
-**Pass:** ALU B matches MBR (no CPLD `q_b`).
+**Pass:** ALU B matches MBR.
 
 ### G1 — R0 프리로드
 
@@ -90,11 +90,3 @@ REG_WE=1 @ CLK↑ → R0 <= d_in
 | SRAM | `MEM_RD`=1 (245 경유) |
 
 **버스 충돌:** `Y_OE`와 `MEM_RD` 동시 1 금지.
-
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-07-07 | R0 only; MBR→B |

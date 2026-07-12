@@ -66,11 +66,3 @@ See [mailbox-protocol.md](mailbox-protocol.md) §2.5.
 | Forth | `KEY ( -- ch )`, `MOUSE? ( -- buttons dx dy )` |
 | Discovery | `SIG_HID = 0x48` |
 | Gate | `hid_smoke.pls` + VM queue assert |
-
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-06-08 | v0.1 normative: keyboard/mouse FIFO, Mailbox 0x40–0x43 |

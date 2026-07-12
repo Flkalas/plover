@@ -22,8 +22,8 @@ Format: `net_{domain}_{name}` or bus `net_{name}[msb:lsb]`
 
 Examples:
 
-- `net_osc` — 4 MHz oscillator output
-- `net_clk2` — 2 MHz divided clock
+- `net_osc` / `CLK_SYS` — **2.000 MHz** oscillator
+- `net_clk2` — buffered system clock (= `CLK_SYS`)
 - `net_a0` … `net_a7`, `net_b0` … `net_b7` — ALU operands
 - `net_y0` … `net_y7` — ALU result
 - `net_cin`, `net_153_s0`, `net_153_s1`, `net_bctrl0`…`3`, `net_lgc0`…`3` — ALU control (VLIW or test)

@@ -39,11 +39,3 @@ Wiring composite: [breadboard-wiring.md](breadboard-wiring.md).
 | G4 | [§G4](M2b-gpr-datapath.md#g4--y--d-버스-r2-쓰기) | Y → D-bus / R0 writeback |
 | G5 | [§G5](M2b-gpr-datapath.md#g5--opcodephase--cpld) | CU strobe decode smoke |
 | G6 | [§G6](M2b-gpr-datapath.md#g6--수동-cw--2-mhz-add-3-phase) | R0 = sum @ 2 MHz |
-
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-07-13 | Consolidate hub for R0/MBR + memory; P12 wording |

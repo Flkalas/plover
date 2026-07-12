@@ -9,17 +9,17 @@
 
 | Axis | Choice | Rationale |
 |------|--------|-----------|
-| Opcode | **`op_legacy`** core; **`0x10–0x1F` reserved** (no TFR) | 5-bit opcode field `[4:0]` |
+| Opcode | Core `0x01–0x0F`; **`0x10–0x1F` reserved** | 5-bit opcode field `[4:0]` |
 | Control | **Pipe CU** | IF\|EX / stall / stretch — [cpld-pipe-cu.md](cpld-pipe-cu.md) |
-| Decode | **`dec_cpld_pipe`** | Pipe FSM in CPLD-CU; **no `alu8_decode`** |
-| CPLD | **`cpld_dual_p12`** | **CU:** pipe · **DP:** **R0 (AC) only**; **ALU B from MBR 574** |
-| CW/Flash | **`cw_fsm_only`** | **No Flash param/CW** |
+| Decode | **Pipe FSM** | Decode and strobes in CPLD-CU |
+| CPLD | Dual ATF1504 | **CU:** pipe · **DP:** **R0 (AC) only**; **ALU B from MBR 574** |
+| Control store | **CPLD FSM** | Strobes from pipe CU outputs |
 
-**No Flash fetch** for control. Flash `$4000` region **unused** ([rom-architecture.md](rom-architecture.md)).
+Control lives in the CPLD pipe CU ([rom-architecture.md](rom-architecture.md) Flash map).
 
 ### 1.1 Pipe schedule
 
-Active schedule = pipe states and SYS tax in [cpld-pipe-cu.md](cpld-pipe-cu.md). No multiphase idle rows.
+Active schedule = pipe states and SYS tax in [cpld-pipe-cu.md](cpld-pipe-cu.md). Every counted SYS does IF work, EX work, a documented stall/bubble, or stretch.
 
 ### 1.2 Operand datapath
 
@@ -45,7 +45,7 @@ Opcode field: **bits `[4:0]`** of the first instruction byte. Bits `[7:5]` are *
 | **Imm8** | 2 B | byte0: opcode; byte1: imm8 — LDA, STA, CMP, ADD, LDIO, STIO |
 | **Abs16** | 3 B | byte0: opcode; bytes1–2: addr LE — BEQ, JMP, CALL, STA16 |
 
-**Extended opcode group:** `0x10–0x1F` — **reserved / trap** (no TFR).
+**Opcode group `0x10–0x1F`:** **reserved / trap**.
 
 ### 2.1 Core (`0x01–0x0F`)
 
@@ -79,7 +79,7 @@ Normative tax table: [cpld-pipe-cu.md](cpld-pipe-cu.md) §4. Summary:
 | RET | **4** |
 | HALT | **1** |
 
-**P12:** lab fail → stretch (+1 visible). No ADD/CMP idle phases.
+**P12:** lab fail → stretch (+1 visible). ADD/CMP use packed EX.
 
 ### 2.3 Return stack (CU-assisted)
 
@@ -93,11 +93,10 @@ No hardware RP register. CALL/RET push/pop is performed by **CPLD-CU** in **STAC
 | CALL | `return_pc` after 3-byte insn; push; `PC←abs16` |
 | RET | pop → `PC`; **`PC_in` ≠ MBR** |
 | Overflow / underflow | execution **stops** |
-| Flash CW | **not used** |
 
 ---
 
-## 3. Control (`cw_fsm_only` + pipe)
+## 3. Control (pipe CU)
 
 | Mechanism | Source |
 |-----------|--------|
@@ -133,7 +132,7 @@ Bus and ALU strobes are **direct CPLD-CU outputs**. `REG_WE` reaches CPLD-DP via
 |--------|----------|
 | `reg_we` | GPR write strobe — **always targets R0** in DP |
 
-No `w_sel`, `tfr_valid`, or `src` on G-IC.
+G-IC is a single wire: `reg_we`.
 
 ---
 
@@ -151,7 +150,7 @@ No `w_sel`, `tfr_valid`, or `src` on G-IC.
 
 ## 7. ALU controls
 
-CPLD drives `cin`, `bctrl0..3`, `lgc3:0`, `y_mux_sel` — no `alu8_decode` on SoC ([control-and-decode.md](control-and-decode.md)).
+CPLD drives `cin`, `bctrl0..3`, `lgc3:0`, `y_mux_sel` ([control-and-decode.md](control-and-decode.md)). M1 bench may use DIP decode separately.
 
 **2 MHz desk:** EX ADD path ≈ **148 ns** in pipe budget ([cpld-pipe-cu.md](cpld-pipe-cu.md) §7); comb Y ≈ **133 ns** ([alu-opcodes-timing.md](alu-opcodes-timing.md)).
 
@@ -160,21 +159,3 @@ CPLD drives `cin`, `bctrl0..3`, `lgc3:0`, `y_mux_sel` — no `alu8_decode` on So
 ## 8. `/NMI`
 
 Inactive (pull-up). No MMU/IRQ.
-
----
-
-## Appendix A — 16-bit CW (`cw16_direct`, P1 bench only)
-
-P1 `DECODE_BYPASS` — not normative SoC path.
-
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-07-13 | **v1.0 P12** — pipe SYS sheet |
-| 2026-07-07 | **CALL/RET** — CU return-stack assist |
-| 2026-07-07 | AC + MBR→B; R0 only; TFR removed |
-| 2026-06-24 | ISA `[4:0]`; FSM-only |
-| 2026-06-10 | v1.0 initial |

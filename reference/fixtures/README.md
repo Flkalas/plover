@@ -1,6 +1,6 @@
 # Frozen fixtures (breadboard burn)
 
-**Status:** Frozen 2026-07-04 — no toolchain in the active repository. Burn these byte images to Flash/SRAM as described in [M4b-boot-hardware.md](../hw-bringup/M4b-boot-hardware.md).
+**Status:** Frozen 2026-07-04. Burn these byte images to Flash/SRAM as described in [M4b-boot-hardware.md](../hw-bringup/M4b-boot-hardware.md).
 
 | File | Target | Use |
 |------|--------|-----|
@@ -10,4 +10,4 @@
 
 Format: one **hex byte per line** (e.g. `05` = `0x05`). When programming, convert to your programmer’s format (byte stream or Intel HEX).
 
-Use these frozen images for burn; do not regenerate from an external toolchain in the Active tree.
+Use these frozen images for burn.

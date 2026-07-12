@@ -16,7 +16,7 @@
 | After ALU (M1) | ALU path verified before CPLD-DP `q_a` and MBR→B |
 | Before M2b/M3 | Both JEDs must drive ADD before fetch glue |
 | CE decode | **138×2 + glue** — off CPLD |
-| SoC decode | **No `alu8_decode` DIP** — strobes from **CPLD-CU** direct |
+| SoC decode | Strobes from **CPLD-CU** direct |
 
 ---
 
@@ -38,7 +38,8 @@
 - [ ] **G-IC wired:** **`reg_we` only** CU→DP ([cpld-dual-routing.md](../hardware/cpld-dual-routing.md))
 - [ ] **MBR→B:** `net_mbr0..7` → `net_b0..7` → ALU B
 - [ ] **JTAG daisy chain:** CU first, then DP
-- [ ] **R0 on DP:** `q_a` → ALU A; **no `q_b`**
+- [ ] **R0 on DP:** `q_a` → ALU A
+- [ ] **ALU B:** MBR → `net_b`
 - [ ] **Fitter:** Design fits on **both** ATF1504AS
 - [ ] **ISA table:** CALL/RET included; align with [microcode-spec.md](../hardware/microcode-spec.md)
 - [ ] **CALL/RET fit:** [cpld-pipe-cu.md](../hardware/cpld-pipe-cu.md) §5.1 conditions before CU reburn
@@ -59,7 +60,7 @@
 
 Preload R0; MBR holds imm8; EX: `Y_OE`, `REG_WE`→R0, observe R0 ← R0+imm.
 
-No TFR smoke (`0x10–0x1F` reserved).
+Opcodes `0x10–0x1F` are reserved.
 
 ### CALL / RET smoke (post CU reburn)
 
@@ -76,11 +77,3 @@ No TFR smoke (`0x10–0x1F` reserved).
 - [ ] MBR→B wired; ALU B sees imm during ADD
 - [ ] G-IC `reg_we` ≤ 10 cm
 - [ ] CALL/RET smoke (§5) after CU JED
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-07-13 | Dual CPLD / pipe CU wording; drop archive cites |
-| 2026-07-07 | CALL/RET lab smoke |
-| 2026-07-07 | R0 only; MBR→B; no TFR |

@@ -11,7 +11,7 @@
 
 ## 1. NOR 이미지 (동결)
 
-v1.0 **FSM-only** — Flash `$4000` CW **미소각**.
+Burn boot and vector fixtures to SST39. Flash physical map: [rom-architecture.md](../hardware/rom-architecture.md).
 
 | Region | Frozen source |
 |--------|---------------|

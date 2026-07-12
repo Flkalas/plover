@@ -14,15 +14,15 @@ This document is the **single normative reference** for who decodes what on the 
 | **Macro sequencer** | **CPLD-CU pipe** | IR, flags, stall sense | Direct strobes + G-IC `reg_we`; stack EX | Yes |
 | **GPR datapath** | **CPLD-DP** | `d_in`, `reg_we` | `q_a` ← R0; write R0 | Yes |
 | **Operand B** | MBR / oper latch | IF | `net_mbr` → ALU B | Yes |
-| **ALU control** | Pipe EX constants on CU | CU outputs | `net_cin`, `net_bctrl0..3`, `net_lgc0..3`, `net_153_s0/s1` | Yes — **no `alu8_decode` DIP** |
+| **ALU control** | Pipe EX constants on CU | CU outputs | `net_cin`, `net_bctrl0..3`, `net_lgc0..3`, `net_153_s0/s1` | Yes |
 | **ALU execute** | alu8 (12 DIP) | A, B, control nets | `net_y*`, `net_c_hi` | Yes |
 | **Memory CE (DATA)** | 74HC138×2 + glue | `A[15:0]`, MAP, mailbox | `/CE` to SRAM×2 + Flash | Yes (off CPLD) |
-| **12-opcode comb decode** | `alu8_decode` | `alu_sel[3:0]` | Control nets | **M1 bench only** |
+| **12-opcode comb decode** | DIP / tie or bench block | `alu_sel[3:0]` | Control nets | **M1 bench only** |
 
 ```text
   PROG Flash ──► IF latch ──► CPLD-CU pipe FSM ──► strobes ──► alu8 / DATA / PC
   boot, vector                 reg_we ───────────► R0, q_a ──► alu8 A
-  $4000 unused                 oper/MBR ─────────────────────► alu8 B
+                               oper/MBR ─────────────────────► alu8 B
   A[15:0] ──────────────────────────────────────────────► 138×2 ──► /CE
 ```
 
@@ -38,7 +38,6 @@ This document is the **single normative reference** for who decodes what on the 
 |--------|------|
 | `$0000+` | Program, bootloader, utility tables (**PROG**) |
 | `$FFFC` | Reset vector image |
-| **`$4000–$4FFF`** | **Reserved — unburned** |
 
 ### CPLD pair (P12)
 
@@ -98,14 +97,3 @@ No dedicated RP register. **CPLD-CU** performs push/pop in **STACK_EX** using `M
 | **Reference** | `reference/**` | Normative detail; **CU = cpld-pipe-cu** |
 | **Machine** | cyclesim golden | Executable golden (pipe rewrite in progress) |
 | **CPLD** | pipe CU PLD | **Design fits pending** |
-
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-07-13 | **v1.0 P12** — pipe CU normative |
-| 2026-07-07 | **CALL/RET** — CU stack assist |
-| 2026-07-07 | AC + MBR→B; R0 only; no TFR |
-| 2026-07-04 | Initial anchor: FSM-only v1.0 |

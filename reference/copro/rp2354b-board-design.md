@@ -45,7 +45,7 @@ This whitepaper defines **electrical interfaces, GPIO budget, power, PCB constra
 
 | Item | Reason |
 |------|--------|
-| CPU address/data **snoop** / shadow RAM DMA | Superseded by Mailbox-only copro — see §8 |
+| CPU address/data **snoop** / shadow RAM DMA | Out of scope — Mailbox-only copro (§6.2) |
 | Serial UART module (`SIG 0xD4`) | Separate **CPU slot** peripheral — [serial-module.md](serial-module.md) |
 | PCM streaming (`MB_CMD 0x58–0x5F`) | Reserved v0.2 |
 | Gamepad / HID extension (`0x44–0x4F`) | Reserved |
@@ -76,7 +76,7 @@ The CPU **never** maps RP2354B SRAM. All copro state (framebuffers, HID FIFOs, S
 
 | Mode | CPU rail | Data path | Reference |
 |------|----------|-----------|-----------|
-| **A — Breadboard bring-up** | 5 V TTL | `SN74LVC8T245` ×1 (CPU side) | [bom-maintenance.md](../project/bom-maintenance.md) appendix |
+| **A — Breadboard bring-up** | 5 V TTL | `SN74LVC8T245` ×1 (CPU side) | — |
 | **B — 3.3 V PCB** | 3.3 V LVC | Direct `D[7:0]` to RP2354B | [BOM-3v3.md](../../BOM-3v3.md) |
 
 Mode A is for M4b smoke on existing 5 V breadboard; Mode B is the production PCB target.
@@ -165,8 +165,8 @@ Suggested connector: **2×10 pin header, 2.54 mm** (20 signals + key/GND) or **F
 
 | Parameter | Value | Notes |
 |-----------|-------|-------|
-| CPU clock | 4 MHz → **2 MHz** execute | [system-architecture.md](../hardware/system-architecture.md) |
-| Execute half-period | **250 ns** | ALU budget reference |
+| CPU clock | **2.000 MHz** `CLK_SYS` (single source) | [system-architecture.md](../hardware/system-architecture.md) |
+| `CLK_SYS` period | **500 ns** | ALU / EX budget @ 2.000 MHz |
 | Mailbox access | `LDIO` / `STIO` MMIO cycle | Firmware must sample/setup within MEM_RD/WR window |
 | RP2354B core clock | ≥ **150 MHz** typical | Headroom for GPIO IRQ-less polling |
 
@@ -210,17 +210,14 @@ Direct LVC connection — **no 245**. Optional **33 Ω** series on `D[7:0]` per 
 
 \* USB D+/D− use **dedicated USB pins** (not counted in the 48 user GPIO pool).
 
-### 6.2 Superseded architecture (do not implement)
+### 6.2 Interface choice
 
-Early exploration assumed **full bus snoop**:
+v1.0 uses a **Mailbox parallel tap** (20 GPIO) — not a full 16-bit address/data bus snoop.
 
-| Block | GPIO |
-|-------|------|
-| D[7:0] + A[15:0] + CLK/R/W/IRQ/arb | 28 |
-| HSTX + SPI + audio | 9–12 |
-| **Total** | **37–40** |
-
-Current v1.0 normative path **rejects** this in favour of Mailbox-only ([rp2350-coprocessor.md](rp2350-coprocessor.md) §4).
+| Interface | GPIO (approx.) | Role |
+|-----------|----------------:|------|
+| **Mailbox tap (normative)** | 20 | `D[7:0]` + offset `A[7:0]` + EN/RD/WR/CLK — [rp2350-coprocessor.md](rp2350-coprocessor.md) |
+| Full bus snoop (not used) | 28+ | Would require A[15:0] + control; exceeds spare budget with HSTX/SPI |
 
 ---
 
@@ -475,11 +472,3 @@ Simulation cross-check:
 | CPU memory map | [memory-map.md](../hardware/memory-map.md) |
 | Boot gates | [M4b-boot-hardware.md](../hw-bringup/M4b-boot-hardware.md) |
 | Firmware stub | [`firmware/rp2350/mailbox_stub/main.c`](../../firmware/rp2350/mailbox_stub/main.c) |
-
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-06-12 | v0.1 draft whitepaper — GPIO budget, connector, subsystems, bring-up |

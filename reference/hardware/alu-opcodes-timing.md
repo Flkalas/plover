@@ -1,11 +1,11 @@
 ﻿# ALU 명령어 · 조합 지연 (alu8)
 
-**버전:** 1.4 · **기준일:** 2026-07-04  
+**버전:** 1.5 · **기준일:** 2026-07-13  
 **블록:** [`hw/netlist/blocks/alu8.yaml`](../../hw/netlist/blocks/alu8.yaml)  
-**디코드:** **M1** — [`alu8_decode.yaml`](../../hw/netlist/blocks/alu8_decode.yaml) 또는 [b3-opcode.md](../hw-bringup/b3-opcode.md) DIP · **SoC** — CPLD pipe CU ([control-and-decode.md](control-and-decode.md), [cpld-pipe-cu.md](cpld-pipe-cu.md))
+**디코드:** **M1** — DIP / [b3-opcode.md](../hw-bringup/b3-opcode.md) · **SoC** — CPLD pipe CU ([control-and-decode.md](control-and-decode.md), [cpld-pipe-cu.md](cpld-pipe-cu.md))
 
 12개 `alu_sel[3:0]` 연산의 동작·제어·**조합 전파 지연**을 한 표로 정리합니다.  
-지연 값은 pre-flight sim [`74hc.yaml`](../../hw/timing/74hc.yaml) **datasheet typ/max** 합산(배선 지연 0)이며, **2.0 MHz** Execute 반주기 **250 ns** 대비 slack을 함께 기록합니다.
+지연 값은 pre-flight sim [`74hc.yaml`](../../hw/timing/74hc.yaml) **datasheet typ/max** 합산(배선 지연 0)이며, **2.0 MHz** `CLK_SYS` 전주기 **500 ns** 대비 slack을 함께 기록합니다.
 
 실기 치트시트: [`b3-opcode.md`](../hw-bringup/b3-opcode.md) · ISA×phase: [`microcode-spec.md`](microcode-spec.md)
 
@@ -57,34 +57,34 @@
 
 ## 3. 조합 전파 지연 (operand → Y)
 
-예산: **250 ns** = 2.0 MHz Execute 반주기 ([`microarch-throughput.md`](microarch-throughput.md) §4).
+예산: **500 ns** = 2.0 MHz `CLK_SYS` 전주기 ([cpld-pipe-cu.md](cpld-pipe-cu.md) §7).
 
 ### 3.1 opcode별 지연 · slack
 
 <!-- TIMING_TABLE_START -->
 | sel | Op | 경로 등급 | max (ns) | slack @ max (ns) | 비고 |
 |-----|-----|-----------|----------|------------------|------|
-| 0 | NOP | adder | **108** | 142 | sum path (Y=0) |
-| 1 | ADD | adder | **108** | 142 | 283 → **157_YBP** |
-| 2 | SUB | arith B-path | **136** | 114 | 153 mux2 → 283 |
-| 3 | AND | logic | **46** | 204 | `U_ALU_153_0` mux1 → 157_YBP |
-| 4 | OR | logic | **46** | 204 |  |
-| 5 | XOR | logic | **46** | 204 |  |
-| 6 | NOT | logic | **46** | 204 |  |
-| 7 | PASS_A | logic | **46** | 204 | AND pattern + B=FF |
-| 8 | PASS_B | logic | **46** | 204 | AND pattern + A=FF |
-| 9 | INC | **critical** | **153** | 97 | `net_cin` → 283 ripple |
-| 10 | DEC | adder | **108** | 142 | 283-only test path; full path = SUB class |
-| 11 | CMP | arith B-path | **136** | 114 | Y = SUB; flags §3.5 |
+| 0 | NOP | adder | **108** | 392 | sum path (Y=0) |
+| 1 | ADD | adder | **108** | 392 | 283 → **157_YBP** |
+| 2 | SUB | arith B-path | **136** | 364 | 153 mux2 → 283 |
+| 3 | AND | logic | **46** | 454 | `U_ALU_153_0` mux1 → 157_YBP |
+| 4 | OR | logic | **46** | 454 |  |
+| 5 | XOR | logic | **46** | 454 |  |
+| 6 | NOT | logic | **46** | 454 |  |
+| 7 | PASS_A | logic | **46** | 454 | AND pattern + B=FF |
+| 8 | PASS_B | logic | **46** | 454 | AND pattern + A=FF |
+| 9 | INC | **critical** | **153** | 347 | `net_cin` → 283 ripple |
+| 10 | DEC | adder | **108** | 392 | 283-only test path; full path = SUB class |
+| 11 | CMP | arith B-path | **136** | 364 | Y = SUB; flags §3.5 |
 <!-- TIMING_TABLE_END -->
 
 측정: [`alu8_opcode_timing`](../../hw/tests/alu8_opcode_timing.yaml) · pre-flight sim artifact `alu8_opcode_timing/timing_report.json` (@ **max**).
 
-**worst-case (Y):** **INC** — **153 ns** (slack **97 ns** @ 250 ns).  
-**SUB / CMP:** **136 ns** (slack **114 ns**).  
+**worst-case (Y):** **INC** — **153 ns** (slack **347 ns** @ 500 ns).  
+**SUB / CMP:** **136 ns** (slack **364 ns**).  
 **fastest:** logic opcodes — **46 ns**.
 
-**Comb-limited Fmax (INC 기준):** \(F \approx 1 / (2 \times 153\,\text{ns}) \approx 3.3\,\text{MHz}\). 명목 **2 MHz:** slack = 250 − 153 = **97 ns**.
+**Comb-limited Fmax (INC 기준):** \(F \approx 1 / 153\,\text{ns} \approx 6.5\,\text{MHz}\). 명목 **2 MHz:** slack = 500 − 153 = **347 ns**.
 
 ### 3.2 canonical critical path (bit0, @ max)
 
@@ -103,7 +103,7 @@ B3c 브링업 경로 — ALU 출력이 **다음 posedge** 전에 setup 만족해
 
 | 구간 | typ (ns) | max (ns) | slack @ max (ns) |
 |------|----------|----------|------------------|
-| `157_YBP_0.1Y` → `574_ACC.D0` (+ setup) | 17 | 28 | 222 |
+| `157_YBP_0.1Y` → `574_ACC.D0` (+ setup) | 17 | 28 | 472 |
 
 전체 **operand → ACC.Q** (max): INC 기준 **153 + 23 (574 t_pd)** ≈ **176 ns** (ACC.Q 직결 A-side, CPLD async read 미포함).
 
@@ -121,11 +121,11 @@ pre-flight sim [`alu8_cmp_sub`](../../hw/tests/alu8_cmp_sub.yaml) — 플래그 
 
 ### 3.4 CPLD pipe CU E2E (v1.0 SoC)
 
-v1.0 CPU는 **pipe CU** — Flash **`$4000` CW 미사용** ([control-and-decode.md](control-and-decode.md)). ALU comb 경로는 M1과 동일하며, Execute 예산에 **CPLD async GPR read** (~10–15 ns typ)만 직렬 가산.
+v1.0 CPU uses the **pipe CU** ([control-and-decode.md](control-and-decode.md)). ALU comb path matches M1; Execute budget adds **CPLD async GPR read** (~10–15 ns typ) in series.
 
 | 구간 | typ (ns) | max (ns) | 비고 |
 |------|----------|----------|------|
-| CPLD `q_a`/`q_b` → ALU A/B | 10 | 15 | [`cpld.yaml`](../../hw/timing/cpld.yaml) |
+| CPLD `q_a` → ALU A | 10 | 15 | [`cpld.yaml`](../../hw/timing/cpld.yaml); B from MBR |
 | ALU comb (worst INC) | — | **153** | §3.1 |
 | ALU comb (SUB/CMP Y) | — | **136** | §3.1 |
 | Y → 574 latch setup | 17 | 28 | §3.3 |
@@ -140,7 +140,7 @@ v1.0 CPU는 **pipe CU** — Flash **`$4000` CW 미사용** ([control-and-decode.
 | [`alu8_opcode_timing`](../../hw/tests/alu8_opcode_timing.yaml) | 12 opcode slack | INC **153**, SUB **136**, logic **46**, ADD **108** |
 | [`alu8_timing`](../../hw/tests/alu8_timing.yaml) | ADD carry · logic hop | ADD **108** ns, `U_ALU_153_0` logic **46** ns |
 | [`alu8_cmp_sub`](../../hw/tests/alu8_cmp_sub.yaml) | CMP flags | behavioral **≤151** ns |
-| [`alu_b3_sub_critical`](../../hw/tests/alu_b3_sub_critical.yaml) | SUB | **136** ns @ max; slack **114** ns |
+| [`alu_b3_sub_critical`](../../hw/tests/alu_b3_sub_critical.yaml) | SUB | **136** ns @ max; slack **364** ns |
 | [`alu_b3_xor_critical`](../../hw/tests/alu_b3_xor_critical.yaml) | XOR | **46** ns |
 | [`alu_b3_latch`](../../hw/tests/alu_b3_latch.yaml) | ACC setup | **51** ns (153→574 CP) |
 | [`alu283_carry`](../../hw/tests/alu283_carry.yaml) | 283 only | ripple **90** ns |
@@ -153,11 +153,11 @@ ALU 블록 자체는 **순수 조합**입니다. ISA 수준 지연은 pipe CU SY
 
 | 계층 | 지연 | 설명 |
 |------|------|------|
-| ALU comb | **≤ 153 ns** | 위 §3 — Execute 반주기 250 ns **내** (worst INC) |
-| Execute | **pipe EX** (250 ns half) | CPLD-CU + regfile + ALU + ACC latch |
+| ALU comb | **≤ 153 ns** | 위 §3 — `CLK_SYS` 전주기 500 ns **내** (worst INC) |
+| Execute | **pipe EX** (≤ 500 ns) | CPLD-CU + regfile + ALU + ACC latch |
 | ALU-only µop (예: `ADD TMP`) | **packed EX** | fetch overlap — [microcode-spec.md](microcode-spec.md) |
-| Fetch+Execute 명령 | pipe SYS tax | [cpld-pipe-cu.md](cpld-pipe-cu.md) · [microarch-throughput](microarch-throughput.md) |
-| 시스템 클록 | **2.0 MHz** | 500 ns macro-cycle, **250 ns** φ halves |
+| Fetch+Execute 명령 | pipe SYS tax | [cpld-pipe-cu.md](cpld-pipe-cu.md) |
+| 시스템 클록 | **2.0 MHz** | **500 ns** `CLK_SYS` period |
 
 CPU E2E (Flash program fetch + CPLD-CU + CPLD-DP `q` + ALU) — ALU Y 상한 **INC 153 ns**, **SUB 136 ns**; logic **46 ns**.
 
@@ -165,7 +165,7 @@ CPU E2E (Flash program fetch + CPLD-CU + CPLD-DP `q` + ALU) — ALU Y 상한 **I
 
 | Path | ns | Note |
 |------|---:|------|
-| Branch BEQ | **212** | 38 ns slack @ 250 ns |
+| Branch BEQ | **212** | **288 ns** slack @ 500 ns |
 | Operand path | **~133** | MBR→B + `q_a`; [cpld-pipe-cu.md](cpld-pipe-cu.md) §7.1 |
 
 ---
@@ -177,16 +177,3 @@ CPU E2E (Flash program fetch + CPLD-CU + CPLD-DP `q` + ALU) — ALU Y 상한 **I
 | SUB | `0x12` | `0x34` | `0xDE` |
 | XOR | `0x12` | `0x34` | `0x26` |
 | INC | `0x12` | — | `0x13` |
-
----
-
-## 변경 이력
-
-| 날짜 | 내용 |
-|------|------|
-| 2026-07-13 | SoC = pipe CU; dual-CPLD path wording |
-| 2026-07-07 | ADD ~133 ns operand path |
-| 2026-07-04 | v1.4: INC **153** / SUB **136** ns |
-| 2026-07-03 | Bit-slice `U_ALU_153_0..7` + AB bus |
-| 2026-06-02 | Phase B2: Gigatron logic, **12 DIP** |
-| 2026-06-01 | 12 opcode timing matrix 초판 |

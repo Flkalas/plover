@@ -21,7 +21,7 @@
 | **FLG** | 574 | Z, C | BEQ / flags |
 | **PC+1** | 283 (low) | — | sequential fetch |
 
-**없음:** PARAM 574, Flash `$4000` CW fetch, CPLD `q_b`, TFR comb.
+Datapath: ALU A ← R0 (`q_a`); ALU B ← MBR.
 
 ---
 
@@ -151,9 +151,8 @@ ROM: CMP + BEQ; verify `PC_LOAD_EN` only when Z=1; taken → **BRANCH_BUBBLE**.
 ## 6. M3b sign-off
 
 - [ ] F0–F4 Pass on **breadboard**
-- [ ] Align with [cpld-pipe-cu.md](../hardware/cpld-pipe-cu.md) SYS sheet (no idle padding)
+- [ ] Align with [cpld-pipe-cu.md](../hardware/cpld-pipe-cu.md) SYS sheet
 - [ ] MBR hold during ADD/CMP EX
-- [ ] No Flash param / `$4000` fetch in path
 - [ ] BEQ: FLG_Z gates `PC_LOAD_EN`
 
 ---
@@ -161,14 +160,3 @@ ROM: CMP + BEQ; verify `PC_LOAD_EN` only when Z=1; taken → **BRANCH_BUBBLE**.
 ## 7. 다음
 
 → [M4a-boot-sim.md](M4a-boot-sim.md) · [M4b-boot-hardware.md](M4b-boot-hardware.md)
-
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-07-13 | Retarget timelines to pipe CU |
-| 2026-07-07 | CALL/RET — 3B/1B fetch; stack push/pop |
-| 2026-07-07 | MBR→B; ADD→R0; TFR removed |
-

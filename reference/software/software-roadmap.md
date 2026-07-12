@@ -19,7 +19,7 @@ Plover v0.1 software milestones **S0–S7** on logic VM (developer), then hardwa
 |----|-------------|-----|-----------|
 | S0 | Roadmap, layout, regression script | this file | baseline regression |
 | S1 | `plover_asm` | [plover-asm.md](plover-asm.md) | milestone checklist |
-| S2 | CALL/RET ISA (pipe CU, no Flash CW) | [calling-convention-v0.1.md](calling-convention-v0.1.md) | pipe CU CALL/RET smoke |
+| S2 | CALL/RET ISA (pipe CU) | [calling-convention-v0.1.md](calling-convention-v0.1.md) | pipe CU CALL/RET smoke |
 | S3 | Forth core | [forth-system.md](forth-system.md) | milestone checklist, `forth_boot.yaml` |
 | S3c | Normative asm Forth | forth-system §normative | `breadboard ISA` |
 | S4 | Forth OS services | [forth-os-services.md](forth-os-services.md) | milestone checklist |

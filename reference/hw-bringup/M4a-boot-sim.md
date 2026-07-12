@@ -1,4 +1,4 @@
-# M4a — Boot chain (historical simulation gate)
+# M4a — Boot chain (JMP handoff gate)
 
 | Field | Value |
 |-------|-------|
@@ -29,7 +29,7 @@ Before breadboard (M4b), the boot chain was checked against the JMP handoff chec
 | Reset vector `$FFFC` | [boot-vector.md](../fixtures/boot-vector.md) |
 | Kernel smoke `$0800` | [add_imm-sram.md](../fixtures/add_imm-sram.md) (or kernel stub in boot-rom tail) |
 
-v1.0 breadboard: **no Flash `$4000` CW** — pipe CU ([cpld-pipe-cu.md](../hardware/cpld-pipe-cu.md)).
+v1.0 breadboard control: **pipe CU** ([cpld-pipe-cu.md](../hardware/cpld-pipe-cu.md)).
 
 ---
 

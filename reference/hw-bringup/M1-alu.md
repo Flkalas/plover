@@ -32,9 +32,9 @@
 
 ## Prerequisites
 
-- [BOM.md](../../BOM.md) **ALU (B3a):** 283×2, 153×8, 157×2, 04×2
-- **B3b/c 추가:** 574×1, 74HC74, 4 MHz OSC
-- (`74HC08`/`74HC32`는 v1.0 ALU에 **미사용** — M2 CPU glue)
+- [BOM.md](../project/BOM.md) **ALU (B3a):** 283×2, 153×8, 157×2 (**12 DIP**)
+- **B3b/c 추가:** 574×1, **2.000 MHz** OSC, 74HC14 (버퍼)
+- **M2 CPU glue** (separate): 74HC08 / 74HC32
 - 5 V, 0.1 µF/IC, 10 µF bulk
 - 배선 **전**:
 

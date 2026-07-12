@@ -150,12 +150,3 @@ Normative Presenter implementation: [vm-rust.md](vm-rust.md). Python `VduState` 
 | logic VM (developer) | Host terminal; wrap at 40 columns (soft) |
 | UART / serial module | Byte stream, `\n` after 40 cols optional |
 | pre-flight sim / breadboard | LED/post only; no bitmap gate in M4 |
-
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-06-08 | v0.1 normative: 40×25, 320×240@30 → 640×480@60 HDMI on RP2350B |
-| 2026-06-08 | MODE_BOTH chroma-key compositing for Presenter |

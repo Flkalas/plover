@@ -53,15 +53,6 @@ No automatic map switch from software — operator toggles DIP, then **RESET**.
 | Access | Address source |
 |--------|----------------|
 | Instruction fetch (Mode A boot) | PC → decode glue |
-| Control store | **Unused** — Flash `$4000` not wired; CPLD-CU pipe FSM |
 | Utility read | PC or boot copy loops |
 
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-06-01 | 64 KB A15 bank; mailbox window |
-| 2026-06-10 | **v1.0** — 138×2 + gates; CPLD GPR only |
-| 2026-06-24 | **v1.0 FSM-only** — Flash `$4000` CW region unused |
+Flash physical layout: [rom-architecture.md](rom-architecture.md). Control strobes come from the CPLD-CU pipe FSM.

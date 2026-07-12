@@ -13,13 +13,13 @@
 ## 1. Design rules
 
 1. **ALU A:** `q_a` ← **R0** only (CPLD-DP).
-2. **ALU B:** **`net_mbr[7:0]`** (MBR / oper latch) → `net_b[7:0]` — **not** from CPLD `q_b`.
-3. **Write target:** **`reg_we` → R0** only (no `w_sel` on G-IC).
-4. **Pipe FSM** on CPLD-CU — [cpld-pipe-cu.md](cpld-pipe-cu.md); **no Flash param fetch**; Flash `$4000` **unused**.
-5. **Strobes:** CU drives memory/ALU/PC nets directly to SoC (no external CW latch).
+2. **ALU B:** **`net_mbr[7:0]`** (MBR / oper latch) → `net_b[7:0]`.
+3. **Write target:** **`reg_we` → R0** only (G-IC is one wire).
+4. **Pipe FSM** on CPLD-CU — [cpld-pipe-cu.md](cpld-pipe-cu.md).
+5. **Strobes:** CU drives memory/ALU/PC nets directly to SoC.
 6. **Branch:** `PC_LOAD_EN` with taken **BRANCH_BUBBLE** (no prediction).
 7. **Return stack assist:** CALL/RET in **STACK_EX** — RP `$0F00`, stack RAM via `MEM_RD`/`MEM_WR` ([microcode-spec.md](microcode-spec.md) §2.3 · [cpld-pipe-cu.md](cpld-pipe-cu.md) §5.1).
-8. **TFR:** **Removed** — `0x10–0x1F` trap; no `tfr_valid`.
+8. **Opcodes `0x10–0x1F`:** reserved / trap.
 9. **Mailbox, MAP, `/CE`** — outside CPLD.
 
 ---
@@ -74,7 +74,7 @@ Full state machine, SYS tax, timing: **[cpld-pipe-cu.md](cpld-pipe-cu.md)**.
 |--------|----------|
 | `q_a[7:0]` | Async read → ALU A |
 
-**No `q_b`.** ALU B from **MBR / oper latch** off-chip.
+ALU B comes from **MBR / oper latch** off-chip (`net_mbr` → `net_b`).
 
 **Pin budget (desk):** **17/32** used (15 spare).
 
@@ -92,9 +92,9 @@ Detail: [cpld-dual-routing.md](cpld-dual-routing.md)
 
 ---
 
-## 5. TFR (removed)
+## 5. Extra program state
 
-Register-to-register implied moves (`0x11–0x19`) are **not** implemented. Software uses **RAM** for additional variables.
+Additional variables live in **RAM**. Normative visible GPR is **R0** only.
 
 ---
 
@@ -107,7 +107,7 @@ TCK/TMS paralleled. See [cpld-dual-jtag.md](cpld-dual-jtag.md).
 
 ## 7. EX policy (P12 pipe)
 
-ADD/CMP use **packed EX** (no idle phases). MBR/oper hold during ALU EX. MEM ops use **MEM_STALL**. Detail: [cpld-pipe-cu.md](cpld-pipe-cu.md).
+ADD/CMP use **packed EX**. MBR/oper hold during ALU EX. MEM ops use **MEM_STALL**. Detail: [cpld-pipe-cu.md](cpld-pipe-cu.md).
 
 ### PC load path
 
@@ -126,13 +126,3 @@ ADD/CMP use **packed EX** (no idle phases). MBR/oper hold during ALU EX. MEM ops
 | CPLD-DP | WinCUPL Design fits |
 
 Do not record fitter used-MC counts as normative BOM gates.
-
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-07-13 | **v1.0 P12** — CU role → pipe; detail in cpld-pipe-cu.md |
-| 2026-07-07 | **CALL/RET** — return-stack assist |
-| 2026-07-07 | R0 only; G-IC 1-wire; MBR→ALU B |

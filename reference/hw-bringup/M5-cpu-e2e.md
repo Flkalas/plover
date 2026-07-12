@@ -24,10 +24,10 @@ Sign-off against frozen fixtures in [fixtures](../fixtures/).
 
 - [ ] Composite breadboard matches normative block diagram
 - [ ] M3b F6 GPR snapshot documented (lab log)
-- [ ] No Flash `$4000` CW programmed
+- [ ] Control path matches pipe CU ([cpld-pipe-cu.md](../hardware/cpld-pipe-cu.md))
 
 ---
 
 ## 3. Note
 
-v1.0 SoC uses **CPLD FSM only** — no `$4000` CW addr mux in M5 target path.
+v1.0 SoC control is the **CPLD pipe CU**.

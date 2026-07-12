@@ -1,14 +1,14 @@
-# ALU Phase B — Gigatron 153 bit-slice (logic + B_CTRL)
+# ALU Phase B — 153 mux1 / mux2 bit-slice (logic + B_CTRL)
 
 **Status:** **implemented** (2026-07)  
-**Netlist:** frozen `alu8` block (12 DIP, B_CTRL bit-slice) — archived `hw.tar.gz`
+**Netlist:** frozen `alu8` block (12 DIP, B_CTRL bit-slice)
 
 ## Architecture
 
 | Layer | Blocks | Role |
 |-------|--------|------|
 | **B-path** | `U_ALU_153_i` mux2, `283×2`, `157_YBP×2` | SUB/ADD/INC/DEC/CMP **Y** |
-| **Logic** | `U_ALU_153_i` mux1 (Gigatron) | AND/OR/XOR/NOT/PASS via operand select |
+| **Logic** | `U_ALU_153_i` mux1 | AND/OR/XOR/NOT/PASS via operand select |
 | **CMP** | `ALU_CMP_SUB` | Z/C_GE from SUB (`Y==0`, `net_c_hi`) — no 7485 |
 | **Glue** | `ALU_Y_MUX_SEL` | `net_y_mux_sel = s0 \| s1` → 157 picks sum vs logic |
 
@@ -16,7 +16,7 @@ Each bit `i` uses one **74HC153** (`U_ALU_153_i`):
 
 | Mux | Pins | Role |
 |-----|------|------|
-| **mux1** | `1C0..3` = `net_lgc*`, `1Y` = `net_y_logic[i]` | Gigatron logic |
+| **mux1** | `1C0..3` = `net_lgc*`, `1Y` = `net_y_logic[i]` | Logic select |
 | **mux2** | `2C0..3` = `net_bctrl*`, `2Y` = `net_b_add[i]` | B_CTRL data inputs |
 | **A/B** | `net_a[i]`, `net_b[i]` | Operand select |
 
@@ -38,7 +38,7 @@ flowchart LR
 All opcodes: `A = net_a[i]`, `B = net_b[i]`.  
 `sel = A | (B<<1)` drives both mux1 and mux2.
 
-## Gigatron mux1 (per bit)
+## mux1 logic table (per bit)
 
 | sel | A | B | Result |
 |-----|---|---|--------|
@@ -93,4 +93,4 @@ Golden vectors: [b3-opcode.md](../hw-bringup/b3-opcode.md) — all 12 opcodes fr
 
 ## Regen
 
-Netlists and timing gates are **frozen** in normative docs (2026-07-04). Do not regenerate from external tools in the Active tree.
+Netlists and timing gates are **frozen** in normative docs (2026-07-04).

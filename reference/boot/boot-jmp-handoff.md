@@ -217,13 +217,3 @@ CPLD: comb only           CPLD: comb only             CPLD: FSM + MMIO
 JMP chain loading is the **stable current-state** bootstrap for v1.0: no CPLD macrocell spend, no board spin. Delegating **16-bit pointer and GPR pre-init** to Boot ROM is the correct split under the 8-bit ISA, but it **raises coupling** between boot ROM, disk image, and linker output.
 
 Fixed **`MAP_MODE=0`** masks the low **2 KB** as non-RAM — a **static map capacity** limit, not an execution bandwidth problem. When **async IRQ** enters the roadmap, static **`$FFFC`** binding and Boot-mode vectors become a structural constraint; plan **v0.2** MMIO map control and soft-reset sequences at that milestone.
-
----
-
-## Change log
-
-| Date | Note |
-|------|------|
-| 2026-06-08 | Initial normative doc — software JMP chain load on v1.0 breadboard |
-| 2026-06-08 | §5 init contract, §5.2 block-copy, §7 verification checklist |
-| 2026-06-08 | Implementation: boot_rom.hex, LDIO/STIO/MOV/STA16, VM gates |

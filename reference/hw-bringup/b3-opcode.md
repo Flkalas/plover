@@ -1,8 +1,8 @@
 # B3 — opcode → control line cheat sheet
 
-Breadboard **DIP / tie** settings for 12 `alu_op[3:0]` operations (v0.2 CW `[15:12]`). **Frozen table** — vectors match archived `alu8_full` gate (2026-07-04).
+Breadboard **DIP / tie** settings for 12 `alu_op[3:0]` operations. **Frozen table** — vectors match `alu8_full` gate (2026-07-04).
 
-**Netlist has no `alu_sel` bus** — set each control net manually (DIP/tie) or use [`alu_decode.yaml`](../hw/netlist/blocks/alu_decode.yaml) decode block when installed.
+**Netlist has no `alu_sel` bus** — set each control net manually (DIP/tie) for M1 bench.
 
 INC: `cin=1` and `bctrl=0000` (B_add=0) — A+0+1. DEC: `bctrl=1111` (B=0xFF). Do not repurpose `net_b0..7` for INC/DEC — see [alu8.md](../hw/netlist/blocks/alu8.md).
 
@@ -11,10 +11,10 @@ INC: `cin=1` and `bctrl=0000` (B_add=0) — A+0+1. DEC: `bctrl=1111` (B=0xFF). D
 | Net | Role |
 |-----|------|
 | `net_cin` | 283 carry in (1 for SUB/CMP/**INC**) |
-| `net_bctrl0..3` | 153 mux2 data (2C0..2C3); Gigatron B_CTRL pattern |
+| `net_bctrl0..3` | 153 mux2 data (2C0..2C3); B_CTRL pattern |
 | `net_cmp_z`, `net_cmp_c_ge` | SUB-derived CMP flags (`Y==0`, `net_c_hi`) |
 | `net_153_s0/s1` | Logic enable → `157_YBP` selects `net_y_logic` |
-| `net_lgc0..3` | Gigatron 153 mux1 data (1C0..1C3) |
+| `net_lgc0..3` | 153 mux1 data (1C0..1C3) |
 
 ## 12 opcodes
 
