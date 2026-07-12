@@ -1,4 +1,7 @@
-"""idx5 FSM control table — implements plover-whitepaper §6 / M3a §2 (Gi1 v1.0)."""
+"""idx5 FSM control table — LEGACY Gi1 multiphase golden (not Active v1.0 P12).
+
+Active CU truth: reference/hardware/cpld-pipe-cu.md
+"""
 
 from __future__ import annotations
 
