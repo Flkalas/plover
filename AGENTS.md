@@ -75,22 +75,23 @@ When answering **hardware architecture**, **bring-up**, or **decode/CPLD/ALU** q
 | **CPLD** | `cpld/tools/` — WinCUPL, OpenOCD, JTAG probe | Toolchain (active); HDL archived |
 | **Archive** | `archive/*.tar.gz`, `archive/tier-c-single-cpld/`, `cpld-rev-g-hdl.tar.gz`, `fit-study-gpr-fsm.tar.gz`, `gpr4-regfile-research.tar.gz` | Historical — **do not** cite for SoC unless user asks |
 
-**Anchor docs:** [control-and-decode.md](reference/hardware/control-and-decode.md), [system-architecture.md](reference/hardware/system-architecture.md), [plover-whitepaper.md](plover-whitepaper.md).
+**Anchor docs:** [cpld-pipe-cu.md](reference/hardware/cpld-pipe-cu.md), [control-and-decode.md](reference/hardware/control-and-decode.md), [system-architecture.md](reference/hardware/system-architecture.md), [plover-whitepaper.md](plover-whitepaper.md).
 
-**Active hardware truth:** whitepaper root → reference cascade → machine code → CPLD artifacts. **v1.0 normative = Gi1** (R0/AC only, MBR→ALU B, TFR removed, G-IC 1-wire). **rev G** (3-GPR·TFR) is archived — [archive/rev-g-dual-3gpr/README.md](archive/rev-g-dual-3gpr/README.md). Restore guide: [archive/MANIFEST.md](archive/MANIFEST.md).
+**Active hardware truth:** whitepaper root → reference cascade → machine code → CPLD artifacts. **v1.0 normative = P12** (IF\|EX pipe CU, PROG∥DATA intent, R0/AC + MBR→ALU B, TFR removed, G-IC 1-wire, no idle). **Gi1** (idx5 multiphase) is archived — [archive/gi1-v1.0-normative/](archive/gi1-v1.0-normative/README.md). **rev G** (3-GPR·TFR) is archived — [archive/rev-g-dual-3gpr/](archive/rev-g-dual-3gpr/README.md). Restore guide: [archive/MANIFEST.md](archive/MANIFEST.md).
 
-**Strobe layers:** LUT/csim tests use `reg_we_lut` (Gi1 G-IC is **reg_we only**). Bench/cyclesim merged pin `net_reg_we`. Reference tables describe Gi1 merged behavior.
+**Strobe layers:** LUT/csim tests may still use Gi1-era `reg_we_lut` / multiphase tables — treat as **legacy golden lag**. Bench merged pin `net_reg_we`. Active reference tables describe **P12 pipe** behavior ([cpld-pipe-cu.md](reference/hardware/cpld-pipe-cu.md)).
 
-**MC policy:** ATF1504 **64 macrocell** is a BOM chip rating only. Bring-up gate = WinCUPL **Design fits** — do not record fitter used-MC counts in normative prose.
+**MC policy:** ATF1504 **64 macrocell** is a BOM chip rating only. Bring-up gate = WinCUPL **Design fits** — do not record fitter used-MC counts in normative prose. Pipe CU PLD is **Design fits pending**.
 
 **Forbidden for SoC / bring-up answers** (unless user asks for history):
 
 - Citing or executing restored content from `archive/*.tar.gz` or restored `cpld/` HDL/fit-study trees
 - Treating **`alu8_decode`** as the breadboard decode path
 - Flash **`$4000`** control-word burn, **`cpu_cw_direct`**, pareto MC as v1.0 gates
+- Treating **Gi1 idx5 idle phases** as Active v1.0 schedule
 
-**No feasibility from archived sim** — timing and fit use reference frozen numbers ([alu-opcodes-timing.md](reference/hardware/alu-opcodes-timing.md)) and M2a lab checklist only.
+**No feasibility from archived sim** — timing and fit use reference frozen numbers ([alu-opcodes-timing.md](reference/hardware/alu-opcodes-timing.md), [cpld-pipe-cu.md](reference/hardware/cpld-pipe-cu.md) §7) and lab checklists.
 
 **Do not** implement bring-up or reference edits based on archived tarball content unless the user explicitly requests historical comparison.
 
-**Stale terms** (after 2026-07 Gi1 adoption): `inc_en`, `INC_B_SEL`, `INC_2C2`, `14 IC` for ALU BOM, `b_sel`/`b_const_sel` as SoC signal names (use `net_bctrl0..3`), **`cpld_3fixed` / rev G normative** (use **Gi1** / `cpld_ac_mbr`), **`tfr_valid` / TFR opcodes** as v1.0 (reserved `0x10–0x1F`).
+**Stale terms** (after 2026-07 P12 adoption): Gi1 **idx5 multiphase idle** as Active, `inc_en`, `INC_B_SEL`, `INC_2C2`, `14 IC` for ALU BOM, `b_sel`/`b_const_sel` as SoC signal names (use `net_bctrl0..3`), **`cpld_3fixed` / rev G normative**, **`tfr_valid` / TFR opcodes** as v1.0 (reserved `0x10–0x1F`).

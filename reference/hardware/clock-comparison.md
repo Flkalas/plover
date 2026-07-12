@@ -1,8 +1,8 @@
-# Plover Gi1 — System clock comparison (peer set)
+# Plover v1.0 P12 — System clock comparison (peer set)
 
 **Audience:** learners comparing **what “MHz” means** on Plover versus peer machines — master clock, micro-step, ISA throughput, and what limits Fmax.  
-**Status:** Illustrative for third-party clocks; **normative** for Plover Gi1 numbers cited from timing docs.  
-**Related:** [cpld-dual-timing.md](cpld-dual-timing.md) · [alu-opcodes-timing.md](alu-opcodes-timing.md) · [rom-comparison.md](rom-comparison.md) · [cu-dp-comparison.md](cu-dp-comparison.md) · [ttl-computer-comparison.md](ttl-computer-comparison.md)
+**Status:** Illustrative for third-party clocks; **normative** for Plover P12 desk numbers in [cpld-pipe-cu.md](cpld-pipe-cu.md) §7 (Gi1 multiphase clock narrative archived).  
+**Related:** [cpld-pipe-cu.md](cpld-pipe-cu.md) · [cpld-dual-timing.md](cpld-dual-timing.md) · [alu-opcodes-timing.md](alu-opcodes-timing.md) · [rom-comparison.md](rom-comparison.md) · [cu-dp-comparison.md](cu-dp-comparison.md) · [ttl-computer-comparison.md](ttl-computer-comparison.md)
 
 ---
 

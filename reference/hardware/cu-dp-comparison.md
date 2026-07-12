@@ -1,8 +1,8 @@
-# Plover Gi1 — CU·DP 소자·구조 비교 (TTL peers)
+# Plover v1.0 P12 — CU·DP 소자·구조 비교 (TTL peers)
 
-**Audience:** learners and external reviewers comparing **Plover Gi1 v1.0** control-unit and datapath design to other discrete-logic 8-bit machines (plus commercial / minicomputer baselines).  
-**Status:** Illustrative — third-party specs summarized from public project docs, not re-measured on Plover hardware.  
-**Related:** [ttl-computer-comparison.md](ttl-computer-comparison.md) (ISA/stack summary for same peers) · [rom-comparison.md](rom-comparison.md) (ROM/Flash count and roles) · [system-architecture.md](system-architecture.md) · [control-and-decode.md](control-and-decode.md) · [cpld-system-controller.md](cpld-system-controller.md)
+**Audience:** learners and external reviewers comparing **Plover v1.0 P12** control-unit and datapath design to other discrete-logic 8-bit machines (plus commercial / minicomputer baselines).  
+**Status:** Illustrative — third-party specs summarized from public project docs. Plover Active = **pipe CU**; Gi1 archived.  
+**Related:** [ttl-computer-comparison.md](ttl-computer-comparison.md) · [rom-comparison.md](rom-comparison.md) · [system-architecture.md](system-architecture.md) · [control-and-decode.md](control-and-decode.md) · [cpld-pipe-cu.md](cpld-pipe-cu.md) · [cpld-system-controller.md](cpld-system-controller.md)
 
 ---
 
@@ -12,7 +12,7 @@ This report focuses on **control unit (CU)** and **datapath (DP)** — chips, re
 
 | Machine | Why included |
 |---------|----------------|
-| **Plover Gi1 v1.0** | Normative breadboard target |
+| **Plover v1.0 P12** | Normative breadboard target (pipe CU) |
 | **Gigatron** | Closest ALU/AC cousin (153 bit-slice) |
 | **Ben Eater 8-bit** | Canonical EEPROM horizontal microcode teaching path |
 | **Magic-1** | Full-scale TTL with hardware stack and wide ROM microstore |

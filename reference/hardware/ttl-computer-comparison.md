@@ -1,14 +1,14 @@
 # TTL homebrew CPU comparison (reference)
 
-**Audience:** learners and external reviewers positioning **Plover Gi1 v1.0** against other well-known discrete-logic machines (plus commercial / minicomputer baselines).  
-**Status:** Illustrative — third-party specs are summarized from public project docs, not re-measured on Plover hardware.  
-**Related:** [cu-dp-comparison.md](cu-dp-comparison.md) (CU·DP chips and structure) · [rom-comparison.md](rom-comparison.md) (ROM/Flash count and roles) · [clock-comparison.md](clock-comparison.md) (clock / µstep / throughput) · [system-architecture.md](system-architecture.md) · [microcode-spec.md](microcode-spec.md) §2.3 · [calling-convention-v0.1.md](../software/calling-convention-v0.1.md)
+**Audience:** learners and external reviewers positioning **Plover v1.0 P12** against other well-known discrete-logic machines (plus commercial / minicomputer baselines).  
+**Status:** Illustrative — third-party specs are summarized from public project docs, not re-measured on Plover hardware. Plover Active = **P12 pipe**; Gi1 idx5 archived.  
+**Related:** [cu-dp-comparison.md](cu-dp-comparison.md) · [rom-comparison.md](rom-comparison.md) · [clock-comparison.md](clock-comparison.md) · [system-architecture.md](system-architecture.md) · [cpld-pipe-cu.md](cpld-pipe-cu.md) · [microcode-spec.md](microcode-spec.md) §2.3 · [calling-convention-v0.1.md](../software/calling-convention-v0.1.md)
 
 ---
 
 ## 1. Scope
 
-This note compares **Plover Gi1** with **five** representative TTL (or TTL-class) homebrew CPUs and **two** commercial / historical baselines:
+This note compares **Plover v1.0 P12** with **five** representative TTL (or TTL-class) homebrew CPUs and **two** commercial / historical baselines:
 
 | Machine | Why included |
 |---------|----------------|
