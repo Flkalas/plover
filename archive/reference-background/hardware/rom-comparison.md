@@ -1,8 +1,9 @@
 # Plover Gi1 — ROM count, structure, and roles (peer comparison)
 
 **Audience:** learners and external reviewers comparing how **Plover Gi1 v1.0** uses non-volatile memory versus peer machines.  
-**Status:** Illustrative — third-party ROM counts and layouts summarized from public project docs, not re-measured on Plover hardware.  
-**Related:** [rom-architecture.md](rom-architecture.md) (normative Plover Flash map) · [control-and-decode.md](control-and-decode.md) · [cu-dp-comparison.md](cu-dp-comparison.md) · [ttl-computer-comparison.md](ttl-computer-comparison.md) · [clock-comparison.md](clock-comparison.md)
+**Status:** Archived background (Illustrative) — not Active implementer spec.  
+**Related (peers):** [cu-dp-comparison.md](cu-dp-comparison.md) · [ttl-computer-comparison.md](ttl-computer-comparison.md) · [clock-comparison.md](clock-comparison.md)  
+**Active:** [rom-architecture.md](../../../reference/hardware/rom-architecture.md) · [control-and-decode.md](../../../reference/hardware/control-and-decode.md)
 
 ---
 

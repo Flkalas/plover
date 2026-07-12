@@ -1,8 +1,9 @@
 # TTL homebrew CPU comparison (reference)
 
 **Audience:** learners and external reviewers positioning **Plover v1.0 P12** against other well-known discrete-logic machines (plus commercial / minicomputer baselines).  
-**Status:** Illustrative — third-party specs are summarized from public project docs, not re-measured on Plover hardware. Plover Active = **P12 pipe**; Gi1 idx5 archived.  
-**Related:** [cu-dp-comparison.md](cu-dp-comparison.md) · [rom-comparison.md](rom-comparison.md) · [clock-comparison.md](clock-comparison.md) · [system-architecture.md](system-architecture.md) · [cpld-pipe-cu.md](cpld-pipe-cu.md) · [microcode-spec.md](microcode-spec.md) §2.3 · [calling-convention-v0.1.md](../software/calling-convention-v0.1.md)
+**Status:** Archived background (Illustrative) — not Active implementer spec. Active = **P12 pipe**.  
+**Related (peers):** [cu-dp-comparison.md](cu-dp-comparison.md) · [rom-comparison.md](rom-comparison.md) · [clock-comparison.md](clock-comparison.md)  
+**Active:** [system-architecture.md](../../../reference/hardware/system-architecture.md) · [cpld-pipe-cu.md](../../../reference/hardware/cpld-pipe-cu.md) · [microcode-spec.md](../../../reference/hardware/microcode-spec.md) · [calling-convention-v0.1.md](../../../reference/software/calling-convention-v0.1.md)
 
 ---
 

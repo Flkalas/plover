@@ -1,8 +1,9 @@
 # Plover v1.0 P12 — CU·DP 소자·구조 비교 (TTL peers)
 
 **Audience:** learners and external reviewers comparing **Plover v1.0 P12** control-unit and datapath design to other discrete-logic 8-bit machines (plus commercial / minicomputer baselines).  
-**Status:** Illustrative — third-party specs summarized from public project docs. Plover Active = **pipe CU**; Gi1 archived.  
-**Related:** [ttl-computer-comparison.md](ttl-computer-comparison.md) · [rom-comparison.md](rom-comparison.md) · [system-architecture.md](system-architecture.md) · [control-and-decode.md](control-and-decode.md) · [cpld-pipe-cu.md](cpld-pipe-cu.md) · [cpld-system-controller.md](cpld-system-controller.md)
+**Status:** Archived background (Illustrative) — not Active implementer spec.  
+**Related (peers):** [ttl-computer-comparison.md](ttl-computer-comparison.md) · [rom-comparison.md](rom-comparison.md)  
+**Active:** [system-architecture.md](../../../reference/hardware/system-architecture.md) · [control-and-decode.md](../../../reference/hardware/control-and-decode.md) · [cpld-pipe-cu.md](../../../reference/hardware/cpld-pipe-cu.md) · [cpld-system-controller.md](../../../reference/hardware/cpld-system-controller.md)
 
 ---
 

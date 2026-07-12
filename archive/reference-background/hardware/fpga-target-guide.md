@@ -1,14 +1,14 @@
 # Plover v1.0 — FPGA 타깃 가이드 (기준 문서)
 
 **Version:** 0.1 · **Date:** 2026-06-02  
-**Status:** Planning — normative for **future FPGA / Verilog** work; **not** the active breadboard/PCB build path  
+**Status:** Archived background (Planning) — **not** the active breadboard/PCB build path  
 
-> **Breadboard v1.0 = FSM-only** (no Flash `$4000` CW, no `alu8_decode` on SoC). This guide includes **legacy CW-BRAM / Flash CW** paths for FPGA migration study — see [control-and-decode.md](control-and-decode.md) for v1.0 TTL truth.
+> **Breadboard Active = v1.0 P12 pipe CU** (no Flash `$4000` CW, no `alu8_decode` on SoC). See [control-and-decode.md](../../../reference/hardware/control-and-decode.md) for TTL truth.
 **Audience:** 교육용 FPGA 보드 사용자, 원칙·외부 ROM/RAM·주변 분리 구현자, 향후 RTL 제공·프로젝트 확장 담당자
 
-**Related (TTL 실기):** [system-architecture.md](system-architecture.md) · [BOM.md](../../../BOM.md) (5 V) · [BOM-3v3.md](../../../BOM-3v3.md) (3.3 V PCB)  
-**Related (명세):** [microcode-spec.md](microcode-spec.md) · [memory-map.md](memory-map.md)  
-**개발자 검증:** [archive/MANIFEST.md](../../archive/MANIFEST.md)
+**Related (TTL 실기):** [system-architecture.md](../../../reference/hardware/system-architecture.md) · [BOM.md](../../../reference/project/BOM.md) (5 V) · [BOM-3v3.md](../../../reference/project/BOM-3v3.md) (3.3 V PCB)  
+**Related (명세):** [microcode-spec.md](../../../reference/hardware/microcode-spec.md) · [memory-map.md](../../../reference/hardware/memory-map.md)  
+**개발자 검증:** [archive/MANIFEST.md](../../MANIFEST.md)
 
 ---
 
