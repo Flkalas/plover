@@ -25,6 +25,7 @@ This study **reverses** the [`cpld-ustep`](../cpld-ustep/) pedagogy priority (ke
 | File | Role |
 |------|------|
 | [programmer-model.md](programmer-model.md) | Visible SYS cost vs Gi1 hidden phases |
+| [opcode-fe-table.md](opcode-fe-table.md) | **FE2 per-opcode F/E sheet (draft)** |
 | [architecture.md](architecture.md) | FE1 / FE2 CU sketch on existing BOM |
 | [bus-timing-feasibility.md](bus-timing-feasibility.md) | Per-opcode desk fit |
 | [model/](model/) | `cycle_model.py` + pytest |

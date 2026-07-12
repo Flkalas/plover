@@ -41,17 +41,11 @@ Only credible with Harvard/dual-port, collapsed ISA, or a clock slow enough to s
 
 | Slot | Does |
 |------|------|
-| **F** | PC→mem → IR (+ start operand bytes as defined) |
-| **E** | One datapath window: ALU **or** one MEM **or** PC load |
+| **F** | One SYS, one insn byte (PC on bus) |
+| **E** | One SYS, one real datapath window |
 
-| Insn | F | E | Notes |
-|------|--:|--:|------|
-| ADD/CMP imm | 1 | 1 | Drop Gi1 idle; imm must be ready for E (may need wider F or prior byte) |
-| LDA/STA | 1 | 1 | Address in MBR from F; one MEM in E — **or** FE2+ if addr+data need two bus cycles |
-| JMP | 1 | 1 | Abs16 may need extra F bytes (programmer-visible) |
-| CALL/RET | 1 | **k** | Stack mem = **documented** multi-E, not idle padding |
-
-Rule: **no blank SYS for CU bookkeeping.** Extra SYS only when the bus/ALU/PC actually moves.
+**Full per-opcode numbers (optimistic baseline):** [opcode-fe-table.md](opcode-fe-table.md).  
+Lab unstable even at **low clock** → **add E phases** (stretch column); do not keep a broken single-E packing.
 
 ## IPC / macros/s
 

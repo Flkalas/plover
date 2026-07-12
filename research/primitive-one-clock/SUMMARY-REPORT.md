@@ -36,8 +36,8 @@ FE1 column in the model is **wishful** (`fe1_possible=False` for every op) — s
 ## Conditions before any FE2 normative proposal
 
 1. CU redesign: drop idx5 idle rows for ALU_REG; state machine **F|E** (+ explicit multi-E).
-2. Programmer timing sheet: per-opcode **F count + E count** (abs16, CALL/RET).
-3. Lab: ADD F+E at 2 MHz with MBR hold across F→E; MEM address ready after F.
+2. Programmer timing sheet: [opcode-fe-table.md](opcode-fe-table.md) — **optimistic F/E**; if lab fails at low clock, **stretch E** (documented), then raise f_SYS.
+3. Lab: ADD F+E; MEM single-E pack at low clock first; split E on fail.
 4. WinCUPL Design fits on a future variant (not in this pass).
 
 ## Contrast: cpld-ustep
@@ -58,4 +58,5 @@ FE1 column in the model is **wishful** (`fe1_possible=False` for every op) — s
 
 | Date | Note |
 |------|------|
+| 2026-07-13 | Optimistic FE2 sheet + stretch-E lab policy |
 | 2026-07-13 | Initial desk study — FE1 No, FE2 Conditional Go |

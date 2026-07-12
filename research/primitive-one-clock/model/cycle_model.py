@@ -37,8 +37,8 @@ class OpCost:
         return self.fe2_fetch_sys + self.fe2_exec_sys
 
 
-# Desk costs: Gi1 exec phases from microcode-spec; fetch = byte count (honest von Neumann).
-# FE2 drops ADD/CMP idle (exec 3->1). CALL/RET stack = visible multi-E.
+# FE2 drops ADD/CMP idle (exec 3->1). MEM/BEQ packed optimistically (E=1);
+# CALL E=3 / RET E=2. Lab fail @ low clock => stretch E (see opcode-fe-table.md).
 OPS: dict[str, OpCost] = {
     "ADD": OpCost("ADD", 2, 3, 1, False, 2, 1),
     "CMP": OpCost("CMP", 2, 3, 1, False, 2, 1),
@@ -46,8 +46,8 @@ OPS: dict[str, OpCost] = {
     "STA": OpCost("STA", 2, 2, 1, False, 2, 1),
     "BEQ": OpCost("BEQ", 3, 2, 1, False, 3, 1),
     "JMP": OpCost("JMP", 3, 1, 1, False, 3, 1),
-    "CALL": OpCost("CALL", 3, 1 + 4, 1, False, 3, 4),  # E: PC + stack sketch
-    "RET": OpCost("RET", 1, 1 + 3, 1, False, 1, 3),
+    "CALL": OpCost("CALL", 3, 1 + 4, 1, False, 3, 3),
+    "RET": OpCost("RET", 1, 1 + 3, 1, False, 1, 2),
 }
 
 
