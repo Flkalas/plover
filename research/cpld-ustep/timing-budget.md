@@ -2,60 +2,53 @@
 
 **Non-normative.** SYS numbers from [cpld-dual-timing.md](../../reference/hardware/cpld-dual-timing.md) · [alu-opcodes-timing.md](../../reference/hardware/alu-opcodes-timing.md).
 
-## CLK_SYS (unchanged)
+## CLK_SYS (unchanged normative target)
 
 | Quantity | Value |
 |----------|------:|
 | Frequency | **2.0 MHz** |
 | Period | **500 ns** |
 | Execute half-cycle | **250 ns** |
-| Gi1 ph2 ADD (desk) | **~133 ns** (slack ~117 ns) |
-| BEQ path | **212 ns** (slack 38 ns) |
+| Gi1 ph2 ADD (desk) | **~133 ns** |
+| BEQ path | **212 ns** |
 
-USTEP **does not** relax these paths: ALU, FLG, PC setup still occur in **SYS** windows.
+USTEP does **not** relax ALU/BEQ SYS windows.
 
-## CLK_USTEP candidates (desk sweep)
+## Related-clock ÷N (primary)
 
-| f_USTEP | Period | Role |
-|--------:|-------:|------|
-| 4 MHz | 250 ns | Match former half-cycle; cheap divide from 4 MHz osc |
-| 8 MHz | 125 ns | Primary research target |
-| 16 MHz | 62.5 ns | Aggressive; breadboard HC unlikely |
+| Example | CLK_USTEP | CLK_SYS | Ratio |
+|---------|----------:|--------:|------:|
+| From 4 MHz OSC | 4 MHz | 2 MHz (÷2) | 2× |
+| From 12 MHz OSC | 6 MHz (÷2) | 2 MHz (÷6) | 3× |
 
-CU-internal decode / wait loops are assumed << one USTEP period on ATF1504 at these rates (desk). **Fit and scope** remain the lab gate.
+Under related clocks:
 
-## When USTEP cannot help
+- Assert strobes only on **SYS-aligned** USTEP edges.
+- Model **`sync_latency_sys = 0`** (sync0 tables in [ipc-scenarios.md](ipc-scenarios.md)).
+- **No PLL** — HC dividers only.
+
+## When USTEP cannot cut SYS cycles
 
 | Path | Why SYS-bound |
 |------|----------------|
-| MEM_LD / MEM_ST | SRAM/Flash `t_ACC` + CE — one SYS mem cycle minimum each |
-| BEQ | 212 ns ALU+FLG+CU+PC in one SYS execute half |
-| CALL/RET stack | Multiple SYS `MEM_RD`/`MEM_WR` |
-| ph2 ADD execute | Must still open a SYS ALU+`REG_WE` window (~133 ns) |
+| MEM_LD / MEM_ST | Memory `t_ACC` |
+| BEQ | 212 ns path in one SYS execute half |
+| CALL/RET stack | Multiple SYS `MEM_*` |
+| ALU execute | Still needs one SYS ALU + `REG_WE` window |
 
-## When USTEP can help
+## What USTEP is for (pedagogy + control)
 
-Baseline **ADD** uses **3 SYS phases** with ph0–1 idle for GPR ([microcode-spec.md](../../reference/hardware/microcode-spec.md) §4). If those idles exist only to keep a single shared clock aligned—not because the bus is busy—an USTEP CU can:
+- Hold **control bookkeeping** off the SYS IPC denominator.
+- Leave **datapath SYS slots** opcode-dependent so e-IPC still varies (learners discover this).
+- Do **not** treat “delete ADD ph0–1 on a single shared CLK” as the preferred speed strategy.
 
-1. Finish internal bookkeeping on USTEP ticks.
-2. Issue **one** SYS execute for ALU + `REG_WE`.
+## Fallback: async CDC
 
-Then `sys_cycles_per_ADD` → **1** (plus any sync latency tax).
-
-**Sync tax:** 2-FF synchronizer may add **+0–1 SYS** before the execute strobe is seen — model both `sync_latency_sys ∈ {0,1}`.
-
-## CDC / metastability (breadboard)
-
-| Risk | Mitigation | Residual |
-|------|-------------|----------|
-| USTEP→SYS strobe metastability | 2-FF sync on request; qualify outputs on SYS | Still fragile on long wires |
-| Pulse too narrow for SYS | Stretch to full SYS high | Extra MC |
-| DP `reg_we` vs USTEP FSM | DP clocked only by SYS | Required |
-
-Breadboard CDC → default research posture **Conditional Go** even when IPC model looks good.
+Unrelated oscillators → 2-FF sync / pulse stretch → **`sync_latency_sys ≥ 1`** (sync1 tables). Breadboard metastability risk. Demoted vs related-clock.
 
 ## Change log
 
 | Date | Note |
 |------|------|
+| 2026-07-13 | Related-clock first; pedagogy note; async demoted |
 | 2026-07-13 | Initial timing / CDC desk notes |

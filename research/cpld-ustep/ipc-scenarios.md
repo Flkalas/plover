@@ -2,23 +2,32 @@
 
 **Non-normative.** Numbers from [model/ustep_ipc_model.py](model/ustep_ipc_model.py) at `F_SYS = 2.0 MHz`.
 
-## Formula
+## Pedagogy: SYS-visible IPC
 
 ```text
-macros/s = f_SYS / sys_cycles_per_macro_average
-IPC      = macros / sys_cycles
+IPC      = macros / SYS_cycles
+macros/s = f_SYS / SYS_cycles_average
 ```
 
-`CLK_USTEP` only helps by cutting **SYS-visible** cycles. Sync tax = optional +1 SYS per macro (`sync_latency_sys`).
+**USTEP ticks are control overhead** — they do not appear in the denominator. Learners measure e-IPC on the **datapath clock** they can reason about (bus settle, ALU windows, MEM).
+
+Keeping **opcode-varying SYS costs** (MEM vs ALU vs CALL) is intentional: students discover that e-IPC is not “1.0 for every opcode.” Prefer dual-clock bookkeeping move over single-clock dead-phase compression as the teaching path.
+
+## Clock labels in the model
+
+| Label | Meaning |
+|-------|---------|
+| **sync0** (`sync_latency_sys=0`) | **Related-clock ÷N** — SYS-aligned strobes; **primary** |
+| **sync1** (`sync_latency_sys=1`) | Async dual-osc tax / 2-FF CDC — **fallback** |
 
 ## Per-macro templates
 
 | Macro | Baseline SYS | USTEP SYS (min) | Notes |
 |-------|-------------:|----------------:|-------|
-| ADD / CMP | 3 | 1 | Compress idle ph0–1 |
+| ADD / CMP | 3 | 1 | Move control bookkeeping to USTEP; SYS cost = datapath slots (teaching e-IPC) |
 | MEM_LD / MEM_ST | 2 | 2 | Mem-bound |
 | BEQ | 3 | 3 | ALU/FLG SYS-bound |
-| JMP | 3 | 2 | Mild compression |
+| JMP | 3 | 2 | Mild SYS reduction |
 | CALL | 8 | 7 | Stack mem dominates |
 | RET | 6 | 6 | Stack mem dominates |
 
@@ -46,11 +55,12 @@ IPC      = macros / sys_cycles
 
 ## Reading
 
-- **Best case (ALU-only, sync0):** large uplift — shows *why* people want µstep CU.
-- **Realistic sync1 + balanced mix:** uplift **~5%** — below a strong Go bar; near the plan’s ≤5% caution zone.
-- **Mem-heavy + sync1:** can **regress**.
+- **Primary desk bound (related-clock / sync0, balanced):** **+69%** macros/s — relevant under ÷N.
+- **ALU-only sync0:** +200% — shows the ceiling when control overhead leaves SYS.
+- **sync1 / async tax:** balanced **+4.8%**; mem-heavy can **regress** — why related-clock is the baseline.
+- Mem/CALL remain **SYS-bound** even under sync0.
 
-Desk conclusion for average user code: uplift is **real only if** (a) idle SYS phases are truly removable and (b) synchronizer tax stays **~0**. Breadboard CDC makes (b) unlikely → see [SUMMARY-REPORT.md](SUMMARY-REPORT.md).
+Lab still must prove which baseline SYS cycles are **datapath-real** vs movable bookkeeping — if ADD still needs three SYS settle windows, uplift collapses.
 
 ## Re-run
 
@@ -64,4 +74,5 @@ python -m pytest test_ustep_ipc_model.py -q
 
 | Date | Note |
 |------|------|
+| 2026-07-13 | Pedagogy + sync0=related-clock labeling |
 | 2026-07-13 | Initial model numbers |

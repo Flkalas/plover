@@ -6,9 +6,9 @@
 
 ## Questions
 
-1. Does a **CPLD-only `CLK_USTEP`** (4–8 MHz desk) with SoC on **`CLK_SYS` = 2 MHz** raise **user-macro throughput** (macros/s, IPC vs SYS cycles)?
-2. What is the **pin / MC** cost of `CLK_USTEP` + strobe synchronizers on ATF1504AS?
-3. Is breadboard **CDC** (CU ustep → SYS strobes) acceptable, or does risk force Conditional / No-go?
+1. Under a **related-clock** pair (`CLK_USTEP` / `CLK_SYS` from one crystal, integer ÷N), does moving control bookkeeping to USTEP raise **macros/s** when IPC is counted on **SYS-visible** cycles only?
+2. What are the **pin / MC** costs of `CLK_USTEP` + SYS-aligned strobe qualify on ATF1504AS?
+3. Does dual-clock make **teaching e-IPC** clearer (`IPC = macros / SYS_cycles`) while keeping **opcode-varying SYS costs**?
 
 ## Baseline (Gi1 v1.0)
 
@@ -21,20 +21,23 @@
 
 ## Fixed research decisions
 
-- CU sequencer on **`CLK_USTEP`**; bus / ALU / 574 / CPLD-DP on **`CLK_SYS` = 2 MHz**.
-- SoC strobes synchronized into SYS before pin drive.
-- First gate = **docs + Python IPC model + PLD spike skeleton** — not breadboard JED burn.
+- **Related clocks (primary):** same OSC → integer divide — e.g. 4 MHz → `CLK_SYS` = ÷2 (2 MHz), `CLK_USTEP` = 4 MHz. **No PLL.**
+- CU sequencer on **`CLK_USTEP`**; bus / ALU / 574 / CPLD-DP on **`CLK_SYS`**.
+- SoC strobes asserted only on **SYS-aligned** USTEP edges (sync enable) — not async dual-osc CDC as the baseline.
+- **IPC (teaching):** `IPC = macros / SYS_cycles`, `macros/s = f_SYS / SYS_cycles`. USTEP ticks = control overhead.
+- **Do not** prioritize single-clock ADD dead-phase compression (preserves multiphase e-IPC lesson for learners).
+- Async 2-FF CDC = **fallback** only if clocks are unrelated.
 
 ## Deliverables
 
 | File | Role |
 |------|------|
-| [architecture.md](architecture.md) | Dual-clock CU, wait/ready, sync |
-| [timing-budget.md](timing-budget.md) | SYS vs USTEP paths; CDC notes |
-| [ipc-scenarios.md](ipc-scenarios.md) | Macro templates + model numbers |
+| [architecture.md](architecture.md) | Related-clock CU, SYS-aligned strobes |
+| [timing-budget.md](timing-budget.md) | ÷N first; async CDC demoted |
+| [ipc-scenarios.md](ipc-scenarios.md) | Pedagogy + model numbers (sync0 = related) |
 | [model/](model/) | `ustep_ipc_model.py` + pytest |
 | [variants/gi1_cu_ustep/](variants/gi1_cu_ustep/) | WinCUPL spike placeholder |
-| [SUMMARY-REPORT.md](SUMMARY-REPORT.md) | Go / Conditional Go / No-go |
+| [SUMMARY-REPORT.md](SUMMARY-REPORT.md) | Conditional Go (related-clock) |
 
 ## Out of scope
 
@@ -47,4 +50,5 @@
 
 | Date | Note |
 |------|------|
+| 2026-07-13 | Dialogue sync — related-clock + SYS-IPC pedagogy |
 | 2026-07-13 | Initial research tree |

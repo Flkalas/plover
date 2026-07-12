@@ -1,6 +1,9 @@
 """Desk model: single-clock vs CPLD µstep dual-clock IPC / macros-per-second.
 
 stdlib only. SYS clock fixed at 2 MHz; USTEP only reduces SYS-visible cycles.
+
+Related-clock ÷N (same OSC) ⇒ use sync_latency_sys=0 (sync0).
+Async dual-osc CDC tax ⇒ sync_latency_sys=1 (sync1, fallback).
 """
 
 from __future__ import annotations
@@ -25,6 +28,7 @@ class MacroTemplate:
 
 # Gi1-inspired templates (research estimates, not normative).
 SCENARIOS: dict[str, MacroTemplate] = {
+    # SYS cost = datapath slots; move control bookkeeping to USTEP (teaching e-IPC).
     "ADD": MacroTemplate("ADD", baseline_sys_cycles=3, ustep_sys_cycles=1, ustep_internal_steps=4),
     "CMP": MacroTemplate("CMP", baseline_sys_cycles=3, ustep_sys_cycles=1, ustep_internal_steps=4),
     "MEM_LD": MacroTemplate("MEM_LD", baseline_sys_cycles=2, ustep_sys_cycles=2, ustep_internal_steps=2),
@@ -124,7 +128,8 @@ def report_line(r: RunResult) -> str:
 
 
 def main() -> None:
-    print(f"F_SYS = {F_SYS_HZ/1e6:.1f} MHz\n")
+    print(f"F_SYS = {F_SYS_HZ/1e6:.1f} MHz")
+    print("related-clock ⇒ sync0; async CDC tax ⇒ sync1\n")
     for name, mix in [
         ("ADD×10", ["ADD"] * 10),
         ("MEM_LD×10", ["MEM_LD"] * 10),

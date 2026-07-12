@@ -2,101 +2,79 @@
 
 **Non-normative.** Baseline single-clock CU: [cpld-system-controller.md](../../reference/hardware/cpld-system-controller.md).
 
-## Block diagram
+## Primary: related clocks (same OSC)
 
 ```text
-                    CLK_USTEP (4–8 MHz desk)
-                           │
-                           ▼
-                 ┌─────────────────────┐
-  OPC[4:0] ─────►│ idx5 / wait FSM     │
-  FLG_Z    ─────►│  (internal phases)  │
-                 └──────────┬──────────┘
-                            │ request bus op
-                            ▼
-                      wait / ready
-                            │
-                            ▼
-                 ┌─────────────────────┐
-                 │ Strobe synchronizer │◄── CLK_SYS (2 MHz)
-                 │ (2-FF or pulse to   │
-                 │  SYS edge)          │
-                 └──────────┬──────────┘
-                            │ MEM_RD/WR, REG_WE, …
-                            ▼
-              SoC: ALU / MEM / PC / MBR / FLG
-              CPLD-DP R0  (CLK_SYS only)
+  4 MHz crystal
+       │
+       ├──► CLK_USTEP (e.g. 4 MHz) ──► CPLD-CU sequencer / wait FSM
+       │
+       └── ÷2 ──► CLK_SYS (2 MHz) ──► ALU, MEM, 574s, CPLD-DP
+                         ▲
+                         │ SYS-aligned qualify
+              CU strobes ─┘  (assert only on SYS edges)
 ```
 
 ```mermaid
-flowchart LR
-  subgraph ustepDom [CLK_USTEP]
-    FSM[idx5_wait_FSM]
-    Wait[wait_ready]
-  end
-  subgraph sysDom [CLK_SYS_2MHz]
-    Sync[Strobe_sync]
-    Bus[MEM_ALU_574_DP]
-  end
-  FSM --> Wait
-  Wait --> Sync
-  Sync --> Bus
+flowchart TB
+  OSC[Crystal_4MHz]
+  OSC --> USTEP[CLK_USTEP]
+  OSC --> DIV[Divide_by_N]
+  DIV --> SYS[CLK_SYS_2MHz]
+  USTEP --> FSM[CPLD_CU_FSM]
+  FSM -->|"qualify on SYS slot"| Qual[SYS_aligned_strobes]
+  SYS --> Qual
+  Qual --> Bus[MEM_ALU_574_DP]
+  SYS --> Bus
 ```
+
+Integer ratios (2×, 3×, 6×, …) keep USTEP and SYS **phase-related**. Strobe generation is **synchronous enable** on SYS slots — not an async CDC path.
+
+**No PLL** — extend the existing 74HC divider chain ([BOM](../../reference/project/BOM.md) clock parts).
 
 ## Domains
 
 | Domain | Clock | Owns |
 |--------|-------|------|
-| **USTEP** | `CLK_USTEP` | CU idx5 decode, internal micro-steps, wait loops |
-| **SYS** | `CLK_SYS` = 2.0 MHz | Data bus, SRAM/Flash CE timing, ALU settle, 574 PC/MBR/FLG, **CPLD-DP** `reg_we`→R0 |
+| **USTEP** | `CLK_USTEP` (related) | CU idx5 / internal steps / wait loops |
+| **SYS** | `CLK_SYS` = 2.0 MHz | Data bus, SRAM/Flash, ALU settle, 574s, **CPLD-DP** |
 
-## wait / ready
+## wait / ready (SYS slots)
 
-1. CU (USTEP) decides a **SYS-visible** op is needed (`MEM_RD`, ALU execute + `REG_WE`, …).
-2. Synchronizer arms a strobe for the next safe **SYS** edge.
-3. CU **spins on USTEP** until `ready` (SYS cycle complete / ALU window done).
-4. CU advances to the next internal step.
-
-Formula for throughput (see [ipc-scenarios.md](ipc-scenarios.md)):
+1. CU runs bookkeeping on USTEP ticks.
+2. When a **datapath** op is needed, CU waits until the next **SYS-aligned** edge, then drives strobes.
+3. After the SYS window completes, CU continues on USTEP.
 
 ```text
 macros/s = f_SYS / sys_cycles_per_macro
+IPC      = macros / SYS_cycles     ← teaching denominator
 ```
 
-`CLK_USTEP` only helps when it **removes SYS-visible idle ticks** (e.g. baseline ADD ph0–1 that consumed full SYS phases without bus work).
+USTEP rate does not appear in the IPC formula.
 
-## Strobe synchronizer
+## Teaching intent
 
-| Approach | Desk note |
-|----------|-----------|
-| **2-FF sync** + SYS-qualified AND | Safe for level-ish requests; latency +1–2 SYS |
-| **Pulse stretch** to one SYS high | Matches today’s “strobe for one phase” habit |
-
-All exported CU pins (`MEM_RD`, `MEM_WR`, `Y_OE`, `FLG_WE`, `PC_LOAD_EN`, ALU nets, `reg_we`) must be **SYS-stable** at the receiving FF setup time.
+- **Keep opcode-varying SYS costs** (MEM vs ALU vs CALL) so learners measure different e-IPC.
+- Move only **control bookkeeping** to USTEP — not “make every opcode one SYS tick.”
+- Single-clock dead-phase compression is **out of preferred path** (would flatten the e-IPC lesson).
 
 ## Pin / routing delta vs Gi1
 
-Today both CPLDs share **CLK pin 43** in parallel ([cpld-dual-routing.md](../../reference/hardware/cpld-dual-routing.md)).
+Today both CPLDs share **CLK pin 43** ([cpld-dual-routing.md](../../reference/hardware/cpld-dual-routing.md)).
 
 | Change | Desk |
 |--------|------|
-| `CLK_SYS` | Keep on CU + DP (bus-aligned) |
-| `CLK_USTEP` | **+1 CU input** (new net from ÷N of 4 MHz or second osc) |
-| DP | Remains **SYS-only** — no ustep on DP |
+| `CLK_SYS` | CU + DP (bus-aligned) |
+| `CLK_USTEP` | **+1 CU input** from undivided (or ÷M) OSC net |
+| DP | **SYS-only** |
 
-Spare CU I/O (~11) can absorb +1 clock input at desk; MC cost is synchronizer FFs + wait state (see [variants/gi1_cu_ustep/](variants/gi1_cu_ustep/)).
+## Fallback: unrelated clocks
 
-## Reuse vs new
-
-| Function | Reuse | New |
-|----------|-------|-----|
-| idx5 key | `(opcode<<2)\|phase` concept | Internal phase may be finer than 2-bit SYS phase |
-| Strobe meanings | Same 14 SoC nets + `reg_we` | Sync wrapper |
-| MBR hold / ALU | SYS timing unchanged | CU must not re-fetch MBR during ADD |
-| CALL/RET stack | SYS `MEM_*` cycles | Many SYS cycles → little IPC help from ustep |
+If USTEP and SYS were ever free-running relative to each other, use 2-FF CDC / pulse stretch — that path pays **sync tax** (`sync_latency_sys ≥ 1` in the model). **Not the baseline.**
 
 ## Change log
 
 | Date | Note |
 |------|------|
+| 2026-07-13 | Related-clock primary; async CDC demoted |
 | 2026-07-13 | Initial dual-clock CU sketch |
