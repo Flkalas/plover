@@ -1,6 +1,6 @@
 # Agent instructions (Plover)
 
-Repository-wide guidance for coding agents. Cursor users: the same rules live in `.cursor/rules/git-workflow-safety.mdc` (local; `.cursor/` is gitignored).
+Repository-wide guidance for coding agents. Cursor users: local mirrors in `.cursor/rules/` (`git-workflow-safety.mdc`, `korean-markdown-encoding.mdc`, `read-on-disk-only.mdc`; `.cursor/` is gitignored).
 
 ---
 
@@ -28,6 +28,36 @@ For work **outside** an active plan, only commit when the user asks or the sessi
 - `git checkout -- .` or `git restore .` on tracked files (especially Korean markdown)
 - `git reset --hard`
 - Bulk encoding replace on `docs/**/*.md`
+
+### Korean / UTF-8 markdown — no StrReplace; preserve user edits
+
+On Windows this repo’s Hangul markdown is repeatedly corrupted by partial edits **and** by agents rewriting whole files from memory (wiping the user’s Qty/wording).
+
+**Do not** use the `StrReplace` tool on:
+
+- `reference/**/*.md`
+- `plover-whitepaper.md`
+- `AGENTS.md` when the edit touches Hangul
+- any other tracked `.md` that contains Korean
+
+**Do not** pipe those files through PowerShell `Set-Content` / `Out-File` without `utf8` (prefer Python).
+
+**Do not** restore older assistant wording over the user’s edits (examples: forcing Breadboard Qty `4`, re-adding `830-pin`, changing `` `IF\|EX` `` back to `` `IF|EX` ``).
+
+**Do:**
+
+1. Read the **current on-disk** file first.
+2. Apply **only** the change requested this turn.
+3. If a full rewrite is required for UTF-8 safety: load → mutate → write (never paste an old chat draft).
+
+```python
+path = Path(...)
+text = path.read_text(encoding="utf-8")
+# minimal mutation only
+path.write_text(text, encoding="utf-8", newline="\n")
+```
+
+After writing, verify Hangul still decodes. Local mirror: `.cursor/rules/korean-markdown-encoding.mdc` (`alwaysApply: true`).
 
 ### Commit procedure
 
@@ -60,6 +90,19 @@ When implementing a **Cursor plan**, commit in-session per **Plan execution (aut
 6. **`conftest.py` fails fast** if `pytest-timeout` is missing — do not disable this check.
 
 Agents adding tests: run the suite locally; if a test needs >30s, document why in the test docstring and set the mark.
+
+---
+
+## On-disk read only (no index / cache)
+
+For architecture, ISA, decode, CPLD, Flash, ALU, bring-up, BOM, MMIO, or any normative claim about this repo:
+
+1. **Read the current on-disk file** with the Read tool before answering or editing.
+2. Treat **codebase index / semantic search / RAG snippets**, **chat cache**, and **prior-session memory** as non-authoritative — never cite them as truth.
+3. Glob/Grep may **locate** paths only; content must come from a fresh Read in the same turn.
+4. Local mirror: `.cursor/rules/read-on-disk-only.mdc` (`alwaysApply: true`).
+
+If you have not Read it this turn, you do not know it.
 
 ---
 
