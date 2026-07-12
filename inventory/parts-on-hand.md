@@ -24,10 +24,10 @@ CPLD **2×** `ATF1504AS-10JU44` + **2×** PLCC→DIP (#13); Flash PDIP 직결; S
 | **2차 B** | 2026-06-01 | 디바이스마트 | IS62C256 ×1 (SRAM 2번째) |
 | **3차 C** | 2026-06-02 | 디바이스마트 | 153×4, MAP slide×10, RESET tact×10 |
 | **AliExpress** | 2026-06-01 | 다수 | PLCC×1, SOP28×10, 0.1 µF×100, FT232H, 74HC02×10 등 |
-| **AliExpress** | 2026-07-01·03·06 | 다수 | SIP 33R×30, MicroSD, LVC125×5, PLCC×1 (배송중) — [purchase-2026-07-aliexpress.md](purchase-2026-07-aliexpress.md) |
+| **AliExpress** | 2026-07-01·03·06 | 다수 | SIP 33R×30, MicroSD, LVC125×5, PLCC×1 — [purchase-2026-07-aliexpress.md](purchase-2026-07-aliexpress.md) |
 | **4차 D·E·F·G** | 2026-07-06·08·13 | 디바이스마트 | ATF1504×1, SIP, 소켓, MB-102×5, OSC 3.6864M, **74HC138×1** — [purchase-2026-07-devicesmart.md](purchase-2026-07-devicesmart.md) |
 
-누적: **ATF1504 ×2** · **PLCC ×2** · **74HC138 ×2** — 코어 BOM 수량 충족 (일부 출고준비/배송중/결제확인).
+누적: **ATF1504 ×2** · **PLCC ×2** · **74HC138 ×2** — 코어 BOM 수량 충족.
 
 ---
 
@@ -36,7 +36,7 @@ CPLD **2×** `ATF1504AS-10JU44` + **2×** PLCC→DIP (#13); Flash PDIP 직결; S
 | BOM # | 어댑터 | 보유 (누적) | 장착 대상 / 비고 |
 |-------|--------|-------------|------------------|
 | **3** | SOP28↔DIP (SOP4-28Pin · 1.27mm) | **14** (1차 4 + Ali 10) | SRAM×2 · **LVC245도 가능** (24/28 패드, 4핀 비움) |
-| **13** | PLCC-44→DIP | **2** (Sinstar + Upmall) | ATF1504 (#12)×2 — Upmall 건 **배송중** |
+| **13** | PLCC-44→DIP | **2** (Sinstar + Upmall) | ATF1504 (#12)×2 |
 | *(BOM 외)* | SIC-DIP 소켓 | 14×10 · 16×30 · 20×10 · 32×10 | DS 4차 · 재사용·보호용 |
 
 Flash (#16)는 **PDIP-32** — 빵판에 **직결** (SIC-DIP-32 보유).
@@ -47,12 +47,12 @@ Flash (#16)는 **PDIP-32** — 빵판에 **직결** (SIC-DIP-32 보유).
 
 | BOM # | MPN | Package | Qty | 역할 / 비고 |
 |-------|-----|---------|-----|-------------|
-| 12 | ATF1504AS-10JU44 | PLCC-44 | **2** | 2차 A + DS 4차 `2026070621281618712` (출고준비) |
-| 13 | PLCC-44→DIP 어댑터 | — | **2** | Sinstar + Upmall `1121526644275950` (배송중) |
+| 12 | ATF1504AS-10JU44 | PLCC-44 | **2** | 2차 A + DS 4차 `2026070621281618712` |
+| 13 | PLCC-44→DIP 어댑터 | — | **2** | Sinstar + Upmall `1121526644275950` |
 | 16 | SST39SF010A-70-4C-PHE | PDIP-32 | **2** | 부트·program ROM (1차; BOM 1 · 여유 1) |
 | 17 | IS62C256AL-45ULI-TR | SOP | **2** | 64 KB RAM (1차 1 + 2차 B 1) |
 | — | SN74LVC8T245DWR | SOIC-24 (1.27mm) | **3** | 메일박스 · SOP4-28Pin에 실장 (4패드 미사용) |
-| 8 | 74HC138N | DIP | **2** | CE tree (1차 + G `2026071307030217559`, 결제확인) |
+| 8 | 74HC138N | DIP | **2** | CE tree (1차 + G `2026071307030217559`) |
 | — | 74HC283N | DIP | **2** | ALU |
 | — | 74HC153 | DIP | **8** | ALU (1차 4 + 주문 C 4) |
 | — | 74HC157 | DIP | **8** | ALU·주소 (1차 5 + 2차 A 3) |
@@ -91,7 +91,7 @@ Flash (#16)는 **PDIP-32** — 빵판에 **직결** (SIC-DIP-32 보유).
 
 LVC245용 전용 SOIC-24 어댑터 **불필요** — 보유 SOP4-28Pin (1.27mm)에 24핀만 사용.
 
-ATF1504 · PLCC · 74HC138은 발주 누적 충족 (출고준비/배송중/결제확인 포함).
+ATF1504 · PLCC · 74HC138은 발주 누적 충족.
 
 ---
 

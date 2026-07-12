@@ -24,12 +24,12 @@
 | 74HC153 | 8 | 8 | 0 | ✓ |
 | 74HC157 | **4** | 8 | +4 | ✓ 여유 |
 | 74HC574 | **4** | 7 | +3 | ✓ 여유 |
-| 74HC138 | **2** | **2** (1 결제확인) | 0 | ✓ (G `2026071307030217559`) |
+| 74HC138 | **2** | **2** | 0 | ✓ |
 | 74HC08 | 2 | 2 | 0 | ✓ |
 | 74HC32 | 2 | 2 | 0 | ✓ |
 | 74HC161 | 3 | 4 | +1 | ✓ 여유 |
-| ATF1504AS-10JU44 | **2** | **2** (1 출고준비) | 0 | ✓ (DS `2026070621281618712`) |
-| PLCC-44↔DIP adapter | **2** | **2** (1 배송중) | 0 | ✓ (Upmall `1121526644275950`) |
+| ATF1504AS-10JU44 | **2** | **2** | 0 | ✓ |
+| PLCC-44↔DIP adapter | **2** | **2** | 0 | ✓ |
 | 74HC245 | 1 | 2 | +1 | ✓ 여유 |
 | SST39SF010A-70-4C-PHE | 1 | 2 | +1 | ✓ 여유 |
 | IS62C256AL-45ULI-TR | 2 | 2 | 0 | ✓ |
@@ -43,23 +43,23 @@
 | Slide / DIP switch (1극) | 1 | 10 | +9 | ✓ |
 | 0.1 µF ceramic | — | ~130 | — | ✓ |
 | 10 µF tantal / electrolytic | — | 10+10 | — | ✓ |
-| 330 Ω ×8 SIP-9 (=**33 Ω**, EIA 330) | — | 1차 8pin×10 + Ali 9PIN×**30** | — | ✓ (`1121478671585950`) |
+| 330 Ω ×8 SIP-9 (=**33 Ω**, EIA 330) | — | 1차 8pin×10 + Ali 9PIN×**30** | — | ✓ |
 | 10 kΩ ×8 SIP-9 | — | 10 (Bourns 4708) | — | ✓ |
 | 10 kΩ (axial) | — | 10 | — | ✓ |
-| ATF1504 JTAG/ISP programmer | 1 | FT232H TYPE-C×1 | 0 | ✓ (Ali `1120935566415950`) |
+| ATF1504 JTAG/ISP programmer | 1 | FT232H TYPE-C×1 | 0 | ✓ |
 | NOR Flash programmer | 1 | Arduino Nano×1 + 74HC595×3 | 0 | ✓ (비트뱅) |
 
 ATF1504 JTAG/ISP programmer BOM 항: AliExpress **FT232H** (FAR EAST ELECTRONICS, `1120935566415950`, 2026-06-01) — 실물 사진 [`photo_2026-07-06_01-27-43.jpg`](../cpld/tools/images/photo_2026-07-06_01-27-43.jpg) · [purchase-2026-06-01-followup.md](purchase-2026-06-01-followup.md).
 
 NOR Flash programmer BOM 항: 별도 전용 기기 없음 — **Arduino Nano + 74HC595×3** 비트뱅으로 충족 ([purchase-devicesmart.md](purchase-devicesmart.md)).
 
-PLCC-44↔DIP: 2026-06 Sinstar ×1 + 2026-07-06 Upmall ×1 (`1121526644275950`, 배송중 · 예상 7/16) — [purchase-2026-07-aliexpress.md](purchase-2026-07-aliexpress.md).
+PLCC-44↔DIP: 2026-06 Sinstar ×1 + 2026-07-06 Upmall ×1 (`1121526644275950`) — [purchase-2026-07-aliexpress.md](purchase-2026-07-aliexpress.md).
 
-ATF1504 dual: DS 4차 D (`2026070621281618712`) · E MB-102×5 · F OSC 3.6864M · **G 74HC138×1** (`2026071307030217559`, **결제확인**, 550원) — D–G **30,530원** — [purchase-2026-07-devicesmart.md](purchase-2026-07-devicesmart.md).
+ATF1504 dual: DS 4차 D (`2026070621281618712`) · E MB-102×5 · F OSC 3.6864M · **G 74HC138×1** (`2026071307030217559`, 550원) — D–G **30,530원** — [purchase-2026-07-devicesmart.md](purchase-2026-07-devicesmart.md).
 
 ### 부족 요약 (발주 후보)
 
-코어 BOM 대비 **수량 부족 없음** (발주 누적). 미도착: ATF1504 2번째(출고준비), PLCC 2번째(배송중), 74HC138 2번째(결제확인).
+코어 BOM 대비 **수량 부족 없음** (발주 누적).
 
 ### BOM 외 보유 (참고)
 
