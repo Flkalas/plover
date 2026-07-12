@@ -8,8 +8,13 @@ From this directory:
 
 ```text
 python ustep_ipc_model.py
+python clock_datapath_timeline.py
 python -m pytest test_ustep_ipc_model.py -q
 ```
+
+`clock_datapath_timeline.py` — interactive walkthrough (pick opcode, Enter=next step).
+
+`clock_datapath_quiz.py` — interactive quiz; wrong answers show misconception fixes + profile.
 
 ## Meaning
 
