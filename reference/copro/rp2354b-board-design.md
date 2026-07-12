@@ -212,7 +212,7 @@ Direct LVC connection — **no 245**. Optional **33 Ω** series on `D[7:0]` per 
 
 ### 6.2 Superseded architecture (do not implement)
 
-Early exploration ([archive/gemini/과거로-간-현대-엔지니어의-한계.md](../archive/gemini/과거로-간-현대-엔지니어의-한계.md)) assumed **full bus snoop**:
+Early exploration assumed **full bus snoop**:
 
 | Block | GPIO |
 |-------|------|

@@ -9,7 +9,7 @@
 
 ## v1.0 breadboard (확정)
 
-CPLD **2×** `ATF1504AS-10JU44` + **2×** PLCC→DIP (#15); Flash PDIP 직결; SRAM SOP28×2; LVC245 SOIC-24×3. **rev G dual-CPLD.**
+CPLD **2×** `ATF1504AS-10JU44` + **2×** PLCC→DIP (#15); Flash PDIP 직결; SRAM SOP28×2; LVC245 SOIC-24×3. **Dual CPLD / pipe CU.**
 
 ---
 
@@ -29,7 +29,7 @@ Flash (#18)는 **PDIP-32** — 빵판에 **직결** (어댑터 없음).
 
 | BOM # | MPN | Package | Qty | 역할 |
 |-------|-----|---------|-----|------|
-| 14 | ATF1504AS-10JU44 | PLCC-44 | **2** | CPLD-CU + CPLD-DP (rev G) |
+| 14 | ATF1504AS-10JU44 | PLCC-44 | **2** | CPLD-CU + CPLD-DP (dual / pipe CU) |
 | 15 | PLCC-44→DIP 어댑터 | — | **2** | CPLD 빵판 장착 |
 | 18 | SST39SF010A-70-4C-PHE | PDIP-32 | 2 | 부트·program ROM (`$4000` CW reserved / unburned) |
 | 19 | IS62C256AL-45ULI-TR | SOP | 2 | 64 KB RAM |
@@ -48,12 +48,12 @@ Flash (#18)는 **PDIP-32** — 빵판에 **직결** (어댑터 없음).
 
 ---
 
-## ATF1504 rev G I/O (desk)
+## ATF1504 dual CPLD I/O (desk)
 
 | Chip | Role | Key signals |
 |------|------|-------------|
-| **CPLD-CU** | Control | In: `opc[4:0]`, `flg_z`, `clk` · Out: 14 strobes + G-IC 6 |
-| **CPLD-DP** | Datapath | In: `d_in[7:0]`, G-IC, `clk` · Out: full `q_a`/`q_b` |
+| **CPLD-CU** | Pipe control | In: `opc[4:0]`, `flg_z`, `clk` · Out: strobes + G-IC `reg_we` |
+| **CPLD-DP** | Datapath | In: `d_in[7:0]`, `reg_we`, `clk` · Out: `q_a` (R0) |
 
 Detail: [cpld-system-controller.md](../hardware/cpld-system-controller.md)
 | **합계** | | **~32** |

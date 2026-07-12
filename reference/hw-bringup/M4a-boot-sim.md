@@ -4,14 +4,14 @@
 |-------|-------|
 | **Milestone** | M4a |
 | **Goal** | JMP handoff: boot ROM → RAM `$0800` → **`JMP $0800`** |
-| **Status** | Logic verified 2026-06-08 (archived VM — see [archived-code-guide.md](../../archive/MANIFEST.md)) |
+| **Status** | Logic verified 2026-06-08 (boot JMP handoff checklist) |
 | **Normative** | [boot-jmp-handoff.md](../boot/boot-jmp-handoff.md) |
 
 ---
 
 ## 1. What was proven
 
-Before breadboard (M4b), the boot chain was checked with archived logic VM:
+Before breadboard (M4b), the boot chain was checked against the JMP handoff checklist:
 
 1. Boot ROM copies kernel sector to RAM `$0800`
 2. SP/RP/GPR pre-init cells written
@@ -29,13 +29,13 @@ Before breadboard (M4b), the boot chain was checked with archived logic VM:
 | Reset vector `$FFFC` | [boot-vector.md](../fixtures/boot-vector.md) |
 | Kernel smoke `$0800` | [add_imm-sram.md](../fixtures/add_imm-sram.md) (or kernel stub in boot-rom tail) |
 
-v1.0 breadboard: **no Flash `$4000` CW** — CPLD FSM only ([M3a](M3a-control-store.md)).
+v1.0 breadboard: **no Flash `$4000` CW** — pipe CU ([cpld-pipe-cu.md](../hardware/cpld-pipe-cu.md)).
 
 ---
 
-## 3. M4a sign-off (historical)
+## 3. M4a sign-off
 
-- [x] JMP handoff chain verified (archived VM, 2026-06)
+- [x] JMP handoff chain verified (2026-06)
 - [ ] M4b hardware burn matches frozen fixtures
 
 ---

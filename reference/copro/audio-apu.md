@@ -1,6 +1,5 @@
 # Audio APU v0.1 (4ch PSG)
 
-**Source decision record:** [archive/gemini/Plover-APU-설계-질의-및-결정.md](../archive/gemini/Plover-APU-설계-질의-및-결정.md)  
 **Related:** [mailbox-protocol.md](mailbox-protocol.md) · [rp2350-coprocessor.md](rp2350-coprocessor.md)
 
 Normative **4-channel PSG** on RP2350 Core0. CPU controls audio **only via Mailbox** (`MB_CMD` `0x50–0x53`); no audio buffer on the 64 KiB CPU map. **PCM streaming is v0.2.**

@@ -4,10 +4,9 @@
 **Roles:** **CPLD-CU** — **pipe FSM** (see [cpld-pipe-cu.md](cpld-pipe-cu.md)) + direct strobes + branch · **CPLD-DP** — **R0 (AC) only** + `q_a`  
 **CE tree:** 74HC138×2 + 08/32/04 (off-chip)
 
-**Related:** [control-and-decode.md](control-and-decode.md) · [cpld-dual-routing.md](cpld-dual-routing.md) · [cpld-dual-jtag.md](cpld-dual-jtag.md) · [microcode-spec.md](microcode-spec.md)  
-**Superseded CU schedule:** Gi1 idx5 — [archive/gi1-v1.0-normative/](../../archive/gi1-v1.0-normative/)
+**Related:** [control-and-decode.md](control-and-decode.md) · [cpld-dual-routing.md](cpld-dual-routing.md) · [cpld-dual-jtag.md](cpld-dual-jtag.md) · [microcode-spec.md](microcode-spec.md)
 
-**Bitstream:** Pipe CU **Design fits pending**. DP may reuse Gi1-class R0 PLD. Legacy Gi1 CU bitstream is **not** Active truth.
+**Bitstream:** Pipe CU **Design fits pending**. DP is **R0-only** PLD (`q_a`).
 
 ---
 
@@ -19,7 +18,7 @@
 4. **Pipe FSM** on CPLD-CU — [cpld-pipe-cu.md](cpld-pipe-cu.md); **no Flash param fetch**; Flash `$4000` **unused**.
 5. **Strobes:** CU drives memory/ALU/PC nets directly to SoC (no external CW latch).
 6. **Branch:** `PC_LOAD_EN` with taken **BRANCH_BUBBLE** (no prediction).
-7. **Return stack assist:** CALL/RET in **STACK_EX** — RP `$0F00`, stack RAM via `MEM_RD`/`MEM_WR` ([microcode-spec.md](microcode-spec.md) §2.3 · [call-ret-cu-fit.md](call-ret-cu-fit.md)).
+7. **Return stack assist:** CALL/RET in **STACK_EX** — RP `$0F00`, stack RAM via `MEM_RD`/`MEM_WR` ([microcode-spec.md](microcode-spec.md) §2.3 · [cpld-pipe-cu.md](cpld-pipe-cu.md) §5.1).
 8. **TFR:** **Removed** — `0x10–0x1F` trap; no `tfr_valid`.
 9. **Mailbox, MAP, `/CE`** — outside CPLD.
 
@@ -77,7 +76,7 @@ Full state machine, SYS tax, timing: **[cpld-pipe-cu.md](cpld-pipe-cu.md)**.
 
 **No `q_b`.** ALU B from **MBR / oper latch** off-chip.
 
-**Pin budget (desk):** **17/32** used (15 spare) — unchanged from Gi1 DP.
+**Pin budget (desk):** **17/32** used (15 spare).
 
 ---
 
@@ -108,7 +107,7 @@ TCK/TMS paralleled. See [cpld-dual-jtag.md](cpld-dual-jtag.md).
 
 ## 7. EX policy (P12 pipe)
 
-ADD/CMP use **packed EX** (no Gi1 ph0–1 idle). MBR/oper hold during ALU EX. MEM ops use **MEM_STALL**. Detail: [cpld-pipe-cu.md](cpld-pipe-cu.md).
+ADD/CMP use **packed EX** (no idle phases). MBR/oper hold during ALU EX. MEM ops use **MEM_STALL**. Detail: [cpld-pipe-cu.md](cpld-pipe-cu.md).
 
 ### PC load path
 
@@ -136,5 +135,4 @@ Do not record fitter used-MC counts as normative BOM gates.
 |------|------|
 | 2026-07-13 | **v1.0 P12** — CU role → pipe; detail in cpld-pipe-cu.md |
 | 2026-07-07 | **CALL/RET** — return-stack assist |
-| 2026-07-07 | **Gi1 v1.0** — R0 only; G-IC 1-wire; MBR→ALU B |
-| 2026-07-06 | **rev G** archived |
+| 2026-07-07 | R0 only; G-IC 1-wire; MBR→ALU B |

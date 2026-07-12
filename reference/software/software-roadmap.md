@@ -1,6 +1,6 @@
 # Software roadmap (VM OS stack)
 
-**Related:** [software-memory-layout.md](software-memory-layout.md) · [archive/MANIFEST.md](../../archive/MANIFEST.md) · [archive/MANIFEST.md](../../archive/MANIFEST.md)
+**Related:** [software-memory-layout.md](software-memory-layout.md)
 
 Plover v0.1 software milestones **S0–S7** on logic VM (developer), then hardware bring-up (M1–M5).
 
@@ -19,7 +19,7 @@ Plover v0.1 software milestones **S0–S7** on logic VM (developer), then hardwa
 |----|-------------|-----|-----------|
 | S0 | Roadmap, layout, regression script | this file | baseline regression |
 | S1 | `plover_asm` | [plover-asm.md](plover-asm.md) | milestone checklist |
-| S2 | CALL/RET ISA (CU idx5, no Flash CW) | [calling-convention-v0.1.md](calling-convention-v0.1.md) | M3a + M2a CALL/RET smoke |
+| S2 | CALL/RET ISA (pipe CU, no Flash CW) | [calling-convention-v0.1.md](calling-convention-v0.1.md) | pipe CU CALL/RET smoke |
 | S3 | Forth core | [forth-system.md](forth-system.md) | milestone checklist, `forth_boot.yaml` |
 | S3c | Normative asm Forth | forth-system §normative | `breadboard ISA` |
 | S4 | Forth OS services | [forth-os-services.md](forth-os-services.md) | milestone checklist |
@@ -34,7 +34,7 @@ Plover v0.1 software milestones **S0–S7** on logic VM (developer), then hardwa
 
 | Software | Hardware |
 |----------|----------|
-| S2 CALL/RET | M3a pack + [call-ret-cu-fit](../hardware/call-ret-cu-fit.md) desk |
+| S2 CALL/RET | M3a + [cpld-pipe-cu.md](../hardware/cpld-pipe-cu.md) §5.1 desk |
 | S7 vFDD | [mailbox-protocol.md](../copro/mailbox-protocol.md), [rp2350-coprocessor.md](../copro/rp2350-coprocessor.md) |
 | Boot / PL-DOS | [bootloader.md](../boot/bootloader.md) |
 

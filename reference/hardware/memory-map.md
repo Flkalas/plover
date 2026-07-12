@@ -53,10 +53,8 @@ No automatic map switch from software — operator toggles DIP, then **RESET**.
 | Access | Address source |
 |--------|----------------|
 | Instruction fetch (Mode A boot) | PC → decode glue |
-| Control store | **Unused** — Flash `$4000` not wired; CPLD-CU idx5 FSM |
+| Control store | **Unused** — Flash `$4000` not wired; CPLD-CU pipe FSM |
 | Utility read | PC or boot copy loops |
-
-Superseded Flash CW prototype: [prototype-flash-cw](../archive/prototype-flash-cw/README.md).
 
 ---
 

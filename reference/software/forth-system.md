@@ -10,8 +10,8 @@ Host-side minimal Forth core — behavioral reference for normative asm ports.
 - Colon definitions: `:` … `;`
 - Line evaluator: `eval_line` (QUIT-like)
 
-## Implementation (archived)
+## Implementation
 
-Reference interpreter and Rust port are in archived bundles (`host_toolchain.tar.gz`, `rust_vm.tar.gz`). See [archived-code-guide.md](../../archive/MANIFEST.md).
+Behavioral reference for normative asm ports. Breadboard burn uses frozen fixtures in [fixtures](../fixtures/) — no host toolchain in the Active tree.
 
 Breadboard bring-up does **not** require Forth on the TTL CPU.

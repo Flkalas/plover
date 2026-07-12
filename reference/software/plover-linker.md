@@ -44,9 +44,9 @@ Each relocation record:
 - linked bytes (`text` + `data`)
 - symbol map
 - relocation stats
-- Executable `.plr` format (archived `kern/` package)
+- Executable `.plr` format
 
-## CLI (archived)
+## CLI
 
-Compiler, assembler, and linker live in `host_toolchain.tar.gz`. See [archived-code-guide.md](../../archive/MANIFEST.md).
+Emit linked images for breadboard using frozen fixtures in [fixtures](../fixtures/). No host toolchain lives in the Active tree.
 

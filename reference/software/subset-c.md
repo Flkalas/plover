@@ -14,7 +14,7 @@ v1.0 breadboard has no hardware stack or frame pointer. **S5 Subset C** therefor
 
 ## Output
 
-- Subset C → Plover asm text → `.sram.hex` (toolchain archived — see [archived-code-guide.md](../../archive/MANIFEST.md))
+- Subset C → Plover asm text → `.sram.hex` (use frozen images in [fixtures](../fixtures/))
 
 ## Frozen smoke image
 

@@ -1,9 +1,8 @@
 # Input HID v0.1 (keyboard / mouse)
 
-**Source:** [archive/gemini/Plover-APU-설계-질의-및-결정.md](../archive/gemini/Plover-APU-설계-질의-및-결정.md) (HID namespace `0x40–0x4F`) · [Gemini-_22.md](../archive/gemini/Gemini-_22.md) (USB/TinyUSB — **reject** SRAM `0x7FEx` injection)  
 **Related:** [mailbox-protocol.md](mailbox-protocol.md) · [rp2350-coprocessor.md](rp2350-coprocessor.md)
 
-Normative **keyboard FIFO + mouse event queue** on RP2350 Core0. CPU reads input **only via Mailbox** (`MB_CMD` `0x40–0x43`); no input buffers on the 64 KiB CPU map.
+Normative **keyboard FIFO + mouse event queue** on RP2350 Core0. CPU reads input **only via Mailbox** (`MB_CMD` `0x40–0x43`); no input buffers on the 64 KiB CPU map. USB/TinyUSB must **not** inject into SRAM `0x7FEx`.
 
 ---
 

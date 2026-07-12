@@ -5,8 +5,6 @@
 
 **v1.0 P12:** PE1-class **IF\|EX** pipeline with Harvard-like **PROG∥DATA** ports; **P12** discipline (no idle, stretch-on-fail, named FE2 fallback). Datapath keeps **R0 (AC)** + **MBR→ALU B**, G-IC **`reg_we`**. Flash `$4000` unused.
 
-**Superseded:** Gi1 idx5 multiphase — [archive/gi1-v1.0-normative/](../../archive/gi1-v1.0-normative/). Prior rev G — [archive/rev-g-dual-3gpr/](../../archive/rev-g-dual-3gpr/).
-
 **CU truth:** [cpld-pipe-cu.md](cpld-pipe-cu.md) (bitstream Design fits pending).
 
 ---
@@ -25,18 +23,18 @@
 | **ROM** | **1× SST39SF010A** — boot + program (**PROG** port; **no CW @ `$4000`**) |
 | **I/O** | MMIO **Mailbox** @ `$FF00–$FFFB` — polling only, **no IRQ** |
 | **Coprocessor** | **RP2350B** — GPU, HID, virtual FDD (separate board) |
-| **Pipe BOM delta** | ~6–10 DIP-class parts (IR/operand latches, PROG buffers, mux/CE glue) vs Gi1 shared-bus |
+| **Pipe BOM delta** | ~6–10 DIP-class parts (IR/operand latches, PROG buffers, mux/CE glue) vs shared-bus baseline |
 
-### Metrics (archived Gi1 → Active P12)
+### Metrics (v1.0 P12)
 
-| Metric | Gi1 (archived) | **v1.0 P12** |
-|--------|----------------|--------------|
-| CU schedule | idx5 multiphase + idle | **IF\|EX pipe; no idle** |
-| Steady ALU IPC @ 2 MHz | ~0.2 | **~1.0** (optimistic stream) |
-| G-IC wires | 1 (`reg_we`) | **1** (`reg_we`) |
-| GPR in CPLD | R0 | **R0** |
-| TFR opcodes | none | **none** |
-| Pipe CU bitstream | — | **Design fits pending** |
+| Metric | **v1.0 P12** |
+|--------|--------------|
+| CU schedule | **IF\|EX pipe; no idle** |
+| Steady ALU IPC @ 2 MHz | **~1.0** (optimistic stream) |
+| G-IC wires | **1** (`reg_we`) |
+| GPR in CPLD | **R0** |
+| TFR opcodes | **none** (`0x10–0x1F` reserved) |
+| Pipe CU bitstream | **Design fits pending** |
 
 ---
 
@@ -82,7 +80,7 @@ Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md
 
 2× CPLD `ATF1504AS-10JU44` + 2× PLCC→DIP; Flash `SST39SF010A`; SRAM `IS62C256`×2; `SN74LVC8T245`×n; **574** class for PC/MBR/FLG plus **pipe IR/operand** latches. Detail: [parts-on-hand.md](../project/parts-on-hand.md) · [BOM.md](../project/BOM.md).
 
-**Wiring vs archived Gi1:** add PROG isolation / pipe latches per [cpld-pipe-cu.md](cpld-pipe-cu.md); keep `net_mbr` → ALU B.
+**Pipe wiring:** PROG isolation / pipe latches per [cpld-pipe-cu.md](cpld-pipe-cu.md); keep `net_mbr` → ALU B.
 
 ---
 
@@ -96,7 +94,7 @@ Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md
 | [cpld-dual-routing.md](cpld-dual-routing.md) | G-IC, MBR→B wiring |
 | [microcode-spec.md](microcode-spec.md) | ISA + pipe SYS sheet |
 | [control-and-decode.md](control-and-decode.md) | Who decodes what |
-| [hw-bringup/README.md](../hw-bringup/README.md) | M1–M5 (Gi1 multiphase steps = legacy until retargeted) |
+| [hw-bringup/README.md](../hw-bringup/README.md) | M1–M5 bring-up checklists |
 
 ---
 
@@ -106,7 +104,7 @@ Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md
 |-------|------|
 | Spec | [cpld-pipe-cu.md](cpld-pipe-cu.md) |
 | Bitstream | WinCUPL **Design fits** (pipe CU when written) |
-| Breadboard | IF∥EX lab pending; M1–M5 checklists partially legacy |
+| Breadboard | IF∥EX lab pending; follow pipe CU + M1–M5 |
 | Scope | BEQ slack; PROG vs DATA isolation; mailbox RP ≤ 80 ns desk |
 
 ---
@@ -115,7 +113,7 @@ Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md
 
 | Date | Note |
 |------|------|
-| 2026-07-13 | **v1.0 P12 Active** — pipe CU; Gi1 archived |
-| 2026-07-07 | Gi1 v1.0 — AC + MBR; rev G archived |
-| 2026-07-06 | rev G dual ATF1504 |
-| 2026-06-24 | v1.0 FSM-only idx5 normative |
+| 2026-07-13 | **v1.0 P12 Active** — pipe CU |
+| 2026-07-07 | AC + MBR→B; R0 only; TFR removed |
+| 2026-07-06 | dual ATF1504 |
+| 2026-06-24 | v1.0 FSM-only normative |

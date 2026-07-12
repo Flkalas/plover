@@ -1,8 +1,7 @@
 # Plover — 구매 목록 (v0.1, 1세트 · 3.3 V PCB)
 
 **1세트 부품 명세** · 단일 **3.3 V** · **PCB SMD**  
-5 V 빵판 목록: [BOM.md](BOM.md) (**중복 주문 금지**)  
-이력 · 검산 · 74HC↔LVC 대응: [../../archive/MANIFEST.md](../../archive/MANIFEST.md)
+5 V 빵판 목록: [BOM.md](BOM.md) (**중복 주문 금지**)
 
 **구분** · **#** = [BOM.md](BOM.md) 동일 라인(있을 때) · **Pkg** · **역할 · 목적** · **비고**
 
@@ -21,7 +20,7 @@
 | CPU · 주소 | 11 | SN74LVC574APWR | Octal D-type flip-flop, 3-state | TSSOP-20 | 7 | 버스 레지스터·범용 레지스터·플래그·PC 상위 저장 | ↔ #11 |
 | CPU · 주소 | 12 | SN74LVC161APWR | 4-bit synchronous binary counter | TSSOP-16 | 3 | PC 하위·명령 실행 단계(phase) 카운트 | ↔ #12 |
 | CPU · 주소 | 13 | SN74LVC157APWR | Quad 2-line to 1-line data selector/multiplexer | TSSOP-16 | 2 | 주소 버스 하위 8비트 선택 | ↔ #13 · #6과 합산 4 |
-| CPLD · 스위치 | 14 | ATF1504AS-10JU44 | CPLD, 64 macrocell | PLCC-44 | **2** | rev G CU + DP | ↔ #14 |
+| CPLD · 스위치 | 14 | ATF1504AS-10JU44 | CPLD, 64 macrocell | PLCC-44 | **2** | pipe CU + DP | ↔ #14 |
 | CPLD · 스위치 | 15 | *(JTAG 2×5, 1.27 mm)* | Pin header, through-hole | TH | 1 | CPLD 구성 데이터 기록 포트 | ↔ #15 어댑터 **대체** |
 | CPLD · 스위치 | 16 | *(SMD slide or tact)* | Single-pole 2-position switch | SMD | 1 | 부팅 시 ROM 맵 / 실행 시 RAM 맵을 운영자가 선택 | ↔ #16 |
 | 버스 · 메모리 | 17 | SN74LVC245APWR | Octal bus transceiver | TSSOP-20 | 1 | SRAM 데이터 버스 ↔ CPU 버스 레지스터 | ↔ #17 |
@@ -34,7 +33,7 @@
 | 전원 · 프로그래밍 | 25 | *(Prog header / USB-C UART)* | Pin header or module | TH / SMD | 1 | NOR Flash 내용 쓰기 | ↔ #27 Nano **대체** |
 | 전원 · 프로그래밍 | 26 | *(선택)* Pico / CH340 모듈 소켓 | — | — | 0–1 | 개발용 비트뱅 | ↔ #26 케이블 없음 |
 | 전원 · 프로그래밍 | 28 | SN74LVC595APWR | 8-bit serial-in parallel-out shift register | TSSOP-16 | 3 | Flash 프로그래밍 시 주소 비트 확장 | ↔ #28 |
-| 패시브 | 29 | 0.1 µF 50 V X7R | Ceramic capacitor | 0603 | 47 | IC 전원 핀 옆 고주파 디커플 | ↔ #29 · [검산](../../archive/MANIFEST.md) |
+| 패시브 | 29 | 0.1 µF 50 V X7R | Ceramic capacitor | 0603 | 47 | IC 전원 핀 옆 고주파 디커플 | ↔ #29 |
 | 패시브 | 30 | 10 µF 10 V X5R | Ceramic capacitor | 0805 | 12 | IC·모듈 VCC 벌크 안정 | ↔ #30 |
 | 패시브 | 31 | 10 µF ceramic 또는 E-C | Capacitor | 0805 / 1206 | 4 | 전원 리플·리셋 RC | ↔ #31 |
 | 패시브 | 32 | Ferrite bead ~600 Ω @ 100 MHz | Ferrite bead | 0603 | 8 | 전원선 고주파 억제 | ↔ #32 |

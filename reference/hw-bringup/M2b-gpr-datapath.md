@@ -1,17 +1,17 @@
-# M2b — CPLD GPR datapath (Gi1)
+# M2b — CPLD GPR datapath (v1.0)
 
 | Field | Value |
 |-------|-------|
 | **Milestone** | M2b (datapath) |
-| **Normative** | [cpld-system-controller.md](../hardware/cpld-system-controller.md) v1.0 Gi1 |
-| **Goal** | **CPLD-only R0 (AC)** + MBR→ALU B + FSM ADD (no external 574 GPR) |
+| **Normative** | [cpld-system-controller.md](../hardware/cpld-system-controller.md) v1.0 P12 |
+| **Goal** | **CPLD-only R0 (AC)** + MBR→ALU B + ADD (no external 574 GPR) |
 
 ---
 
 ## 1. 아키텍처 요약
 
-| 항목 | v1.0 Gi1 |
-|------|----------|
+| 항목 | v1.0 |
+|------|------|
 | GPR | **ATF1504 내부 R0 only** |
 | Read | **R0→`q_a`→ALU A** |
 | Operand B | **MBR 574 → `net_mbr` → ALU B** |
@@ -78,7 +78,7 @@ REG_WE=1 @ CLK↑ → R0 <= d_in
 
 **작업:** R0=`0x12`, MBR=`0x34`; ph2 ADD; `Y_OE`, `REG_WE`.
 
-**Pass:** **R0** = `0x46` (Gi1 writeback to AC).
+**Pass:** **R0** = `0x46` (ADD writeback to AC).
 
 ---
 
@@ -97,5 +97,4 @@ REG_WE=1 @ CLK↑ → R0 <= d_in
 
 | Date | Note |
 |------|------|
-| 2026-07-07 | Gi1 — R0 only; MBR→B |
-| 2026-07-06 | rev G 3-GPR archived |
+| 2026-07-07 | R0 only; MBR→B |

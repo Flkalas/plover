@@ -93,4 +93,4 @@ Golden vectors: [b3-opcode.md](../hw-bringup/b3-opcode.md) — all 12 opcodes fr
 
 ## Regen
 
-Netlists and timing gates are **frozen** in normative docs (2026-07-04). Historical generators: [archived-code-guide.md](../../archive/MANIFEST.md) → `tools.tar.gz`.
+Netlists and timing gates are **frozen** in normative docs (2026-07-04). Do not regenerate from external tools in the Active tree.

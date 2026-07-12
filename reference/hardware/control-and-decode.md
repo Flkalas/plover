@@ -4,8 +4,6 @@
 
 This document is the **single normative reference** for who decodes what on the v1.0 P12 CPU.
 
-**Superseded:** Gi1 idx5 — [archive/gi1-v1.0-normative/](../../archive/gi1-v1.0-normative/). Rev G — [archive/rev-g-dual-3gpr/](../../archive/rev-g-dual-3gpr/). Tier C — [archive/tier-c-single-cpld/](../../archive/tier-c-single-cpld/).
-
 ---
 
 ## 1. Layered responsibilities
@@ -88,7 +86,8 @@ No dedicated RP register. **CPLD-CU** performs push/pop in **STACK_EX** using `M
 | Pipe CU states / SYS tax | [cpld-pipe-cu.md](cpld-pipe-cu.md) |
 | ISA opcodes | [microcode-spec.md](microcode-spec.md) |
 | Dual CPLD ports, G-IC | [cpld-system-controller.md](cpld-system-controller.md) |
-| Routing, JTAG, timing | [cpld-dual-routing.md](cpld-dual-routing.md), [cpld-dual-jtag.md](cpld-dual-jtag.md), [cpld-dual-timing.md](cpld-dual-timing.md) |
+| Routing, JTAG | [cpld-dual-routing.md](cpld-dual-routing.md), [cpld-dual-jtag.md](cpld-dual-jtag.md) |
+| Pipe timing / CALL-RET fit | [cpld-pipe-cu.md](cpld-pipe-cu.md) §7 / §5.1 |
 | Flash layout | [rom-architecture.md](rom-architecture.md) |
 
 ### Truth cascade (edit order)
@@ -97,7 +96,7 @@ No dedicated RP register. **CPLD-CU** performs push/pop in **STACK_EX** using `M
 |------|------|------|
 | **Root** | [plover-whitepaper.md](../../plover-whitepaper.md) §6 | ISA / pipe narrative |
 | **Reference** | `reference/**` | Normative detail; **CU = cpld-pipe-cu** |
-| **Machine** | cyclesim golden | **Legacy Gi1 lag** until pipe rewrite |
+| **Machine** | cyclesim golden | Executable golden (pipe rewrite in progress) |
 | **CPLD** | pipe CU PLD | **Design fits pending** |
 
 ---
@@ -106,8 +105,7 @@ No dedicated RP register. **CPLD-CU** performs push/pop in **STACK_EX** using `M
 
 | Date | Note |
 |------|------|
-| 2026-07-13 | **v1.0 P12** — pipe CU; Gi1 idx5 decode archived |
+| 2026-07-13 | **v1.0 P12** — pipe CU normative |
 | 2026-07-07 | **CALL/RET** — CU stack assist |
-| 2026-07-07 | **Gi1 v1.0** — AC + MBR; no TFR |
-| 2026-07-06 | rev G archived |
+| 2026-07-07 | AC + MBR→B; R0 only; no TFR |
 | 2026-07-04 | Initial anchor: FSM-only v1.0 |

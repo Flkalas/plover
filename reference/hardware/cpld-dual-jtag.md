@@ -1,4 +1,4 @@
-# Dual CPLD JTAG daisy chain (rev G)
+# Dual CPLD JTAG daisy chain (v1.0)
 
 **Device:** ATF1504AS PLCC-44 — ISP pins **7=TDI, 13=TMS, 32=TCK, 38=TDO**
 

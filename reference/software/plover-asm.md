@@ -1,6 +1,6 @@
 # Plover assembler (S1)
 
-**Source extension:** `.pls` (Plover Language Source). Toolchain archived — assemble using frozen `.sram.hex` in [fixtures](../fixtures/) or restore `host_toolchain.tar.gz` ([archived-code-guide.md](../../archive/MANIFEST.md)).
+**Source extension:** `.pls` (Plover Language Source). Use frozen `.sram.hex` images in [fixtures](../fixtures/) for breadboard burn.
 
 ## Syntax
 

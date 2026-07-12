@@ -2,7 +2,7 @@
 
 **버전:** 1.4 · **기준일:** 2026-07-04  
 **블록:** [`hw/netlist/blocks/alu8.yaml`](../../hw/netlist/blocks/alu8.yaml)  
-**디코드:** **M1** — [`alu8_decode.yaml`](../../hw/netlist/blocks/alu8_decode.yaml) 또는 [b3-opcode.md](../hw-bringup/b3-opcode.md) DIP · **SoC** — CPLD idx5 FSM ([control-and-decode.md](control-and-decode.md))
+**디코드:** **M1** — [`alu8_decode.yaml`](../../hw/netlist/blocks/alu8_decode.yaml) 또는 [b3-opcode.md](../hw-bringup/b3-opcode.md) DIP · **SoC** — CPLD pipe CU ([control-and-decode.md](control-and-decode.md), [cpld-pipe-cu.md](cpld-pipe-cu.md))
 
 12개 `alu_sel[3:0]` 연산의 동작·제어·**조합 전파 지연**을 한 표로 정리합니다.  
 지연 값은 pre-flight sim [`74hc.yaml`](../../hw/timing/74hc.yaml) **datasheet typ/max** 합산(배선 지연 0)이며, **2.0 MHz** Execute 반주기 **250 ns** 대비 slack을 함께 기록합니다.
@@ -119,9 +119,9 @@ pre-flight sim [`alu8_cmp_sub`](../../hw/tests/alu8_cmp_sub.yaml) — 플래그 
 
 실기: `net_cmp_z` / `net_cmp_c_ge` → FLG 574 또는 CPLD; Execute 말 샘플 ([`alu8.md`](../../hw/netlist/blocks/alu8.md)).
 
-### 3.4 CPLD FSM E2E (v1.0 SoC)
+### 3.4 CPLD pipe CU E2E (v1.0 SoC)
 
-v1.0 CPU는 **FSM-only idx5** — Flash **`$4000` CW 미사용** ([control-and-decode.md](control-and-decode.md)). ALU comb 경로는 M1과 동일하며, Execute 예산에 **CPLD async GPR read** (~10–15 ns typ)만 직렬 가산.
+v1.0 CPU는 **pipe CU** — Flash **`$4000` CW 미사용** ([control-and-decode.md](control-and-decode.md)). ALU comb 경로는 M1과 동일하며, Execute 예산에 **CPLD async GPR read** (~10–15 ns typ)만 직렬 가산.
 
 | 구간 | typ (ns) | max (ns) | 비고 |
 |------|----------|----------|------|
@@ -149,26 +149,24 @@ v1.0 CPU는 **FSM-only idx5** — Flash **`$4000` CW 미사용** ([control-and-d
 
 ## 5. CPU 맥락 — 명령 “지연” (macro-cycle)
 
-ALU 블록 자체는 **순수 조합**입니다. ISA 수준 지연은 FSM phase에 따릅니다.
+ALU 블록 자체는 **순수 조합**입니다. ISA 수준 지연은 pipe CU SYS / EX에 따릅니다.
 
 | 계층 | 지연 | 설명 |
 |------|------|------|
 | ALU comb | **≤ 153 ns** | 위 §3 — Execute 반주기 250 ns **내** (worst INC) |
-| Execute phase | **1 macro-half** (250 ns) | CPLD FSM + regfile + ALU + ACC latch |
-| ALU-only µop (예: `ADD TMP`) | **1 Execute** | fetch 없음 — [microcode-spec.md](microcode-spec.md) §3.1 |
-| Fetch+Execute 명령 | **2 macro-cycle** (1.0 µs) | T1 fetch + T3 exec — [microarch-throughput](microarch-throughput.md) §3.5 |
-| 시스템 클록 | **2.0 MHz** | 500 ns macro-cycle, **250 ns** φ_fetch / φ_exec |
+| Execute | **pipe EX** (250 ns half) | CPLD-CU + regfile + ALU + ACC latch |
+| ALU-only µop (예: `ADD TMP`) | **packed EX** | fetch overlap — [microcode-spec.md](microcode-spec.md) |
+| Fetch+Execute 명령 | pipe SYS tax | [cpld-pipe-cu.md](cpld-pipe-cu.md) · [microarch-throughput](microarch-throughput.md) |
+| 시스템 클록 | **2.0 MHz** | 500 ns macro-cycle, **250 ns** φ halves |
 
 CPU E2E (Flash program fetch + CPLD-CU + CPLD-DP `q` + ALU) — ALU Y 상한 **INC 153 ns**, **SUB 136 ns**; logic **46 ns**.
 
-### Gi1 dual-CPLD paths (desk, 2 MHz)
+### Dual-CPLD / pipe paths (desk, 2 MHz)
 
 | Path | ns | Note |
 |------|---:|------|
 | Branch BEQ | **212** | 38 ns slack @ 250 ns |
-| P8 operand (Gi1) | **~133** | MBR→B + `q_a`; [cpld-dual-timing.md](cpld-dual-timing.md) |
-
-Prior rev G: TFR G-IC 40 ns; P8 168 ns — archived.
+| Operand path | **~133** | MBR→B + `q_a`; [cpld-pipe-cu.md](cpld-pipe-cu.md) §7.1 |
 
 ---
 
@@ -186,8 +184,8 @@ Prior rev G: TFR G-IC 40 ns; P8 168 ns — archived.
 
 | 날짜 | 내용 |
 |------|------|
-| 2026-07-07 | Gi1 ph2 ADD ~133 ns path |
-| 2026-07-06 | rev G dual-CPLD timing paths |
+| 2026-07-13 | SoC = pipe CU; dual-CPLD path wording |
+| 2026-07-07 | ADD ~133 ns operand path |
 | 2026-07-04 | v1.4: INC **153** / SUB **136** ns |
 | 2026-07-03 | Bit-slice `U_ALU_153_0..7` + AB bus |
 | 2026-06-02 | Phase B2: Gigatron logic, **12 DIP** |

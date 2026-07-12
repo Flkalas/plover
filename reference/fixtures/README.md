@@ -10,4 +10,4 @@
 
 Format: one **hex byte per line** (e.g. `05` = `0x05`). When programming, convert to your programmer’s format (byte stream or Intel HEX).
 
-Historical generators and full `hw/fixtures/` tree: see [archived-code-guide.md](../../archive/MANIFEST.md) → `hw.tar.gz`.
+Use these frozen images for burn; do not regenerate from an external toolchain in the Active tree.

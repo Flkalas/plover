@@ -1,8 +1,7 @@
 # Microcode Specification v1.0 P12
 
 **Normative:** v1.0 breadboard intent — **P12** pipe CU (PE1 machine + P12 discipline)  
-**Related:** [cpld-pipe-cu.md](cpld-pipe-cu.md) · [rom-architecture.md](rom-architecture.md) · [cpld-system-controller.md](cpld-system-controller.md)  
-**Superseded:** Gi1 idx5 multiphase — [archive/gi1-v1.0-normative/](../../archive/gi1-v1.0-normative/). Rev G 3-GPR + TFR — [archive/rev-g-dual-3gpr/](../../archive/rev-g-dual-3gpr/).
+**Related:** [cpld-pipe-cu.md](cpld-pipe-cu.md) · [rom-architecture.md](rom-architecture.md) · [cpld-system-controller.md](cpld-system-controller.md)
 
 ---
 
@@ -18,9 +17,9 @@
 
 **No Flash fetch** for control. Flash `$4000` region **unused** ([rom-architecture.md](rom-architecture.md)).
 
-### 1.1 Pipe (not idx5 phase)
+### 1.1 Pipe schedule
 
-Gi1 `(opcode<<2)|phase` idle-capable tables are **archived**. Active schedule = pipe states and SYS tax in [cpld-pipe-cu.md](cpld-pipe-cu.md).
+Active schedule = pipe states and SYS tax in [cpld-pipe-cu.md](cpld-pipe-cu.md). No multiphase idle rows.
 
 ### 1.2 Operand datapath
 
@@ -80,7 +79,7 @@ Normative tax table: [cpld-pipe-cu.md](cpld-pipe-cu.md) §4. Summary:
 | RET | **4** |
 | HALT | **1** |
 
-**P12:** lab fail → stretch (+1 visible). No Gi1 ADD/CMP idle phases.
+**P12:** lab fail → stretch (+1 visible). No ADD/CMP idle phases.
 
 ### 2.3 Return stack (CU-assisted)
 
@@ -107,7 +106,7 @@ No hardware RP register. CALL/RET push/pop is performed by **CPLD-CU** in **STAC
 | Operand imm8 | **MBR / oper latch** from IF |
 | ALU / bus strobes | **CPLD-CU** pipe outputs |
 
-Verify: [cpld-pipe-cu.md](cpld-pipe-cu.md). Legacy Gi1 idx5 row lists are archived.
+Verify: [cpld-pipe-cu.md](cpld-pipe-cu.md).
 
 ---
 
@@ -174,9 +173,8 @@ P1 `DECODE_BYPASS` — not normative SoC path.
 
 | Date | Note |
 |------|------|
-| 2026-07-13 | **v1.0 P12** — pipe SYS sheet; Gi1 idx5 idle schedule archived |
+| 2026-07-13 | **v1.0 P12** — pipe SYS sheet |
 | 2026-07-07 | **CALL/RET** — CU return-stack assist |
-| 2026-07-07 | **Gi1 v1.0** — AC + MBR→B; R0 only; TFR removed |
-| 2026-07-06 | **rev G** archived |
-| 2026-06-24 | idx5 FSM decode; ISA `[4:0]`; FSM-only |
+| 2026-07-07 | AC + MBR→B; R0 only; TFR removed |
+| 2026-06-24 | ISA `[4:0]`; FSM-only |
 | 2026-06-10 | v1.0 initial |

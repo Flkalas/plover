@@ -1,15 +1,10 @@
 # Plover hardware bring-up index
 
 > **Normative v1.0 P12:** pipe CU — [cpld-pipe-cu.md](../hardware/cpld-pipe-cu.md) · [system-architecture.md](../hardware/system-architecture.md).  
-> **Legacy:** Gi1 idx5 multiphase M2a/M3a/M3b steps below remain useful wiring history until pipe bring-up is rewritten — [archive/gi1-v1.0-normative/](../../archive/gi1-v1.0-normative/).  
-> **실구매 패키지:** [parts-on-hand.md](../project/parts-on-hand.md) · Wiring: [breadboard-wiring.md](breadboard-wiring.md).
-
-**마일스톤 계획:** [archive/MANIFEST.md](../../archive/MANIFEST.md)
+> **실구매 패키지:** [parts-on-hand.md](../project/parts-on-hand.md) · Wiring: [breadboard-wiring.md](breadboard-wiring.md).  
+> Reading ladder: [reference/README.md](../README.md) (L0–L10).
 
 초보 작업자도 **문서만 따라** 빵판 CPU를 올릴 수 있도록 단계별 시방서입니다.
-
-> **P12 note:** Target control is **IF\|EX pipe**, not idx5 idle phases. Treat M3a “22 idx5 rows” and M3b multiphase execute as **legacy Gi1** until updated.
-
 
 ---
 
@@ -17,10 +12,10 @@
 
 ```mermaid
 flowchart LR
-  M1[M1 ALU] --> M2a[M2a CPLD FSM]
-  M2a --> M2b[M2b 138x2 + memory]
-  M2b --> M3a[M3a FSM verify (no Flash CW)]
-  M3a --> M3b[M3b fetch FSM]
+  M1[M1 ALU] --> M2a[M2a Dual CPLD]
+  M2a --> M2b[M2b Datapath plus memory]
+  M2b --> M3a[M3a Pipe CU verify]
+  M3a --> M3b[M3b Fetch Execute]
   M3b --> M4[M4 boot]
   M4 --> M5[M5 E2E]
 ```
@@ -28,10 +23,10 @@ flowchart LR
 | 순서 | 할 일 | 시작 문서 |
 |------|-------|-----------|
 | 1 | ALU 납땜 + Y LED | [M1-alu.md](M1-alu.md) → [M1-b3-procedure.md](M1-b3-procedure.md) |
-| 2 | CPLD FSM 소각 (WinCUPL CUPL + FIT1504 JED) | [M2a-cpld-decode.md](M2a-cpld-decode.md) |
-| 3 | 138×2 · CPLD datapath · SRAM/NOR | [M2b-gpr-memory.md](M2b-gpr-memory.md) · [breadboard-wiring.md](breadboard-wiring.md) |
-| 4 | FSM table verify | [M3a-control-store.md](M3a-control-store.md) |
-| 5 | ROM fetch + FSM execute | [M3b-fetch-execute.md](M3b-fetch-execute.md) |
+| 2 | Dual CPLD JED (WinCUPL + Design fits) | [M2a-cpld-decode.md](M2a-cpld-decode.md) |
+| 3 | R0/MBR datapath · SRAM/NOR | [M2b-gpr-memory.md](M2b-gpr-memory.md) · [breadboard-wiring.md](breadboard-wiring.md) |
+| 4 | Pipe CU verify (no Flash CW) | [M3a-control-store.md](M3a-control-store.md) |
+| 5 | PROG fetch + pipe execute | [M3b-fetch-execute.md](M3b-fetch-execute.md) |
 | 6 | (PC) 부트 sim | [M4a-boot-sim.md](M4a-boot-sim.md) |
 | 7 | 부트 실기 | [M4b-boot-hardware.md](M4b-boot-hardware.md) |
 | 8 | netlist 고정 | [M5-cpu-e2e.md](M5-cpu-e2e.md) |
@@ -53,18 +48,18 @@ flowchart LR
 
 | 문서 | 내용 |
 |------|------|
-| [M2a-cpld-decode.md](M2a-cpld-decode.md) | CPLD 3fixed + phase FSM ISP |
-| [M2b-gpr-memory.md](M2b-gpr-memory.md) | M2b 개요 |
-| [M2b-gpr-datapath.md](M2b-gpr-datapath.md) | Gi1 AC (R0) + MBR→ALU B (no decode) |
+| [M2a-cpld-decode.md](M2a-cpld-decode.md) | Dual CPLD ISP / Design fits |
+| [M2b-gpr-memory.md](M2b-gpr-memory.md) | M2b 개요 (datapath + memory) |
+| [M2b-gpr-datapath.md](M2b-gpr-datapath.md) | R0 + MBR→ALU B |
 | [M2b-memory.md](M2b-memory.md) | SRAM·NOR·MAP_MODE |
-| [breadboard-wiring.md](breadboard-wiring.md) | 138×2 · CPLD FSM idx5 |
+| [breadboard-wiring.md](breadboard-wiring.md) | 138×2 · dual CPLD / pipe CU |
 
-### M3 — Microcode
+### M3 — Control / fetch
 
 | 문서 | 내용 |
 |------|------|
-| [M3a-control-store.md](M3a-control-store.md) | FSM table verify (no Flash CW) |
-| [M3b-fetch-execute.md](M3b-fetch-execute.md) | PC · FSM · 첫 ROM 프로그램 |
+| [M3a-control-store.md](M3a-control-store.md) | Pipe CU verify (no Flash CW) |
+| [M3b-fetch-execute.md](M3b-fetch-execute.md) | PC · pipe · 첫 ROM 프로그램 |
 
 ### M4 / M5
 
@@ -76,9 +71,9 @@ flowchart LR
 
 ---
 
-## 사전 검증 (개발자)
+## 사전 검증
 
-Breadboard 전 시뮬·회귀 명령: [archive/MANIFEST.md](../../archive/MANIFEST.md).
+Use frozen fixtures in [fixtures](../fixtures/) before breadboard burn.
 
 ---
 
@@ -86,6 +81,6 @@ Breadboard 전 시뮬·회귀 명령: [archive/MANIFEST.md](../../archive/MANIFE
 
 | Date | Note |
 |------|------|
-| 2026-06-24 | **v1.0** — CPLD FSM + CPLD FSM; no alu8_decode in SoC |
-| 2026-06-10 | v1.0 path archived |
+| 2026-07-13 | Pipe CU retarget; M2b hub; no archive banners |
+| 2026-06-24 | **v1.0** — CPLD + no alu8_decode in SoC |
 | 2026-06-08 | Milestone index M1–M5 |

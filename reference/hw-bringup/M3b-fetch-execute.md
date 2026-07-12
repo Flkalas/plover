@@ -1,11 +1,11 @@
-# M3b — Fetch path and macro execution (Gi1)
+# M3b — Fetch path and macro execution (v1.0 P12)
 
 | Field | Value |
 |-------|-------|
 | **Milestone** | M3b |
-| **Goal** | ROM fetch → **CPLD FSM (idx5)** → operand via MBR → 첫 프로그램 HALT |
+| **Goal** | ROM/PROG fetch → **pipe CU** → operand via MBR → 첫 프로그램 HALT |
 | **선행** | [M2b G4](M2b-gpr-datapath.md#g4--fsm-add-ph2), [M3a](M3a-control-store.md) |
-| **Normative** | [cpld-system-controller.md](../hardware/cpld-system-controller.md) §7 |
+| **Normative** | [cpld-pipe-cu.md](../hardware/cpld-pipe-cu.md) · [cpld-system-controller.md](../hardware/cpld-system-controller.md) |
 
 ---
 
@@ -15,10 +15,10 @@
 |------|-----|-----|------|
 | **PC** | 574+161 | `net_pc0..15` | instruction address |
 | **IR** | 574 | `net_ir0..7` | opcode byte → CPLD `OPC[4:0]` |
-| **MBR** | 574 | `net_mbr0..7` | operand imm8 / abs16 lo; **Gi1: ALU B** |
+| **MBR** | 574 | `net_mbr0..7` | operand imm8 / abs16 lo; **ALU B** |
 | **MBR hi** | 574 or PC+2 path | — | abs16 high byte (BEQ/JMP/CALL) |
-| **Phase** | CPLD internal | `phase[1:0]` | micro-phase 0..2 |
-| **FLG** | 574 | Z, C | BEQ @ macro_end |
+| **Pipe CU** | CPLD-CU | IF\|EX states | [cpld-pipe-cu.md](../hardware/cpld-pipe-cu.md) |
+| **FLG** | 574 | Z, C | BEQ / flags |
 | **PC+1** | 283 (low) | — | sequential fetch |
 
 **없음:** PARAM 574, Flash `$4000` CW fetch, CPLD `q_b`, TFR comb.
@@ -27,26 +27,26 @@
 
 ## 2. 주소 MUX · 오퍼랜드 데이터 경로
 
-| 모드 | `FETCH` | A 버스 소스 | 데이터 → |
-|------|---------|-------------|----------|
-| **Insn fetch** | 1 | PC → ROM/RAM | IR (byte0), MBR (byte1+) |
-| **Data access** | 0 | MBR (or abs16 latch) | MEM_RD / MEM_WR |
+| 모드 | `FETCH` / PROG | A 버스 소스 | 데이터 → |
+|------|----------------|-------------|----------|
+| **Insn fetch (IF)** | PROG | PC → Flash | IR (byte0), MBR (byte1+) |
+| **Data access (EX)** | DATA | MBR (or abs16 latch) | MEM_RD / MEM_WR |
 
-### 오퍼랜드 취득 (Gi1)
+### 오퍼랜드 취득
 
-| 명령 | Fetch bytes | MBR / latch | FSM |
-|------|-------------|-------------|-----|
-| LDA `02 imm` | PC, PC+1 | imm8 → MBR (address) | ph0 MEM_RD @ MBR |
-| STA `03 imm` | PC, PC+1 | imm8 → MBR | ph1 MEM_WR @ MBR |
-| LDIO/STIO | 2-byte | imm8 → MBR | MMIO decode |
-| BEQ/JMP/CALL | 3-byte | abs16 LE → MBR+hi | macro_end PC_LOAD_EN |
-| RET | 1-byte | — | macro_end pop + PC_LOAD_EN |
-| ADD `01 imm` | PC, PC+1 | imm8 → **MBR (held → ALU B)** | ALU_REG ph2 → **R0** |
-| `0x10–0x1F` | — | — | **trap / NOP** |
+| 명령 | Fetch bytes | MBR / latch | Pipe intent |
+|------|-------------|-------------|-------------|
+| LDA `02 imm` | PC, PC+1 | imm8 → MBR (address) | MEM_STALL + REG_WE |
+| STA `03 imm` | PC, PC+1 | imm8 → MBR | MEM_STALL + MEM_WR |
+| LDIO/STIO | 2-byte | imm8 → MBR | MMIO + MEM_STALL |
+| BEQ/JMP/CALL | 3-byte | abs16 LE → MBR+hi | BRANCH_BUBBLE / STACK_EX |
+| RET | 1-byte | — | STACK_EX + PC_LOAD_EN |
+| ADD `01 imm` | PC, PC+1 | imm8 → **MBR (held → ALU B)** | packed EX → **R0** |
+| `0x10–0x1F` | — | — | **trap / invalid** |
 
-### MBR hold (ALU_REG)
+### MBR hold (ALU EX)
 
-During ADD/CMP macro ph0–ph2: **do not reload MBR** — operand imm8 must remain on `net_mbr` for ALU B.
+During ADD/CMP EX: **do not reload MBR** — operand imm8 must remain on `net_mbr` for ALU B.
 
 RESET: **74HC157** → `$FFFC` → PC `$0000` (Boot).
 
@@ -56,12 +56,12 @@ RESET: **74HC157** → `$FFFC` → PC `$0000` (Boot).
 
 | 단계 | 동작 |
 |------|------|
-| BEQ ph0 | ALU SUB (or prior CMP) → **FLG 574** ← Z |
-| BEQ macro_end | CPLD `PC_LOAD_EN <= FLG_Z`; if Z, PC ← abs16 in MBR |
-| JMP macro_end | `PC_LOAD_EN <= 1`; PC ← abs16 in MBR |
-| CALL macro_end | stack push (`mem[RP]←return_pc`, `RP+=2`); then `PC_LOAD_EN <= 1`; PC ← abs16 in MBR |
-| RET macro_end | `RP-=2`; read `mem[RP]` → **PC_in**; `PC_LOAD_EN <= 1` |
-| Non-branch macro_end | `PC_LOAD_EN=0`; PC += insn_length (283/161 glue) |
+| BEQ EX | ALU SUB (or prior CMP) → **FLG 574** ← Z |
+| BEQ taken | CPLD `PC_LOAD_EN <= FLG_Z`; **BRANCH_BUBBLE**; PC ← abs16 |
+| JMP | `PC_LOAD_EN`; **BRANCH_BUBBLE**; PC ← abs16 |
+| CALL | **STACK_EX** push return PC; `PC_LOAD_EN`; PC ← abs16 |
+| RET | **STACK_EX** pop → **PC_in**; `PC_LOAD_EN` |
+| Non-branch retire | `PC_LOAD_EN=0`; PC advances with IF stream |
 
 **관측:** 스코프 on `FLG_Z`, `PC_LOAD_EN`, PC transition.
 
@@ -69,44 +69,44 @@ RESET: **74HC157** → `$FFFC` → PC `$0000` (Boot).
 
 ## 4. 매크로 타임라인 (@ 2 MHz)
 
-**idx5 key:** `(opcode[4:0] << 2) | phase` — [M3a-control-store.md](M3a-control-store.md) §2.
+Active SYS tax: [cpld-pipe-cu.md](../hardware/cpld-pipe-cu.md) §4. Do **not** verify idle padding phases.
 
 ### ADD (`0x01`)
 
-| phase | idx5 | 동작 |
-|-------|------|------|
-| 0 | 4 | idle; MBR holds imm |
-| 1 | 5 | idle |
-| 2 | 6 | R0←R0+imm; `Y_OE`; REG_WE→R0; FLG_WE |
+| Intent | 동작 |
+|--------|------|
+| IF | Fetch opcode / imm on PROG (imm may shadow prior EX) |
+| EX | R0←R0+imm; `Y_OE`; `REG_WE`→R0; FLG_WE; **MBR hold** |
+
+Typical SYS: **2** (stream → **1**).
 
 ### CMP (`0x0D`)
 
-| phase | idx5 | 동작 |
-|-------|------|------|
-| 0 | 52 | idle |
-| 1 | 53 | idle |
-| 2 | 54 | FLG_WE only; B from MBR |
+| Intent | 동작 |
+|--------|------|
+| IF | Fetch opcode / imm |
+| EX | FLG_WE only; B from MBR |
 
-### CALL (`0x06`) — idx5 24
+### CALL (`0x06`)
 
-| phase | idx5 | 동작 |
-|-------|------|------|
-| 0 | 24 | macro_end: push return PC; `PC_LOAD_EN`; PC ← abs16 (MBR) |
+| Intent | 동작 |
+|--------|------|
+| IF | Abs16 |
+| EX | **STACK_EX** push; `PC_LOAD_EN`; bubble as needed |
 
-### RET (`0x07`) — idx5 28
+### RET (`0x07`)
 
-| phase | idx5 | 동작 |
-|-------|------|------|
-| 0 | 28 | macro_end: pop return PC → **PC_in**; `PC_LOAD_EN` |
+| Intent | 동작 |
+|--------|------|
+| EX | **STACK_EX** pop → **PC_in**; `PC_LOAD_EN`; bubble |
 
 Return stack semantics: [microcode-spec.md](../hardware/microcode-spec.md) §2.3.
 
 ### LDA (`0x02`)
 
-| phase | 동작 |
-|-------|------|
-| 0 | FETCH=0; MEM_RD @ MBR |
-| 1 | REG_WE → R0 |
+| Intent | 동작 |
+|--------|------|
+| EX | MEM_RD @ MBR; REG_WE → R0; **MEM_STALL** |
 
 ---
 
@@ -128,31 +128,31 @@ Return stack semantics: [microcode-spec.md](../hardware/microcode-spec.md) §2.3
 
 **Pass:** IR = `0x02`; after 2nd fetch MBR = `0x42`.
 
-### F2 — FSM → datapath
+### F2 — Pipe CU → datapath
 
-1. IR=`0x02` → FSM MEM_LD.
-2. ph0: `FETCH=0`, `MEM_RD` @ MBR=`$42`.
-3. ph1: `REG_WE` → R0.
+1. IR=`0x02` → MEM load path.
+2. EX: `MEM_RD` @ MBR=`$42` (**MEM_STALL** as needed).
+3. `REG_WE` → R0.
 
 ### F3 — PC advance
 
-LDA: PC += 2 after macro; phase reset.
+LDA: PC advances with IF stream after retire.
 
 ### F4 — Full mini-program
 
-LDA → ADD → HALT. **Pass:** R0 holds final sum (Gi1: ADD result in R0).
+LDA → ADD → HALT. **Pass:** R0 holds final sum.
 
 ### F5 — BEQ smoke (optional)
 
-ROM: CMP + BEQ; verify `PC_LOAD_EN` only when Z=1.
+ROM: CMP + BEQ; verify `PC_LOAD_EN` only when Z=1; taken → **BRANCH_BUBBLE**.
 
 ---
 
 ## 6. M3b sign-off
 
 - [ ] F0–F4 Pass on **breadboard**
-- [ ] Machine golden pre-flight: fetch IR/MBR, m3b mini, BEQ/JMP/CALL/RET
-- [ ] MBR hold during ADD/CMP macro
+- [ ] Align with [cpld-pipe-cu.md](../hardware/cpld-pipe-cu.md) SYS sheet (no idle padding)
+- [ ] MBR hold during ADD/CMP EX
 - [ ] No Flash param / `$4000` fetch in path
 - [ ] BEQ: FLG_Z gates `PC_LOAD_EN`
 
@@ -168,6 +168,7 @@ ROM: CMP + BEQ; verify `PC_LOAD_EN` only when Z=1.
 
 | Date | Note |
 |------|------|
-| 2026-07-07 | CALL/RET — 3B/1B fetch; macro_end push/pop |
-| 2026-07-07 | Gi1 — MBR→B; ADD→R0; TFR removed |
-| 2026-07-06 | rev G timeline archived |
+| 2026-07-13 | Retarget timelines to pipe CU |
+| 2026-07-07 | CALL/RET — 3B/1B fetch; stack push/pop |
+| 2026-07-07 | MBR→B; ADD→R0; TFR removed |
+

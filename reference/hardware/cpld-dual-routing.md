@@ -1,4 +1,4 @@
-# Dual CPLD breadboard routing (Gi1)
+# Dual CPLD breadboard routing (v1.0 P12)
 
 **Pins:** [cpld-system-controller.md](cpld-system-controller.md) · **Bring-up:** [breadboard-wiring.md](../hw-bringup/breadboard-wiring.md)
 
@@ -40,13 +40,13 @@ Place **CPLD-CU** and **CPLD-DP** on **adjacent 830-tie rows**, pin-1 aligned.
 
 ---
 
-## MBR → ALU B (Gi1)
+## MBR → ALU B
 
 | Net | Source | Destination |
 |-----|--------|-------------|
 | `net_mbr0..7` | MBR 574 Q | `net_b0..7` → ALU B |
 
-**Removed vs rev G:** CPLD `q_b0..7` → ALU B (disconnect).
+ALU B is **not** driven from CPLD `q_b` (no `q_b` on DP).
 
 Optional **74HC244** on MBR fanout if needed (desk: direct wire OK).
 
@@ -74,5 +74,5 @@ JTAG: [cpld-dual-jtag.md](cpld-dual-jtag.md)
 
 | Date | Note |
 |------|------|
-| 2026-07-07 | Gi1 — G-IC 1-wire; MBR→B |
-| 2026-07-06 | rev G 6-wire G-IC |
+| 2026-07-13 | v1.0 P12 title; Active-only wording |
+| 2026-07-07 | G-IC 1-wire; MBR→B |
