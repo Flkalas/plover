@@ -1,6 +1,6 @@
 ﻿# ROM Architecture v1.0
 
-**Related:** [system-architecture.md](system-architecture.md) · [memory-map.md](memory-map.md) · [microcode-spec.md](microcode-spec.md) · [rom-comparison.md](rom-comparison.md) (peer ROM roles)
+**Related:** [system-architecture.md](system-architecture.md) · [memory-map.md](memory-map.md) · [microcode-spec.md](microcode-spec.md)
 
 ROM is the **code of law** for the system: deterministic rules for boot, datapath control, and fixed assets.
 

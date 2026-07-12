@@ -37,11 +37,9 @@ ISA or pipe CU changes: **whitepaper first** → reference → machine code → 
 | [hardware/cpld-system-controller.md](hardware/cpld-system-controller.md) | Dual CPLD CU/DP ports |
 | [hardware/memory-map.md](hardware/memory-map.md) | Address map |
 | [hardware/alu-opcodes-timing.md](hardware/alu-opcodes-timing.md) | ALU comb delay |
-| [hardware/ttl-computer-comparison.md](hardware/ttl-computer-comparison.md) | Plover vs other TTL homebrew CPUs |
-| [hardware/cu-dp-comparison.md](hardware/cu-dp-comparison.md) | CU·DP vs peers |
-| [hardware/rom-comparison.md](hardware/rom-comparison.md) | ROM/Flash count and roles |
-| [hardware/clock-comparison.md](hardware/clock-comparison.md) | Clock / throughput comparison |
 | [fixtures/README.md](fixtures/README.md) | Frozen burn images |
+
+Peer surveys / FPGA planning (not Active): [archive/reference-background/](../archive/reference-background/).
 
 ## Software, boot, copro
 

@@ -1,7 +1,7 @@
 # Dual CPLD timing (Gi1)
 
-**Clock:** 2.0 MHz Â· **Half-cycle:** 250 ns  
-**Related:** [cpld-dual-timing.md](cpld-dual-timing.md) Â· [alu-opcodes-timing.md](alu-opcodes-timing.md) Â· [rom-comparison.md](rom-comparison.md) Â· [cu-dp-comparison.md](cu-dp-comparison.md) Â· [ttl-computer-comparison.md](ttl-computer-comparison.md) Â· [clock-comparison.md](clock-comparison.md) (peer clocks)
+**Clock:** 2.0 MHz · **Half-cycle:** 250 ns  
+**Related:** [alu-opcodes-timing.md](alu-opcodes-timing.md) · [cpld-pipe-cu.md](cpld-pipe-cu.md) §7 (P12 pipe desk) · [cpld-system-controller.md](cpld-system-controller.md)
 
 ---
 
