@@ -44,6 +44,8 @@ Restore: `tar -xzf archive/NAME.tar.gz -C .` from repository root.
 | [rev-g-dual-3gpr/](rev-g-dual-3gpr/) | **Superseded 2026-07-07** — rev G 3-GPR + TFR index |
 | [gi1-v1.0-normative/](gi1-v1.0-normative/) | **Superseded 2026-07-13** — Gi1 idx5 multiphase normative before **v1.0 P12** |
 | [reference-background/](reference-background/) | **Frozen 2026-07-13** — peer comparisons + FPGA guide (not Active implementer specs) |
+| `pl-dos-fs-interchange-notes.tar.gz` | **Frozen 2026-07-13** — PL-DOS / SD FDD interchange design notes (not Active) |
+| [pl-dos-fs-interchange-notes/](pl-dos-fs-interchange-notes/) | Index README for `pl-dos-fs-interchange-notes.tar.gz` |
 
 `build/`, `target/`, `.venv/` — local artifacts; not bundled. Delete locally.
 
