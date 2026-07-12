@@ -37,6 +37,8 @@ Restore: `tar -xzf archive/NAME.tar.gz -C .` from repository root.
 | `fit-study-gpr-fsm.tar.gz` | **Frozen 2026-07-06** — GPR-FSM variant studies (A1/D5a/E1/F2/G), WinCUPL fit logs, desk reports |
 | `cpld-rev-g-hdl.tar.gz` | **Frozen 2026-07-06** — rev G dual CPLD HDL (`hdl/`, `netlist/`) — restore before WinCUPL build |
 | `gpr4-regfile-research.tar.gz` | **Frozen 2026-07-07** — 4-GPR / P1 / P1M1 / Gi1 feasibility study (`research/gpr4-regfile/`) |
+| `p12-era-research.tar.gz` | **Frozen 2026-07-13** — call-ret / cpld-ustep / primitive-one-clock / pe1 / p12 desk studies (fed **v1.0 P12**) |
+| [p12-era-research/](p12-era-research/) | Index README for `p12-era-research.tar.gz` |
 | [tier-c-single-cpld/](tier-c-single-cpld/) | **Superseded 2026-07-06** — single ATF1504 + CW 574×2 (pre rev G) |
 | [rev-g-normative-snapshot/](rev-g-normative-snapshot/) | **Frozen 2026-07-07** — rev G normative prose before Gi1 adoption |
 | [rev-g-dual-3gpr/](rev-g-dual-3gpr/) | **Superseded 2026-07-07** — rev G 3-GPR + TFR index |
@@ -57,7 +59,8 @@ Restore: `tar -xzf archive/NAME.tar.gz -C .` from repository root.
 | `docs/hw-bringup/**` | `reference/hw-bringup/**` |
 | `docs/developer/**` | `developer_docs.tar.gz` |
 | `docs/hardware/research/**` | `research_docs.tar.gz` |
-| `research/**` | `gpr4-regfile-research.tar.gz` |
+| `research/gpr4-regfile/**` | `gpr4-regfile-research.tar.gz` |
+| `research/call-ret-cu-fit/**`, `pe1/**`, `p12/**`, … | `p12-era-research.tar.gz` |
 | `docs/archive/**` | `docs_archive.tar.gz` |
 | `BOM.md` (root) | `reference/project/BOM.md` |
 | `archive/bundles/**` | `archive/*.tar.gz` |
@@ -74,7 +77,7 @@ For **architecture**, **bring-up**, **timing**, or **decode**:
 1. Cite **`reference/**` and `plover-whitepaper.md` only** — not restored tarball content.
 2. Do **not** run or quote sim/code from `archive/*.tar.gz` unless the user explicitly asks for historical comparison.
 3. **Forbidden as v1.0 SoC truth:** `alu8_decode` on breadboard, Flash `$4000` CW burn, `cpu_cw_direct`, pareto MC reports.
-4. Research and developer docs exist only in tarballs — exploration history, not current spec. **No `research/` folder in the active tree** — restore `gpr4-regfile-research.tar.gz` only when comparing history.
+4. Research and developer docs exist only in tarballs — exploration history, not current spec. **No `research/` folder in the active tree** — restore `gpr4-regfile-research.tar.gz` or `p12-era-research.tar.gz` only when comparing history.
 
 ### Frozen FSM snapshot (M3a) — Gi1 legacy
 
