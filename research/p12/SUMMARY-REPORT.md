@@ -2,12 +2,13 @@
 
 **Date:** 2026-07-13  
 **Build code:** **P12** (PE1 + FE2 discipline)  
-**Tier:** Research (non-normative)  
-**Model:** [model/p12_ipc_model.py](model/p12_ipc_model.py)
+**Tier:** Research desk (fed **Active v1.0 P12**)  
+**Model:** [model/p12_ipc_model.py](model/p12_ipc_model.py)  
+**Active reference:** [system-architecture.md](../../reference/hardware/system-architecture.md) · [cpld-pipe-cu.md](../../reference/hardware/cpld-pipe-cu.md)
 
-## Verdict: **Conditional Go**
+## Verdict: **Fed Active** (desk was Conditional Go)
 
-P12 is **PE1’s IF|EX + Harvard-like ports** with FE2’s **no-idle EX**, **stretch-on-fail** sheet, and **serial FE2 fallback**. Optimistic P12 matches PE1 (ALU stream **IPC → 1.0**). Lab failure must update visible SYS, not reintroduce Gi1 idle or wishful FE1.
+P12 discipline + PE1 machine are **Active normative** as **v1.0 P12**. Lab / Design fits still open. Optimistic P12 matches PE1 (ALU stream **IPC → 1.0**).
 
 ## Question answers
 
@@ -38,13 +39,13 @@ Run: `python model/p12_ipc_model.py`.
 | FE2 / PE1 / **P12** | 7 | ≈ **286 KB/s** |
 | P12 stretch | 9 | ≈ 222 KB/s |
 
-## Conditions before any P12 normative proposal
+## Conditions (lab / bitstream — prose already Active)
 
-1. All PE1 lab / fit / BOM gates still apply.
+1. All PE1 lab / fit / BOM gates still apply on hardware.
 2. Stretch columns stay in the programmer sheet; no silent idle return.
 3. Fallback to serial FE2 is a **named mode** if ports fail ([fallback-fe2.md](fallback-fe2.md)).
 4. Stretch before raising f_SYS ([clock-candidates.md](clock-candidates.md)).
-5. Keep Gi1 normative until PE1/P12 lab + fit pass.
+5. Gi1 idx5 is **archived** — [archive/gi1-v1.0-normative/](../../archive/gi1-v1.0-normative/).
 
 ## Contrast
 
@@ -57,12 +58,13 @@ Run: `python model/p12_ipc_model.py`.
 
 ## Next steps
 
-1. Prefer P12 over raw PE1 when documenting lab stretch / fallback.
-2. Breadboard PE1 ports first; apply stretch policy from day one.
-3. Do not edit normative multiphase tables yet.
+1. Breadboard PROG∥DATA + pipe latches per Active CU doc.
+2. WinCUPL pipe CU Design fits.
+3. Rewrite cyclesim golden off legacy Gi1 multiphase.
 
 ## Change log
 
 | Date | Note |
 |------|------|
+| 2026-07-13 | Desk **fed Active v1.0 P12** + [cpld-pipe-cu.md](../../reference/hardware/cpld-pipe-cu.md) |
 | 2026-07-13 | Initial desk study — Conditional Go |

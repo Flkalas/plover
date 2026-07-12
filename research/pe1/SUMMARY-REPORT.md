@@ -55,12 +55,14 @@ Exact numbers: run `python pe1_ipc_model.py`.
 
 ## Conditions before any PE1 normative proposal
 
+**Note (2026-07-13):** PE1 machine + P12 discipline are now **Active v1.0 P12** in reference ([system-architecture.md](../../reference/hardware/system-architecture.md), [cpld-pipe-cu.md](../../reference/hardware/cpld-pipe-cu.md)). Remaining gates are **lab / bitstream**, not prose nomination.
+
 1. Accept BOM delta (PROG latch path + pipe IR) on breadboard real estate.
 2. Lab: IF||EX overlap on ADD stream at **low SYS** first; stretch stalls if unstable.
-3. Document programmer sheet = pipe table (bubbles are ISA-visible timing).
-4. CU pipe/stall **Design fits** on ATF1504 if PLD forked later.
-5. Do **not** add branch prediction in v1 of PE1.
-6. Lab-measure RP mailbox GPIO response; keep **≤ 80 ns** desk or stretch MMIO EX / update budget.
+3. Programmer sheet = pipe table (bubbles are ISA-visible timing) — see Active CU doc.
+4. CU pipe/stall **Design fits** on ATF1504 when PLD exists.
+5. Do **not** add branch prediction in v1 of PE1/P12.
+6. Lab-measure RP mailbox GPIO response; keep **≤ 80 ns** desk or stretch MMIO EX.
 7. For f_SYS > 2 MHz: prefer **3.6864 MHz** over 4.0; gate on **measured BEQ slack ≥ 50 ns**.
 
 ## Contrast
@@ -75,18 +77,15 @@ Exact numbers: run `python pe1_ipc_model.py`.
 
 ## Next steps
 
-1. Optional breadboard sketch: PROG 245 + IR 574 wiring note.
-2. Scope mailbox `LDIO` D-valid vs 80 ns assumption ([mailbox-2mhz.md](mailbox-2mhz.md)).
-3. Scope BEQ slack at 2.0 then 3.6864 ([beq-lab.md](beq-lab.md)).
-4. Keep Gi1 normative until PE1 lab + fit gates pass.
-5. Prefer PE1 over cpld-ustep when the goal is **programmer 1-work≈1-clock**, not multiphase pedagogy.
-6. vFDD fast path only if **throughput** goal exceeds ~0.3 MB/s copy — not required for 2 MHz timing closure.
-7. For stretch sheet + FE2 fallback documentation, use build **P12** — [../p12/SUMMARY-REPORT.md](../p12/SUMMARY-REPORT.md).
+1. Prefer P12 over raw PE1 when documenting lab stretch / fallback — **fed Active [v1.0 P12](../../reference/hardware/system-architecture.md)** / [cpld-pipe-cu.md](../../reference/hardware/cpld-pipe-cu.md).
+2. Breadboard PE1 ports first; apply stretch policy from day one.
+3. Pipe CU `.pld` Design fits — follow Active CU doc (bitstream still pending).
 
 ## Change log
 
 | Date | Note |
 |------|------|
+| 2026-07-13 | Desk study **fed Active v1.0 P12** reference + pipe CU |
 | 2026-07-13 | Link P12 (PE1 + FE2 discipline) |
 | 2026-07-13 | Clock margin policy; 3.6864 candidate; BEQ lab |
 | 2026-07-13 | Mailbox @ 2 MHz Conditional Go; copy B/s table |
