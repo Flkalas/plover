@@ -54,9 +54,12 @@ FE1 column in the model is **wishful** (`fe1_possible=False` for every op) — s
 2. If insisting on FE1: only via **Harvard / dual-port** machine (new architecture), not Gi1 wiring.
 3. Do **not** edit normative multiphase tables until FE2 conditions pass.
 
+**FE1-class throughput with extra silicon:** see research build **PE1** — [../pe1/SUMMARY-REPORT.md](../pe1/SUMMARY-REPORT.md) (IF\|EX pipe, no branch prediction).
+
 ## Change log
 
 | Date | Note |
 |------|------|
+| 2026-07-13 | Link PE1 pipelined FE1 extension study |
 | 2026-07-13 | Optimistic FE2 sheet + stretch-E lab policy |
 | 2026-07-13 | Initial desk study — FE1 No, FE2 Conditional Go |
