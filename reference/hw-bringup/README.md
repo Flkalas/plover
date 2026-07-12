@@ -1,11 +1,15 @@
 # Plover hardware bring-up index
 
-> **Normative v1.0:** CPLD FSM idx5 + 138×2 — [system-architecture.md](../hardware/system-architecture.md).  
+> **Normative v1.0 P12:** pipe CU — [cpld-pipe-cu.md](../hardware/cpld-pipe-cu.md) · [system-architecture.md](../hardware/system-architecture.md).  
+> **Legacy:** Gi1 idx5 multiphase M2a/M3a/M3b steps below remain useful wiring history until pipe bring-up is rewritten — [archive/gi1-v1.0-normative/](../../archive/gi1-v1.0-normative/).  
 > **실구매 패키지:** [parts-on-hand.md](../project/parts-on-hand.md) · Wiring: [breadboard-wiring.md](breadboard-wiring.md).
 
 **마일스톤 계획:** [archive/MANIFEST.md](../../archive/MANIFEST.md)
 
 초보 작업자도 **문서만 따라** 빵판 CPU를 올릴 수 있도록 단계별 시방서입니다.
+
+> **P12 note:** Target control is **IF\|EX pipe**, not idx5 idle phases. Treat M3a “22 idx5 rows” and M3b multiphase execute as **legacy Gi1** until updated.
+
 
 ---
 

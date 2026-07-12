@@ -1,10 +1,10 @@
-# Control and decode (v1.0 Gi1)
+# Control and decode (v1.0 P12)
 
-**Related:** [system-architecture.md](system-architecture.md) · [microcode-spec.md](microcode-spec.md) · [cpld-system-controller.md](cpld-system-controller.md) · [rom-architecture.md](rom-architecture.md)
+**Related:** [system-architecture.md](system-architecture.md) · [cpld-pipe-cu.md](cpld-pipe-cu.md) · [microcode-spec.md](microcode-spec.md) · [cpld-system-controller.md](cpld-system-controller.md) · [rom-architecture.md](rom-architecture.md)
 
-This document is the **single normative reference** for who decodes what on the v1.0 breadboard CPU.
+This document is the **single normative reference** for who decodes what on the v1.0 P12 CPU.
 
-**Superseded:** rev G 3-GPR + TFR — [archive/rev-g-dual-3gpr/README.md](../../archive/rev-g-dual-3gpr/README.md). Tier C single-CPLD — [archive/tier-c-single-cpld/README.md](../../archive/tier-c-single-cpld/README.md).
+**Superseded:** Gi1 idx5 — [archive/gi1-v1.0-normative/](../../archive/gi1-v1.0-normative/). Rev G — [archive/rev-g-dual-3gpr/](../../archive/rev-g-dual-3gpr/). Tier C — [archive/tier-c-single-cpld/](../../archive/tier-c-single-cpld/).
 
 ---
 
@@ -12,22 +12,23 @@ This document is the **single normative reference** for who decodes what on the 
 
 | Layer | Block | Input | Output / effect | On v1.0 SoC? |
 |-------|-------|-------|-----------------|--------------|
-| **Program store** | SST39 Flash | Address | Instruction bytes, boot, utilities | Yes |
-| **Macro sequencer** | **CPLD-CU** idx5 FSM | `IR[4:0]`, `phase`, `FLG_Z` | Direct strobes + G-IC `reg_we`; CALL/RET stack assist @ macro_end | Yes |
+| **Program store (PROG)** | SST39 Flash + IF path | PC / offset | Instruction bytes | Yes |
+| **Macro sequencer** | **CPLD-CU pipe** | IR, flags, stall sense | Direct strobes + G-IC `reg_we`; stack EX | Yes |
 | **GPR datapath** | **CPLD-DP** | `d_in`, `reg_we` | `q_a` ← R0; write R0 | Yes |
-| **Operand B** | **MBR 574** | Fetch | `net_mbr` → ALU B (off CPLD) | Yes |
-| **ALU control** | FSM row constants on CU | CU outputs | `net_cin`, `net_bctrl0..3`, `net_lgc0..3`, `net_153_s0/s1` | Yes — **no `alu8_decode` DIP** |
+| **Operand B** | MBR / oper latch | IF | `net_mbr` → ALU B | Yes |
+| **ALU control** | Pipe EX constants on CU | CU outputs | `net_cin`, `net_bctrl0..3`, `net_lgc0..3`, `net_153_s0/s1` | Yes — **no `alu8_decode` DIP** |
 | **ALU execute** | alu8 (12 DIP) | A, B, control nets | `net_y*`, `net_c_hi` | Yes |
-| **Memory CE** | 74HC138×2 + glue | `A[15:0]`, MAP, mailbox | `/CE` to SRAM×2 + Flash | Yes (off CPLD) |
+| **Memory CE (DATA)** | 74HC138×2 + glue | `A[15:0]`, MAP, mailbox | `/CE` to SRAM×2 + Flash | Yes (off CPLD) |
 | **12-opcode comb decode** | `alu8_decode` | `alu_sel[3:0]` | Control nets | **M1 bench only** |
 
 ```text
-  Flash ROM          CPLD-CU (idx5)              CPLD-DP (R0)            MBR 574
-  program bytes  IR ──► macro phases ──► strobes ──► alu8 / MEM / PC
-  boot, vector       reg_we ───────────► R0, q_a ──► alu8 A
-  $4000 unused                              net_mbr ───────────────► alu8 B
-  A[15:0] ─────────────────────────────────────────────────────► 138×2 ──► /CE
+  PROG Flash ──► IF latch ──► CPLD-CU pipe FSM ──► strobes ──► alu8 / DATA / PC
+  boot, vector                 reg_we ───────────► R0, q_a ──► alu8 A
+  $4000 unused                 oper/MBR ─────────────────────► alu8 B
+  A[15:0] ──────────────────────────────────────────────► 138×2 ──► /CE
 ```
+
+**CU detail:** [cpld-pipe-cu.md](cpld-pipe-cu.md).
 
 ---
 
@@ -37,24 +38,18 @@ This document is the **single normative reference** for who decodes what on the 
 
 | Region | Role |
 |--------|------|
-| `$0000+` | Program, bootloader, utility tables |
+| `$0000+` | Program, bootloader, utility tables (**PROG**) |
 | `$FFFC` | Reset vector image |
-| **`$4000–$4FFF`** | **Reserved — unburned in v1.0** |
+| **`$4000–$4FFF`** | **Reserved — unburned** |
 
-### CPLD pair (Gi1)
+### CPLD pair (P12)
 
 | Chip | Function |
 |------|----------|
-| **CPLD-CU** | idx5 FSM + LUT (**22 active rows**); branch `PC_LOAD_EN`; CALL/RET stack assist; **14 direct strobes** to SoC |
+| **CPLD-CU** | Pipe / stall / stretch / fallback FSM; branch `PC_LOAD_EN`; CALL/RET **STACK_EX**; direct strobes |
 | **CPLD-DP** | **R0 (8 FF)**; async `q_a`; `reg_we` → R0 from `d_in` |
 
-FSM index (CU internal only):
-
-```text
-fsm_index[6:0] = (opcode[4:0] << 2) | phase[1:0]
-```
-
-**Not in CPLD:** memory `/CE`, mailbox MAP, `FETCH` addr mux, **ALU B operand wire** (MBR). See [memory-map.md](memory-map.md).
+**Not in CPLD:** memory `/CE`, mailbox MAP, **ALU B operand wire** (MBR/oper). See [memory-map.md](memory-map.md).
 
 ---
 
@@ -73,7 +68,7 @@ fsm_index[6:0] = (opcode[4:0] << 2) | phase[1:0]
 
 ### CALL / RET (software return stack)
 
-Gi1 has no dedicated RP register. **CPLD-CU** performs push/pop at **macro_end** using existing `MEM_RD`/`MEM_WR` and address glue — RP cell `$0F00`, stack body `$F600+` ([microcode-spec.md](microcode-spec.md) §2.3, [calling-convention-v0.1.md](../software/calling-convention-v0.1.md)). RET loads PC from the popped word, not from MBR.
+No dedicated RP register. **CPLD-CU** performs push/pop in **STACK_EX** using `MEM_RD`/`MEM_WR` — RP cell `$0F00`, stack body `$F600+` ([microcode-spec.md](microcode-spec.md) §2.3). RET loads PC from the popped word, not from MBR.
 
 ---
 
@@ -82,7 +77,7 @@ Gi1 has no dedicated RP register. **CPLD-CU** performs push/pop at **macro_end**
 | Context | Who drives ALU control? |
 |---------|-------------------------|
 | **M1 ALU bring-up** | Manual DIP / [b3-opcode.md](../hw-bringup/b3-opcode.md) |
-| **M2+ integrated CPU** | **CPLD-CU** FSM outputs only |
+| **Integrated CPU** | **CPLD-CU** pipe outputs only |
 
 ---
 
@@ -90,20 +85,20 @@ Gi1 has no dedicated RP register. **CPLD-CU** performs push/pop at **macro_end**
 
 | Topic | Document |
 |-------|----------|
-| ISA opcodes × phases | [microcode-spec.md](microcode-spec.md) |
+| Pipe CU states / SYS tax | [cpld-pipe-cu.md](cpld-pipe-cu.md) |
+| ISA opcodes | [microcode-spec.md](microcode-spec.md) |
 | Dual CPLD ports, G-IC | [cpld-system-controller.md](cpld-system-controller.md) |
 | Routing, JTAG, timing | [cpld-dual-routing.md](cpld-dual-routing.md), [cpld-dual-jtag.md](cpld-dual-jtag.md), [cpld-dual-timing.md](cpld-dual-timing.md) |
 | Flash layout | [rom-architecture.md](rom-architecture.md) |
-| ALU delay | [alu-opcodes-timing.md](alu-opcodes-timing.md) |
 
 ### Truth cascade (edit order)
 
 | Tier | Path | Role |
 |------|------|------|
-| **Root** | [plover-whitepaper.md](../../plover-whitepaper.md) §6 | ISA / FSM narrative |
-| **Reference** | `reference/**` | Normative detail |
-| **Machine** | idx5 FSM golden tables | Executable parity (developer tree) |
-| **CPLD** | Gi1 PLD forks | Bitstream source |
+| **Root** | [plover-whitepaper.md](../../plover-whitepaper.md) §6 | ISA / pipe narrative |
+| **Reference** | `reference/**` | Normative detail; **CU = cpld-pipe-cu** |
+| **Machine** | cyclesim golden | **Legacy Gi1 lag** until pipe rewrite |
+| **CPLD** | pipe CU PLD | **Design fits pending** |
 
 ---
 
@@ -111,7 +106,8 @@ Gi1 has no dedicated RP register. **CPLD-CU** performs push/pop at **macro_end**
 
 | Date | Note |
 |------|------|
-| 2026-07-07 | **CALL/RET** — CU stack assist; 22-row idx5 |
+| 2026-07-13 | **v1.0 P12** — pipe CU; Gi1 idx5 decode archived |
+| 2026-07-07 | **CALL/RET** — CU stack assist |
 | 2026-07-07 | **Gi1 v1.0** — AC + MBR; no TFR |
 | 2026-07-06 | rev G archived |
 | 2026-07-04 | Initial anchor: FSM-only v1.0 |

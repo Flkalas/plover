@@ -1,9 +1,13 @@
-# Plover v1.0 — System Architecture (Gi1)
+# Plover v1.0 P12 — System Architecture
 
-**Version:** 1.0 · **Hardware:** Gi1 dual-CPLD · **Date:** 2026-07-07  
-**Status:** Active normative specification (breadboard)
+**Version:** 1.0 P12 · **Hardware:** dual-CPLD + IF\|EX pipe · **Date:** 2026-07-13  
+**Status:** Active normative specification
 
-**v1.0 Gi1:** FSM-only **idx5** control, **R0 (AC) only** in CPLD-DP, **MBR→ALU B**, Flash `$4000` unused. Prior rev G 3-GPR archived.
+**v1.0 P12:** PE1-class **IF\|EX** pipeline with Harvard-like **PROG∥DATA** ports; **P12** discipline (no idle, stretch-on-fail, named FE2 fallback). Datapath keeps **R0 (AC)** + **MBR→ALU B**, G-IC **`reg_we`**. Flash `$4000` unused.
+
+**Superseded:** Gi1 idx5 multiphase — [archive/gi1-v1.0-normative/](../../archive/gi1-v1.0-normative/). Prior rev G — [archive/rev-g-dual-3gpr/](../../archive/rev-g-dual-3gpr/).
+
+**CU truth:** [cpld-pipe-cu.md](cpld-pipe-cu.md) (bitstream Design fits pending).
 
 ---
 
@@ -11,56 +15,55 @@
 
 | Item | Specification |
 |------|---------------|
-| **CPU** | 8-bit TTL datapath: custom ALU (74HC, 12 DIP) + **R0 (AC) in CPLD-DP**; **MBR 574 → ALU B** |
-| **Control** | **FSM-only (idx5)** in **CPLD-CU** — `(opcode[4:0]<<2)\|phase`; **direct strobes**; **no `alu8_decode`** |
+| **CPU** | 8-bit TTL datapath: alu8 (12×74HC DIP) + **R0 in CPLD-DP**; **MBR 574 → ALU B** |
+| **Control** | **Pipe CU** in **CPLD-CU** — IF\|EX / stall / stretch / fallback; **direct strobes**; **no `alu8_decode`** |
 | **ISA** | Opcode **`[4:0]`**; core `0x01–0x0F`; **`0x10–0x1F` reserved** (no TFR); `0x0C` reserved |
-| **System CPLD** | **2× ATF1504AS-10JU44** — CPLD-CU + CPLD-DP (Gi1) |
+| **System CPLD** | **2× ATF1504AS-10JU44** — CPLD-CU (pipe) + CPLD-DP (R0) |
 | **CE decode** | **74HC138×2** + **74HC08/32/04** glue → RAM/ROM `/CE` |
-| **Flags / branch** | **574×1 FLG** (Z/C) + CPLD-CU `PC_LOAD_EN` |
-| **RAM** | **2× IS62C256AL** — 64 KB via **A15** bank |
-| **ROM** | **1× SST39SF010A** — boot + utility (**no control store @ `$4000`**) |
+| **Flags / branch** | **574×1 FLG** (Z/C) + CPLD-CU `PC_LOAD_EN` (bubble on taken) |
+| **RAM** | **2× IS62C256AL** — 64 KB via **A15** bank (**DATA** port) |
+| **ROM** | **1× SST39SF010A** — boot + program (**PROG** port; **no CW @ `$4000`**) |
 | **I/O** | MMIO **Mailbox** @ `$FF00–$FFFB` — polling only, **no IRQ** |
 | **Coprocessor** | **RP2350B** — GPU, HID, virtual FDD (separate board) |
+| **Pipe BOM delta** | ~6–10 DIP-class parts (IR/operand latches, PROG buffers, mux/CE glue) vs Gi1 shared-bus |
 
-### Metrics (Gi1 vs archived rev G)
+### Metrics (archived Gi1 → Active P12)
 
-| Metric | rev G (archived) | **Gi1 v1.0** |
-|--------|------------------|--------------|
-| CPLD-DP pins | 31/32 | **17/32** |
-| CPLD-CU pins | 26/32 | **~21/32** |
-| G-IC wires | 6 | **1** (`reg_we`) |
-| ph2 ADD @ 2 MHz | ~168 ns PASS | **~133 ns PASS** |
-| GPR in CPLD | R0–R2 (24 FF) | **R0 (8 FF)** |
-| TFR opcodes | 6 | **none** |
-| 574 count | 3 | **3** (unchanged) |
+| Metric | Gi1 (archived) | **v1.0 P12** |
+|--------|----------------|--------------|
+| CU schedule | idx5 multiphase + idle | **IF\|EX pipe; no idle** |
+| Steady ALU IPC @ 2 MHz | ~0.2 | **~1.0** (optimistic stream) |
+| G-IC wires | 1 (`reg_we`) | **1** (`reg_we`) |
+| GPR in CPLD | R0 | **R0** |
+| TFR opcodes | none | **none** |
+| Pipe CU bitstream | — | **Design fits pending** |
 
 ---
 
 ## 2. Design philosophy
 
-- **Deterministic:** no IRQ; operator-visible mode switches.
-- **Passive map:** mailbox/MAP in **discrete gates**; CPLD pair holds GPR + sequencer.
-- **Thin decode:** ALU controls from CPLD-CU FSM, not comb `alu8_decode` block.
-- **AC-centric:** single visible GPR; extra state in **RAM** (Gigatron-style).
-- **ROM as law:** boot + program only; Flash **`$4000` unused** ([rom-architecture.md](rom-architecture.md)).
+- **Transparent timing:** SYS cost is on the pipe/stretch sheet — no hidden CU idle rows.
+- **Overlap fetch and execute** when PROG∥DATA isolation holds.
+- **Deterministic:** no IRQ; no branch prediction.
+- **AC-centric:** single visible GPR; extra state in **RAM**.
+- **ROM as law:** boot + program only; Flash **`$4000` unused**.
 - **Flat memory:** 64 KiB linear map; **no MMU**.
+- **P12 discipline:** stretch before clock hope; FE2 fallback if ports fail.
 
 ---
 
 ## 3. Block diagram
 
 ```text
-  IR OPC[4:0] ──► CPLD-CU idx5 FSM ──► MEM_RD/WR, Y_OE, FLG_WE, PC_LOAD_EN
-  FLG_Z ─────────► branch merge          cin/bctrl/lgc/s0/s1 ──► alu8
-                    │
-                    └── reg_we ──► CPLD-DP R0 ──► q_a ──► alu8 A
-  MBR 574 Q ──────────────────────────────────────────────► alu8 B
-  d_bus[7:0] ─────────────────────────► CPLD-DP (write R0)
+  PROG Flash ──► IF latch (IR / operand) ──► CPLD-CU pipe FSM
+  DATA SRAM/MMIO ◄─ EX strobes (MEM_RD/WR, Y_OE, …) ◄─┘
+                    reg_we ──► CPLD-DP R0 ──► q_a ──► alu8 A
+  MBR / oper latch ─────────────────────────────────► alu8 B
 
   A[15:0] ──► 08/32 mailbox·MAP ──► 74HC138×2 ──► /CE ──► SRAM×2 + SST39
 ```
 
-Detail: [cpld-system-controller.md](cpld-system-controller.md) · [cpld-dual-routing.md](cpld-dual-routing.md)
+Detail: [cpld-pipe-cu.md](cpld-pipe-cu.md) · [cpld-system-controller.md](cpld-system-controller.md) · [cpld-dual-routing.md](cpld-dual-routing.md)
 
 ---
 
@@ -75,11 +78,11 @@ Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md
 
 ---
 
-## 5. Physical packages (v1.0 breadboard Gi1)
+## 5. Physical packages
 
-2× CPLD `ATF1504AS-10JU44` + 2× PLCC→DIP (#15); Flash `SST39SF010A-70-4C-PHE` PDIP; SRAM `IS62C256` + SOP28 (#3a)×2; `SN74LVC8T245` + SOIC-24 (#3c)×3; **574×3** (PC/MBR/FLG). 상세: [parts-on-hand.md](../project/parts-on-hand.md) · [BOM.md](../project/BOM.md).
+2× CPLD `ATF1504AS-10JU44` + 2× PLCC→DIP; Flash `SST39SF010A`; SRAM `IS62C256`×2; `SN74LVC8T245`×n; **574** class for PC/MBR/FLG plus **pipe IR/operand** latches. Detail: [parts-on-hand.md](../project/parts-on-hand.md) · [BOM.md](../project/BOM.md).
 
-**Wiring delta vs rev G:** `net_mbr[7:0]` → `net_b[7:0]`; CPLD `q_b` disconnected.
+**Wiring vs archived Gi1:** add PROG isolation / pipe latches per [cpld-pipe-cu.md](cpld-pipe-cu.md); keep `net_mbr` → ALU B.
 
 ---
 
@@ -87,16 +90,13 @@ Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md
 
 | Document | Content |
 |----------|---------|
+| [cpld-pipe-cu.md](cpld-pipe-cu.md) | **Active pipe CU** — states, bubbles, stretch, timing |
 | [memory-map.md](memory-map.md) | Address map, 138×2 + gate decode |
-| [cpld-system-controller.md](cpld-system-controller.md) | Dual CPLD Gi1 ports |
+| [cpld-system-controller.md](cpld-system-controller.md) | Dual CPLD ports; DP R0; CU points to pipe |
 | [cpld-dual-routing.md](cpld-dual-routing.md) | G-IC, MBR→B wiring |
-| [cpld-dual-jtag.md](cpld-dual-jtag.md) | JTAG daisy chain |
-| [microcode-spec.md](microcode-spec.md) | FSM-only ISA, idx5 |
-| [ttl-computer-comparison.md](ttl-computer-comparison.md) | Gi1 vs TTL homebrew peers |
-| [cu-dp-comparison.md](cu-dp-comparison.md) | Gi1 CU·DP vs Gigatron, Ben Eater, Magic-1, Isetta, Novasaur, Apple II, PDP-11 |
-| [rom-comparison.md](rom-comparison.md) | ROM/Flash count, structure, roles vs peers |
-| [clock-comparison.md](clock-comparison.md) | System clock / µstep / throughput vs peers |
-| [hw-bringup/README.md](../hw-bringup/README.md) | M1–M5 breadboard bring-up |
+| [microcode-spec.md](microcode-spec.md) | ISA + pipe SYS sheet |
+| [control-and-decode.md](control-and-decode.md) | Who decodes what |
+| [hw-bringup/README.md](../hw-bringup/README.md) | M1–M5 (Gi1 multiphase steps = legacy until retargeted) |
 
 ---
 
@@ -104,9 +104,10 @@ Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md
 
 | Layer | Gate |
 |-------|------|
-| Breadboard | M1–M5 bring-up checklists ([hw-bringup/README.md](../hw-bringup/README.md)) |
-| FSM table | M3a checklist — opcode×phase logical consistency |
-| Scope | CPLD-CU `REG_WE`, `MEM_RD`, `PC_LOAD_EN` vs FLG; MBR hold on ADD |
+| Spec | [cpld-pipe-cu.md](cpld-pipe-cu.md) |
+| Bitstream | WinCUPL **Design fits** (pipe CU when written) |
+| Breadboard | IF∥EX lab pending; M1–M5 checklists partially legacy |
+| Scope | BEQ slack; PROG vs DATA isolation; mailbox RP ≤ 80 ns desk |
 
 ---
 
@@ -114,7 +115,7 @@ Details: [bootloader.md](../boot/bootloader.md) · [memory-map.md](memory-map.md
 
 | Date | Note |
 |------|------|
-| 2026-07-07 | Link to [ttl-computer-comparison.md](ttl-computer-comparison.md) |
-| 2026-07-07 | **Gi1 v1.0** — AC + MBR; rev G archived |
+| 2026-07-13 | **v1.0 P12 Active** — pipe CU; Gi1 archived |
+| 2026-07-07 | Gi1 v1.0 — AC + MBR; rev G archived |
 | 2026-07-06 | rev G dual ATF1504 |
 | 2026-06-24 | v1.0 FSM-only idx5 normative |
