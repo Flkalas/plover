@@ -41,7 +41,7 @@
 - [ ] **R0 on DP:** `q_a` → ALU A; **no `q_b`**
 - [ ] **Fitter:** Design fits on **both** ATF1504AS
 - [ ] **Frozen table:** **22** idx5 slots match M3a §2 (Gi1 semantics incl. CALL/RET)
-- [ ] **CALL/RET fit:** [research/call-ret-cu-fit/SUMMARY-REPORT.md](../../research/call-ret-cu-fit/SUMMARY-REPORT.md) pass before CU reburn
+- [ ] **CALL/RET fit:** desk study in [p12-era-research](../../archive/p12-era-research/README.md) (`call-ret-cu-fit`) — restore tarball; gate before CU reburn if using that study
 
 ---
 

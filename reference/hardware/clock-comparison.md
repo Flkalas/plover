@@ -211,7 +211,7 @@ Flash appears on **instruction fetch** cycles, not on every control strobe. Rais
 2. **ROM-based CU/ALU** machines (Isetta, Novasaur, Ben Eater, Magic-1, PDP-11 µcode) couple **memory `t_ACC`** to Fmax; Plover couples **combinational ALU + CPLD**.
 3. **Interpretation** (Novasaur 8080, Isetta 6502/Z80) makes board MHz a weak proxy for software speed.
 4. Plover’s **2 MHz** is a **margin policy**, not the desk Fmax ceiling (~3.7 MHz on ph2 ADD).
-5. Dual-clock **CPLD-only µstep** is a research topic — desk model and Conditional Go: [research/cpld-ustep/SUMMARY-REPORT.md](../../research/cpld-ustep/SUMMARY-REPORT.md).
+5. Dual-clock **CPLD-only µstep** remains a historical research topic — desk model archived in [p12-era-research](../../archive/p12-era-research/README.md) (`cpld-ustep`). Active CU is **pipe** ([cpld-pipe-cu.md](cpld-pipe-cu.md)), not µstep.
 
 ---
 
@@ -224,7 +224,7 @@ Flash appears on **instruction fetch** cycles, not on every control strobe. Rais
 | ROM roles vs peers | [rom-comparison.md](rom-comparison.md) |
 | CU·DP structure | [cu-dp-comparison.md](cu-dp-comparison.md) |
 | ISA / stack peers | [ttl-computer-comparison.md](ttl-computer-comparison.md) |
-| CPLD µstep clock (research) | [cpld-ustep](../../research/cpld-ustep/README.md) |
+| CPLD µstep clock (archived research) | [p12-era-research](../../archive/p12-era-research/README.md) (`cpld-ustep`) |
 
 ---
 

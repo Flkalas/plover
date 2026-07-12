@@ -62,7 +62,7 @@ Flash `$4000`: **unused** (FSM-only).
 - [ ] Frozen table §2 matches Gi1 CU idx5 LUT (**22 rows** incl. CALL/RET)
 - [ ] Gi1 **`system_ctrl_cu.jed`** and **`system_ctrl_dp.jed`** burned per [M2a-cpld-decode.md](M2a-cpld-decode.md)
 - [ ] CALL/RET lab smoke — nested CALL/RET returns to caller ([M2a-cpld-decode.md](M2a-cpld-decode.md))
-- [ ] CALL/RET CU fit — [research/call-ret-cu-fit/SUMMARY-REPORT.md](../../research/call-ret-cu-fit/SUMMARY-REPORT.md) gate
+- [ ] CALL/RET CU fit — [p12-era-research](../../archive/p12-era-research/README.md) (`call-ret-cu-fit`, restore tarball)
 - [ ] No PARAM 574 on SoC bill of materials ([BOM.md](../project/BOM.md))
 - [ ] Flash `$4000` region left empty for v1.0 bring-up
 

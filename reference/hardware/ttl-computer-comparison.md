@@ -111,7 +111,7 @@ vSP in zero page            RP in RAM @ $0F00          HW S → page $01
 | **8080 bytecode** (Novasaur) | **CP/M** and games without a real 8080 | Effective ~450 kHz 8080; dual-processor complexity |
 | **Monolithic PLA** (Apple II / 6502) | Dense ISA + IRQ + ecosystem | Not discrete; no breadboard CU visibility |
 | **16-bit µcode minicomputer** (PDP-11) | Orthogonal GPRs + HW SP + vectored IRQ | Far beyond v1.0 8-bit breadboard scope |
-| **CPLD FSM-only** (Plover) | Direct strobes; no µstore burn | CALL/RET needs **CU stack assist** — [research/call-ret-cu-fit/SUMMARY-REPORT.md](../../research/call-ret-cu-fit/SUMMARY-REPORT.md) |
+| **CPLD FSM-only** (Plover) | Direct strobes; no µstore burn | CALL/RET needs **CU stack assist** — desk study in [p12-era-research](../../archive/p12-era-research/README.md) (`call-ret-cu-fit`, restore tarball) |
 
 ---
 
